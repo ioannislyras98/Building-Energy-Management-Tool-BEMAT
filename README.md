@@ -2,7 +2,9 @@
 Λογισμικό Υποστήριξης Ενεργειακής Διαχείρισης Κτιρίων
 
 # useful sites: 
-https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/#gunicorn
+1. https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/#gunicorn
+2. https://www.enterprisedb.com/postgres-tutorials/how-use-postgresql-django
+
 
 # run backend dev (http://localhost:8000/admin)
 1. docker-compose down -v
@@ -14,3 +16,8 @@ https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/#
 2. docker-compose -f docker-compose.prod.yml up -d --build
 3. docker-compose -f docker-compose.prod.yml exec web python manage.py migrate --noinput
 4. docker-compose -f docker-compose.prod.yml exec web python manage.py collectstatic --no-input --clear
+
+# Git Bash
+1. docker ps (για τα django-container-id)
+2. docker exec -it <django-container-id> bash
+3. 
