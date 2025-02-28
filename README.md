@@ -4,6 +4,7 @@
 # useful sites: 
 1. https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/#gunicorn
 2. https://www.enterprisedb.com/postgres-tutorials/how-use-postgresql-django
+3. https://www.digitalocean.com/community/tutorials/build-a-to-do-application-using-django-and-react
 
 
 # run backend dev (http://localhost:8000/admin)
@@ -21,3 +22,12 @@
 1. docker ps (για τα django-container-id)
 2. docker exec -it <django-container-id> bash
 3. 
+
+#create new table
+1. docker exec -it <django-container-id> bash (web)
+2. python manage.py startapp table(users)
+3. to models.py of table(users) create the model
+4. add to admin.py
+5. add table(users) to INSTALLED_APPS of settings.py 
+6. python manage.py makemigrations users
+7. python manage.py migrate
