@@ -5,6 +5,7 @@
 1. https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/#gunicorn
 2. https://www.enterprisedb.com/postgres-tutorials/how-use-postgresql-django
 3. https://www.digitalocean.com/community/tutorials/build-a-to-do-application-using-django-and-react
+4. https://nabendu82.medium.com/full-stack-app-with-reactjs-django-0cb33b9835b2
 
 
 # run backend dev (http://localhost:8000/admin)
