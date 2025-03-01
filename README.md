@@ -40,3 +40,6 @@
 1. git bash
 2. cd folder/app(folder/backend)
 3. pip ...
+
+#stop container
+1.docker stop <django-container-id>
