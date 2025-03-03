@@ -1,0 +1,44 @@
+# ---- Python build / byte files ----
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ---- Django stuff ----
+*.log
+*.pot
+*.pyc
+*.pyc.*
+*.sqlite3
+db.sqlite3
+db.sqlite3-journal
+
+# ---- Environment & secret files ----
+.env
+.env.*
+.env.dev
+.env.prod
+.env.prod.db
+
+# ---- Virtual environments ----
+venv/
+env/
+.venv/
+.venv
+
+# ---- Pipenv ----
+Pipfile.lock
+
+# ---- Docker (προαιρετικά, αν δεν θέλετε να τα αγνοήσετε) ----
+# Αν θέλετε να διατηρήσετε τα docker-compose αρχεία στο repo, αφαιρέστε αυτές τις γραμμές.
+docker-compose.yml
+docker-compose.prod.yml
+
+# ---- Static / media files (εφόσον τα παράγει ο Django) ----
+static/
+staticfiles/
+media/
+
+# ---- IDE / Editor folders ----
+.vscode/
+.idea/
+*.swp
