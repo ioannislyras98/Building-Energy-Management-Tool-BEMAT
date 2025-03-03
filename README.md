@@ -6,6 +6,7 @@
 2. https://www.enterprisedb.com/postgres-tutorials/how-use-postgresql-django
 3. https://www.digitalocean.com/community/tutorials/build-a-to-do-application-using-django-and-react
 4. https://nabendu82.medium.com/full-stack-app-with-reactjs-django-0cb33b9835b2
+5. https://medium.com/@osamajavaid/setting-up-react-19-with-tailwind-css-v4-using-vite-in-just-two-steps-3748f55b06fd
 
 
 # run backend dev (http://localhost:8000/admin)
@@ -43,3 +44,4 @@
 
 #stop container
 1.docker stop <django-container-id>
+
