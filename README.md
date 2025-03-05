@@ -22,14 +22,14 @@
 
 # Git Bash
 1. docker ps (για τα django-container-id)
-2. docker exec -it <django-container-id> bash
+2. docker exec -it django-container-id bash
 3. 
 
 # create admin user
 1. python manage.py createsuperuser
 
 # create new table
-1. docker exec -it <django-container-id> bash (web)
+1. docker exec -it django-container-id bash (web)
 2. python manage.py startapp table(users)
 3. to models.py of table(users) create the model
 4. add to admin.py
@@ -43,5 +43,5 @@
 3. pip ...
 
 # stop container
-1.docker stop <django-container-id>
+1.docker stop django-container-id
 
