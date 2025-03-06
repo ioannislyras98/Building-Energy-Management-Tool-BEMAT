@@ -1,0 +1,19 @@
+{
+    "SignUp": {
+      "lang": "gr",
+      "h2": "Sign Up",
+      "p1": "Sign up on the system or ",
+      "a": "log in",
+      "p2": " if you already have an account.",
+      "name": "Name",
+      "name_example": "John",
+      "surname": "Surname",
+      "surname_example": "Smith",
+      "email": "Email",
+      "email_example": "johnsm@hotmail.com",
+      "password": "Password",
+      "password_text": "Enter your password",
+      "confirm_password": "Confirm your password",
+      "save": "Sign Up"
+    }
+  }
