@@ -15,5 +15,17 @@
       "password_text": "Enter your password",
       "confirm_password": "Confirm your password",
       "save": "Sign Up"
-    }
+    },
+    "LogIn": {
+      "lang": "gr",
+      "h2": "Login",
+      "p1": "Enter your credentials to login or ",
+      "a": "sign up",
+      "p2": " if you do not have an account.",
+      "email": "Εmail",
+      "email_example": "johnsm@hotmail.com",
+      "password": "Password",
+      "password_text": "Enter your password",
+      "save": "Login"
+  }
   }

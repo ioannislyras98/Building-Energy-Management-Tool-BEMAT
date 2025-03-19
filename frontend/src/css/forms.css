@@ -1,0 +1,55 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
+
+@theme {
+  --color-primary: oklch(57.34% 0.1369 149.89);
+  --color-primary-bold: oklch(48.57% 0.1083 151.08);
+  --font-basic: "Helvetica", "sans-serif"
+}
+
+#sign-screen {
+    @apply h-screen w-screen bg-cover bg-linear-to-t bg-center bg-[url(../images/bemat_alt.avif)] flex flex-col;
+}
+
+#toggle-language {
+    @apply text-neutral-500 hover:text-neutral-100 float-right flex flex-row-reverse;
+}
+
+#form-container {
+    @apply bg-neutral-100 px-6 text-gray-900  pb-4 rounded-md;
+}
+
+#register-form,
+#login-form {
+    @apply mx-auto max-w-xl py-12 md:max-w-4xl;
+  }
+
+.logo-img {
+  @apply bg-[url(../images/bemat_alt.avif)] bg-cover size-16 justify-self-center mb-8;
+}
+
+  #submit-form {
+   @apply bg-primary hover:bg-primary-bold text-white font-bold py-2 px-4 rounded-full w-full float-right mb-8;
+  }
+
+.register-title {
+  @apply font-bold text-primary-bold text-center text-[24px];
+}
+
+.alt-option {
+  @apply mt-2 text-neutral-500 text-center text-[16px];
+}
+
+.label-name {
+    @apply text-neutral-500 font-basic text-sm font-bold ml-4;
+}
+
+  .input-field {
+    @apply form-input mt-1 block w-full rounded-full border-neutral-100 placeholder:text-neutral-400 
+    focus:border-neutral-400 focus:outline-none focus:ring-0 active:border-neutral-400 ; 
+  }
+
+.link-text{
+  @apply text-primary hover:text-primary-bold;
+}
