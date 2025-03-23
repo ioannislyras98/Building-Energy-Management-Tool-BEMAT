@@ -75,3 +75,4 @@ class User(models.Model):
 
     def has_module_perms(self, app_label):
         return True
+        return self.username
