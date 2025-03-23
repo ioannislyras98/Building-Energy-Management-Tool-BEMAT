@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from .models import User
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
-
+from django.utils.translation import gettext_lazy as _
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):  # Use this version
@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):  # Use this version
     
     class Meta:
         model = User
-        fields = ('username', 'email', 'password', 'first_name', 'last_name', 'date_joined')
+        fields = ('email', 'password', 'first_name', 'last_name', 'date_joined')
         extra_kwargs = {
             'date_joined': {'read_only': True},
         }
@@ -90,3 +90,31 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         user.set_password(new_password)
         user.save()
         return user
+
+class CustomAuthTokenSerializer(serializers.Serializer):
+    email = serializers.EmailField(label="Email")
+    password = serializers.CharField(
+        label="Κωδικός",
+        style={'input_type': 'password'},
+        trim_whitespace=False
+    )
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if email and password:
+            # Χρησιμοποιούμε authenticate για να ελέγξουμε τα διαπιστευτήρια.
+            # Εφόσον ο custom user έχει ορίσει ως USERNAME_FIELD το email,
+            # η authenticate θα δουλέψει κανονικά.
+            user = authenticate(request=self.context.get('request'),
+                                username=email, password=password)
+            if not user:
+                msg = _('Αδύνατη η σύνδεση με τα δοθέντα διαπιστευτήρια.')
+                raise serializers.ValidationError(msg, code='authorization')
+        else:
+            msg = _('Πρέπει να συμπληρώσετε email και κωδικό.')
+            raise serializers.ValidationError(msg, code='authorization')
+
+        attrs['user'] = user
+        return attrs

@@ -9,10 +9,27 @@ from .serializers import UserSerializer
 from .serializers import ChangePasswordSerializer
 from .serializers import PasswordResetRequestSerializer
 from .serializers import PasswordResetConfirmSerializer
+from .serializers import CustomAuthTokenSerializer
+from rest_framework.authtoken.views import ObtainAuthToken
+
 
 
 User = get_user_model()
 
+class CustomAuthToken(ObtainAuthToken):
+    serializer_class = CustomAuthTokenSerializer  # Χρησιμοποιούμε το custom serializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                             context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            # μπορείς να προσθέσεις επιπλέον πεδία αν χρειάζεται
+        })
+    
 class SignUpView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
