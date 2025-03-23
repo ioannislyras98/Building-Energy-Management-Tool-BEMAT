@@ -8,20 +8,20 @@ from django.core.mail import send_mail
 
 User = get_user_model()
 
-class UserSerializer(serializers.ModelSerializer):  # ή HyperlinkedModelSerializer αν το χρειάζεσαι
+class UserSerializer(serializers.ModelSerializer):  # Use this version
     password = serializers.CharField(write_only=True)
-
+    
     class Meta:
         model = User
         fields = ('username', 'email', 'password', 'first_name', 'last_name', 'date_joined')
         extra_kwargs = {
-            'date_joined': {'read_only': True},  # καθορισμός ως read-only
+            'date_joined': {'read_only': True},
         }
-
+    
     def create(self, validated_data):
         password = validated_data.pop('password')
         user = User(**validated_data)
-        user.set_password(password)  # Χρήση set_password για κρυπτογράφηση
+        user.set_password(password)
         user.save()
         return user
 
@@ -29,7 +29,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
     new_password_confirm = serializers.CharField(required=True)
-
+    
     def validate_old_password(self, value):
         user = self.context['request'].user
         if not user.check_password(value):
@@ -90,8 +90,3 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         user.set_password(new_password)
         user.save()
         return user
-
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'password', 'first_name', 'last_name', 'date_joined')
