@@ -11,7 +11,7 @@ export default function InputEntry({ entry, id, type, example, method }) {
           id={id}
           className="input-field required"
           placeholder={example}
-          onBlur={method}
+          onChange={method}
         />
       </label>)
   }

@@ -1,5 +1,3 @@
-// import React, { useState, useCallback } from "react";
-
 //jquery
 import $ from "jquery";
 //hooks
@@ -17,13 +15,40 @@ import greek_text from '../../languages/greek.json';
 
 const cookies = new Cookies(null, { path: '/' });
 
-function submitData(event, data) {
+function submitData(event) {
+  event.preventDefault();
+
+  if(formIsValid){      //hook to check from validity or just pswds?
+
   const payload = {
     "email": $(event.currentTarget).find("#email").val(),
-    "password": $(event.currentTarget).find("#password").val(),     //pswd encrypted?
+    "password": btoa($(event.currentTarget).find("#password").val()), //encode paswd in base64    
     "first_name": $(event.currentTarget).find("#name").val(),
     "last_name": $(event.currentTarget).find("#surname").val()
   }
+
+  var settings = {
+    url: "http://127.0.0.1:8000/api/users/signup/",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    data: JSON.stringify(payload)
+  };
+
+  $.ajax(settings).done(function (response) {
+    console.log(response);
+    cookies.set('token', response.token, { path: '/', expires:  new Date(Date.now() + 60 * 60 * 24 * 1000) });   //expires in 1 day
+    window.location.href = "/";
+  })
+  .fail((response) => {
+    console.log(response);
+    //show message user does not exist
+  }); 
+}
+else {
+  return false
+} 
 }
 
 function SignUpForm({ params }) {
@@ -35,10 +60,10 @@ function SignUpForm({ params }) {
   }
 
   return (
-    <div id="form-container" className="w-md h-md">
+    <div id="form-container" className="">
       <form id="register-form" onSubmit={submitData}>
         <div>
-          <div class="logo-img"></div>
+          <div className="logo-img"></div>
           <h2 className="register-title">{params.h2}</h2>
           <p className="alt-option">
             {params.p1}
@@ -105,7 +130,7 @@ export default function SignUp(data) {
       <div id="toggle-language">
         <button className="justify-self-end pr-6 pt-3" onClick={toggleLanguage}>{params.lang}</button>
       </div>
-      <div className="flex justify-center items-center pt-24">
+      <div className="form-wrapper">
         <SignUpForm params={params} />
       </div>
     </div>

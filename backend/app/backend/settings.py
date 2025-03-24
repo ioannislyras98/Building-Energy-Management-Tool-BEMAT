@@ -146,6 +146,8 @@ CORS_ORIGIN_WHITELIST = [
      'http://localhost:3000'
 ]
 
+CORS_ALLOW_CREDENTIALS = True
+
 AUTH_USER_MODEL = 'user.User'
 
 REST_FRAMEWORK = {

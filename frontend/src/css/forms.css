@@ -9,15 +9,19 @@
 }
 
 #sign-screen {
-    @apply h-screen w-screen bg-cover bg-linear-to-t bg-center bg-[url(../images/bemat_alt.avif)] flex flex-col;
+    @apply h-full w-full bg-cover bg-linear-to-t bg-center bg-[url(../images/bemat_alt.avif)] flex flex-col relative min-h-screen;
 }
 
 #toggle-language {
-    @apply text-neutral-500 hover:text-neutral-100 float-right flex flex-row-reverse;
+    @apply text-neutral-500 hover:text-neutral-100 absolute top-0 right-0 pr-6 pt-3;
+}
+
+.form-wrapper {
+  @apply flex justify-center items-center h-full;
 }
 
 #form-container {
-    @apply bg-neutral-100 px-6 text-gray-900  pb-4 rounded-md;
+    @apply bg-neutral-100 px-6 text-gray-900 rounded-md w-md h-auto;
 }
 
 #register-form,
