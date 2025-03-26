@@ -1,14 +1,13 @@
-# myapp/models.py
 from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.hashers import make_password, check_password
+import uuid
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError("The Email must be set")
         email = self.normalize_email(email)
-
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -23,9 +22,8 @@ class UserManager(BaseUserManager):
             raise ValueError("Superuser must have is_staff=True.")
         return self.create_user(email, password, **extra_fields)
 
-
 class User(AbstractBaseUser):
-    # username = models.CharField(max_length=150, unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)
     first_name = models.CharField(max_length=30, blank=True)
@@ -49,8 +47,10 @@ class User(AbstractBaseUser):
 
     @classmethod
     def get_email_field_name(cls):
-        # Required for Django's password reset, token generation, etc.
         return cls.EMAIL_FIELD
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.email

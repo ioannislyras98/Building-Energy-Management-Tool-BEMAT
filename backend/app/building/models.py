@@ -1,7 +1,13 @@
+import uuid
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Building(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
     project = models.ForeignKey('project.Project', on_delete=models.CASCADE, related_name='buildings')
     user = models.ForeignKey(
         'user.User', 
@@ -113,6 +119,6 @@ class Building(models.Model):
         verbose_name='Θερμοκρασία Καυσαερίων (°C)',
         help_text='Βεβαιωθείτε ότι η τιμή είναι ≥ 180'
     )
-
+        
     def __str__(self):
         return self.name

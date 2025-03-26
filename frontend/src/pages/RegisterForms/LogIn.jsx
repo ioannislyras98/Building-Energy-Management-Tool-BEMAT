@@ -26,7 +26,7 @@ function submitData(event) {
   };
 
   var settings = {
-    url: "http://127.0.0.1:8000/api/users/login/",
+    url: "http://127.0.0.1:8000/users/login/",
     method: "POST",
     headers: {
       "Content-Type": "application/json"
