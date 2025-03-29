@@ -50,14 +50,14 @@ def create_project(request):
         return JsonResponse({"error": str(e)}, status=400)
 
     return JsonResponse({
-        "id": project.id,
+        "uuid": project.uuid,
         "name": project.name,
-        "User": project.user.id,
+        "User": project.user.email,
         "message": "Project created successfully"
     }, status=201)
 
 @csrf_exempt
-def delete_project(request, project_id):
+def delete_project(request, project_uuid):
     if request.method != "DELETE":
         return HttpResponseNotAllowed(["DELETE"])
     
@@ -74,7 +74,7 @@ def delete_project(request, project_id):
         return JsonResponse({"error": "Invalid or expired token"}, status=401)
     
     try:
-        project = Project.objects.get(id=project_id, user=user)
+        project = Project.objects.get(uuid=project_uuid, user=user)
     except Project.DoesNotExist:
         return JsonResponse({"error": "Project not found or access denied"}, status=404)
     
@@ -99,7 +99,7 @@ def get_projects(request):
     
     projects = Project.objects.filter(user=user)
     projects_list = [{
-        "id": project.id,
+        "uuid": project.uuid,
         "name": project.name,
         "cost_per_kwh_fuel": str(project.cost_per_kwh_fuel),
         "cost_per_kwh_electricity": str(project.cost_per_kwh_electricity)

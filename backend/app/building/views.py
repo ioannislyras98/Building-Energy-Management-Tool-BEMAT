@@ -2,6 +2,7 @@ import json
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from .models import Building
+from project.models import Project
 from rest_framework.authtoken.models import Token
 
 def get_user_from_token(token):
@@ -41,9 +42,16 @@ def create_building(request):
                 "missing_fields": missing_fields
             }, status=400)
 
+        # Fetch the related Project instance using the provided uuid.
+        project_uuid = data.get("project")
+        try:
+            project = Project.objects.get(uuid=project_uuid, user=user)
+        except Project.DoesNotExist:
+            return JsonResponse({"error": "Project not found or access denied"}, status=404)
+
         try:
             building = Building.objects.create(
-                project_id=data.get("project"),
+                project=project,  # pass the Project instance
                 user=user,
                 name=data.get("name", ""),
                 usage=data.get("usage", ""),
@@ -68,7 +76,7 @@ def create_building(request):
             return JsonResponse({"error": str(e)}, status=400)
 
         return JsonResponse({
-            "id": str(building.id),
+            "uuid": str(building.uuid),
             "message": "Building created successfully"
         }, status=201)
     else:
@@ -89,29 +97,29 @@ def get_buildings(request):
     if not user:
         return JsonResponse({"error": "Invalid or expired token"}, status=401)
     
-    # Αν ο χρήστης περάσει query parameter 'project', φιλτράρει τα buildings εκείνου του project
-    project_id = request.GET.get("project")
-    if project_id:
-        buildings = Building.objects.filter(user=user, project_id=project_id)
+    project_uuid = request.GET.get("project")
+    if project_uuid:
+        buildings = Building.objects.filter(user=user, project__uuid=project_uuid)
     else:
         buildings = Building.objects.filter(user=user)
     
     buildings_list = [{
-        "id": str(b.id),
+        "uuid": str(b.uuid),
         "name": b.name,
-        "project": b.project_id,
+        "project": str(b.project.uuid),
         "usage": b.usage,
+        "user": str(b.user.email),
         "total_area": str(b.total_area),
         "examined_area": str(b.examined_area)
-        # πρόσθεσε και άλλα πεδία όπως χρειάζεται
     } for b in buildings]
     
     return JsonResponse({"buildings": buildings_list}, status=200)
 
 @csrf_exempt
-def delete_building(request, building_id):
+def delete_building(request, building_uuid):
     if request.method != "DELETE":
         return HttpResponseNotAllowed(["DELETE"])
+    
     auth_header = request.META.get("HTTP_AUTHORIZATION")
     if not auth_header:
         return JsonResponse({"error": "Authorization token required"}, status=401)
@@ -119,14 +127,19 @@ def delete_building(request, building_id):
         token = auth_header.split()[1]
     except IndexError:
         return JsonResponse({"error": "Invalid Authorization header format"}, status=401)
+    
     user = get_user_from_token(token)
     if not user:
         return JsonResponse({"error": "Invalid or expired token"}, status=401)
     
     try:
-        building = Building.objects.get(id=building_id, user=user)
+        building = Building.objects.get(uuid=building_uuid)
     except Building.DoesNotExist:
-        return JsonResponse({"error": "Building not found or access denied"}, status=404)
+        return JsonResponse({"error": "Building not found"}, status=404)
+    
+    # Έλεγχος αν ο authenticated χρήστης είναι ο ιδιοκτήτης του κτιρίου
+    if building.user != user:
+        return JsonResponse({"error": "Access denied: You do not own this building"}, status=403)
     
     building.delete()
     return JsonResponse({"message": "Building deleted successfully"}, status=200)

@@ -3,7 +3,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Building(models.Model):
-    id = models.UUIDField(
+    uuid = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
         editable=False
