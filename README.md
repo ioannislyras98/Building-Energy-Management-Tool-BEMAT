@@ -45,3 +45,6 @@
 # stop container
 1.docker stop django-container-id
 
+# connect to database
+1. docker-compose exec db psql --username=backend --dbname=backend_dev
+
