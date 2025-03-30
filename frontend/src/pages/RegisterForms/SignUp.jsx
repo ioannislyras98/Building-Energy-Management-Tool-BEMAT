@@ -1,58 +1,65 @@
 //jquery
 import $ from "jquery";
 //hooks
-import React, { useState } from 'react';
+import React, { useState } from "react";
 //css
 import "./../../css/forms.css";
 //components
 import InputEntry from "./InputEntry";
 //cookie
-import Cookies from 'universal-cookie';
+import Cookies from "universal-cookie";
 import useLanguage from "../../tools/cookies/language-cookie";
 //language
-import english_text from '../../languages/english.json';
-import greek_text from '../../languages/greek.json';
+import english_text from "../../languages/english.json";
+import greek_text from "../../languages/greek.json";
+import { BiHide, BiShow } from "react-icons/bi";
 
-const cookies = new Cookies(null, { path: '/' });
+const cookies = new Cookies(null, { path: "/" });
 
 function submitData(event) {
   event.preventDefault();
 
-  if(formIsValid){      //hook to check from validity or just pswds?
+  if (true) {
+    //hook to check from validity or just pswds?
 
-  const payload = {
-    "email": $(event.currentTarget).find("#email").val(),
-    "password": btoa($(event.currentTarget).find("#password").val()), //encode paswd in base64    
-    "first_name": $(event.currentTarget).find("#name").val(),
-    "last_name": $(event.currentTarget).find("#surname").val()
+    const payload = {
+      email: $(event.currentTarget).find("#email").val(),
+      password: btoa($(event.currentTarget).find("#password").val()), //encode paswd in base64
+      first_name: $(event.currentTarget).find("#name").val(),
+      last_name: $(event.currentTarget).find("#surname").val(),
+    };
+
+    var settings = {
+      url: "http://127.0.0.1:8000/users/signup/",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: JSON.stringify(payload),
+    };
+
+    $.ajax(settings)
+      .done(function (response) {
+        console.log(response);
+        cookies.set("token", response.token, {
+          path: "/",
+          expires: new Date(Date.now() + 60 * 60 * 24 * 1000),
+        }); //expires in 1 day
+        window.location.href = "/";
+      })
+      .fail((response) => {
+        console.log(response);
+        //show message user does not exist
+      });
+  } else {
+    return false;
   }
-
-  var settings = {
-    url: "http://127.0.0.1:8000/users/signup/",
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    data: JSON.stringify(payload)
-  };
-
-  $.ajax(settings).done(function (response) {
-    console.log(response);
-    cookies.set('token', response.token, { path: '/', expires:  new Date(Date.now() + 60 * 60 * 24 * 1000) });   //expires in 1 day
-    window.location.href = "/";
-  })
-  .fail((response) => {
-    console.log(response);
-    //show message user does not exist
-  }); 
-}
-else {
-  return false
-} 
 }
 
 function SignUpForm({ params }) {
   const [passwordsMatch, setPasswordsMatch] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   function handleConfirmPassword(event) {
     const value = $("#confirm-password").val() === $("#password").val();
@@ -69,7 +76,8 @@ function SignUpForm({ params }) {
             {params.p1}
             <a href="/login" className="link-text">
               {params.a}
-            </a>{params.p2}
+            </a>
+            {params.p2}
           </p>
           <div className="mt-4 grid grid-cols-1 items-start gap-3">
             <div className="grid grid-cols-1 gap-3">
@@ -94,41 +102,64 @@ function SignUpForm({ params }) {
                 example={params.email_example}
               />
               {/*bale toggle hide/show pswd me hook ktl*/}
-              <InputEntry
-                entry={params.password}
-                id="password"
-                type="password"
-                example={params.password_text}
-                // method={handleConfirmPassword}
-              />
-              <InputEntry
-                entry={params.confirm_password}
-                id="confirm-password"
-                type="password"
-                example={params.password_text}
-                method={handleConfirmPassword}
-              />
+              <div className="relative">
+                <InputEntry
+                  entry={params.password}
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  example={params.password_text}
+                />
+                <button
+                  type="button"
+                  id="show-password"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-2 flex items-center bg-transparent border-none cursor-pointer mt-[25px] pr-[9px] hover:text-primary">
+                  {showPassword ? <BiShow /> : <BiHide />}
+                </button>
+              </div>
+              <div className="relative">
+                <InputEntry
+                  entry={params.confirm_password}
+                  id="confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  example={params.password_text}
+                  method={handleConfirmPassword}
+                />
+                <button
+                  type="button"
+                  id="show-confirm-password"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-2 flex items-center bg-transparent border-none cursor-pointer mt-[25px] pr-[9px] hover:text-primary">
+                  {showConfirmPassword ? <BiShow /> : <BiHide />}
+                </button>
+              </div>
               {!passwordsMatch && (
-                <div className="text-red-500 text-[12px] text-end mr-6">
-                  Passwords do not match.
+                <div className="text-red-500 text-[12px] justify-self-center mt-2">
+                  {params.passwords_not_match}
                 </div>
               )}
             </div>
           </div>
         </div>
-        <button id="submit-form" type="submit" className="mt-6">{params.save}</button>
+        <button id="submit-form" type="submit" className="mt-6">
+          {params.save}
+        </button>
       </form>
-    </div>)
+    </div>
+  );
 }
 
 export default function SignUp(data) {
   const { language, toggleLanguage } = useLanguage();
-  const params = cookies.get("language") === "en" ? english_text.SignUp : greek_text.SignUp;
+  const params =
+    cookies.get("language") === "en" ? english_text.SignUp : greek_text.SignUp;
 
   return (
     <div id="sign-screen">
       <div id="toggle-language">
-        <button className="justify-self-end pr-6 pt-3" onClick={toggleLanguage}>{params.lang}</button>
+        <button className="justify-self-end pr-6 pt-3" onClick={toggleLanguage}>
+          {params.lang}
+        </button>
       </div>
       <div className="form-wrapper">
         <SignUpForm params={params} />
@@ -136,4 +167,3 @@ export default function SignUp(data) {
     </div>
   );
 }
-

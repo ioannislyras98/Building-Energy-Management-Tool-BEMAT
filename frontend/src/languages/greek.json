@@ -14,7 +14,8 @@
         "password": "Κωδικός πρόσβασης",
         "password_text": "Εισάγετε τον κωδικό σας",
         "confirm_password": "Κωδικός πρόσβασης (επανάληψη)",
-        "save": "Εγγραφή"
+        "save": "Εγγραφή",
+        "passwords_not_match": "Οι κωδικοί πρόσβασης δεν ταιριάζουν."
     },
     "LogIn": {
         "lang": "en",
@@ -26,7 +27,8 @@
         "email_example": "dhmhtrhsv@hotmail.com",
         "password": "Κωδικός πρόσβασης",
         "password_text": "Εισάγετε τον κωδικό σας",
-        "save": "Σύνδεση"
+        "save": "Σύνδεση",
+        "notfound": "Ο χρήστης δεν βρέθηκε ή ο κωδικός πρόσβασης είναι λανθασμένος."
     },
     "PageNotFound": {
         "lang": "en",
