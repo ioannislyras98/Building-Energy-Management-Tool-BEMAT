@@ -1,34 +1,38 @@
 {
-    "SignUp": {
-      "lang": "gr",
-      "h2": "Sign Up",
-      "p1": "Sign up on the system or ",
-      "a": "log in",
-      "p2": " if you already have an account.",
-      "name": "Name",
-      "name_example": "John",
-      "surname": "Surname",
-      "surname_example": "Smith",
-      "email": "Email",
-      "email_example": "johnsm@hotmail.com",
-      "password": "Password",
-      "password_text": "Enter your password",
-      "confirm_password": "Confirm your password",
-      "save": "Sign Up",
-      "passwords_not_match": "Passwords do not match."
-    },
-    "LogIn": {
-      "lang": "gr",
-      "h2": "Login",
-      "p1": "Enter your credentials to login or ",
-      "a": "sign up",
-      "p2": " if you do not have an account.",
-      "email": "Εmail",
-      "email_example": "johnsm@hotmail.com",
-      "password": "Password",
-      "password_text": "Enter your password",
-      "save": "Login",
-      "notfound": "User not found or password incorrect."
+  "SignUp": {
+    "lang": "gr",
+    "h2": "Sign Up",
+    "p1": "Sign up on the system or ",
+    "a": "log in",
+    "p2": " if you already have an account.",
+    "name": "Name",
+    "name_example": "John",
+    "surname": "Surname",
+    "surname_example": "Smith",
+    "email": "Email",
+    "email_example": "johnsm@hotmail.com",
+    "password": "Password",
+    "password_text": "Enter your password",
+    "confirm_password": "Confirm your password",
+    "save": "Sign Up",
+    "passwords_not_match": "Passwords do not match."
+  },
+  "LogIn": {
+    "lang": "gr",
+    "h2": "Login",
+    "p1": "Enter your credentials to login or ",
+    "a": "sign up",
+    "p2": " if you do not have an account.",
+    "email": "Εmail",
+    "email_example": "johnsm@hotmail.com",
+    "password": "Password",
+    "password_text": "Enter your password",
+    "save": "Login",
+    "notfound": "User not found or password incorrect.",
+    "forgot_password": "Forgot your password?",
+    "forgot_password_message": "An email has been sent to your address with instructions to reset your password.",
+    "forgot_password_message_error": "An error occurred while sending the email. Please try again.",
+    "email_missed": "Please enter your email."
   },
   "PageNotFound": {
     "lang": "gr",
@@ -36,6 +40,15 @@
     "p": "The page you are looking for does not exist.",
     "p1": "Please click ",
     "link": "here",
-    "p2":  "to return to the home page."
+    "p2": "to return to the home page."
+  },
+  "ResetPassword": {
+    "lang": "gr",
+    "passwords_not_match": "Passwords do not match.",
+    "reset_password_error": "Error resetting password.",
+    "reset_password_success": "Password has been reset.",
+    "reset_password": "Reset Password",
+    "new_password": "New Password",
+    "confirm_new_password": "Confirm New Password"
   }
-  }
+}

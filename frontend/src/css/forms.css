@@ -26,7 +26,7 @@
 
 #register-form,
 #login-form {
-    @apply mx-auto max-w-xl py-12 md:max-w-4xl;
+    @apply mx-auto max-w-xl py-8 md:max-w-4xl;
   }
 
 .logo-img {

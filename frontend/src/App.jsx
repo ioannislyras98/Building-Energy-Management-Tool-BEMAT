@@ -4,6 +4,7 @@ import Cookies from 'universal-cookie';
 import SignUp from './pages/RegisterForms/SignUp';
 import LogIn from './pages/RegisterForms/LogIn';
 import Logout from "./pages/RegisterForms/Logout";
+import ResetPasswordConfirm from "./pages/RegisterForms/ResetPasswordConfirm";
 import Home from "./pages/Home";
 import Layout from "./tools/Layout";
 import PageNotFound from "./pages/PageNotFound";
@@ -22,6 +23,7 @@ function App() {
         <Route path="/login" element={<LogIn />} />
         <Route path="*" element={<PageNotFound />} />
         <Route path="/logout" element={<Logout />} />
+        <Route path="/reset-password-confirm/:uid/:token" element={<ResetPasswordConfirm />} />
         <Route path="/unauthorized" element={<UnauthorizedAccess />} />
         <Route element={<RequireAuth />}>
               <Route path="" element={<Home />} />
