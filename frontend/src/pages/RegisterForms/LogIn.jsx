@@ -5,7 +5,8 @@ import React, { useState } from 'react';
 //router
 import { useNavigate } from "react-router-dom"
 //css
-import "./../../css/forms.css";//components
+import "./../../css/forms.css";
+//components
 import InputEntry from "./InputEntry";
 //cookie
 import Cookies from 'universal-cookie';
