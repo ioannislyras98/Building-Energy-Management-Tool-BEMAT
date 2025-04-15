@@ -1,12 +1,6 @@
+@import "./themes.css";
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
-
-
-@theme {
-  --color-primary: oklch(57.34% 0.1369 149.89);
-  --color-primary-bold: oklch(48.57% 0.1083 151.08);
-  --font-basic: "Helvetica", "sans-serif"
-}
 
 #sign-screen {
     @apply h-full w-full bg-cover bg-linear-to-t bg-center bg-[url(../images/bemat_alt.avif)] flex flex-col relative min-h-screen;
