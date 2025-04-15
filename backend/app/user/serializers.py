@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):  # Use this version
     
     class Meta:
         model = User
-        fields = ('email', 'password', 'first_name', 'last_name', 'date_joined')
+        fields = ('uuid', 'email', 'password', 'first_name', 'last_name', 'date_joined')
         extra_kwargs = {
             'date_joined': {'read_only': True},
         }
@@ -60,7 +60,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         user = User.objects.get(email=email)
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
-        reset_url = f"https://myfrontend.com/reset-password-confirm/{uid}/{token}/"
+        reset_url = f"http://localhost:3000/reset-password-confirm/{uid}/{token}/"
         subject = "Επαναφορά κωδικού πρόσβασης"
         message = f"Παρακαλώ κάνε κλικ στον παρακάτω σύνδεσμο για να επαναφέρεις τον κωδικό σου:\n\n{reset_url}"
         send_mail(subject, message, None, [email], fail_silently=False)

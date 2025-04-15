@@ -9,7 +9,8 @@ export default function InputEntry({ entry, id, type, example, method }) {
         <input
           type={type}
           id={id}
-          className="input-field required"
+          className="input-field"
+          required
           placeholder={example}
           onChange={method}
         />

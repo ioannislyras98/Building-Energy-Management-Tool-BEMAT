@@ -1,6 +1,12 @@
 from django.db import models
+import uuid
 
 class Project(models.Model):
+    uuid = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
     name = models.CharField(max_length=100)
     cost_per_kwh_fuel = models.DecimalField(
         max_digits=6, 
@@ -19,6 +25,8 @@ class Project(models.Model):
         related_name="projects"
     )
 
+    class Meta:
+        unique_together = (("user", "name"),)
+
     def __str__(self):
         return self.name
-    

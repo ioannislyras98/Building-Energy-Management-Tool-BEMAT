@@ -4,7 +4,7 @@ from .models import Building
 @admin.register(Building)
 class BuildingAdmin(admin.ModelAdmin):
     list_display = (
-        "id",
+        "uuid",
         "project",
         "user",
         "name",
