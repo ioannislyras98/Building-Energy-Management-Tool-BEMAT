@@ -25,7 +25,7 @@ class Building(models.Model):
         help_text='π.χ. Νοσοκομείο, Κλινικές'
     )
     description = models.TextField(
-        blank=True,
+        blank=False,  # Changed from blank=True to make it required
         verbose_name='Περιγραφή'
     )
     year_built = models.PositiveIntegerField(
@@ -35,7 +35,7 @@ class Building(models.Model):
     )
     address = models.CharField(
         max_length=200,
-        blank=True,
+        blank=False,  # Changed from blank=True to make it required
         verbose_name='Διεύθυνση'
     )
     
@@ -78,46 +78,108 @@ class Building(models.Model):
         verbose_name='Αριθμός Εξεταζόμενων Ορόφων'
     )
     
-    # Μετρήσεις / Συνθήκες
-    room_temperature = models.DecimalField(
+    # New fields
+    floor_height = models.DecimalField(
         max_digits=5,
         decimal_places=2,
-        default=25,
+        null=True,
+        blank=True,
         validators=[MinValueValidator(0)],
-        verbose_name='Θερμοκρασία Χώρου (°C)'
+        verbose_name='Ύψος Ορόφου (m)'
     )
-    no_ppm = models.DecimalField(
-        max_digits=5,
+    
+    construction_type = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name='Τύπος Κατασκευής',
+        help_text='Μέθοδος/υλικά κατασκευής'
+    )
+    
+    free_facades = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        validators=[MaxValueValidator(4)],
+        verbose_name='Ελεύθερες Όψεις',
+        help_text='Αριθμός εκτεθειμένων εξωτερικών τοίχων (0-4)'
+    )
+    
+    altitude = models.DecimalField(
+        max_digits=8,
         decimal_places=2,
-        validators=[MaxValueValidator(65)],
-        verbose_name='Μονοξείδιο του Αζώτου - NO (ppm)',
-        help_text='Βεβαιωθείτε ότι η τιμή είναι ≤ 65'
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)],
+        verbose_name='Υψόμετρο (m)',
+        help_text='Υψόμετρο κτιρίου από τη στάθμη της θάλασσας'
     )
-    nox_ppm = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        validators=[MaxValueValidator(65)],
-        verbose_name='Οξείδια του Αζώτου - NOx (ppm)',
-        help_text='Βεβαιωθείτε ότι η τιμή είναι ≤ 65'
+    
+    non_operating_days = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name='Ημέρες Μη Λειτουργίας',
+        help_text='π.χ. Σαββατοκύριακα, Αργίες'
     )
-    co2_ppm = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        validators=[MaxValueValidator(125)],
-        verbose_name='Διοξείδιο του Άνθρακα (ppm)',
-        help_text='Βεβαιωθείτε ότι η τιμή είναι ≤ 125'
+    
+    operating_hours = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name='Ωράριο Λειτουργίας',
+        help_text='π.χ. 9:00-17:00'
     )
-    smoke_scale = models.PositiveIntegerField(
-        validators=[MaxValueValidator(9)],
-        verbose_name='Κάπνός (Brigon smoke scale 0-9)',
-        help_text='Βεβαιωθείτε ότι η τιμή είναι ≤ 9'
+    
+    occupants = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name='Αριθμός Ατόμων',
+        help_text='Μέσος αριθμός ατόμων στο κτίριο'
     )
-    exhaust_temperature = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        validators=[MinValueValidator(180)],
-        verbose_name='Θερμοκρασία Καυσαερίων (°C)',
-        help_text='Βεβαιωθείτε ότι η τιμή είναι ≥ 180'
+    
+    # # Μετρήσεις / Συνθήκες - keeping these for backward compatibility
+    # room_temperature = models.DecimalField(
+    #     max_digits=5,
+    #     decimal_places=2,
+    #     default=25,
+    #     validators=[MinValueValidator(0)],
+    #     verbose_name='Θερμοκρασία Χώρου (°C)'
+    # )
+    # no_ppm = models.DecimalField(
+    #     max_digits=5,
+    #     decimal_places=2,
+    #     validators=[MaxValueValidator(65)],
+    #     verbose_name='Μονοξείδιο του Αζώτου - NO (ppm)',
+    #     help_text='Βεβαιωθείτε ότι η τιμή είναι ≤ 65'
+    # )
+    # nox_ppm = models.DecimalField(
+    #     max_digits=5,
+    #     decimal_places=2,
+    #     validators=[MaxValueValidator(65)],
+    #     verbose_name='Οξείδια του Αζώτου - NOx (ppm)',
+    #     help_text='Βεβαιωθείτε ότι η τιμή είναι ≤ 65'
+    # )
+    # co2_ppm = models.DecimalField(
+    #     max_digits=5,
+    #     decimal_places=2,
+    #     validators=[MaxValueValidator(125)],
+    #     verbose_name='Διοξείδιο του Άνθρακα (ppm)',
+    #     help_text='Βεβαιωθείτε ότι η τιμή είναι ≤ 125'
+    # )
+    # smoke_scale = models.PositiveIntegerField(
+    #     validators=[MaxValueValidator(9)],
+    #     verbose_name='Κάπνός (Brigon smoke scale 0-9)',
+    #     help_text='Βεβαιωθείτε ότι η τιμή είναι ≤ 9'
+    # )
+    # exhaust_temperature = models.DecimalField(
+    #     max_digits=5,
+    #     decimal_places=2,
+    #     validators=[MinValueValidator(180)],
+    #     verbose_name='Θερμοκρασία Καυσαερίων (°C)',
+    #     help_text='Βεβαιωθείτε ότι η τιμή είναι ≥ 180'
+    # )
+    
+    # Χρονική σήμανση
+    date_created = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Ημερομηνία Δημιουργίας'
     )
         
     def __str__(self):

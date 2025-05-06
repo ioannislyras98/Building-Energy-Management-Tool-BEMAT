@@ -101,6 +101,8 @@ def get_projects(request):
     projects_list = [{
         "uuid": project.uuid,
         "name": project.name,
+        "date_created": project.date_created.strftime("%Y-%m-%d"),
+        "buildings_count": project.buildings_count,
         "cost_per_kwh_fuel": str(project.cost_per_kwh_fuel),
         "cost_per_kwh_electricity": str(project.cost_per_kwh_electricity)
     } for project in projects]

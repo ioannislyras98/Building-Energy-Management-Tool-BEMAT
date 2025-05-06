@@ -20,7 +20,11 @@
   }
 
   .main-container {
-    @apply w-full h-full pt-[60px] pl-27;
+    @apply w-full h-full pt-[60px] pl-27 bg-white transition duration-300 ease-in-out;
+  }
+
+  .modal-open {
+    @apply blur-xs filter brightness-85;
   }
 
   .sidebar-open {

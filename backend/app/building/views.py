@@ -1,6 +1,8 @@
 import json
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 from .models import Building
 from project.models import Project
 from rest_framework.authtoken.models import Token
@@ -12,6 +14,7 @@ def get_user_from_token(token):
     except Token.DoesNotExist:
         return None
 
+# Update the create_building function to match new fields
 @csrf_exempt
 def create_building(request):
     if request.method == "POST":
@@ -33,29 +36,29 @@ def create_building(request):
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON data"}, status=400)
 
-        # Ορισμός των required πεδίων (χωρίς το "user" γιατί προέρχεται από το token)
-        required_fields = ["project", "name", "usage", "total_area", "examined_area", "no_ppm", "nox_ppm", "co2_ppm", "smoke_scale", "exhaust_temperature"]
-        missing_fields = [field for field in required_fields if not data.get(field)]
-        if missing_fields:
-            return JsonResponse({
-                "error": "Missing required fields",
-                "missing_fields": missing_fields
-            }, status=400)
-
-        # Fetch the related Project instance using the provided uuid.
-        project_uuid = data.get("project")
+        # Ορισμός των required πεδίων
+        required_fields = ["name", "usage", "description", "address", "total_area", "examined_area", "floors_examined", "project"]
+        for field in required_fields:
+            if field not in data or not data.get(field):
+                return JsonResponse({field: "This field is required"}, status=400)
+        
+        # Έλεγχος αν το project υπάρχει
         try:
-            project = Project.objects.get(uuid=project_uuid, user=user)
+            project = Project.objects.get(uuid=data.get("project"))
         except Project.DoesNotExist:
-            return JsonResponse({"error": "Project not found or access denied"}, status=404)
-
+            return JsonResponse({"project": "Project not found"}, status=404)
+        
+        # Έλεγχος αν ο χρήστης έχει δικαίωμα να προσθέσει building στο project
+        if project.user != user:
+            return JsonResponse({"error": "Access denied: You do not own this project"}, status=403)
+        
         try:
             building = Building.objects.create(
-                project=project,  # pass the Project instance
                 user=user,
-                name=data.get("name", ""),
-                usage=data.get("usage", ""),
-                description=data.get("description", ""),
+                project=project,
+                name=data.get("name"),
+                usage=data.get("usage"),
+                description=data.get("description"),
                 year_built=data.get("year_built"),
                 address=data.get("address", ""),
                 is_insulated=data.get("is_insulated", False),
@@ -65,12 +68,13 @@ def create_building(request):
                 total_area=data.get("total_area"),
                 examined_area=data.get("examined_area"),
                 floors_examined=data.get("floors_examined", 1),
-                room_temperature=data.get("room_temperature", 25),
-                no_ppm=data.get("no_ppm"),
-                nox_ppm=data.get("nox_ppm"),
-                co2_ppm=data.get("co2_ppm"),
-                smoke_scale=data.get("smoke_scale"),
-                exhaust_temperature=data.get("exhaust_temperature")
+                floor_height=data.get("floor_height"),
+                construction_type=data.get("construction_type", ""),
+                free_facades=data.get("free_facades"),
+                altitude=data.get("altitude"),
+                non_operating_days=data.get("non_operating_days", ""),
+                operating_hours=data.get("operating_hours", ""),
+                occupants=data.get("occupants")
             )
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
@@ -79,9 +83,11 @@ def create_building(request):
             "uuid": str(building.uuid),
             "message": "Building created successfully"
         }, status=201)
+    
     else:
         return HttpResponseBadRequest("Only POST method is allowed")
-
+    
+# Update the get_buildings function to return all fields
 @csrf_exempt
 def get_buildings(request):
     if request.method != "GET":
@@ -109,12 +115,27 @@ def get_buildings(request):
         "project": str(b.project.uuid),
         "usage": b.usage,
         "user": str(b.user.email),
+        "description": b.description,
+        "year_built": b.year_built,
+        "address": b.address,
+        "is_insulated": b.is_insulated,
+        "is_certified": b.is_certified,
+        "energy_class": b.energy_class,
+        "orientation": b.orientation,
         "total_area": str(b.total_area),
-        "examined_area": str(b.examined_area)
+        "examined_area": str(b.examined_area),
+        "floors_examined": b.floors_examined,
+        "floor_height": str(b.floor_height) if b.floor_height else None,
+        "construction_type": b.construction_type,
+        "free_facades": b.free_facades,
+        "altitude": str(b.altitude) if b.altitude else None,
+        "non_operating_days": b.non_operating_days,
+        "operating_hours": b.operating_hours,
+        "occupants": b.occupants,
+        "date_created": b.date_created.strftime("%Y-%m-%d %H:%M:%S")
     } for b in buildings]
     
     return JsonResponse({"buildings": buildings_list}, status=200)
-
 @csrf_exempt
 def delete_building(request, building_uuid):
     if request.method != "DELETE":
@@ -143,3 +164,10 @@ def delete_building(request, building_uuid):
     
     building.delete()
     return JsonResponse({"message": "Building deleted successfully"}, status=200)
+
+@receiver(post_save, sender=Building)
+def update_buildings_count(sender, instance, created, **kwargs):
+    if created:
+        project = instance.project
+        project.buildings_count = project.buildings.count()
+        project.save()

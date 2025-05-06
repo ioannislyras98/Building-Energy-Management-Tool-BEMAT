@@ -2,7 +2,7 @@ from django.db import models
 import uuid
 from django.conf import settings
 
-class energyConsumption(models.Model):
+class EnergyConsumption(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     
     # Link to the user (using Django's AUTH_USER_MODEL)
@@ -14,14 +14,14 @@ class energyConsumption(models.Model):
     
     # Link to a Project (adjust the app label if needed, e.g. "project.Project")
     project = models.ForeignKey(
-        "Project",
+        "project.Project",
         on_delete=models.CASCADE,
         related_name="energy_profiles",
     )
     
     # Link to a Building (adjust the app label if needed, e.g. "building.Building")
     building = models.ForeignKey(
-        "Building",
+        "building.Building",
         on_delete=models.CASCADE,
         related_name="energy_profiles",
     )

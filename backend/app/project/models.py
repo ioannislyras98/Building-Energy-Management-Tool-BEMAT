@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 import uuid
 
 class Project(models.Model):
@@ -8,6 +9,8 @@ class Project(models.Model):
         editable=False
     )
     name = models.CharField(max_length=100)
+    date_created = models.DateField(default=timezone.now)
+    buildings_count = models.PositiveIntegerField(default=0)
     cost_per_kwh_fuel = models.DecimalField(
         max_digits=6, 
         decimal_places=3,

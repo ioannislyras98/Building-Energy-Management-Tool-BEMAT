@@ -2,16 +2,16 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
 
+
 #sign-screen {
-    @apply h-full w-full bg-cover bg-linear-to-t bg-center bg-[url(../images/bemat_alt.avif)] flex flex-col relative min-h-screen;
+  @apply h-full w-full bg-cover bg-linear-to-t bg-center bg-[url(../images/bemat_alt.avif)] flex flex-col relative min-h-screen;
 }
 
 #toggle-language {
-    @apply text-neutral-500 hover:text-neutral-100 absolute top-0 right-0 pr-6 pt-3;
+  @apply text-neutral-500 hover:text-neutral-100 absolute top-0 right-0 pr-6 pt-3;
 }
-
 .form-wrapper {
-  @apply flex justify-center items-center h-full;
+  @apply  h-full absolute inset-0 flex justify-center items-center z-10;
 }
 
 #form-container {
@@ -50,4 +50,12 @@
 
 .link-text{
   @apply text-primary hover:text-primary-bold;
+}
+
+.confirm-button {
+  @apply mr-2 px-4 py-2 bg-primary-light text-white rounded hover:bg-primary transition delay-150 duration-300 ease-in-out cursor-pointer;
+}
+
+.close-modal {
+  @apply  mr-2 px-4 py-2 bg-transparent rounded text-primary-light border-[2px] border-primary-light hover:text-primary hover:border-primary transition delay-150 duration-300 ease-in-out cursor-pointer;
 }

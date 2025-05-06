@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import energyConsumption
+from .models import EnergyConsumption
 from .serializers import EnergyConsumptionSerializer
 
 # Create a new EnergyProfile
@@ -17,8 +17,8 @@ class CreateEnergyConsumption(APIView):
 class UpdateEnergyConsumption(APIView):
     def put(self, request, uuid):
         try:
-            energy_profile = energyConsumption.objects.get(uuid=uuid)
-        except energyConsumption.DoesNotExist:
+            energy_profile = EnergyConsumption.objects.get(uuid=uuid)
+        except EnergyConsumption.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         
         serializer = EnergyConsumptionSerializer(energy_profile, data=request.data, partial=True)
@@ -31,8 +31,8 @@ class UpdateEnergyConsumption(APIView):
 class DeleteEnergyConsumption(APIView):
     def delete(self, request, uuid):
         try:
-            energy_profile = energyConsumption.objects.get(uuid=uuid)
-        except energyConsumption.DoesNotExist:
+            energy_profile = EnergyConsumption.objects.get(uuid=uuid)
+        except EnergyConsumption.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         energy_profile.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -40,21 +40,21 @@ class DeleteEnergyConsumption(APIView):
 # Retrieve all EnergyProfiles for a given building (by building uuid)
 class GetEnergyConsumptionByBuilding(APIView):
     def get(self, request, building_id):
-        profiles = energyConsumption.objects.filter(building_id=building_id)
+        profiles = EnergyConsumption.objects.filter(building_id=building_id)
         serializer = EnergyConsumptionSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
         
 # Retrieve EnergyProfiles by project (by project uuid)
 class GetEnergyConsumptionByProject(APIView):
     def get(self, request, project_id):
-        profiles = energyConsumption.objects.filter(project_id=project_id)
+        profiles = EnergyConsumption.objects.filter(project_id=project_id)
         serializer = EnergyConsumptionSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
         
 # Retrieve EnergyProfiles by user (by user uuid)
 class GetEnergyConsumptionByUser(APIView):
     def get(self, request, user_id):
-        profiles = energyConsumption.objects.filter(user_id=user_id)
+        profiles = EnergyConsumption.objects.filter(user_id=user_id)
         serializer = EnergyConsumptionSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
         
@@ -62,8 +62,8 @@ class GetEnergyConsumptionByUser(APIView):
 class GetEnergyConsumptionByUUID(APIView):
     def get(self, request, uuid):
         try:
-            energy_profile = energyConsumption.objects.get(uuid=uuid)
-        except energyConsumption.DoesNotExist:
+            energy_profile = EnergyConsumption.objects.get(uuid=uuid)
+        except EnergyConsumption.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         serializer = EnergyConsumptionSerializer(energy_profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
