@@ -75,13 +75,22 @@ class PasswordResetConfirmView(APIView):
             return Response({"detail": "Ο κωδικός έχει αλλάξει επιτυχώς."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_current_user(request):
-    user = request.user
-    return Response({
-        'id': user.id,
-        'email': user.email,
-        'first_name': user.first_name,
-        'last_name': user.last_name
-    })
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            user = request.user
+            data = {
+                'uuid': str(user.uuid) if hasattr(user, 'uuid') else user.id,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"Error in get_current_user: {str(e)}")
+            return Response(
+                {"error": "An unexpected error occurred."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

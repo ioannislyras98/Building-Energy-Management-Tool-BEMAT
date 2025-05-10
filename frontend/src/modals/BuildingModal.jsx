@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import $ from "jquery";
 import Cookies from "universal-cookie";
-import "./../../css/forms.css";
-import useLanguage from "../../tools/cookies/language-cookie";
+import "./../css/forms.css";
+import { useLanguage } from "../context/LanguageContext"; // Updated import
 //language
-import english_text from "../../languages/english.json";
-import greek_text from "../../languages/greek.json";
-import InputEntry from "../RegisterForms/InputEntry";
+import english_text from "../languages/english.json";
+import greek_text from "../languages/greek.json";
+import InputEntryModal from "./InputEntryModal";
 
 const cookies = new Cookies();
 
@@ -34,6 +34,7 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
   });
   
   const [errors, setErrors] = useState({});
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
 
   const token = cookies.get("token") || "";
 
@@ -75,50 +76,82 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
 
   const validateForm = () => {
     const newErrors = {};
+    let hasErrors = false;
     
     // Required fields validation
     if (!formData.name.trim()) {
-      newErrors.name = params.errorRequired;
+      newErrors.name = params.errorRequired || "Field is required";
+      hasErrors = true;
     }
     
     if (!formData.usage.trim()) {
-      newErrors.usage = params.errorRequired;
+      newErrors.usage = params.errorRequired || "Field is required";
+      hasErrors = true;
     }
     
     if (!formData.description.trim()) {
       newErrors.description = params.errorRequired;
+      hasErrors = true;
     }
     
     if (!formData.address.trim()) {
       newErrors.address = params.errorRequired;
+      hasErrors = true;
     }
     
     if (!formData.total_area) {
       newErrors.total_area = params.errorRequired;
+      hasErrors = true;
     } else if (parseFloat(formData.total_area) <= 0) {
       newErrors.total_area = params.errorPositive;
+      hasErrors = true;
     }
     
     if (!formData.examined_area) {
       newErrors.examined_area = params.errorRequired;
+      hasErrors = true;
     } else if (parseFloat(formData.examined_area) <= 0) {
       newErrors.examined_area = params.errorPositive;
+      hasErrors = true;
     }
     
     if (!formData.floors_examined) {
       newErrors.floors_examined = params.errorRequired;
+      hasErrors = true;
     } else if (parseInt(formData.floors_examined) <= 0) {
       newErrors.floors_examined = params.errorPositive;
+      hasErrors = true;
     }
     
+    // Σημαντικό: Πρώτα ορίζουμε τα errors και μετά το showValidationErrors
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setShowValidationErrors(true);
+    
+    return !hasErrors;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    if (!validateForm()) {
+    // Καθαρίζουμε τυχόν προηγούμενα σφάλματα
+    setErrors({});
+    
+    // Επικύρωση φόρμας
+    const isValid = validateForm();
+    
+    // Αν η φόρμα δεν είναι έγκυρη, διακόπτουμε την υποβολή
+    if (!isValid) {
+      setTimeout(() => {
+        // Χρησιμοποιούμε setTimeout για να εξασφαλίσουμε ότι το state έχει ενημερωθεί
+        const firstErrorField = Object.keys(errors)[0];
+        if (firstErrorField) {
+          const element = document.getElementById(firstErrorField);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.focus();
+          }
+        }
+      }, 0);
       return;
     }
 
@@ -168,7 +201,7 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
         onClose();
       },
       error: function (error) {
-        
+        setShowValidationErrors(true);
         if (error.responseJSON) {
           alert("Error: " + JSON.stringify(error.responseJSON.error));
           setErrors(error.responseJSON.error);
@@ -181,9 +214,28 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
 
   if (!isOpen) return null;
 
+  // Διαμόρφωση CSS κλάσης για τα πεδία με σφάλματα
+  const getInputClass = (fieldName) => {
+    return showValidationErrors && errors[fieldName] 
+      ? "block w-full p-2 border border-red-500 bg-red-50 rounded-md shadow-sm focus:border-red-500 focus:ring focus:ring-red-200" 
+      : "block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50";
+  };
+
+  // Κώδικας για την εμφάνιση μηνύματος σφάλματος
+  const renderError = (fieldName) => {
+    if (showValidationErrors && errors[fieldName]) {
+      return (
+        <div className="text-red-500 text-xs mt-1">
+          {errors[fieldName]}
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-50">
-      <div className="rounded-lg p-6 w-full max-w-xl border-primary-light border-2 bg-white shadow-lg flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-opacity-50 py-20">
+      <div className="rounded-lg p-6 w-full max-w-xl border-primary-light border-2 bg-white shadow-lg flex flex-col max-h-[80vh]">
         <h2 className="text-lg font-bold mb-2 text-center sticky top-0 bg-white pb-2 z-10">{params.h2}</h2>
         <p className="text-sm text-gray-500 text-center mb-4 sticky top-8 bg-white z-10">
           <span className="text-red-500">*</span> {params.requiredFieldsNote}
@@ -201,10 +253,10 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
             <div className="border-b border-gray-200 pb-4">
               <h3 className="font-bold text-primary text-sm mb-3">{params.basicInfoSection}</h3>
               
-              <InputEntry
+              <InputEntryModal
                 entry={
                   <>
-                    {params.buildingName} <span style={{ color: "red" }}>*</span>
+                    {params.buildingName} 
                   </>
                 }
                 id="name"
@@ -213,14 +265,15 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.name}
                 onChange={handleChange}
                 example={params.buildingName_example}
-                error={errors.name}
+                error={showValidationErrors ? errors.name : ""}
                 required
+                className={errors.name && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
 
-              <InputEntry
+              <InputEntryModal
                 entry={
                   <>
-                    {params.buildingUsage} <span style={{ color: "red" }}>*</span>
+                    {params.buildingUsage} 
                   </>
                 }
                 id="usage"
@@ -229,14 +282,15 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.usage}
                 onChange={handleChange}
                 example={params.buildingUsage_example}
-                error={errors.usage}
+                error={showValidationErrors ? errors.usage : ""}
                 required
+                className={errors.usage && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
 
-              <InputEntry
+              <InputEntryModal
                 entry={
                   <>
-                    {params.description} <span style={{ color: "red" }}>*</span>
+                    {params.description} 
                   </>
                 }
                 id="description"
@@ -245,11 +299,12 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.description}
                 onChange={handleChange}
                 example={params.description_example}
-                error={errors.description}
+                error={showValidationErrors ? errors.description : ""}
                 required
+                className={errors.description && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
 
-              <InputEntry
+              <InputEntryModal
                 entry={params.yearBuilt}
                 id="year_built"
                 name="year_built"
@@ -257,15 +312,16 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.year_built}
                 onChange={handleChange}
                 example={params.yearBuilt_example}
-                error={errors.year_built}
+                error={showValidationErrors ? errors.year_built : ""}
                 min="1800"
                 max={new Date().getFullYear()}
+                className={errors.year_built && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
 
-              <InputEntry
+              <InputEntryModal
                 entry={
                   <>
-                    {params.address} <span style={{ color: "red" }}>*</span>
+                    {params.address} 
                   </>
                 }
                 id="address"
@@ -274,8 +330,9 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.address}
                 onChange={handleChange}
                 example={params.address_example}
-                error={errors.address}
+                error={showValidationErrors ? errors.address : ""}
                 required
+                className={errors.address && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
             </div>
 
@@ -290,11 +347,12 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                   name="is_insulated"
                   value={formData.is_insulated.toString()}
                   onChange={handleChange}
-                  className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                  className={getInputClass("is_insulated")}
                 >
                   <option value="false">{params.no}</option>
                   <option value="true">{params.yes}</option>
                 </select>
+                {renderError("is_insulated")}
               </div>
 
               <div className="mb-4">
@@ -304,14 +362,15 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                   name="is_certified"
                   value={formData.is_certified.toString()}
                   onChange={handleChange}
-                  className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                  className={getInputClass("is_certified")}
                 >
                   <option value="false">{params.no}</option>
                   <option value="true">{params.yes}</option>
                 </select>
+                {renderError("is_certified")}
               </div>
 
-              <InputEntry
+              <InputEntryModal
                 entry={params.energyClass}
                 id="energy_class"
                 name="energy_class"
@@ -319,10 +378,11 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.energy_class}
                 onChange={handleChange}
                 example={params.energyClass_example}
-                error={errors.energy_class}
+                error={showValidationErrors ? errors.energy_class : ""}
+                className={errors.energy_class && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
 
-              <InputEntry
+              <InputEntryModal
                 entry={params.orientation}
                 id="orientation"
                 name="orientation"
@@ -330,7 +390,8 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.orientation}
                 onChange={handleChange}
                 example={params.orientation_example}
-                error={errors.orientation}
+                error={showValidationErrors ? errors.orientation : ""}
+                className={errors.orientation && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
             </div>
 
@@ -338,10 +399,10 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
             <div className="border-b border-gray-200 pb-4">
               <h3 className="font-bold text-primary text-sm mb-3">{params.areasAndFloorsSection}</h3>
               
-              <InputEntry
+              <InputEntryModal
                 entry={
                   <>
-                    {params.totalArea} <span style={{ color: "red" }}>*</span>
+                    {params.totalArea} 
                   </>
                 }
                 id="total_area"
@@ -350,16 +411,17 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.total_area}
                 onChange={handleChange}
                 example={params.totalArea_example}
-                error={errors.total_area}
+                error={showValidationErrors ? errors.total_area : ""}
                 required
                 min="0"
                 step="0.01"
+                className={errors.total_area && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
 
-              <InputEntry
+              <InputEntryModal
                 entry={
                   <>
-                    {params.examinedArea} <span style={{ color: "red" }}>*</span>
+                    {params.examinedArea} 
                   </>
                 }
                 id="examined_area"
@@ -368,16 +430,17 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.examined_area}
                 onChange={handleChange}
                 example={params.examinedArea_example}
-                error={errors.examined_area}
+                error={showValidationErrors ? errors.examined_area : ""}
                 required
                 min="0"
                 step="0.01"
+                className={errors.examined_area && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
 
-              <InputEntry
+              <InputEntryModal
                 entry={
                   <>
-                    {params.floorsExamined} <span style={{ color: "red" }}>*</span>
+                    {params.floorsExamined} 
                   </>
                 }
                 id="floors_examined"
@@ -386,12 +449,13 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.floors_examined}
                 onChange={handleChange}
                 example={params.floorsExamined_example}
-                error={errors.floors_examined}
+                error={showValidationErrors ? errors.floors_examined : ""}
                 required
                 min="1"
+                className={errors.floors_examined && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
               
-              <InputEntry
+              <InputEntryModal
                 entry={params.floorHeight}
                 id="floor_height"
                 name="floor_height"
@@ -399,9 +463,10 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.floor_height}
                 onChange={handleChange}
                 example={params.floorHeight_example}
-                error={errors.floor_height}
+                error={showValidationErrors ? errors.floor_height : ""}
                 min="0"
                 step="0.01"
+                className={errors.floor_height && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
             </div>
 
@@ -409,7 +474,7 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
             <div className="border-b border-gray-200 pb-4">
               <h3 className="font-bold text-primary text-sm mb-3">{params.additionalInfoSection}</h3>
               
-              <InputEntry
+              <InputEntryModal
                 entry={params.constructionType}
                 id="construction_type"
                 name="construction_type"
@@ -417,10 +482,11 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.construction_type}
                 onChange={handleChange}
                 example={params.constructionType_example}
-                error={errors.construction_type}
+                error={showValidationErrors ? errors.construction_type : ""}
+                className={errors.construction_type && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
               
-              <InputEntry
+              <InputEntryModal
                 entry={params.freeFacades}
                 id="free_facades"
                 name="free_facades"
@@ -428,12 +494,13 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.free_facades}
                 onChange={handleChange}
                 example={params.freeFacades_example}
-                error={errors.free_facades}
+                error={showValidationErrors ? errors.free_facades : ""}
                 min="0"
                 max="4"
+                className={errors.free_facades && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
               
-              <InputEntry
+              <InputEntryModal
                 entry={params.altitude}
                 id="altitude"
                 name="altitude"
@@ -441,9 +508,10 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.altitude}
                 onChange={handleChange}
                 example={params.altitude_example}
-                error={errors.altitude}
+                error={showValidationErrors ? errors.altitude : ""}
                 min="0"
                 step="0.1"
+                className={errors.altitude && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
             </div>
 
@@ -451,7 +519,7 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
             <div>
               <h3 className="font-bold text-primary text-sm mb-3">{params.operationalInfoSection}</h3>
               
-              <InputEntry
+              <InputEntryModal
                 entry={params.nonOperatingDays}
                 id="non_operating_days"
                 name="non_operating_days"
@@ -459,10 +527,11 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.non_operating_days}
                 onChange={handleChange}
                 example={params.nonOperatingDays_example}
-                error={errors.non_operating_days}
+                error={showValidationErrors ? errors.non_operating_days : ""}
+                className={errors.non_operating_days && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
               
-              <InputEntry
+              <InputEntryModal
                 entry={params.operatingHours}
                 id="operating_hours"
                 name="operating_hours"
@@ -470,10 +539,11 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.operating_hours}
                 onChange={handleChange}
                 example={params.operatingHours_example}
-                error={errors.operating_hours}
+                error={showValidationErrors ? errors.operating_hours : ""}
+                className={errors.operating_hours && showValidationErrors ? "border-red-50" : ""}
               />
               
-              <InputEntry
+              <InputEntryModal
                 entry={params.occupants}
                 id="occupants"
                 name="occupants"
@@ -481,8 +551,9 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 value={formData.occupants}
                 onChange={handleChange}
                 example={params.occupants_example}
-                error={errors.occupants}
+                error={showValidationErrors ? errors.occupants : ""}
                 min="0"
+                className={errors.occupants && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
             </div>
           </form>
@@ -508,11 +579,8 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
 }
 
 export default function BuildingModal({ isOpen, onClose, onBuildingCreated, projectUuid }) {
-  const { language, toggleLanguage } = useLanguage();
-  const params =
-    cookies.get("language") === "en"
-      ? english_text.BuildingModal
-      : greek_text.BuildingModal;
+  const { language } = useLanguage();
+  const params = language === "en" ? english_text.BuildingModal : greek_text.BuildingModal;
 
   return (
     <div className="form-wrapper">

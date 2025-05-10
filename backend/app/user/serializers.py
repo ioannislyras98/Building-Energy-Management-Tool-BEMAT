@@ -104,9 +104,6 @@ class CustomAuthTokenSerializer(serializers.Serializer):
         password = attrs.get('password')
 
         if email and password:
-            # Χρησιμοποιούμε authenticate για να ελέγξουμε τα διαπιστευτήρια.
-            # Εφόσον ο custom user έχει ορίσει ως USERNAME_FIELD το email,
-            # η authenticate θα δουλέψει κανονικά.
             user = authenticate(request=self.context.get('request'),
                                 username=email, password=password)
             if not user:

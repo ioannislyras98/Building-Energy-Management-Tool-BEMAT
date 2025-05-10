@@ -10,7 +10,7 @@ import "./../../css/forms.css";
 import InputEntry from "./InputEntry";
 //cookie
 import Cookies from "universal-cookie";
-import useLanguage from "../../tools/cookies/language-cookie";
+import { useLanguage } from "../../context/LanguageContext"; // Updated import
 //language
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
@@ -187,8 +187,8 @@ function LogInForm({ params }) {
 
 export default function LogIn(data) {
   const { language, toggleLanguage } = useLanguage();
-  const params =
-    cookies.get("language") === "en" ? english_text.LogIn : greek_text.LogIn;
+  const params = language === "en" ? english_text.LogIn : greek_text.LogIn;
+
 
   return (
     <div id="sign-screen">

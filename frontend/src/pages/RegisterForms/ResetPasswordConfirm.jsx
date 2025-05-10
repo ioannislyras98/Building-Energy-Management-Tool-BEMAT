@@ -4,7 +4,7 @@ import $ from "jquery";
 import "./../../css/forms.css";
 import InputEntry from "./InputEntry";
 import Cookies from "universal-cookie";
-import useLanguage from "../../tools/cookies/language-cookie";
+import { useLanguage } from "../../context/LanguageContext"; // Updated import
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import { BiHide, BiShow } from "react-icons/bi";
@@ -127,8 +127,7 @@ function ResetPasswordConfirmForm({ params }) {
 }
 export default function ResetPasswordConfirm(data) {
   const { language, toggleLanguage } = useLanguage();
-  const params =
-    cookies.get("language") === "en" ? english_text.ResetPassword : greek_text.ResetPassword;
+  const params = language === "en" ? english_text.ResetPassword : greek_text.ResetPassword;
 
   return (
     <div id="sign-screen">

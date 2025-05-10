@@ -1,8 +1,10 @@
 from django.urls import path
-from .views import create_project, delete_project, get_projects
+from . import views
 
 urlpatterns = [
-    path('create/', create_project, name='create_project'),
-    path('delete/<uuid:project_uuid>/', delete_project, name='delete_project'),
-    path('get/', get_projects, name='get_projects'),
+    path('create/', views.create_project, name='create_project'),
+    path('get/', views.get_projects, name='get_projects'),
+    path('get/<uuid:uuid>/', views.get_project_detail, name='get_project_detail'),
+    path('delete/<uuid:uuid>/', views.delete_project, name='delete_project'),
+    path('update/<uuid:uuid>/', views.update_project, name='update_project'),
 ]

@@ -11,23 +11,31 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
+import secrets
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+secrets.token_hex(50)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+# It's better to set this as an environment variable for production
+# For local development, you can provide a default if the env var isn't set.
+# Replace 'your_fallback_secret_key_here_if_env_var_is_not_set' with a real, random string.
+# You can generate one using: python -c 'import secrets; print(secrets.token_hex(50))'
+SECRET_KEY = os.environ.get("SECRET_KEY", 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2')
 
-DEBUG = False
-# DEBUG = bool(os.environ.get("DEBUG", default=0))
+DEBUG = True  # Or False, depending on your needs
 
-# 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
-# For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
-# ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost").split(" ")
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    # Add any other specific IPs or hostnames you use for testing
+    # e.g., if you access it via a local network IP like '192.168.1.100'
+    # '192.168.1.100',
+]
 
 
 # Application definition

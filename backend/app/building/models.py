@@ -12,7 +12,8 @@ class Building(models.Model):
     user = models.ForeignKey(
         'user.User', 
         on_delete=models.CASCADE,
-        related_name="buildings"
+        related_name="buildings",
+        to_field='uuid'  # Add this to specify the target field on the User model
     )
     # Βασικές πληροφορίες
     name = models.CharField(

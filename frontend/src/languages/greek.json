@@ -62,11 +62,13 @@
     "projectFuelCost": "Κόστος ανά kWh καυσίμου(€)",
     "projectFuelCost_example": "0.153",
     "create": "Δημιουργία Εργου",
-    "cancel": "Ακύρωση"
+    "cancel": "Ακύρωση",
+    "createProject": "Δημιουργία Έργου",
+    "updateProject": "Ενημέρωση Έργου"
   },
   "BuildingModal": {
     "h2": "Προσθήκη Νέου Κτιρίου",
-    "requiredFieldsNote": "υποδεικνύει υποχρεωτικό πεδίο",
+    "requiredFieldsNote": "Τα πεδία με * είναι υποχρεωτικά",
     "buildingName": "Όνομα Κτιρίου",
     "buildingName_example": "Εισάγετε όνομα κτιρίου",
     "buildingUsage": "Χρήση Κτιρίου",
@@ -105,9 +107,9 @@
     "occupants_example": "Μέσος αριθμός ατόμων στο κτίριο",
     "cancel": "Ακύρωση",
     "create": "Δημιουργία",
-    "errorRequired": "Το πεδίο αυτό είναι υποχρεωτικό",
+    "errorRequired": "Το πεδίο είναι υποχρεωτικό",
     "errorPositive": "Η τιμή πρέπει να είναι μεγαλύτερη από 0",
-    "errorGeneral": "Παρουσιάστηκε σφάλμα κατά τη δημιουργία του κτιρίου. Παρακαλώ δοκιμάστε ξανά.",
+    "errorGeneral": "Προέκυψε σφάλμα. Παρακαλώ προσπαθήστε ξανά.",
     "yes": "Ναι",
     "no": "Όχι",
     "basicInfoSection": "Βασικές πληροφορίες",
@@ -117,6 +119,32 @@
     "operationalInfoSection": "Λειτουργικές πληροφορίες"
   },
   "TopBar": {
-    "logout": "Αποσύνδεση"
+    "home": "Αρχική",
+    "settings": "Ρυθμίσεις",
+    "logout": "Αποσύνδεση",
+    "loading": "Φόρτωση...",
+    "changeLanguage": "Αγγλικά"
+  },
+  "Home": {
+    "myProjects": "Τα Έργα Μου",
+    "addNewProject": "Προσθήκη Νέου Έργου",
+    "addNewBuilding": "Προσθήκη Νέου Κτιρίου",
+    "buildings": "Κτίρια",
+    "backToProjects": "Πίσω στα Έργα",
+    "update": "Ενημέρωση",
+    "delete": "Διαγραφή",
+    "confirmDelete": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό το έργο; Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
+    "deleteError": "Παρουσιάστηκε σφάλμα κατά την προσπάθεια διαγραφής του έργου."
+  },
+  "SideBar": {
+    "home": "Αρχική"
+  },
+  "ProjectBtn": {
+    "buildings": "Κτίρια",
+    "created": "Δημιουργήθηκε"
+  },
+  "BuildingBtn": {
+    "usage": "Χρήση",
+    "created": "Δημιουργήθηκε"
   }
 }

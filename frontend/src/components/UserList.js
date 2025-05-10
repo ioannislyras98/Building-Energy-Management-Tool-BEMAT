@@ -1,4 +1,4 @@
-import { getuser } from "../services/ApiService";
+import { getuser } from "../../services/ApiService";
 import { useEffect, useState } from "react";
 
 const UserList = () => {

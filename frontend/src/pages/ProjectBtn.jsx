@@ -1,10 +1,17 @@
-//css
 import "./../css/pages.css";
-
-//icons
+import { useContext } from "react";
+import Cookies from 'universal-cookie';
+import { useLanguage } from "../context/LanguageContext";
 import { BsBuildings } from "react-icons/bs";
+import english_text from '../languages/english.json';
+import greek_text from '../languages/greek.json';
+
+const cookies = new Cookies(null, { path: '/' });
 
 export default function ProjectBtn({ name, buildings_count, date_created }) {
+    const { language } = useLanguage();
+    const params = language === "en" ? english_text.ProjectBtn : greek_text.ProjectBtn;
+    
     return (
         <>
             <div className="project-icon drop-shadow-[0_5px_15px_rgba(53,_94,_59,_0.25)]">
@@ -13,8 +20,8 @@ export default function ProjectBtn({ name, buildings_count, date_created }) {
             <div className="info w-[180px]">
                 <label className="poject-name opacity-80 font-bold text-primary">{name}</label>
                 <div className="project-details flex flex-col">
-                    <span className="opacity-80 font-medium text-primary text-[13px]">Buildings: {buildings_count}</span>
-                    <span className="opacity-80 font-extrabold text-primary text-[12px]">Created: {date_created}</span>
+                    <span className="opacity-80 font-medium text-primary text-[13px]">{params.buildings}: {buildings_count}</span>
+                    <span className="opacity-80 font-extrabold text-primary text-[12px]">{params.created}: {date_created}</span>
                 </div>
             </div>
         </>)

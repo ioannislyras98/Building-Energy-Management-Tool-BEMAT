@@ -59,3 +59,25 @@
 .close-modal {
   @apply  mr-2 px-4 py-2 bg-transparent rounded text-primary-light border-[2px] border-primary-light hover:text-primary hover:border-primary transition delay-150 duration-300 ease-in-out cursor-pointer;
 }
+
+.entry-input.border-red-500 {
+  border-color: #f56565;
+}
+
+.entry-input.bg-red-50 {
+  background-color: #fef2f2;
+}
+
+.text-red-500 {
+  color: #f56565;
+}
+
+.input-field.error-input {
+  border-color: #f56565 !important;
+  background-color: #fef2f2 !important;
+}
+
+.input-field.error-input:focus {
+  border-color: #f56565 !important;
+  box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.2) !important;
+}

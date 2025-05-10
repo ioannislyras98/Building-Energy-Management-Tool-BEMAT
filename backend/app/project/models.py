@@ -10,7 +10,6 @@ class Project(models.Model):
     )
     name = models.CharField(max_length=100)
     date_created = models.DateField(default=timezone.now)
-    buildings_count = models.PositiveIntegerField(default=0)
     cost_per_kwh_fuel = models.DecimalField(
         max_digits=6, 
         decimal_places=3,
@@ -21,11 +20,15 @@ class Project(models.Model):
         decimal_places=3,
         verbose_name="Κόστος ανά kWh ρεύματος (€)"
     )
-    # Κάθε έργο ανήκει σε έναν χρήστη
     user = models.ForeignKey(
         'user.User', 
         on_delete=models.CASCADE,
         related_name="projects"
+    )
+    buildings_count = models.IntegerField(
+        default=0, 
+        verbose_name="Αριθμός Κτιρίων",
+        editable=False  # Managed by signals, not direct user input
     )
 
     class Meta:
