@@ -27,10 +27,10 @@ const ProjectsView = ({ projects, params, onProjectClick, onAddProject }) => {
             <div 
               key={project.uuid} 
               className="project-card" 
-              onClick={() => onProjectClick(project)}
+              onClick={() => onProjectClick(project)} // This will trigger navigation via Home.jsx
             >
               <ProjectBtn 
-                key={project.uuid}
+                uuid={project.uuid}
                 name={project.name} 
                 buildings_count={project.buildings_count} 
                 date_created={project.date_created} 

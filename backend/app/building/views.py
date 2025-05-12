@@ -146,7 +146,7 @@ def get_buildings(request):
     return JsonResponse({"buildings": buildings_list}, status=200)
 
 @csrf_exempt
-def get_building_detail(request, building_uuid):
+def get_building_detail(request, uuid):
     """
     Endpoint για την ανάκτηση λεπτομερειών ενός συγκεκριμένου κτιρίου.
     """
@@ -166,7 +166,7 @@ def get_building_detail(request, building_uuid):
         return JsonResponse({"error": "Invalid or expired token"}, status=401)
     
     try:
-        building = Building.objects.get(uuid=building_uuid)
+        building = Building.objects.get(uuid=uuid)
         
         # Έλεγχος αν ο authenticated χρήστης έχει δικαίωμα πρόσβασης στο κτίριο
         if building.user != user:

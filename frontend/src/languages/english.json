@@ -118,6 +118,75 @@
     "additionalInfoSection": "Additional Information",
     "operationalInfoSection": "Operational Information"
   },
+  "EditBuildingModal": {
+    "h2": "Edit Building Details",
+    "updateBuilding": "Update Building",
+    "cancel": "Cancel",
+    "buildingName": "Building Name",
+    "buildingName_example": "e.g., Building A",
+    "buildingUsage": "Building Usage",
+    "buildingUsage_example": "e.g., Residential, Offices",
+    "usage": "Building Usage",
+    "description": "Description",
+    "description_example": "e.g., Two-story house with basement",
+    "yearBuilt": "Year Built",
+    "yearBuilt_example": "e.g., 1990",
+    "address": "Address",
+    "address_example": "e.g., 10 Example Street",
+    "isInsulated": "Insulation Present",
+    "isCertified": "Energy Class Certified",
+    "energyClass": "Energy Class",
+    "energyClass_example": "e.g., B+",
+    "orientation": "Orientation",
+    "orientation_example": "e.g., South",
+    "totalArea": "Total Area (m²)",
+    "totalArea_example": "e.g., 120.5",
+    "examinedArea": "Examined Area (m²)",
+    "examinedArea_example": "e.g., 100.0",
+    "floorsExamined": "Number of Examined Floors",
+    "floorsExamined_example": "e.g., 2",
+    "floorHeight": "Average Floor Height (m)",
+    "floorHeight_example": "e.g., 2.8",
+    "constructionType": "Construction Type",
+    "constructionType_example": "e.g., Standard",
+    "freeFacades": "Free Facades",
+    "freeFacades_example": "e.g., 3",
+    "altitude": "Altitude (m)",
+    "altitude_example": "e.g., 150",
+    "nonOperatingDays": "Non-Operating Days (Annually)",
+    "nonOperatingDays_example": "e.g., 100",
+    "operatingHours": "Operating Hours",
+    "operatingHours_example": "e.g., 09:00-17:00",
+    "occupants": "Number of Occupants",
+    "occupants_example": "e.g., 4",
+    "requiredFieldsNote": "Fields marked with * are required",
+    "errorRequired": "This field is required.",
+    "errorPositive": "The value must be a positive number.",
+    "errorGeneral": "An error occurred during the update.",
+    "yes": "Yes",
+    "no": "No",
+    "basicInfoSection": "Basic Information",
+    "buildingCharacteristicsSection": "Building Characteristics",
+    "areasAndFloorsSection": "Areas and Floors",
+    "additionalInfoSection": "Additional Information",
+    "operationalInfoSection": "Operational Information"
+  },
+  "AddContactModal": {
+    "h2": "Add Contact Person",
+    "contactName": "Contact Name",
+    "contactName_example": "e.g., John Doe",
+    "contactRole": "Role",
+    "contactRole_example": "e.g., Manager",
+    "contactEmail": "Email",
+    "contactEmail_example": "e.g., example@email.com",
+    "contactPhone": "Phone",
+    "contactPhone_example": "e.g., +1234567890",
+    "addContact": "Add Contact",
+    "cancel": "Cancel",
+    "errorRequired": "This field is required.",
+    "errorEmail": "Invalid email address.",
+    "errorGeneral": "An error occurred while adding the contact."
+  },
   "TopBar": {
     "home": "Home",
     "settings": "Settings",
@@ -136,6 +205,50 @@
     "confirmDelete": "Are you sure you want to delete this project? This action cannot be undone.",
     "deleteError": "An error occurred while trying to delete the project."
   },
+  "BuildingProfile": {
+    "backToBuildings": "Back to Buildings List",
+    "loading": "Loading building profile...",
+    "errors": {
+      "auth": "Authentication is required to view building details.",
+      "generic": "An error occurred.",
+      "notFound": "Building data not found."
+    },
+    "basicInfo": {
+      "title": "Basic Information",
+      "name": "Building Name",
+      "yearBuilt": "Year Built",
+      "energyClass": "Energy Class",
+      "description": "Description",
+      "examined_area": "Examined Area",
+      "loading": "Loading..."
+    },
+    "contactInfo": {
+      "title": "Information",
+      "informationTitle": "Information",
+      "address": "Address",
+      "contactPersonTitle": "Contact Person Details",
+      "noContactDetails": "No contact details have been added.",
+      "addContactPerson": "Add Contact Person Details"
+    },
+    "tabs": {
+      "energyProfile": "Energy Profile",
+      "systems": "Systems",
+      "thermalZones": "Thermal Zones & Consumption",
+      "scenarios": "Scenarios",
+      "results": "Results",
+      "images": "Images",
+      "energyProfileContent": "Content for Energy Profile...",
+      "systemsContent": "Content for Systems...",
+      "thermalZonesContent": "Content for Thermal Zones & Consumption...",
+      "scenariosContent": "Content for Scenarios...",
+      "resultsContent": "Content for Results...",
+      "imagesContent": "Content for Images..."
+    },
+    "actions": {
+      "editBasicInfo": "Edit Basic Information",
+      "addContactPerson": "Add Contact Person"
+    }
+  },
   "SideBar": {
     "home": "Home"
   },
@@ -143,7 +256,7 @@
     "buildings": "Buildings",
     "created": "Created"
   },
-  "BuildingBtn":{
+  "BuildingBtn": {
     "usage": "Usage",
     "created": "Created"
   }

@@ -1,15 +1,13 @@
-import React from 'react'
-import { StrictMode } from 'react'
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { createRoot } from 'react-dom/client'
-import { LanguageProvider } from './context/LanguageContext';
-import './css/pages.css'
-import App from './App.jsx'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App'; // Assuming your main App component is in App.jsx
+import './index.css'; // Or your main css file
+import { LanguageProvider } from './context/LanguageContext'; // Assuming this is how you provide language
 
-createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <LanguageProvider>
-      <App />
+        <App />
     </LanguageProvider>
   </React.StrictMode>
-)
+);

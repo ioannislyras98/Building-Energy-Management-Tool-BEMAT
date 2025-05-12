@@ -5,6 +5,8 @@ export const useModals = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBuildingModalOpen, setIsBuildingModalOpen] = useState(false);
   const [isUpdateProjectModalOpen, setIsUpdateProjectModalOpen] = useState(false);
+  const [isEditBuildingModalOpen, setIsEditBuildingModalOpen] = useState(false);
+  const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
 
   const openProjectModal = () => {
     $("#projects-wrapper").addClass("modal-open");
@@ -35,6 +37,26 @@ export const useModals = () => {
     setIsUpdateProjectModalOpen(false);
     $("#projects-wrapper").removeClass("modal-open");
   };
+
+  const openEditBuildingModal = () => {
+    $("#projects-wrapper").addClass("modal-open");
+    setIsEditBuildingModalOpen(true);
+  };
+
+  const closeEditBuildingModal = () => {
+    setIsEditBuildingModalOpen(false);
+    $("#projects-wrapper").removeClass("modal-open");
+  };
+
+  const openAddContactModal = () => {
+    $("#projects-wrapper").addClass("modal-open");
+    setIsAddContactModalOpen(true);
+  };
+
+  const closeAddContactModal = () => {
+    setIsAddContactModalOpen(false);
+    $("#projects-wrapper").removeClass("modal-open");
+  };
   
   return {
     isModalOpen,
@@ -45,6 +67,12 @@ export const useModals = () => {
     openBuildingModal,
     closeBuildingModal,
     openUpdateProjectModal,
-    closeUpdateProjectModal
+    closeUpdateProjectModal,
+    isEditBuildingModalOpen,
+    openEditBuildingModal,
+    closeEditBuildingModal,
+    isAddContactModalOpen,
+    openAddContactModal,
+    closeAddContactModal
   };
 };

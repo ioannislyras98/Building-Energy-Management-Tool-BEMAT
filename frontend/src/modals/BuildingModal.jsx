@@ -11,6 +11,8 @@ import InputEntryModal from "./InputEntryModal";
 const cookies = new Cookies();
 
 function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, params }) {
+  console.log("BuildingModalForm params:", params);
+  console.log("BuildingModalForm projectUuid:", projectUuid);
   const [formData, setFormData] = useState({
     name: "", // Building name
     usage: "", // Building usage
@@ -182,6 +184,8 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
     });
 
     // API call to create building
+    console.log("Data being sent to API (object):", buildingData);
+    console.log("Data being sent to API (JSON string):", JSON.stringify(buildingData));
     $.ajax({
       url: "http://127.0.0.1:8000/buildings/create/",
       method: "POST",
@@ -200,13 +204,62 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
         onBuildingCreated(newBuilding);
         onClose();
       },
-      error: function (error) {
+      error: function (jqXHR) { // Changed 'error' to 'jqXHR' for clarity
         setShowValidationErrors(true);
-        if (error.responseJSON) {
-          alert("Error: " + JSON.stringify(error.responseJSON.error));
-          setErrors(error.responseJSON.error);
+        const newErrorState = {};
+        console.error("AJAX error object:", jqXHR); // Log the full jqXHR object
+
+        if (jqXHR.responseJSON) {
+          // Alert the full JSON response from the backend for detailed diagnostics
+          alert("Backend Error Details: " + JSON.stringify(jqXHR.responseJSON));
+          
+          if (typeof jqXHR.responseJSON === 'object' && jqXHR.responseJSON !== null) {
+            // Handle common error structures like { field: ["message"] } or { detail: "message" }
+            // or the originally anticipated { error: "message" } or { error: { field: "message" } }
+            if (jqXHR.responseJSON.error) { 
+                if (typeof jqXHR.responseJSON.error === 'object') {
+                    setErrors(jqXHR.responseJSON.error);
+                } else {
+                    newErrorState.general = String(jqXHR.responseJSON.error);
+                    setErrors(newErrorState);
+                }
+            } else if (jqXHR.responseJSON.detail) { 
+                newErrorState.general = String(jqXHR.responseJSON.detail);
+                setErrors(newErrorState);
+            } else { 
+                // Attempt to map field-specific errors
+                const fieldErrors = {};
+                let hasFieldErrors = false;
+                for (const key in jqXHR.responseJSON) {
+                    if (Array.isArray(jqXHR.responseJSON[key])) {
+                        fieldErrors[key] = jqXHR.responseJSON[key].join(' ');
+                        hasFieldErrors = true;
+                    } else if (typeof jqXHR.responseJSON[key] === 'string') {
+                        // If it's a string, assume it's an error for that key or a general one
+                        fieldErrors[key] = jqXHR.responseJSON[key];
+                        hasFieldErrors = true;
+                    }
+                }
+                if (hasFieldErrors) {
+                    setErrors(fieldErrors);
+                } else {
+                    // Fallback if responseJSON is an object but not in a recognized error format
+                    newErrorState.general = "Error processing server response. Check console for details.";
+                    setErrors(newErrorState);
+                }
+            }
+          } else {
+            // If responseJSON is not an object (e.g. a string)
+            newErrorState.general = String(jqXHR.responseJSON);
+            setErrors(newErrorState);
+          }
         } else {
-          setErrors({ general: params.errorGeneral });
+          // Fallback if no jqXHR.responseJSON (e.g. network error, non-JSON response)
+          const defaultMessage = `An error occurred: ${jqXHR.statusText || 'Unknown error'}.`;
+          const errorMessage = (params && params.errorGeneral) ? params.errorGeneral : defaultMessage;
+          newErrorState.general = errorMessage;
+          setErrors(newErrorState);
+          alert("Error: " + errorMessage + (jqXHR.responseText ? `\nRaw Response: ${jqXHR.responseText}` : ''));
         }
       },
     });

@@ -1,6 +1,8 @@
 import React from 'react';
 import ProjectModal from '../modals/ProjectModal';
 import BuildingModal from '../modals/BuildingModal';
+import EditBuildingModal from '../modals/EditBuildingModal';
+import AddContactModal from '../modals/AddContactModal';
 
 export const Modals = ({ 
   isModalOpen,
@@ -11,8 +13,19 @@ export const Modals = ({
   closeUpdateProjectModal,
   handleProjectCreated,
   handleBuildingCreated,
+  projectUuid,
   handleProjectUpdated,
-  selectedProject
+  selectedProject,
+  // Props for EditBuildingModal
+  isEditBuildingModalOpen,
+  closeEditBuildingModal,
+  editingBuilding,
+  handleBuildingUpdated,
+  // Props for AddContactModal
+  isAddContactModalOpen,
+  closeAddContactModal,
+  targetBuildingUuidForContact,
+  handleContactAdded
 }) => {
   return (
     <>
@@ -29,7 +42,7 @@ export const Modals = ({
           isOpen={isBuildingModalOpen}
           onClose={closeBuildingModal}
           onBuildingCreated={handleBuildingCreated}
-          projectUuid={selectedProject?.uuid}
+          projectUuid={projectUuid}
         />
       )}
 
@@ -40,6 +53,24 @@ export const Modals = ({
           onProjectUpdated={handleProjectUpdated}
           project={selectedProject}
           isEditMode={true}
+        />
+      )}
+
+      {isEditBuildingModalOpen && editingBuilding && (
+        <EditBuildingModal
+          isOpen={isEditBuildingModalOpen}
+          onClose={closeEditBuildingModal}
+          building={editingBuilding}
+          onBuildingUpdated={handleBuildingUpdated}
+        />
+      )}
+
+      {isAddContactModalOpen && targetBuildingUuidForContact && (
+        <AddContactModal
+          isOpen={isAddContactModalOpen}
+          onClose={closeAddContactModal}
+          buildingUuid={targetBuildingUuidForContact}
+          onContactAdded={handleContactAdded}
         />
       )}
     </>

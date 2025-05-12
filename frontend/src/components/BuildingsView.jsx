@@ -1,16 +1,28 @@
 import React from "react";
 import { MdOutlineAddCircle, MdDelete, MdEdit, MdArrowBack } from "react-icons/md";
 import BuildingBtn from "../pages/BuildingBtn";
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const BuildingsView = ({
   buildings,
-  selectedProject,
+  selectedProject, // This contains project.uuid
   params,
   onBackClick,
   onUpdateProject,
   onDeleteProject,
   onAddBuilding,
 }) => {
+  const navigate = useNavigate(); // Initialize navigate
+
+  const handleBuildingClick = (buildingUuid) => {
+    if (selectedProject && selectedProject.uuid && buildingUuid) {
+      navigate(`/projects/${selectedProject.uuid}/buildings/${buildingUuid}`);
+    } else {
+      console.error("Missing project or building UUID for navigation");
+      // Optionally, show an error to the user
+    }
+  };
+
   return (
     <div className="buildings-view">
       <div className="header-section">
@@ -32,7 +44,7 @@ const BuildingsView = ({
             className="action-button update-button"
             aria-label={params.update}
           >
-            <MdEdit size={18} className="mr-4" />
+            <MdEdit size={18} className="mr-1" /> {/* Corrected margin from mr-4 to mr-1 */}
             {params.update}
           </button>
           <button 
@@ -53,9 +65,9 @@ const BuildingsView = ({
       <div className="buildings-grid">
         {/* Add New Building Card */}
         <div
-          className="project-card add-project-card" // You can use building-card add-building-card if you have specific styles
+          className="project-card add-project-card"
           onClick={onAddBuilding}
-          style={{ cursor: 'pointer' }} // Ensure it's clear it's clickable
+          style={{ cursor: 'pointer' }}
         >
           <div className="flex flex-col items-center justify-center h-full">
             <MdOutlineAddCircle className="text-5xl text-primary mb-2" />
@@ -69,6 +81,8 @@ const BuildingsView = ({
             <div 
               key={building.uuid} 
               className="building-card" // Assuming you have a .building-card style
+              onClick={() => handleBuildingClick(building.uuid)} // Updated onClick
+              style={{ cursor: 'pointer' }} // Add cursor pointer to indicate clickability
             >
               <BuildingBtn 
                 name={building.name} 
