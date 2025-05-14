@@ -218,12 +218,13 @@
       "loading": "Φόρτωση..."
     },
     "contactInfo": {
-      "title": "Πληροφορίες",
-      "informationTitle": "Πληροφορίες",
-      "address": "Διεύθυνση",
-      "contactPersonTitle": "Στοιχεία Υπευθύνου",
-      "noContactDetails": "Δεν έχουν προστεθεί στοιχεία υπευθύνου.",
-      "addContactPerson": "Προσθήκη Στοιχείων Υπευθύνου"
+      "title": "Στοιχεία Επικοινωνίας",
+      "addContactButton": "Προσθήκη Επαφής",
+      "noContacts": "Δεν έχουν προστεθεί ακόμη υπεύθυνοι επικοινωνίας.",
+      "name": "Όνομα",
+      "role": "Ρόλος",
+      "email": "Email",
+      "phone_number": "Τηλέφωνο"
     },
     "tabs": {
       "energyProfile": "Ενεργειακό Προφίλ",
@@ -232,7 +233,26 @@
       "scenarios": "Σενάρια",
       "results": "Αποτελέσματα",
       "images": "Εικόνες",
-      "energyProfileContent": "Περιεχόμενο για Ενεργειακό Προφίλ...",
+      "energyProfileContent": {
+        "title": "Λίστα Καταναλώσεων Ενέργειας",
+        "addButton": "Προσθήκη Κατανάλωσης Ενέργειας",
+        "exportButton": "Εξαγωγή CSV",
+        "loading": "Φόρτωση καταναλώσεων ενέργειας...",
+        "errorAuth": "Λείπει ταυτοποίηση ή κωδικός κτιρίου.",
+        "errorFetch": "Αποτυχία φόρτωσης καταναλώσεων ενέργειας.",
+        "columns": {
+          "energySource": "Πηγή Ενέργειας",
+          "quantity": "Ποσότητα",
+          "unit": "Μονάδα",
+          "startDate": "Ημερομηνία Έναρξης",
+          "endDate": "Ημερομηνία Λήξης",
+          "actions": "Ενέργειες"
+        },
+        "actions": {
+          "edit": "Επεξεργασία",
+          "delete": "Διαγραφή"
+        }
+      },
       "systemsContent": "Περιεχόμενο για Συστήματα...",
       "thermalZonesContent": "Περιεχόμενο για Θερμικές Ζώνες & Καταναλώσεις...",
       "scenariosContent": "Περιεχόμενο για Σενάρια...",
@@ -259,5 +279,22 @@
   "BuildingBtn": {
     "usage": "Χρήση",
     "created": "Δημιουργήθηκε"
+  },
+  "AddEnergyConsumptionModal": {
+    "title": "Προσθήκη Νέας Κατανάλωσης Ενέργειας",
+    "energySource": "Πηγή Ενέργειας",
+    "sources": {
+      "electricity": "Ηλεκτρισμός",
+      "heatingOil": "Πετρέλαιο Θέρμανσης",
+      "naturalGas": "Φυσικό Αέριο"
+    },
+    "startDate": "Ημερομηνία Έναρξης",
+    "endDate": "Ημερομηνία Λήξης",
+    "quantity": "Ποσότητα",
+    "cancel": "Ακύρωση",
+    "save": "Αποθήκευση",
+    "saving": "Αποθήκευση...",
+    "errorAuth": "Απαιτείται έλεγχος ταυτότητας.",
+    "errorFailed": "Αποτυχία προσθήκης κατανάλωσης ενέργειας."
   }
 }

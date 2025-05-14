@@ -27,7 +27,7 @@ function App() {
           <Route path="/unauthorized" element={<UnauthorizedAccess />} />
 
           <Route element={<RequireAuth />}>
-            <Route element={<MainLayout />}>          {/*routing to maintain topbar and sidebar visible #TODO: add settings and messages path, maybe routing by project with url param? tbd*/}
+            <Route element={<MainLayout />}>          
               <Route path="" element={<Home />} />
               <Route path="/projects/:projectUuid" element={<Home />} />
               <Route path="/projects/:projectUuid/buildings/:buildingUuid" element={<BuildingProfilePage />} />

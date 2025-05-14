@@ -1,18 +1,19 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 from .models import EnergyConsumption
 from .serializers import EnergyConsumptionSerializer
 
-# Create a new EnergyProfile
-class CreateEnergyConsumption(APIView):
-    def post(self, request):
-        serializer = EnergyConsumptionSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()  # You may need to set user from request.user if applicable
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+class CreateEnergyConsumption(generics.CreateAPIView):
+    queryset = EnergyConsumption.objects.all()
+    serializer_class = EnergyConsumptionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 # Update an existing EnergyProfile identified by uuid
 class UpdateEnergyConsumption(APIView):
     def put(self, request, uuid):

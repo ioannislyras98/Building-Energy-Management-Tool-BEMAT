@@ -4,4 +4,14 @@ from .models import EnergyConsumption
 class EnergyConsumptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = EnergyConsumption
-        fields = '__all__'
+        fields = [
+            'uuid', 
+            'project', 
+            'building', 
+            'energy_source', 
+            'start_date', 
+            'end_date', 
+            'quantity', 
+            'user' 
+        ]
+        read_only_fields = ['uuid', 'user']

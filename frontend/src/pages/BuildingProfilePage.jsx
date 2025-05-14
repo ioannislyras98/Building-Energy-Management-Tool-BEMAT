@@ -100,7 +100,7 @@ export default function BuildingProfilePage() {
   return (
     <>
     <div id="projects-wrapper" className="main-container">
-      <div className="main-container p-4 md:p-6 bg-gray-100 min-h-screen">
+      <div className="p-4 md:p-6 bg-gray-100 min-h-screen"> {/* Removed "main-container" from here */}
         <button
           onClick={() => navigate(`/projects/${projectUuid}`)}
           className="mb-4 inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
@@ -115,7 +115,7 @@ export default function BuildingProfilePage() {
             <BuildingContactInfo building={building} params={text?.contactInfo || {}} onAddContact={handleAddContact} />
           </div>
           <div className="lg:w-2/3 bg-white rounded-lg shadow">
-            <BuildingTabs params={text?.tabs || {}} buildingUuid={buildingUuid} projectUuid={projectUuid} />
+          <BuildingTabs params={text?.tabs || {}} buildingUuid={buildingUuid} projectUuid={projectUuid} buildingData={building} />
           </div>
         </div>
       </div>

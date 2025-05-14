@@ -223,12 +223,13 @@
       "loading": "Loading..."
     },
     "contactInfo": {
-      "title": "Information",
-      "informationTitle": "Information",
-      "address": "Address",
-      "contactPersonTitle": "Contact Person Details",
-      "noContactDetails": "No contact details have been added.",
-      "addContactPerson": "Add Contact Person Details"
+      "title": "Contact Information",
+      "addContactButoon": "Add Contact Person",
+      "noContacts": "No contact persons available.",
+      "name": "Name",
+      "role": "Role",
+      "email": "Email",
+      "phone_number": "Phone"
     },
     "tabs": {
       "energyProfile": "Energy Profile",
@@ -237,7 +238,26 @@
       "scenarios": "Scenarios",
       "results": "Results",
       "images": "Images",
-      "energyProfileContent": "Content for Energy Profile...",
+      "energyProfileContent": {
+        "title": "Energy Consumption List",
+        "addButton": "Add Energy Consumption",
+        "exportButton": "Export CSV",
+        "loading": "Loading energy consumptions...",
+        "errorAuth": "Authentication or Building ID missing.",
+        "errorFetch": "Failed to fetch energy consumptions.",
+        "columns": {
+          "energySource": "Energy Source",
+          "quantity": "Quantity",
+          "unit": "Unit",
+          "startDate": "Start Date",
+          "endDate": "End Date",
+          "actions": "Actions"
+        },
+        "actions": {
+          "edit": "Edit",
+          "delete": "Delete"
+        }
+      },
       "systemsContent": "Content for Systems...",
       "thermalZonesContent": "Content for Thermal Zones & Consumption...",
       "scenariosContent": "Content for Scenarios...",
@@ -259,5 +279,22 @@
   "BuildingBtn": {
     "usage": "Usage",
     "created": "Created"
+  },
+  "AddEnergyConsumptionModal": {
+    "title": "Add New Energy Consumption",
+    "energySource": "Energy Source",
+    "sources": {
+      "electricity": "Electricity",
+      "heatingOil": "Heating Oil",
+      "naturalGas": "Natural Gas"
+    },
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "quantity": "Quantity",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "errorAuth": "Authentication required.",
+    "errorFailed": "Failed to add energy consumption."
   }
 }

@@ -12,6 +12,8 @@ from .models import Building
 from .serializer import BuildingSerializer
 from project.models import Project
 from rest_framework.authtoken.models import Token
+from contact.models import Contact
+from contact.serializers import ContactSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -172,13 +174,16 @@ def get_building_detail(request, uuid):
         if building.user != user:
             return JsonResponse({"error": "Access denied: You do not own this building"}, status=403)
         
-        # Επιστρέφουμε αναλυτικά όλα τα πεδία του κτιρίου
+        # Ανάκτηση των επαφών για το κτίριο
+        contacts = Contact.objects.filter(building=building)
+        contacts_data = ContactSerializer(contacts, many=True).data
+
         building_data = {
             "uuid": str(building.uuid),
             "name": building.name,
             "project": str(building.project.uuid),
-            "usage": building.usage,
-            "user": str(building.user.email),
+                        "usage": building.usage,
+"user": str(building.user.email),
             "description": building.description,
             "year_built": building.year_built,
             "address": building.address,
@@ -186,17 +191,18 @@ def get_building_detail(request, uuid):
             "is_certified": building.is_certified,
             "energy_class": building.energy_class,
             "orientation": building.orientation,
-            "total_area": str(building.total_area),
-            "examined_area": str(building.examined_area),
+            "total_area": str(building.total_area) if building.total_area is not None else None,
+            "examined_area": str(building.examined_area) if building.examined_area is not None else None,
             "floors_examined": building.floors_examined,
-            "floor_height": str(building.floor_height) if building.floor_height else None,
+            "floor_height": str(building.floor_height) if building.floor_height is not None else None,
             "construction_type": building.construction_type,
             "free_facades": building.free_facades,
-            "altitude": str(building.altitude) if building.altitude else None,
+            "altitude": str(building.altitude) if building.altitude is not None else None,
             "non_operating_days": building.non_operating_days,
             "operating_hours": building.operating_hours,
             "occupants": building.occupants,
-            "date_created": building.date_created.strftime("%d-%m-%Y")
+            "date_created": building.date_created.strftime("%d-%m-%Y"),
+            "contacts": contacts_data
         }
         
         return JsonResponse(building_data, status=200)
@@ -204,7 +210,11 @@ def get_building_detail(request, uuid):
     except Building.DoesNotExist:
         return JsonResponse({"error": "Building not found"}, status=404)
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        # Log the exception for debugging
+        print(f"Error in get_building_detail: {e}")
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({"error": "An unexpected error occurred: " + str(e)}, status=500)
 
 @csrf_exempt
 def delete_building(request, building_uuid):
