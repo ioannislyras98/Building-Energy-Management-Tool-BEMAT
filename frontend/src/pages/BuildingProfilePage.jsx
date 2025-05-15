@@ -66,12 +66,14 @@ export default function BuildingProfilePage() {
   }, [buildingUuid, text]);
 
   const handleEditBasicInfo = () => {
+    console.log("Edit Basic Info button clicked");
     if (building) {
       openEditBuildingModal();
     }
   };
 
   const handleAddContact = () => {
+    console.log("Add Contact button clicked");
     if (building) {
       openAddContactModal();
     }
@@ -84,6 +86,7 @@ export default function BuildingProfilePage() {
   const handleContactAdded = (newContact) => {
     fetchBuildingDetails();
   };
+
 
   if (loading) {
     return <div className="p-6">{text?.loading || "Loading building profile..."}</div>;
@@ -102,7 +105,10 @@ export default function BuildingProfilePage() {
     <div id="projects-wrapper" className="main-container">
       <div className="p-4 md:p-6 bg-gray-100 min-h-screen"> {/* Removed "main-container" from here */}
         <button
-          onClick={() => navigate(`/projects/${projectUuid}`)}
+          onClick={() => {
+            console.log("Back to Buildings button clicked");
+            navigate(`/projects/${projectUuid}`);
+          }}
           className="mb-4 inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
         >
           <MdArrowBack className="mr-2" size={18} />

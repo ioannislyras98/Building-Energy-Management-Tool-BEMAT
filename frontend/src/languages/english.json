@@ -187,6 +187,22 @@
     "errorEmail": "Invalid email address.",
     "errorGeneral": "An error occurred while adding the contact."
   },
+  "EditContactModal": {
+    "h2": "Edit Contact",
+    "contactName": "Contact Name",
+    "contactName_example": "e.g., John Doe",
+    "contactRole": "Role",
+    "contactRole_example": "e.g., Manager",
+    "contactEmail": "Email",
+    "contactEmail_example": "e.g., example@email.com",
+    "contactPhone": "Phone",
+    "contactPhone_example": "e.g., +1234567890",
+    "updateContact": "Update Contact",
+    "cancel": "Cancel",
+    "errorRequired": "This field is required.",
+    "errorEmail": "Invalid email address.",
+    "errorGeneral": "An error occurred while updating the contact."
+  },
   "TopBar": {
     "home": "Home",
     "settings": "Settings",
@@ -245,17 +261,24 @@
         "loading": "Loading energy consumptions...",
         "errorAuth": "Authentication or Building ID missing.",
         "errorFetch": "Failed to fetch energy consumptions.",
+        "errorDelete": "Failed to delete energy consumption.",
         "columns": {
           "energySource": "Energy Source",
-          "quantity": "Quantity",
+          "quantity": "Energy",
           "unit": "Unit",
-          "startDate": "Start Date",
-          "endDate": "End Date",
+          "startDate": "from",
+          "endDate": "To",
           "actions": "Actions"
         },
         "actions": {
           "edit": "Edit",
           "delete": "Delete"
+        },
+        "deleteDialog": {
+          "title": "Delete Energy Consumption",
+          "message": "Are you sure you want to delete this energy consumption record? This action cannot be undone.",
+          "cancel": "Cancel",
+          "confirm": "Delete"
         }
       },
       "systemsContent": "Content for Systems...",
@@ -293,8 +316,30 @@
     "quantity": "Quantity",
     "cancel": "Cancel",
     "save": "Save",
-    "saving": "Saving...",
+"saving": "Saving...",
     "errorAuth": "Authentication required.",
     "errorFailed": "Failed to add energy consumption."
+  },
+  "EnergyConsumptionModal": {
+    "h2": "Add Energy Consumption",
+    "h2_edit": "Edit Energy Consumption",
+    "energySource": "Energy Source",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "quantity": "Quantity",
+    "quantity_example": "e.g., 1000",
+    "selectOption": "Select an option",
+    "electricity": "Electricity",
+    "natural_gas": "Natural Gas",
+    "heating_oil": "Oil",
+    "biomass": "Biomass",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "update": "Update",
+    "errorRequired": "This field is required",
+    "errorNumber": "Must be a number",
+    "errorGeneral": "Error creating energy consumption",
+    "errorUpdate": "Error updating energy consumption",
+    "deleteConfirmation": "Are you sure you want to delete this energy consumption?"
   }
 }

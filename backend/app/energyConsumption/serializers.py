@@ -11,7 +11,9 @@ class EnergyConsumptionSerializer(serializers.ModelSerializer):
             'energy_source', 
             'start_date', 
             'end_date', 
-            'quantity', 
+            'quantity',
+            'unit',
+            'kwh_equivalent', 
             'user' 
         ]
-        read_only_fields = ['uuid', 'user']
+        read_only_fields = ['uuid', 'user', 'unit', 'kwh_equivalent']
