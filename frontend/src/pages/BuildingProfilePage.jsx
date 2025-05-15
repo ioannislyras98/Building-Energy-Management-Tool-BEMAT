@@ -87,6 +87,13 @@ export default function BuildingProfilePage() {
     fetchBuildingDetails();
   };
 
+  const handleContactEdited = (editedContact) => {
+    fetchBuildingDetails();
+  };
+
+  const handleContactDeleted = (deletedContact) => {
+    fetchBuildingDetails();
+  };
 
   if (loading) {
     return <div className="p-6">{text?.loading || "Loading building profile..."}</div>;
@@ -118,7 +125,13 @@ export default function BuildingProfilePage() {
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="lg:w-1/3 space-y-6">
             <BuildingBasicInfo building={building} params={text?.basicInfo || {}} onEdit={handleEditBasicInfo} />
-            <BuildingContactInfo building={building} params={text?.contactInfo || {}} onAddContact={handleAddContact} />
+            <BuildingContactInfo 
+              building={building} 
+              params={text?.contactInfo || {}} 
+              onAddContact={handleAddContact} 
+              onEditContact={handleContactEdited}
+              onDeleteContact={handleContactDeleted}
+            />
           </div>
           <div className="lg:w-2/3 bg-white rounded-lg shadow">
           <BuildingTabs params={text?.tabs || {}} buildingUuid={buildingUuid} projectUuid={projectUuid} buildingData={building} />

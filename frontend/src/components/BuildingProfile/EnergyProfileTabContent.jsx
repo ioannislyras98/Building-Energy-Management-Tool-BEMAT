@@ -10,6 +10,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import EnergyConsumptionModal from '../../modals/EnergyConsumptionModal';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const EnergyProfileTabContent = ({ buildingUuid, projectUuid, buildingData, params }) => {
   const [consumptions, setConsumptions] = useState([]);
@@ -134,6 +135,7 @@ const EnergyProfileTabContent = ({ buildingUuid, projectUuid, buildingData, para
           unit: item.unit || '',
           start_date: item.start_date || '',
           end_date: item.end_date || '',
+          kwh_equivalent: item.kwh_equivalent || 0,
           // Keep original data for reference
           ...item
         })) : [];
@@ -153,6 +155,67 @@ const EnergyProfileTabContent = ({ buildingUuid, projectUuid, buildingData, para
   useEffect(() => {
     fetchConsumptions();
   }, [fetchConsumptions]);
+
+  // Function to prepare data for the stacked area chart
+  const prepareChartData = useCallback(() => {
+    if (!consumptions.length) return [];
+    
+    // Map to aggregate energy consumption by date
+    const dateMap = new Map();
+    
+    // Process each consumption entry
+    consumptions.forEach(consumption => {
+      const startDate = new Date(consumption.start_date);
+      const endDate = new Date(consumption.end_date);
+      
+      // Skip invalid dates
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return;
+      
+      // Calculate daily consumption rate
+      const daysDiff = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
+      const dailyKwh = consumption.kwh_equivalent / daysDiff;
+      
+      // For each day in the consumption period
+      let currentDate = new Date(startDate);
+      while (currentDate <= endDate) {
+        const dateStr = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+        
+        if (!dateMap.has(dateStr)) {
+          dateMap.set(dateStr, {
+            date: dateStr,
+            electricity: 0,
+            heating_oil: 0,
+            natural_gas: 0,
+            biomass: 0
+          });
+        }
+        
+        // Add consumption to appropriate energy source
+        const dateData = dateMap.get(dateStr);
+        switch(consumption.energy_source?.toLowerCase()) {
+          case 'electricity':
+            dateData.electricity += dailyKwh;
+            break;
+          case 'heating_oil':
+            dateData.heating_oil += dailyKwh;
+            break;
+          case 'natural_gas':
+            dateData.natural_gas += dailyKwh;
+            break;
+          case 'biomass':
+            dateData.biomass += dailyKwh;
+            break;
+        }
+        
+        // Move to next day
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    });
+    
+    // Convert map to array and sort by date
+    return Array.from(dateMap.values())
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+  }, [consumptions]);
 
   // Define columns for the data grid
   const columns = [
@@ -190,6 +253,13 @@ const EnergyProfileTabContent = ({ buildingUuid, projectUuid, buildingData, para
       flex: 0.5,
       minWidth: 80 
     },
+    { 
+      field: 'kwh_equivalent', 
+      headerName: translations.columns.kwhEquivalent || 'Ενέργεια(kwh)',
+      type: 'number',
+      flex: 0.8,
+      minWidth: 120,
+    },
     {
       field: 'actions',
       headerName: translations.columns.actions,
@@ -222,6 +292,8 @@ const EnergyProfileTabContent = ({ buildingUuid, projectUuid, buildingData, para
 
   if (loading) return <p>{translations.loading}</p>;
   if (error) return <p className="text-red-500">{error}</p>;
+
+  const chartData = prepareChartData();
 
   console.log("EnergyProfileTabContent: Rendering, open state is:", open);
 
@@ -271,6 +343,80 @@ const EnergyProfileTabContent = ({ buildingUuid, projectUuid, buildingData, para
             },
           }}
         />
+      </Card>
+      
+      {/* Energy Consumption Chart */}
+      <Card variant="outlined" sx={{ mt: 4, p: 2 }}>
+        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'var(--color-primary)', mb: 2 }}>
+          {translations.energyConsumptionChart || "Energy Consumption Chart"}
+        </Typography>
+        <Box sx={{ width: '100%', height: 400 }}>
+          <ResponsiveContainer>
+            <AreaChart
+              data={chartData}
+              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="date" 
+                tickFormatter={(date) => {
+                  const dateObj = new Date(date);
+                  return dateObj.toLocaleDateString(language === 'en' ? 'en-US' : 'el-GR', {
+                    day: '2-digit',
+                    month: 'short'
+                  });
+                }}
+                label={{ 
+                  value: translations.chartDateAxis || "Date", 
+                  position: 'insideBottomRight', 
+                  offset: -10 
+                }} 
+              />
+              <YAxis 
+                label={{ 
+                  value: translations.chartEnergyAxis || "Energy (kWh)", 
+                  angle: -90, 
+                  position: 'insideLeft' 
+                }} 
+              />
+              <RechartsTooltip />
+              <Legend />
+              {/* Order of stacking: electricity -> heating oil -> natural gas -> biomass */}
+              <Area 
+                type="monotone" 
+                dataKey="electricity" 
+                name={getEnergySourceDisplay("electricity")} 
+                stackId="1" 
+                stroke="#8884d8" 
+                fill="#8884d8" 
+              />
+              <Area 
+                type="monotone" 
+                dataKey="heating_oil" 
+                name={getEnergySourceDisplay("heating_oil")} 
+                stackId="1" 
+                stroke="#82ca9d" 
+                fill="#82ca9d" 
+              />
+              <Area 
+                type="monotone" 
+                dataKey="natural_gas" 
+                name={getEnergySourceDisplay("natural_gas")} 
+                stackId="1" 
+                stroke="#ffc658" 
+                fill="#ffc658" 
+              />
+              <Area 
+                type="monotone" 
+                dataKey="biomass" 
+                name={getEnergySourceDisplay("biomass")} 
+                stackId="1" 
+                stroke="#ff8042" 
+                fill="#ff8042" 
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </Box>
       </Card>
       
       {/* Energy Consumption Modal */}

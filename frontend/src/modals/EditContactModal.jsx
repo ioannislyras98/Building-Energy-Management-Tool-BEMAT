@@ -9,7 +9,7 @@ import InputEntryModal from "./InputEntryModal";
 
 const cookies = new Cookies();
 
-function EditContactModalForm({ isOpen, onClose, onContactUpdated, contact, params }) {
+function EditContactModalForm({ isOpen, onClose, onContactUpdated, contact, params, buildingUuid }) {
   const [formData, setFormData] = useState({
     name: "",
     role: "",
@@ -62,7 +62,7 @@ function EditContactModalForm({ isOpen, onClose, onContactUpdated, contact, para
     if (!validateForm()) return;
 
     $.ajax({
-      url: `http://127.0.0.1:8000/buildings/contacts/update/${contact.uuid}/`,
+      url: `http://127.0.0.1:8000/buildings/${buildingUuid}/contacts/${contact.uuid}/update/`,
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -142,18 +142,18 @@ function EditContactModalForm({ isOpen, onClose, onContactUpdated, contact, para
   );
 }
 
-export default function EditContactModal({ isOpen, onClose, onContactUpdated, contact }) {
+export default function EditContactModal({ isOpen, onClose, onContactUpdated, contact, buildingUuid }) {
   const { language } = useLanguage();
   const params = language === "en" ? english_text.EditContactModal : greek_text.EditContactModal;
 
   return (
-    
     <EditContactModalForm
       isOpen={isOpen}
       onClose={onClose}
       onContactUpdated={onContactUpdated}
       contact={contact}
       params={params || {}} // Ensure params is always an object
+      buildingUuid={buildingUuid}
     />
   );
 }

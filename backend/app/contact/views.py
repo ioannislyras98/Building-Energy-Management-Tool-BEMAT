@@ -2,6 +2,8 @@ from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.http import JsonResponse
+from rest_framework.views import APIView
 from .models import Contact
 from .serializers import ContactSerializer, ContactCreateSerializer
 from building.models import Building
@@ -77,3 +79,48 @@ class ContactDetailView(generics.RetrieveUpdateDestroyAPIView):
         # Διασφάλιση ότι ο χρήστης έχει πρόσβαση μόνο στις δικές του επαφές (μέσω του project του κτιρίου)
         user = self.request.user
         return Contact.objects.filter(building__project__user=user)
+
+class ContactDeleteView(APIView):
+    """
+    View for deleting a contact associated with a building.
+    """
+    def delete(self, request, building_uuid, contact_uuid, *args, **kwargs):
+        try:
+            # Verify the building exists
+            building = Building.objects.get(uuid=building_uuid)
+            
+            # Find the contact that belongs to this building
+            contact = Contact.objects.get(uuid=contact_uuid, building=building)
+            
+            # Perform deletion
+            contact.delete()
+            return Response({"message": "Contact deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+        except Building.DoesNotExist:
+            return Response({"error": "Building not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Contact.DoesNotExist:
+            return Response({"error": "Contact not found."}, status=status.HTTP_404_NOT_FOUND)
+
+class ContactUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def put(self, request, building_uuid, contact_uuid, format=None):
+        try:
+            # Verify building exists
+            building = Building.objects.get(uuid=building_uuid)
+            
+            # Get the contact that belongs to this building
+            contact = Contact.objects.get(uuid=contact_uuid, building=building)
+            
+            # Get the data from request
+            serializer = ContactSerializer(contact, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        except Building.DoesNotExist:
+            return Response({"error": "Building not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Contact.DoesNotExist:
+            return Response({"error": "Contact not found for this building"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

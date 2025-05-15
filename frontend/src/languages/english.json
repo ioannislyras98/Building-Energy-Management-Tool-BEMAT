@@ -268,6 +268,7 @@
           "unit": "Unit",
           "startDate": "from",
           "endDate": "To",
+          "kwhEquivalent": "Energy (kWh)",
           "actions": "Actions"
         },
         "actions": {
@@ -279,7 +280,10 @@
           "message": "Are you sure you want to delete this energy consumption record? This action cannot be undone.",
           "cancel": "Cancel",
           "confirm": "Delete"
-        }
+        },
+        "energyConsumptionChart": "Energy Consumption Chart",
+        "chartDateAxis": "Date",
+        "chartEnergyAxis": "Energy (kWh)"
       },
       "systemsContent": "Content for Systems...",
       "thermalZonesContent": "Content for Thermal Zones & Consumption...",
@@ -291,6 +295,12 @@
       "editBasicInfo": "Edit Basic Information",
       "addContactPerson": "Add Contact Person"
     }
+  },
+  "BuildingContactInfo": {
+    "deleteContactTitle": "Delete Contact",
+    "deleteContactConfirmation": "Are you sure you want to delete this contact? This action cannot be undone.",
+    "cancelButton": "Cancel",
+    "deleteButton": "Delete"
   },
   "SideBar": {
     "home": "Home"

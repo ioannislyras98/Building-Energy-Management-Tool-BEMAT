@@ -2,12 +2,25 @@ import React, { useState } from 'react';
 import { MdPersonAdd, MdEdit, MdDelete } from 'react-icons/md';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import EditContactModal from '../../modals/EditContactModal';
+import $ from 'jquery';
+import Cookies from 'universal-cookie';
+import { useLanguage } from "../../context/LanguageContext";
+import english_text from "../../languages/english.json";
+import greek_text from "../../languages/greek.json";
 
 export default function BuildingContactInfo({ building, params, onAddContact, onEditContact, onDeleteContact }) {
   const contacts = building?.contacts || [];
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentContact, setCurrentContact] = useState(null);
+  const cookies = new Cookies();
+  const token = cookies.get("token") || "";
+  const { language } = useLanguage();
+  
+  // Get the appropriate text based on the current language
+  const dialogText = language === "en" ? 
+    english_text.BuildingContactInfo : 
+    greek_text.BuildingContactInfo;
 
   const handleEditClick = (contact) => {
     setCurrentContact(contact);
@@ -26,12 +39,35 @@ export default function BuildingContactInfo({ building, params, onAddContact, on
 
   const confirmDelete = () => {
     if (currentContact && onDeleteContact) {
-      onDeleteContact(currentContact);
+      const settings = {
+        url: `http://127.0.0.1:8000/buildings/${building.uuid}/contacts/${currentContact.uuid}/delete/`,
+        method: "DELETE",
+        timeout: 0,
+        headers: {
+          "Authorization": `token ${token}`
+        }
+      };
+
+      $.ajax(settings)
+        .done(function (response) {
+          // If successful, update the UI through the provided callback
+          onDeleteContact(currentContact);
+        })
+        .fail(function (error) {
+          console.error('Error deleting contact:', error);
+          alert("Error deleting contact. Please try again.");
+        })
+        .always(function () {
+          setDeleteDialogOpen(false);
+          setCurrentContact(null);
+        });
+    } else {
+      setDeleteDialogOpen(false);
+      setCurrentContact(null);
     }
-    setDeleteDialogOpen(false);
-    setCurrentContact(null);
   };
 
+  // Remove the API call from handleContactUpdated as it will now be handled in the modal
   const handleContactUpdated = (updatedContact) => {
     if (onEditContact) {
       onEditContact(updatedContact);
@@ -94,25 +130,34 @@ export default function BuildingContactInfo({ building, params, onAddContact, on
         onClose={() => setEditModalOpen(false)}
         onContactUpdated={handleContactUpdated}
         contact={currentContact}
+        buildingUuid={building.uuid}
       />
 
       {/* Delete Confirmation Dialog */}
       <Dialog
         open={deleteDialogOpen}
         onClose={cancelDelete}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+        keepMounted={false}
       >
-        <DialogTitle>{params?.deleteContact || "Delete Contact"}</DialogTitle>
+        <DialogTitle id="delete-dialog-title">{dialogText.deleteContactTitle}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {params?.deleteConfirmation || "Are you sure you want to delete this contact? This action cannot be undone."}
+          <DialogContentText id="delete-dialog-description">
+            {dialogText.deleteContactConfirmation}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={cancelDelete} color="primary">
-            {params?.cancel || "Cancel"}
+            {dialogText.cancelButton}
           </Button>
-          <Button onClick={confirmDelete} color="error" autoFocus>
-            {params?.delete || "Delete"}
+          <Button 
+            onClick={confirmDelete} 
+            color="error" 
+            autoFocus
+            id="delete-confirm-button"
+          >
+            {dialogText.deleteButton}
           </Button>
         </DialogActions>
       </Dialog>
