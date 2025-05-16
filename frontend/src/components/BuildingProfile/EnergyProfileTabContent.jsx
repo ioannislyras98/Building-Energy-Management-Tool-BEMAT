@@ -10,7 +10,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import EnergyConsumptionModal from '../../modals/EnergyConsumptionModal';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const EnergyProfileTabContent = ({ buildingUuid, projectUuid, buildingData, params }) => {
   const [consumptions, setConsumptions] = useState([]);
@@ -156,12 +156,12 @@ const EnergyProfileTabContent = ({ buildingUuid, projectUuid, buildingData, para
     fetchConsumptions();
   }, [fetchConsumptions]);
 
-  // Function to prepare data for the stacked area chart
-  const prepareChartData = useCallback(() => {
+  // Function to prepare data by consumption period
+  const preparePeriodsData = useCallback(() => {
     if (!consumptions.length) return [];
     
-    // Map to aggregate energy consumption by date
-    const dateMap = new Map();
+    // Group consumptions by their exact date ranges
+    const periodMap = new Map();
     
     // Process each consumption entry
     consumptions.forEach(consumption => {
@@ -171,51 +171,106 @@ const EnergyProfileTabContent = ({ buildingUuid, projectUuid, buildingData, para
       // Skip invalid dates
       if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return;
       
-      // Calculate daily consumption rate
-      const daysDiff = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
-      const dailyKwh = consumption.kwh_equivalent / daysDiff;
+      // Create a unique key for this period
+      const periodKey = `${consumption.start_date}|${consumption.end_date}`;
       
-      // For each day in the consumption period
-      let currentDate = new Date(startDate);
-      while (currentDate <= endDate) {
-        const dateStr = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD format
-        
-        if (!dateMap.has(dateStr)) {
-          dateMap.set(dateStr, {
-            date: dateStr,
-            electricity: 0,
-            heating_oil: 0,
-            natural_gas: 0,
-            biomass: 0
-          });
-        }
-        
-        // Add consumption to appropriate energy source
-        const dateData = dateMap.get(dateStr);
-        switch(consumption.energy_source?.toLowerCase()) {
-          case 'electricity':
-            dateData.electricity += dailyKwh;
-            break;
-          case 'heating_oil':
-            dateData.heating_oil += dailyKwh;
-            break;
-          case 'natural_gas':
-            dateData.natural_gas += dailyKwh;
-            break;
-          case 'biomass':
-            dateData.biomass += dailyKwh;
-            break;
-        }
-        
-        // Move to next day
-        currentDate.setDate(currentDate.getDate() + 1);
+      // Format dates for display
+      const formatDate = (date) => {
+        return date.toLocaleDateString(language === 'en' ? 'en-US' : 'el-GR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: '2-digit'
+        });
+      };
+      
+      // Create period label
+      const periodLabel = startDate.getTime() === endDate.getTime() 
+        ? formatDate(startDate) 
+        : `${formatDate(startDate)} - ${formatDate(endDate)}`;
+      
+      // Initialize period if not exists
+      if (!periodMap.has(periodKey)) {
+        periodMap.set(periodKey, {
+          periodKey,
+          periodLabel,
+          startDate,
+          endDate,
+          electricity: 0,
+          heating_oil: 0,
+          natural_gas: 0,
+          biomass: 0,
+          totalEnergy: 0
+        });
+      }
+      
+      // Add this consumption to the right energy source in this period
+      const periodData = periodMap.get(periodKey);
+      switch(consumption.energy_source?.toLowerCase()) {
+        case 'electricity':
+          periodData.electricity += consumption.kwh_equivalent;
+          periodData.totalEnergy += consumption.kwh_equivalent;
+          break;
+        case 'heating_oil':
+          periodData.heating_oil += consumption.kwh_equivalent;
+          periodData.totalEnergy += consumption.kwh_equivalent;
+          break;
+        case 'natural_gas':
+          periodData.natural_gas += consumption.kwh_equivalent;
+          periodData.totalEnergy += consumption.kwh_equivalent;
+          break;
+        case 'biomass':
+          periodData.biomass += consumption.kwh_equivalent;
+          periodData.totalEnergy += consumption.kwh_equivalent;
+          break;
       }
     });
     
-    // Convert map to array and sort by date
-    return Array.from(dateMap.values())
-      .sort((a, b) => new Date(a.date) - new Date(b.date));
-  }, [consumptions]);
+    // Convert to array and sort by start date
+    return Array.from(periodMap.values())
+      .sort((a, b) => b.startDate - a.startDate); // newest first
+    
+  }, [consumptions, language]);
+
+  const periodsData = preparePeriodsData();
+
+  // Function to prepare data for pie charts
+  const preparePieData = (period) => {
+    const data = [];
+    
+    if (period.electricity > 0) {
+      data.push({
+        name: getEnergySourceDisplay("electricity"),
+        value: period.electricity,
+        color: "#8884d8"
+      });
+    }
+    
+    if (period.heating_oil > 0) {
+      data.push({
+        name: getEnergySourceDisplay("heating_oil"),
+        value: period.heating_oil,
+        color: "#82ca9d"
+      });
+    }
+    
+    if (period.natural_gas > 0) {
+      data.push({
+        name: getEnergySourceDisplay("natural_gas"),
+        value: period.natural_gas,
+        color: "#ffc658"
+      });
+    }
+    
+    if (period.biomass > 0) {
+      data.push({
+        name: getEnergySourceDisplay("biomass"),
+        value: period.biomass,
+        color: "#ff8042"
+      });
+    }
+    
+    return data;
+  };
 
   // Define columns for the data grid
   const columns = [
@@ -293,8 +348,6 @@ const EnergyProfileTabContent = ({ buildingUuid, projectUuid, buildingData, para
   if (loading) return <p>{translations.loading}</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
-  const chartData = prepareChartData();
-
   console.log("EnergyProfileTabContent: Rendering, open state is:", open);
 
   return (
@@ -345,79 +398,74 @@ const EnergyProfileTabContent = ({ buildingUuid, projectUuid, buildingData, para
         />
       </Card>
       
-      {/* Energy Consumption Chart */}
-      <Card variant="outlined" sx={{ mt: 4, p: 2 }}>
-        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'var(--color-primary)', mb: 2 }}>
-          {translations.energyConsumptionChart || "Energy Consumption Chart"}
-        </Typography>
-        <Box sx={{ width: '100%', height: 400 }}>
-          <ResponsiveContainer>
-            <AreaChart
-              data={chartData}
-              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+      {/* Commenting out Energy Consumption Charts section for now
+      
+      <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'var(--color-primary)', mt: 4, mb: 2 }}>
+        {translations.energyConsumptionChart || "Energy Consumption Chart"}
+      </Typography>
+      
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'row', 
+        flexWrap: 'wrap', 
+        gap: 2, 
+        mt: 2,
+        overflowX: 'auto', 
+        pb: 2 
+      }}>
+        {periodsData.length === 0 ? (
+          <Typography variant="body1">No energy consumption data available.</Typography>
+        ) : (
+          periodsData.map((period) => (
+            <Card 
+              key={period.periodKey} 
+              variant="outlined" 
+              sx={{ 
+                width: 300, 
+                minWidth: 300,
+                p: 2, 
+                display: 'flex', 
+                flexDirection: 'column' 
+              }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="date" 
-                tickFormatter={(date) => {
-                  const dateObj = new Date(date);
-                  return dateObj.toLocaleDateString(language === 'en' ? 'en-US' : 'el-GR', {
-                    day: '2-digit',
-                    month: 'short'
-                  });
-                }}
-                label={{ 
-                  value: translations.chartDateAxis || "Date", 
-                  position: 'insideBottomRight', 
-                  offset: -10 
-                }} 
-              />
-              <YAxis 
-                label={{ 
-                  value: translations.chartEnergyAxis || "Energy (kWh)", 
-                  angle: -90, 
-                  position: 'insideLeft' 
-                }} 
-              />
-              <RechartsTooltip />
-              <Legend />
-              {/* Order of stacking: electricity -> heating oil -> natural gas -> biomass */}
-              <Area 
-                type="monotone" 
-                dataKey="electricity" 
-                name={getEnergySourceDisplay("electricity")} 
-                stackId="1" 
-                stroke="#8884d8" 
-                fill="#8884d8" 
-              />
-              <Area 
-                type="monotone" 
-                dataKey="heating_oil" 
-                name={getEnergySourceDisplay("heating_oil")} 
-                stackId="1" 
-                stroke="#82ca9d" 
-                fill="#82ca9d" 
-              />
-              <Area 
-                type="monotone" 
-                dataKey="natural_gas" 
-                name={getEnergySourceDisplay("natural_gas")} 
-                stackId="1" 
-                stroke="#ffc658" 
-                fill="#ffc658" 
-              />
-              <Area 
-                type="monotone" 
-                dataKey="biomass" 
-                name={getEnergySourceDisplay("biomass")} 
-                stackId="1" 
-                stroke="#ff8042" 
-                fill="#ff8042" 
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </Box>
-      </Card>
+              <Typography variant="subtitle1" fontWeight="bold" mb={1}>
+                {period.periodLabel}
+              </Typography>
+              
+              <Box sx={{ height: 180 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={preparePieData(period)}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={70}
+                      fill="#8884d8"
+                      dataKey="value"
+                      nameKey="name"
+                    >
+                      {preparePieData(period).map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip 
+                      formatter={(value) => `${parseFloat(value).toFixed(2)} kWh`}
+                    />
+                    <Legend layout="horizontal" verticalAlign="bottom" align="center" />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
+              
+              <Typography variant="body1" mt={2} align="center">
+                {translations.chartEnergyAxis || "Total Energy"}: <strong>{parseFloat(period.totalEnergy || 0).toFixed(2)} kWh</strong>
+              </Typography>
+            </Card>
+          ))
+        )}
+      </Box>
+      
+      */}
       
       {/* Energy Consumption Modal */}
       <EnergyConsumptionModal

@@ -10,15 +10,42 @@ import InputEntryModal from "./InputEntryModal";
 
 const cookies = new Cookies();
 
+// Prefecture to energy zone mapping
+const PREFECTURE_TO_ZONE = {
+  // Zone A prefectures
+  'Ηρακλείου': 'A', 'Χανίων': 'A', 'Ρεθύμνου': 'A', 'Λασιθίου': 'A', 
+  'Κυκλάδων': 'A', 'Δωδεκανήσου': 'A', 'Σάμου': 'A', 'Μεσσηνίας': 'A', 
+  'Λακωνίας': 'A', 'Αργολίδας': 'A', 'Ζακύνθου': 'A', 'Κεφαλληνίας & Ιθάκης': 'A', 
+  'Αρκαδίας': 'A',
+  
+  // Zone B prefectures
+  'Αττικής': 'B', 'Κορινθίας': 'B', 'Ηλείας': 'B', 'Αχαΐας': 'B', 
+  'Αιτωλοακαρνανίας': 'B', 'Φθιώτιδας': 'B', 'Φωκίδας': 'B', 'Βοιωτίας': 'B', 
+  'Εύβοιας': 'B', 'Μαγνησίας': 'B', 'Λέσβου': 'B', 'Χίου': 'B', 'Κέρκυρας': 'B', 
+  'Λευκάδας': 'B', 'Θεσπρωτίας': 'B', 'Πρέβεζας': 'B', 'Άρτας': 'B',
+  
+  // Zone C prefectures
+  'Ευρυτανίας': 'C', 'Ιωαννίνων': 'C', 'Λάρισας': 'C', 'Καρδίτσας': 'C', 
+  'Τρικάλων': 'C', 'Πιερίας': 'C', 'Ημαθίας': 'C', 'Πέλλας': 'C', 'Θεσσαλονίκης': 'C', 
+  'Κιλκίς': 'C', 'Χαλκιδικής': 'C', 'Σερρών': 'C', 'Καβάλας': 'C', 'Ξάνθης': 'C', 
+  'Ροδόπης': 'C', 'Έβρου': 'C',
+  
+  // Zone D prefectures
+  'Γρεβενών': 'D', 'Κοζάνης': 'D', 'Καστοριάς': 'D', 'Φλώρινας': 'D', 'Δράμας': 'D'
+};
+
+// Get a sorted array of all prefecture names for a flat dropdown
+const ALL_PREFECTURES = Object.keys(PREFECTURE_TO_ZONE).sort();
+
 function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, params }) {
-  console.log("BuildingModalForm params:", params);
-  console.log("BuildingModalForm projectUuid:", projectUuid);
   const [formData, setFormData] = useState({
     name: "", // Building name
     usage: "", // Building usage
     description: "", // Building description
     year_built: "", // Year built
     address: "", // Address
+    prefecture: "", // New field for prefecture
+    energy_zone: "", // New field for energy zone
     is_insulated: false, // Is insulated
     is_certified: false, // Is energy class certified
     energy_class: "", // Energy class
@@ -34,40 +61,38 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
     operating_hours: "", // Operating hours
     occupants: "", // Number of people in building
   });
-  
+
   const [errors, setErrors] = useState({});
   const [showValidationErrors, setShowValidationErrors] = useState(false);
 
   const token = cookies.get("token") || "";
 
+  // Update energy zone when prefecture changes
+  useEffect(() => {
+    if (formData.prefecture) {
+      const zone = PREFECTURE_TO_ZONE[formData.prefecture] || "";
+      setFormData(prevState => ({
+        ...prevState,
+        energy_zone: zone
+      }));
+    }
+  }, [formData.prefecture]);
+
   const handleChange = (e) => {
     const { id, value, type } = e.target;
-    
-    console.log(`Field ${id} changed to: "${value}" (type: ${type})`);
-    console.log("Previous state:", formData);
-    
-    // Δημιουργήστε το νέο state αντικείμενο πριν την ενημέρωση
+
     const newFormData = { ...formData };
-    
-    // Για τα dropdown που αναπαριστούν boolean τιμές
+
     if (id === "is_insulated" || id === "is_certified") {
       newFormData[id] = value === "true";
-    } 
-    // Για αριθμητικά πεδία
-    else if (type === "number") {
-      newFormData[id] = value === "" ? "" : value; // Διατήρηση κενού string αν δεν υπάρχει τιμή
-    }
-    // Για όλα τα άλλα πεδία (text, κλπ)
-    else {
+    } else if (type === "number") {
+      newFormData[id] = value === "" ? "" : value;
+    } else {
       newFormData[id] = value;
     }
-    
-    console.log("New state will be:", newFormData);
-    
-    // Ενημέρωση του state
+
     setFormData(newFormData);
-    
-    // Καθαρισμός σφάλματος όταν το πεδίο επεξεργάζεται
+
     if (errors[id]) {
       setErrors({
         ...errors,
@@ -79,28 +104,32 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
   const validateForm = () => {
     const newErrors = {};
     let hasErrors = false;
-    
-    // Required fields validation
+
     if (!formData.name.trim()) {
       newErrors.name = params.errorRequired || "Field is required";
       hasErrors = true;
     }
-    
+
     if (!formData.usage.trim()) {
       newErrors.usage = params.errorRequired || "Field is required";
       hasErrors = true;
     }
-    
+
     if (!formData.description.trim()) {
       newErrors.description = params.errorRequired;
       hasErrors = true;
     }
-    
+
     if (!formData.address.trim()) {
       newErrors.address = params.errorRequired;
       hasErrors = true;
     }
-    
+
+    if (!formData.prefecture) {
+      newErrors.prefecture = params.errorRequired;
+      hasErrors = true;
+    }
+
     if (!formData.total_area) {
       newErrors.total_area = params.errorRequired;
       hasErrors = true;
@@ -108,7 +137,7 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
       newErrors.total_area = params.errorPositive;
       hasErrors = true;
     }
-    
+
     if (!formData.examined_area) {
       newErrors.examined_area = params.errorRequired;
       hasErrors = true;
@@ -116,7 +145,7 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
       newErrors.examined_area = params.errorPositive;
       hasErrors = true;
     }
-    
+
     if (!formData.floors_examined) {
       newErrors.floors_examined = params.errorRequired;
       hasErrors = true;
@@ -124,27 +153,22 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
       newErrors.floors_examined = params.errorPositive;
       hasErrors = true;
     }
-    
-    // Σημαντικό: Πρώτα ορίζουμε τα errors και μετά το showValidationErrors
+
     setErrors(newErrors);
     setShowValidationErrors(true);
-    
+
     return !hasErrors;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // Καθαρίζουμε τυχόν προηγούμενα σφάλματα
+
     setErrors({});
-    
-    // Επικύρωση φόρμας
+
     const isValid = validateForm();
-    
-    // Αν η φόρμα δεν είναι έγκυρη, διακόπτουμε την υποβολή
+
     if (!isValid) {
       setTimeout(() => {
-        // Χρησιμοποιούμε setTimeout για να εξασφαλίσουμε ότι το state έχει ενημερωθεί
         const firstErrorField = Object.keys(errors)[0];
         if (firstErrorField) {
           const element = document.getElementById(firstErrorField);
@@ -157,13 +181,11 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
       return;
     }
 
-    // Prepare data for API call
     const buildingData = {
       ...formData,
-      project: projectUuid, // Include the project UUID
+      project: projectUuid,
     };
 
-    // Μετατροπή κενών τιμών σε null και βεβαίωση ότι οι αριθμοί είναι πραγματικά αριθμοί
     const decimalFields = ['total_area', 'examined_area', 'floor_height', 'altitude'];
     decimalFields.forEach(field => {
       if (buildingData[field] === "") {
@@ -173,7 +195,6 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
       }
     });
 
-    // Βεβαίωση ότι και άλλα αριθμητικά πεδία είναι πραγματικά αριθμοί
     const integerFields = ['year_built', 'floors_examined', 'free_facades', 'occupants'];
     integerFields.forEach(field => {
       if (buildingData[field] === "") {
@@ -183,9 +204,6 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
       }
     });
 
-    // API call to create building
-    console.log("Data being sent to API (object):", buildingData);
-    console.log("Data being sent to API (JSON string):", JSON.stringify(buildingData));
     $.ajax({
       url: "http://127.0.0.1:8000/buildings/create/",
       method: "POST",
@@ -196,7 +214,6 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
       },
       data: JSON.stringify(buildingData),
       success: function (response) {
-        console.log("Building created:", response);
         const newBuilding = {
           ...buildingData,
           uuid: response.uuid,
@@ -204,18 +221,12 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
         onBuildingCreated(newBuilding);
         onClose();
       },
-      error: function (jqXHR) { // Changed 'error' to 'jqXHR' for clarity
+      error: function (jqXHR) {
         setShowValidationErrors(true);
         const newErrorState = {};
-        console.error("AJAX error object:", jqXHR); // Log the full jqXHR object
 
         if (jqXHR.responseJSON) {
-          // Alert the full JSON response from the backend for detailed diagnostics
-          alert("Backend Error Details: " + JSON.stringify(jqXHR.responseJSON));
-          
           if (typeof jqXHR.responseJSON === 'object' && jqXHR.responseJSON !== null) {
-            // Handle common error structures like { field: ["message"] } or { detail: "message" }
-            // or the originally anticipated { error: "message" } or { error: { field: "message" } }
             if (jqXHR.responseJSON.error) { 
                 if (typeof jqXHR.responseJSON.error === 'object') {
                     setErrors(jqXHR.responseJSON.error);
@@ -227,7 +238,6 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 newErrorState.general = String(jqXHR.responseJSON.detail);
                 setErrors(newErrorState);
             } else { 
-                // Attempt to map field-specific errors
                 const fieldErrors = {};
                 let hasFieldErrors = false;
                 for (const key in jqXHR.responseJSON) {
@@ -235,7 +245,6 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                         fieldErrors[key] = jqXHR.responseJSON[key].join(' ');
                         hasFieldErrors = true;
                     } else if (typeof jqXHR.responseJSON[key] === 'string') {
-                        // If it's a string, assume it's an error for that key or a general one
                         fieldErrors[key] = jqXHR.responseJSON[key];
                         hasFieldErrors = true;
                     }
@@ -243,23 +252,19 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 if (hasFieldErrors) {
                     setErrors(fieldErrors);
                 } else {
-                    // Fallback if responseJSON is an object but not in a recognized error format
                     newErrorState.general = "Error processing server response. Check console for details.";
                     setErrors(newErrorState);
                 }
             }
           } else {
-            // If responseJSON is not an object (e.g. a string)
             newErrorState.general = String(jqXHR.responseJSON);
             setErrors(newErrorState);
           }
         } else {
-          // Fallback if no jqXHR.responseJSON (e.g. network error, non-JSON response)
           const defaultMessage = `An error occurred: ${jqXHR.statusText || 'Unknown error'}.`;
           const errorMessage = (params && params.errorGeneral) ? params.errorGeneral : defaultMessage;
           newErrorState.general = errorMessage;
           setErrors(newErrorState);
-          alert("Error: " + errorMessage + (jqXHR.responseText ? `\nRaw Response: ${jqXHR.responseText}` : ''));
         }
       },
     });
@@ -267,14 +272,12 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
 
   if (!isOpen) return null;
 
-  // Διαμόρφωση CSS κλάσης για τα πεδία με σφάλματα
   const getInputClass = (fieldName) => {
     return showValidationErrors && errors[fieldName] 
       ? "block w-full p-2 border border-red-500 bg-red-50 rounded-md shadow-sm focus:border-red-500 focus:ring focus:ring-red-200" 
       : "block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50";
   };
 
-  // Κώδικας για την εμφάνιση μηνύματος σφάλματος
   const renderError = (fieldName) => {
     if (showValidationErrors && errors[fieldName]) {
       return (
@@ -302,7 +305,6 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
         
         <div className="overflow-y-auto flex-grow pr-2">
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Basic information section */}
             <div className="border-b border-gray-200 pb-4">
               <h3 className="font-bold text-primary text-sm mb-3">{params.basicInfoSection}</h3>
               
@@ -387,9 +389,43 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
                 required
                 className={errors.address && showValidationErrors ? "border-red-500 bg-red-50" : ""}
               />
+
+              <div className="mb-4">
+                <label htmlFor="prefecture" className="block text-sm mb-1">
+                  {params.prefecture} <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="prefecture"
+                  name="prefecture"
+                  value={formData.prefecture}
+                  onChange={handleChange}
+                  className={getInputClass("prefecture")}
+                  required
+                >
+                  <option value="">{params.selectPrefecture}</option>
+                  {ALL_PREFECTURES.map(prefecture => (
+                    <option key={prefecture} value={prefecture}>{prefecture}</option>
+                  ))}
+                </select>
+                {renderError("prefecture")}
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="energy_zone" className="block text-sm mb-1">
+                  {params.energyZone}
+                </label>
+                <input
+                  type="text"
+                  id="energy_zone"
+                  name="energy_zone"
+                  value={formData.energy_zone}
+                  readOnly
+                  disabled
+                  className="block w-full p-2 border border-gray-300 bg-gray-100 rounded-md shadow-sm cursor-not-allowed"
+                />
+              </div>
             </div>
 
-            {/* Building characteristics section */}
             <div className="border-b border-gray-200 pb-4">
               <h3 className="font-bold text-primary text-sm mb-3">{params.buildingCharacteristicsSection}</h3>
               
@@ -448,7 +484,6 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
               />
             </div>
 
-            {/* Areas and floors section */}
             <div className="border-b border-gray-200 pb-4">
               <h3 className="font-bold text-primary text-sm mb-3">{params.areasAndFloorsSection}</h3>
               
@@ -523,7 +558,6 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
               />
             </div>
 
-            {/* Additional building information section */}
             <div className="border-b border-gray-200 pb-4">
               <h3 className="font-bold text-primary text-sm mb-3">{params.additionalInfoSection}</h3>
               
@@ -568,7 +602,6 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
               />
             </div>
 
-            {/* Operation information section */}
             <div>
               <h3 className="font-bold text-primary text-sm mb-3">{params.operationalInfoSection}</h3>
               

@@ -40,6 +40,18 @@ class Building(models.Model):
         verbose_name='Διεύθυνση'
     )
     
+    prefecture = models.CharField(
+        max_length=100,
+        blank=False,
+        verbose_name='Νομός',
+    )
+    
+    energy_zone = models.CharField(
+        max_length=1,
+        blank=False,
+        verbose_name='Ενεργειακή Ζώνη',
+    )
+    
     # Λογικές τιμές
     is_insulated = models.BooleanField(
         default=False,
