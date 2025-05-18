@@ -288,7 +288,16 @@
         "chartDateAxis": "Date",
         "chartEnergyAxis": "Energy (kWh)"
       },
-      "systemsContent": "Content for Systems...",
+      "systemsContent": {
+        "title": "Building Systems",
+        "boiler": "Boiler Details",
+        "cooling": "Cooling System",
+        "heating": "Heating System",
+        "hotWater": "Hot Water System (HWS)",
+        "solarCollectors": "Solar Collectors",
+        "edit": "Edit",
+        "add": "Add"
+      },
       "thermalZonesContent": "Content for Thermal Zones & Consumption...",
       "scenariosContent": "Content for Scenarios...",
       "resultsContent": "Content for Results...",

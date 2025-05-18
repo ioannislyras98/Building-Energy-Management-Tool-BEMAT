@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import EnergyProfileTabContent from './EnergyProfileTabContent';
+import SystemsTabContent from './SystemsTabContent';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 // Replace Admin with core providers
 import { AdminContext, ResourceContextProvider, Resource } from 'react-admin';
@@ -71,7 +72,14 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData }) => {
             </ResourceContextProvider>
           </AdminContext>
         )}
-        {activeTab === 1 && <div>{params?.systemsContent || 'Systems content not available.'}</div>}
+        {activeTab === 1 && (
+          <SystemsTabContent 
+            buildingUuid={buildingUuid} 
+            projectUuid={projectUuid} 
+            buildingData={buildingData} 
+            params={params}
+          />
+        )}
         {activeTab === 2 && <div>{params?.thermalZonesContent || 'Thermal zones content not available.'}</div>}
         {activeTab === 3 && <div>{params?.scenariosContent || 'Scenarios content not available.'}</div>}
         {activeTab === 4 && <div>{params?.resultsContent || 'Results content not available.'}</div>}

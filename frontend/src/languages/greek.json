@@ -283,7 +283,16 @@
         "chartDateAxis": "Ημερομηνία",
         "chartEnergyAxis": "Ενέργεια (kWh)"
       },
-      "systemsContent": "Περιεχόμενο για Συστήματα...",
+      "systemsContent": {
+        "title": "Συστήματα κτιρίου",
+        "boiler": "Στοιχεία λέβητα",
+        "cooling": "Σύστημα Ψύξης",
+        "heating": "Σύστημα Θέρμανσης",
+        "hotWater": "Σύστημα Ζεστού Νερού Χρήσης (Z.N.X)",
+        "solarCollectors": "Ηλιακοί Συλλέκτες",
+        "edit": "Επεξεργασία",
+        "add": "Εισαγωγή"
+      },
       "thermalZonesContent": "Περιεχόμενο για Θερμικές Ζώνες & Καταναλώσεις...",
       "scenariosContent": "Περιεχόμενο για Σενάρια...",
       "resultsContent": "Περιεχόμενο για Αποτελέσματα...",

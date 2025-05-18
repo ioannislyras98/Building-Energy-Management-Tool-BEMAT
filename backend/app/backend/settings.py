@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     "project",
     "building",
     "energyConsumption",
-    "contact"
+    "contact",
+    "boilerDetail",
 ]
 
 MIDDLEWARE = [
