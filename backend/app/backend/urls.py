@@ -8,5 +8,6 @@ urlpatterns = [
     path('projects/', include('project.urls')),
     path('energy_consumptions/', include('energyConsumption.urls')),
     path('contacts/', include('contact.urls')),
-    path('boiler_details/', include('boilerDetail.urls'))
+    path('boiler_details/', include('boilerDetail.urls')),
+    path('cooling_systems/', include('coolingSystem.urls')),
 ]

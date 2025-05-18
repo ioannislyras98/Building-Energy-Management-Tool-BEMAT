@@ -9,6 +9,11 @@ from building.models import Building
 from project.models import Project
 import uuid
 from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .serializer import BoilerDetailSerializer
 
 def get_user_from_token(token_key):
     try:
@@ -159,98 +164,39 @@ def get_building_boiler_details(request, building_uuid):
             'message': str(e)
         }, status=400)
 
-@csrf_exempt
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def update_boiler_detail(request, boiler_uuid):
-    if request.method != "PUT":
-        return JsonResponse({"error": "Only PUT method is allowed"}, status=405)
-        
-    # Check authentication manually
-    auth_header = request.META.get("HTTP_AUTHORIZATION")
-    if not auth_header:
-        return JsonResponse({"error": "Authorization token required"}, status=401)
+    """
+    Endpoint για την ενημέρωση των λεπτομερειών λέβητα.
+    """
     try:
-        token = auth_header.split()[1]
-    except IndexError:
-        return JsonResponse({"error": "Invalid Authorization header format"}, status=401)
-    
-    user = get_user_from_token(token)
-    if not user:
-        return JsonResponse({"error": "Invalid or expired token"}, status=401)
-    
-    try:
-        boiler_uuid = uuid.UUID(boiler_uuid)
-        boiler_detail = get_object_or_404(BoilerDetail, uuid=boiler_uuid)
+        boiler_detail = BoilerDetail.objects.get(uuid=boiler_uuid)
         
         # Check if the user has permission to update this boiler detail
-        if boiler_detail.user != user:
-            return JsonResponse({
-                'status': 'error',
-                'message': 'Δεν έχετε δικαίωμα να τροποποιήσετε αυτόν τον λέβητα'
-            }, status=403)
-            
-        data = json.loads(request.body)
+        if boiler_detail.user != request.user:
+            return Response(
+                {"error": "You don't have permission to update this boiler detail"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         
-        # Check if project is being updated
-        if 'project' in data:
-            project_uuid = data.get('project')
-            if project_uuid:
-                try:
-                    project = Project.objects.get(uuid=project_uuid)
-                    
-                    # Check if the user has permission to add to this project
-                    if project.user != user:
-                        return JsonResponse({
-                            'status': 'error',
-                            'message': 'Δεν έχετε δικαίωμα να προσθέσετε λέβητα σε αυτό το έργο'
-                        }, status=403)
-                    boiler_detail.project = project
-                except Project.DoesNotExist:
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': 'Έργο δεν βρέθηκε'
-                    }, status=404)
-            else:
-                boiler_detail.project = None
+        serializer = BoilerDetailSerializer(boiler_detail, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
         
-        # Update the rest of the fields
-        update_fields = [
-            'nominal_power', 'internal_efficiency', 'manufacturing_year', 
-            'nitrogen_monoxide', 'nitrogen_oxides', 'exhaust_temperature',
-            'smoke_scale', 'room_temperature'
-        ]
-        
-        for field in update_fields:
-            if field in data:
-                setattr(boiler_detail, field, data[field])
-        
-        try:
-            boiler_detail.full_clean()
-            boiler_detail.save()
-        except ValidationError as e:
-            error_messages = {}
-            for field, errors in e.message_dict.items():
-                error_messages[field] = errors[0] if errors else "Validation error"
-            return JsonResponse({"validation_errors": error_messages}, status=400)
-        
-        return JsonResponse({
-            'status': 'success',
-            'message': 'Ο λέβητας ενημερώθηκε επιτυχώς'
-        })
-    except ValueError:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'Μη έγκυρο UUID'
-        }, status=400)
-    except json.JSONDecodeError:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'Μη έγκυρα δεδομένα JSON'
-        }, status=400)
+        return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    
+    except BoilerDetail.DoesNotExist:
+        return Response(
+            {"error": "Boiler detail not found"}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
     except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': str(e)
-        }, status=400)
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 @csrf_exempt
 def delete_boiler_detail(request, boiler_uuid):

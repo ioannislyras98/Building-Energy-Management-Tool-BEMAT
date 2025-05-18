@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "energyConsumption",
     "contact",
     "boilerDetail",
+    "coolingSystem",
 ]
 
 MIDDLEWARE = [
