@@ -10,4 +10,5 @@ urlpatterns = [
     path('contacts/', include('contact.urls')),
     path('boiler_details/', include('boilerDetail.urls')),
     path('cooling_systems/', include('coolingSystem.urls')),
+    path('heating_systems/', include('heatingSystem.urls')),
 ]
