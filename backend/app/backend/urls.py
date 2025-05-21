@@ -11,4 +11,5 @@ urlpatterns = [
     path('boiler_details/', include('boilerDetail.urls')),
     path('cooling_systems/', include('coolingSystem.urls')),
     path('heating_systems/', include('heatingSystem.urls')),
+    path('domestic_hot_water_systems/', include('domesticHotWaterSystem.urls')),
 ]

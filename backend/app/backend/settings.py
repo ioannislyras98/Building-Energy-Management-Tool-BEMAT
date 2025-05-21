@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "boilerDetail",
     "coolingSystem",
     "heatingSystem",
+    "domesticHotWaterSystem",
 ]
 
 MIDDLEWARE = [
