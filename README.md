@@ -48,3 +48,5 @@
 # connect to database
 1. docker-compose exec db psql --username=backend --dbname=backend_dev
 
+# Άντληση δεδομένων
+[Κλιματικες Ζωνες](https://www.monodomiki.gr/ell/blog-details/klimatikes-zones-kai-oria-syntelesti-thermoperatotitas)
