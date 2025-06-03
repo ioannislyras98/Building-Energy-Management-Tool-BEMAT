@@ -1,0 +1,83 @@
+@import "./themes.css";
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
+
+#sign-screen {
+  @apply h-full w-full bg-cover bg-linear-to-t bg-center bg-[url(../images/bemat_alt.avif)] flex flex-col relative min-h-screen;
+}
+
+#toggle-language {
+  @apply text-neutral-500 hover:text-neutral-100 absolute top-0 right-0 pr-6 pt-3;
+}
+.form-wrapper {
+  @apply  h-full absolute inset-0 flex justify-center items-center z-10;
+}
+
+#form-container {
+    @apply bg-neutral-100 px-6 text-gray-900 rounded-md w-md h-auto;
+}
+
+#register-form,
+#login-form {
+    @apply mx-auto max-w-xl py-8 md:max-w-4xl;
+  }
+
+.logo-img {
+  @apply bg-[url(../images/bemat_alt.avif)] bg-cover size-16 justify-self-center mb-8;
+}
+
+  #submit-form {
+   @apply bg-primary hover:bg-primary-bold text-white font-bold py-2 px-4 rounded-full w-full float-right mb-8;
+  }
+
+.register-title {
+  @apply font-bold text-primary-bold text-center text-[24px];
+}
+
+.alt-option {
+  @apply mt-2 text-neutral-500 text-center text-[16px];
+}
+
+.label-name {
+    @apply text-neutral-500 font-basic text-sm font-bold ml-4;
+}
+
+  .input-field {
+    @apply form-input mt-1 block w-full rounded-full border-neutral-100 placeholder:text-neutral-400 
+    focus:border-neutral-400 focus:outline-none focus:ring-0 active:border-neutral-400 ; 
+  }
+
+.link-text{
+  @apply text-primary hover:text-primary-bold;
+}
+
+.confirm-button {
+  @apply mr-2 px-4 py-2 bg-primary-light text-white rounded hover:bg-primary transition delay-150 duration-300 ease-in-out cursor-pointer;
+}
+
+.close-modal {
+  @apply  mr-2 px-4 py-2 bg-transparent rounded text-primary-light border-[2px] border-primary-light hover:text-primary hover:border-primary transition delay-150 duration-300 ease-in-out cursor-pointer;
+}
+
+.entry-input.border-red-500 {
+  border-color: #f56565;
+}
+
+.entry-input.bg-red-50 {
+  background-color: #fef2f2;
+}
+
+.text-red-500 {
+  color: #f56565;
+}
+
+.input-field.error-input {
+  border-color: #f56565 !important;
+  background-color: #fef2f2 !important;
+}
+
+.input-field.error-input:focus {
+  border-color: #f56565 !important;
+  box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.2) !important;
+}

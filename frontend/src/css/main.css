@@ -1,0 +1,38 @@
+@import "./themes.css";
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
+#root {
+    @apply  h-auto md:h-screen w-screen font-basic leading-normal font-normal text-base;
+  }
+  
+  body {
+    margin: 0;
+    display: flex;
+    place-items: center;
+    min-width: 320px;
+    min-height: 100vh;
+  }
+  
+  h1 {
+    font-size: 3.2em;
+    line-height: 1.1;
+  }
+
+  .main-container {
+    @apply w-full h-full pt-[60px] pl-27 bg-white transition duration-300 ease-in-out;
+  }
+
+  .modal-open {
+    @apply blur-xs filter brightness-85;
+  }
+
+  .sidebar-open {
+    .main-container {
+      @apply pl-60;
+    }
+  }
+
+  h1.page-name { 
+    @apply size-[3em] mt-[3vh] ml-[1vw] font-basic text-primary w-fit h-fit pb-14;
+  }

@@ -1,0 +1,25 @@
+@import "./themes.css";
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
+#sidebar {
+    @apply  bg-white fixed flex flex-col z-40 left-0 top-0 lg:left-auto lg:top-auto lg:translate-x-0 h-screen overflow-y-scroll 
+    lg:overflow-y-auto shrink-0 border-r border-primary-light shadow-sm shadow-primary sm:translate-x-0 p-4 transition-all duration-200 overflow-hidden
+    z-999;
+}
+
+.sidebar-expanded {
+    @apply lg:w-55  w-60;
+}
+
+.sidebar-shrinked {
+    @apply lg:w-17 w-27;
+}
+
+.sidebar-icon {
+    @apply text-primary hover:text-primary-bold size-[24px];
+}
+
+.nav-link {
+    @apply text-primary text-[18px] origin-center hover:text-primary-bold hover:text-primary-bold transition delay-150 duration-300 ease-in-out hover:scale-105 cursor-pointer hover:drop-shadow-basic;
+}
