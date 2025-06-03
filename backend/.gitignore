@@ -28,11 +28,6 @@ env/
 # ---- Pipenv ----
 Pipfile.lock
 
-# ---- Docker (προαιρετικά, αν δεν θέλετε να τα αγνοήσετε) ----
-# Αν θέλετε να διατηρήσετε τα docker-compose αρχεία στο repo, αφαιρέστε αυτές τις γραμμές.
-docker-compose.yml
-docker-compose.prod.yml
-
 # ---- Static / media files (εφόσον τα παράγει ο Django) ----
 static/
 staticfiles/
