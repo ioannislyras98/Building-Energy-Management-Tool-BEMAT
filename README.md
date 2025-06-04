@@ -1,52 +1,197 @@
-# Building-Energy-Management-Tool-BEMAT
-Λογισμικό Υποστήριξης Ενεργειακής Διαχείρισης Κτιρίων
+# Building Energy Management Tool (BEMAT) 🏢⚡
 
-# useful sites: 
-1. https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/#gunicorn
-2. https://www.enterprisedb.com/postgres-tutorials/how-use-postgresql-django
-3. https://www.digitalocean.com/community/tutorials/build-a-to-do-application-using-django-and-react
-4. https://nabendu82.medium.com/full-stack-app-with-reactjs-django-0cb33b9835b2
-5. https://medium.com/@osamajavaid/setting-up-react-19-with-tailwind-css-v4-using-vite-in-just-two-steps-3748f55b06fd
+Λογισμικό Υποστήριξης Ενεργειακής Διαχείρισης Κτιρίων - Ολοκληρωμένη εφαρμογή με Django Backend & React Frontend
 
+## 🚀 Γρήγορη Εκκίνηση (Recommended)
 
-# run backend dev (http://localhost:8000/admin)
-1. docker-compose down -v
-2. docker-compose up -d --build
-3. docker-compose exec web python manage.py migrate --noinput
+**Για άμεση εκτέλεση όλης της εφαρμογής:**
 
-# run backend prod (http://localhost:1337/admin)
-1. docker-compose down -v
-2. docker-compose -f docker-compose.prod.yml up -d --build
-3. docker-compose -f docker-compose.prod.yml exec web python manage.py migrate --noinput
-4. docker-compose -f docker-compose.prod.yml exec web python manage.py collectstatic --no-input --clear
+1. **Προαπαιτούμενα:**
+   - Εγκαταστήστε [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+   - Εκκινήστε το Docker Desktop και περιμένετε να φορτώσει πλήρως
+   - Εγκαταστήστε [Git](https://git-scm.com/downloads) (εαν δεν το έχετε)
 
-# Git Bash
-1. docker ps (για τα django-container-id)
-2. docker exec -it django-container-id bash
-3. 
+2. **Κλωνοποίηση του repository:**
+   ```bash
+   git clone https://github.com/your-username/Building-Energy-Management-Tool-BEMAT.git
+   cd Building-Energy-Management-Tool-BEMAT
+   ```
 
-# create admin user
-1. python manage.py createsuperuser
+3. **Εκτέλεση με ένα κλικ:**
+   ```cmd
+   start-bemat.bat
+   ```
+   
+   ✅ Αυτόματα ξεκινούν όλα τα services  
+   ✅ Ανοίγουν τα browsers στο Frontend & Backend  
+   ✅ Γίνεται npm install για το frontend  
+   ✅ Εκτελούνται οι migrations  
 
-# create new table
-1. docker exec -it django-container-id bash (web)
-2. python manage.py startapp table(users)
-3. to models.py of table(users) create the model
-4. add to admin.py
-5. add table(users) to INSTALLED_APPS of settings.py 
-6. python manage.py makemigrations users
-7. python manage.py migrate
+   **🔧 Αν αντιμετωπίσετε προβλήματα με dependencies:**
+   ```cmd
+   rebuild-containers.bat
+   ```
 
-# installation
-1. git bash
-2. cd folder/app(folder/backend)
-3. pip ...
+## 📋 Διαθέσιμα Scripts
 
-# stop container
-1.docker stop django-container-id
+| Script | Περιγραφή | Browser Auto-Open |
+|--------|-----------|-------------------|
+| `start-bemat.bat` | Γρήγορη εκκίνηση (Development) | ✅ Frontend + Backend |
+| `start-bemat-advanced.bat` | Προηγμένη εκκίνηση με έλεγχους | ✅ Frontend + Backend |
+| `rebuild-containers.bat` | Ανακατασκευή containers + dependencies | ✅ Frontend + Backend |
+| `docker-manager.bat` | Κεντρικό menu διαχείρισης | ✅ Όλα τα modes |
+| `start-development.bat` | Development environment | ✅ Frontend + Backend |
+| `start-production.bat` | Production environment | ✅ Frontend + Nginx |
+| `stop-all.bat` | Σταματά όλα τα containers | ❌ |
 
-# connect to database
-1. docker-compose exec db psql --username=backend --dbname=backend_dev
+## 🌐 URLs μετά την εκκίνηση
 
-# Άντληση δεδομένων
+### Development Mode:
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **Admin Panel**: http://localhost:8000/admin
+- **Database**: PostgreSQL (port 5432)
+
+### Production Mode:
+- **Application**: http://localhost:1337 (via Nginx)
+- **Frontend**: http://localhost:3000
+- **API**: http://localhost:8000 (via Nginx)
+- **Database**: PostgreSQL (port 5432)
+
+## 🛠️ Προαπαιτούμενα
+
+- **Docker Desktop** εγκατεστημένο και ενεργό
+- **Git** (για κλωνοποίηση)
+- **Windows** (τα scripts είναι για Windows)
+- Διαθέσιμα ports: 3000, 8000, 5432 (και 1337 για production)
+
+## 📚 Χειροκίνητη Εκτέλεση (Advanced)
+
+### Backend Development
+```bash
+cd backend
+docker-compose up -d --build
+docker-compose exec web python manage.py migrate --noinput
+```
+
+### Backend Production
+```bash
+cd backend
+docker-compose -f docker-compose.prod.yml up -d --build
+docker-compose -f docker-compose.prod.yml exec web python manage.py migrate --noinput
+docker-compose -f docker-compose.prod.yml exec web python manage.py collectstatic --no-input --clear
+```
+
+### Frontend
+```bash
+cd frontend
+docker-compose -f docker-compose.frontend.yml up -d --build
+```
+
+## 👤 Δημιουργία Admin User
+
+```bash
+# Μπες στο web container
+docker exec -it backend-web-1 bash
+
+# Δημιούργησε superuser
+python manage.py createsuperuser
+```
+
+## 🗄️ Διαχείριση Database
+
+### Σύνδεση στη βάση
+```bash
+docker-compose exec db psql --username=backend --dbname=backend_dev
+```
+
+### Νέος πίνακας (Django App)
+```bash
+# Μπες στο container
+docker exec -it backend-web-1 bash
+
+# Δημιούργησε νέα app
+python manage.py startapp myapp
+
+# Μετά τις αλλαγές στα models
+python manage.py makemigrations myapp
+python manage.py migrate
+```
+
+## 🔧 Αντιμετώπιση Προβλημάτων
+
+### Τα containers δεν ξεκινούν
+1. Τρέξε `stop-all.bat`
+2. Έλεγξε ότι το Docker Desktop τρέχει
+3. Τρέξε ξανά `start-bemat.bat`
+
+### Πρόβλημα με ports
+```bash
+# Έλεγξε ποια ports χρησιμοποιούνται
+netstat -ano | findstr :3000
+netstat -ano | findstr :8000
+```
+
+### Καθαρισμός Docker
+```bash
+# Από το docker-manager.bat → επιλογή 5
+# Ή χειροκίνητα:
+docker system prune -a -f
+docker volume prune -f
+```
+
+### Frontend δεν φορτώνει
+```bash
+cd frontend
+docker-compose -f docker-compose.frontend.yml logs frontend
+```
+
+## 🏗️ Αρχιτεκτονική
+
+```
+BEMAT/
+├── backend/           # Django REST API
+│   ├── app/          # Django εφαρμογή
+│   ├── docker-compose.yml        # Development
+│   └── docker-compose.prod.yml   # Production + Nginx
+├── frontend/         # React + Vite + TailwindCSS
+│   ├── src/         # React components
+│   └── docker-compose.frontend.yml
+└── *.bat            # Automation scripts
+```
+
+## 📦 Tech Stack
+
+**Backend:**
+- Django 4.x
+- Django REST Framework
+- PostgreSQL 15
+- Gunicorn (Production)
+- Nginx (Production)
+
+**Frontend:**
+- React 18
+- Vite (Build tool)
+- TailwindCSS 4.x
+- Axios (HTTP client)
+
+**DevOps:**
+- Docker & Docker Compose
+- Automated batch scripts
+- Auto browser opening
+
+## 🔗 Χρήσιμοι σύνδεσμοι
+
+1. [Dockerizing Django with Postgres, Gunicorn and Nginx](https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/#gunicorn)
+2. [PostgreSQL with Django](https://www.enterprisedb.com/postgres-tutorials/how-use-postgresql-django)
+3. [Django + React Full Stack](https://www.digitalocean.com/community/tutorials/build-a-to-do-application-using-django-and-react)
+4. [React 19 + TailwindCSS 4 + Vite](https://medium.com/@osamajavaid/setting-up-react-19-with-tailwind-css-v4-using-vite-in-just-two-steps-3748f55b06fd)
+
+## 📄 Άδεια
+
+[Προσθέστε την άδεια χρήσης]
+
+---
+
+**Για γρήγορη εκκίνηση:** Απλά τρέξτε `start-bemat.bat` και θα ανοίξουν αυτόματα όλα! 🎉
 [Κλιματικες Ζωνες](https://www.monodomiki.gr/ell/blog-details/klimatikes-zones-kai-oria-syntelesti-thermoperatotitas)

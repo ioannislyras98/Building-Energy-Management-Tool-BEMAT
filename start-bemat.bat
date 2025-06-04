@@ -30,5 +30,15 @@ echo Two terminal windows have opened:
 echo - One for Backend services
 echo - One for Frontend service
 echo.
+echo Waiting for services to be ready...
+timeout /t 30 /nobreak > nul
+
+echo Opening browsers...
+start http://localhost:3000
+timeout /t 2 /nobreak > nul
+start http://localhost:8000
+echo.
+echo Browsers opened! Your BEMAT application is ready.
+echo.
 echo Press any key to exit this window...
 pause > nul

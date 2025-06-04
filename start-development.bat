@@ -24,6 +24,16 @@ echo Backend API: http://localhost:8000
 echo Frontend: http://localhost:3000
 echo Database: PostgreSQL on port 5432
 echo.
+echo Waiting for services to be ready...
+timeout /t 30 /nobreak > nul
+
+echo Opening browsers...
+start http://localhost:3000
+timeout /t 2 /nobreak > nul
+start http://localhost:8000
+echo.
+echo Browsers opened! BEMAT Development Environment is ready.
+echo.
 echo Press any key to return to main menu...
 pause > nul
 
