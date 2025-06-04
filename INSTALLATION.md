@@ -178,9 +178,9 @@ docker restart backend-web-1
 
 ### Development:
 - Default passwords είναι για development μόνο
-- DEBUG=1 δεν πρέπει να χρησιμοποιείται σε production
+- DEBUG=1 είναι ενεργό για development
 
-### Production:
+### Deployment:
 - Αλλάξτε όλα τα default passwords
 - Δημιουργήστε νέο SECRET_KEY
 - Ρυθμίστε HTTPS
