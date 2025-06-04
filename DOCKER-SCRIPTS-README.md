@@ -32,7 +32,6 @@ start-bemat.bat
 
 ### 🛠️ Ειδικά Scripts
 - **`start-development.bat`** - Εκτέλεση Development environment
-- **`start-production.bat`** - Εκτέλεση Production environment  
 - **`rebuild-containers.bat`** - Ανακατασκευή containers με τελευταίες dependencies
 - **`stop-all.bat`** - Σταματά όλα τα containers
 
@@ -50,12 +49,11 @@ docker-manager.bat
 
 Επιλογές menu:
 1. Start Development Environment
-2. Start Production Environment  
-3. Stop All Services
-4. **Rebuild Containers (Force Update Dependencies)** 🆕
-5. View Docker Status
-6. Clean Docker System
-7. Exit
+2. Stop All Services
+3. **Rebuild Containers (Force Update Dependencies)** 🆕
+4. View Docker Status
+5. Clean Docker System
+6. Exit
 
 ### Ανακατασκευή Containers (Νέο!)
 ```cmd
@@ -83,34 +81,21 @@ stop-all.bat
 
 ### docker-manager.bat
 - 📋 Menu με όλες τις επιλογές
-- 🔄 Development ή Production mode
 - 📊 Status check containers
 - 🧹 Καθαρισμός Docker system
 - ⏹️ Stop όλων των services
-- 🌐 **Αυτόματο άνοιγμα browsers** για όλα τα modes
+- 🌐 **Αυτόματο άνοιγμα browsers** για development mode
 
 ### start-development.bat
 - 🔨 Development environment με hot reload
 - 🌐 Ανοίγει: Frontend + Backend API
 - ⏱️ Περιμένει 30 δευτερόλεπτα
 
-### start-production.bat
-- 🔨 Production environment με Nginx
-- 🌐 Ανοίγει: Main app + Frontend
-- ⏱️ Περιμένει 45 δευτερόλεπτα (περισσότερο για Nginx)
-
 ## 🌐 Services που εκτελούνται
 
-### Development Mode:
 - **Frontend**: http://localhost:3000 🎨
 - **Backend API**: http://localhost:8000 ⚙️
 - **Admin Panel**: http://localhost:8000/admin 👤
-- **Database**: PostgreSQL (port 5432) 🗄️
-
-### Production Mode:
-- **Main Application**: http://localhost:1337 (via Nginx) 🌐
-- **Frontend**: http://localhost:3000 🎨
-- **Backend API**: http://localhost:8000 (via Nginx) ⚙️
 - **Database**: PostgreSQL (port 5432) 🗄️
 
 ## 📋 Προαπαιτούμενα
@@ -118,7 +103,7 @@ stop-all.bat
 - ✅ **Docker Desktop** εγκατεστημένο και τρέχον
 - ✅ **Windows** (τα batch scripts είναι για Windows)
 - ✅ **Git** (για κλωνοποίηση του repository)
-- ✅ Ports **3000, 8000, 5432** διαθέσιμα (και **1337** για production)
+- ✅ Ports **3000, 8000, 5432** διαθέσιμα
 
 ### Έλεγχος Προαπαιτούμενων
 ```powershell

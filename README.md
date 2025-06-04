@@ -39,23 +39,15 @@
 | `start-bemat.bat` | Γρήγορη εκκίνηση (Development) | ✅ Frontend + Backend |
 | `start-bemat-advanced.bat` | Προηγμένη εκκίνηση με έλεγχους | ✅ Frontend + Backend |
 | `rebuild-containers.bat` | Ανακατασκευή containers + dependencies | ✅ Frontend + Backend |
-| `docker-manager.bat` | Κεντρικό menu διαχείρισης | ✅ Όλα τα modes |
+| `docker-manager.bat` | Κεντρικό menu διαχείρισης | ✅ Development mode |
 | `start-development.bat` | Development environment | ✅ Frontend + Backend |
-| `start-production.bat` | Production environment | ✅ Frontend + Nginx |
 | `stop-all.bat` | Σταματά όλα τα containers | ❌ |
 
 ## 🌐 URLs μετά την εκκίνηση
 
-### Development Mode:
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 - **Admin Panel**: http://localhost:8000/admin
-- **Database**: PostgreSQL (port 5432)
-
-### Production Mode:
-- **Application**: http://localhost:1337 (via Nginx)
-- **Frontend**: http://localhost:3000
-- **API**: http://localhost:8000 (via Nginx)
 - **Database**: PostgreSQL (port 5432)
 
 ## 🛠️ Προαπαιτούμενα
@@ -63,7 +55,7 @@
 - **Docker Desktop** εγκατεστημένο και ενεργό
 - **Git** (για κλωνοποίηση)
 - **Windows** (τα scripts είναι για Windows)
-- Διαθέσιμα ports: 3000, 8000, 5432 (και 1337 για production)
+- Διαθέσιμα ports: 3000, 8000, 5432
 
 ## 📚 Χειροκίνητη Εκτέλεση (Advanced)
 
@@ -72,14 +64,6 @@
 cd backend
 docker-compose up -d --build
 docker-compose exec web python manage.py migrate --noinput
-```
-
-### Backend Production
-```bash
-cd backend
-docker-compose -f docker-compose.prod.yml up -d --build
-docker-compose -f docker-compose.prod.yml exec web python manage.py migrate --noinput
-docker-compose -f docker-compose.prod.yml exec web python manage.py collectstatic --no-input --clear
 ```
 
 ### Frontend
@@ -152,8 +136,7 @@ docker-compose -f docker-compose.frontend.yml logs frontend
 BEMAT/
 ├── backend/           # Django REST API
 │   ├── app/          # Django εφαρμογή
-│   ├── docker-compose.yml        # Development
-│   └── docker-compose.prod.yml   # Production + Nginx
+│   └── docker-compose.yml        # Development
 ├── frontend/         # React + Vite + TailwindCSS
 │   ├── src/         # React components
 │   └── docker-compose.frontend.yml
@@ -166,8 +149,6 @@ BEMAT/
 - Django 4.x
 - Django REST Framework
 - PostgreSQL 15
-- Gunicorn (Production)
-- Nginx (Production)
 
 **Frontend:**
 - React 18

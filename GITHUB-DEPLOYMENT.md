@@ -207,30 +207,8 @@ docker volume prune
 BEMAT Application
 ├── Frontend (React + Vite)     → Port 3000
 ├── Backend (Django)            → Port 8000
-├── Database (PostgreSQL)       → Port 5432
-└── Production (Nginx)          → Port 1337 (optional)
+└── Database (PostgreSQL)       → Port 5432
 ```
-
-## 🔒 Production Deployment
-
-For production environments:
-
-```bash
-# Use production configuration
-start-production.bat   # Windows
-
-# Manual production start
-cd backend
-docker-compose -f docker-compose.prod.yml up -d --build
-cd ../frontend
-docker-compose -f docker-compose.frontend.yml up -d --build
-```
-
-Production features:
-- Nginx reverse proxy
-- Gunicorn WSGI server
-- Static file serving
-- Enhanced security settings
 
 ## 📞 Support
 
