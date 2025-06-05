@@ -170,9 +170,12 @@ BEMAT/
 
 ## 📄 Άδεια
 
-[Προσθέστε την άδεια χρήσης]
+
 
 ---
 
 **Για γρήγορη εκκίνηση:** Απλά τρέξτε `start-bemat.bat` και θα ανοίξουν αυτόματα όλα! 🎉
-[Κλιματικες Ζωνες](https://www.monodomiki.gr/ell/blog-details/klimatikes-zones-kai-oria-syntelesti-thermoperatotitas)
+
+## 📄 Πληροφορίες
+
+1. [Κλιματικες Ζωνες](https://www.monodomiki.gr/ell/blog-details/klimatikes-zones-kai-oria-syntelesti-thermoperatotitas)
