@@ -336,7 +336,16 @@ const EnergyProfileTabContent = ({
       headerName: translations.columns.quantity,
       type: 'number',
       flex: 0.7,
-      minWidth: 100
+      minWidth: 120,
+      renderCell: params => {
+        const value = params.value || 0
+        const unit = params.row.unit || ''
+        return (
+          <span>
+            {parseFloat(value).toFixed(2)} {unit}
+          </span>
+        )
+      }
     },
     {
       field: 'unit',
@@ -349,7 +358,15 @@ const EnergyProfileTabContent = ({
       headerName: translations.columns.kwhEquivalent || 'Ενέργεια(kwh)',
       type: 'number',
       flex: 0.8,
-      minWidth: 120
+      minWidth: 120,
+      renderCell: params => {
+        const value = params.value || 0
+        return (
+          <span className='font-medium text-green-600'>
+            {parseFloat(value).toFixed(2)} kWh
+          </span>
+        )
+      }
     },
     {
       field: 'actions',

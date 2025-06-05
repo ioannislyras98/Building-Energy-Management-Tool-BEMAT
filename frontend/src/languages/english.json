@@ -223,9 +223,10 @@
     "delete": "Delete",
     "confirmDelete": "Are you sure you want to delete this project? This action cannot be undone.",
     "deleteError": "An error occurred while trying to delete the project."
-  },
-  "BuildingProfile": {
+  },  "BuildingProfile": {
     "backToBuildings": "Back to Buildings List",
+    "projectLabel": "Project",
+    "buildingLabel": "Building",
     "loading": "Loading building profile...",
     "errors": {
       "auth": "Authentication is required to view building details.",
@@ -341,8 +342,7 @@
 "saving": "Saving...",
     "errorAuth": "Authentication required.",
     "errorFailed": "Failed to add energy consumption."
-  },
-  "EnergyConsumptionModal": {
+  },  "EnergyConsumptionModal": {
     "h2": "Add Energy Consumption",
     "h2_edit": "Edit Energy Consumption",
     "energySource": "Energy Source",
@@ -362,6 +362,8 @@
     "errorNumber": "Must be a number",
     "errorGeneral": "Error creating energy consumption",
     "errorUpdate": "Error updating energy consumption",
-    "deleteConfirmation": "Are you sure you want to delete this energy consumption?"
+    "deleteConfirmation": "Are you sure you want to delete this energy consumption?",
+    "unitLabel": "Unit of measurement",
+    "equivalentLabel": "Equivalent"
   }
 }

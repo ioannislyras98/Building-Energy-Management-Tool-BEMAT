@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "bemat-frontend": "file:.."
+  }
+}

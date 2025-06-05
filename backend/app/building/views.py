@@ -176,14 +176,14 @@ def get_building_detail(request, uuid):
         
         # Ανάκτηση των επαφών για το κτίριο
         contacts = Contact.objects.filter(building=building)
-        contacts_data = ContactSerializer(contacts, many=True).data
-
+        contacts_data = ContactSerializer(contacts, many=True).data       
         building_data = {
             "uuid": str(building.uuid),
             "name": building.name,
             "project": str(building.project.uuid),
-                        "usage": building.usage,
-"user": str(building.user.email),
+            "project_name": building.project.name,  # Added project name
+            "usage": building.usage,
+            "user": str(building.user.email),
             "description": building.description,
             "year_built": building.year_built,
             "address": building.address,
