@@ -20,7 +20,6 @@ function EnergyConsumptionModalForm ({
 }) {
   console.log('EnergyConsumptionModalForm: Rendering, open prop is:', open)
 
-  // Initialize form state based on editItem (if provided)
   const [formData, setFormData] = useState({
     energy_source: '',
     start_date: '',
@@ -31,7 +30,6 @@ function EnergyConsumptionModalForm ({
   const [errors, setErrors] = useState({})
   const token = cookies.get('token') || ''
 
-  // Energy source unit mappings - same as backend
   const ENERGY_UNITS = {
     biomass: 'kg',
     electricity: 'kWh',
@@ -39,7 +37,6 @@ function EnergyConsumptionModalForm ({
     natural_gas: 'm³'
   }
 
-  // Energy conversion rates to kWh - same as backend
   const ENERGY_KWH_CONVERSIONS = {
     biomass: 4.1, // 1 kg = 4.1 kWh
     electricity: 1.0, // 1 kWh = 1 kWh
@@ -47,12 +44,10 @@ function EnergyConsumptionModalForm ({
     natural_gas: 10.0 // 1 m³ = 10 kWh
   }
 
-  // Get current unit for selected energy source
   const getCurrentUnit = () => {
     return ENERGY_UNITS[formData.energy_source] || ''
   }
 
-  // Calculate kWh equivalent
   const calculateKwhEquivalent = () => {
     if (!formData.quantity || !formData.energy_source) return 0
     const quantity = parseFloat(formData.quantity)
@@ -60,7 +55,6 @@ function EnergyConsumptionModalForm ({
     return quantity * conversionFactor
   }
 
-  // Set form data when editItem changes or on initial render
   useEffect(() => {
     if (editItem) {
       setFormData({
@@ -70,15 +64,11 @@ function EnergyConsumptionModalForm ({
         quantity: editItem.quantity ? String(editItem.quantity) : ''
       })
     } else {
-      // Reset form when not editing
       resetForm()
     }
   }, [editItem])
-
-  // Determine if we're in edit mode
   const isEditMode = !!editItem
 
-  // Handle form input changes
   const handleChange = e => {
     const { id, value } = e.target
     setFormData({
@@ -93,7 +83,6 @@ function EnergyConsumptionModalForm ({
     }
   }
 
-  // Form validation
   const validateForm = () => {
     const newErrors = {}
     let hasErrors = false
@@ -122,7 +111,6 @@ function EnergyConsumptionModalForm ({
     return !hasErrors
   }
 
-  // Handle form submission (create or update)
   const handleSubmit = e => {
     e.preventDefault()
 
@@ -140,7 +128,6 @@ function EnergyConsumptionModalForm ({
     }
 
     if (isEditMode) {
-      // Update existing record
       $.ajax({
         url: `http://127.0.0.1:8000/energy_consumptions/update/${editItem.id}/`,
         method: 'PUT',
@@ -162,7 +149,6 @@ function EnergyConsumptionModalForm ({
         }
       })
     } else {
-      // Create new record
       $.ajax({
         url: 'http://127.0.0.1:8000/energy_consumptions/create/',
         method: 'POST',
@@ -186,7 +172,6 @@ function EnergyConsumptionModalForm ({
     }
   }
 
-  // Handle API errors
   const handleApiError = jqXHR => {
     if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
       const backendErrors = jqXHR.responseJSON.error
@@ -214,7 +199,6 @@ function EnergyConsumptionModalForm ({
     setErrors({})
   }
 
-  // Energy source options for select dropdown
   const energySources = [
     { value: '', label: params.selectOption || 'Select an option' },
     { value: 'electricity', label: params.electricity || 'Electricity' },
@@ -231,7 +215,6 @@ function EnergyConsumptionModalForm ({
     'EnergyConsumptionModalForm: open is true, rendering modal content.'
   )
 
-  // Get the title and submit button text based on mode
   const modalTitle = isEditMode
     ? params.h2_edit || 'Edit Energy Consumption'
     : params.h2 || 'Add Energy Consumption'
@@ -298,7 +281,6 @@ function EnergyConsumptionModalForm ({
             required
           />
 
-          {/* Enhanced Quantity Input with Unit Display */}
           <div className='mb-4'>
             <label htmlFor='quantity' className='label-name'>
               {params.quantity || 'Quantity'}
@@ -320,7 +302,6 @@ function EnergyConsumptionModalForm ({
             {errors.quantity && (
               <div className='text-red-500 text-xs mt-1'>{errors.quantity}</div>
             )}
-            {/* Energy Source Info & kWh Preview */}
             {formData.energy_source && (
               <div className='mt-2 p-2 bg-gray-50 rounded text-sm'>
                 <div className='text-gray-600'>

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'; // Import useCallback
+import { useState, useCallback } from 'react'; 
 import $ from 'jquery';
 import Cookies from 'universal-cookie';
 
@@ -7,7 +7,7 @@ export const useBuildings = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
-  const cookies = new Cookies(null, { path: '/' }); // Consistent with other files
+  const cookies = new Cookies(null, { path: '/' }); 
   const token = cookies.get("token") || "";
 
   const fetchBuildings = useCallback((projectUuid) => {
@@ -17,7 +17,7 @@ export const useBuildings = () => {
     }
     
     setLoading(true);
-    setError(null); // Clear previous errors
+    setError(null); 
     
     const settings = {
       url: `http://127.0.0.1:8000/buildings/get/?project=${projectUuid}`,
@@ -28,11 +28,10 @@ export const useBuildings = () => {
       },
     };
 
-    console.log("Fetching buildings with settings:", settings); // Log before AJAX call
-
+    console.log("Fetching buildings with settings:", settings); 
     $.ajax(settings)
       .done(function (response) {
-        console.log("Buildings fetched successfully:", response); // Log successful response
+        console.log("Buildings fetched successfully:", response); 
         const buildingsArray = Array.isArray(response)
           ? response
           : response.buildings || response.data || [];
@@ -40,7 +39,7 @@ export const useBuildings = () => {
       })
       .fail(function (jqXHR, textStatus, errorThrown) {
         console.error("Failed to fetch buildings:", textStatus, errorThrown, jqXHR);
-        console.log("Fetch buildings failed. jqXHR:", jqXHR, "textStatus:", textStatus, "errorThrown:", errorThrown); // Log failure details
+        console.log("Fetch buildings failed. jqXHR:", jqXHR, "textStatus:", textStatus, "errorThrown:", errorThrown); 
         const errorMessage = jqXHR.responseJSON?.error || jqXHR.statusText || "Failed to fetch buildings.";
         setError(errorMessage);
         if (jqXHR.responseJSON?.error) {
@@ -48,18 +47,18 @@ export const useBuildings = () => {
         }
       })
       .always(function () {
-        console.log("Fetch buildings AJAX call finished."); // Log completion
+        console.log("Fetch buildings AJAX call finished.");
         setLoading(false);
       });
-  }, [token]); // token is a dependency
+  }, [token]); 
 
   const handleBuildingCreated = useCallback((newBuilding) => {
     setBuildings((prevBuildings) => [...prevBuildings, newBuilding]);
-  }, []); // setBuildings is stable
+  }, []); 
   
   const clearBuildings = useCallback(() => {
     setBuildings([]);
-  }, []); // setBuildings is stable
+  }, []);
 
   return {
     buildings,

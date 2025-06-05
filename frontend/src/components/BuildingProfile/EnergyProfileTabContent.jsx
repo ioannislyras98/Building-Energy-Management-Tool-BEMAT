@@ -48,23 +48,20 @@ const EnergyProfileTabContent = ({
   const cookies = new Cookies(null, { path: '/' })
   const token = cookies.get('token')
 
-  // Modal states
   const [open, setOpen] = useState(false)
   const [editItem, setEditItem] = useState(null)
 
-  // Delete confirmation dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingItem, setDeletingItem] = useState(null)
 
   console.log('EnergyProfileTabContent: Initial render, open state is:', open)
 
-  const { language } = useLanguage() // Get language object
+  const { language } = useLanguage()
   const translations =
     language === 'en'
       ? english_text.BuildingProfile.tabs.energyProfileContent
       : greek_text.BuildingProfile.tabs.energyProfileContent
 
-  // Function to translate energy source names based on language
   const getEnergySourceDisplay = sourceKey => {
     if (!sourceKey) return ''
 
@@ -83,13 +80,12 @@ const EnergyProfileTabContent = ({
       case 'biomass':
         return energySources.biomass
       default:
-        return sourceKey // Return original if no match
+        return sourceKey
     }
   }
 
-  // Handle modal actions
   const handleOpen = () => {
-    setEditItem(null) // Reset edit item for add mode
+    setEditItem(null)
     console.log(
       'EnergyProfileTabContent: handleOpen called, setting open to true'
     )
@@ -101,22 +97,19 @@ const EnergyProfileTabContent = ({
       'EnergyProfileTabContent: handleClose called, setting open to false'
     )
     setOpen(false)
-    setEditItem(null) // Clear edit item when modal closes
+    setEditItem(null) 
   }
 
-  // Handle edit button click
   const handleEdit = item => {
     setEditItem(item)
     setOpen(true)
   }
 
-  // Handle delete button click
   const handleDeleteClick = item => {
     setDeletingItem(item)
     setDeleteDialogOpen(true)
   }
 
-  // Confirm delete action
   const confirmDelete = () => {
     if (!deletingItem || !token) return
 
@@ -131,7 +124,7 @@ const EnergyProfileTabContent = ({
         console.log('Energy consumption deleted:', response)
         setDeleteDialogOpen(false)
         setDeletingItem(null)
-        fetchConsumptions() // Refresh data
+        fetchConsumptions()
       },
       error: jqXHR => {
         console.error('Error deleting energy consumption:', jqXHR)
@@ -141,7 +134,6 @@ const EnergyProfileTabContent = ({
     })
   }
 
-  // Cancel delete action
   const cancelDelete = () => {
     setDeleteDialogOpen(false)
     setDeletingItem(null)
@@ -162,7 +154,6 @@ const EnergyProfileTabContent = ({
       },
       success: data => {
         console.log('Fetched energy consumptions:', data)
-        // Transform data to ensure correct field mapping
         const mappedData = Array.isArray(data)
           ? data.map(item => ({
               id: item.uuid,
@@ -172,7 +163,6 @@ const EnergyProfileTabContent = ({
               start_date: item.start_date || '',
               end_date: item.end_date || '',
               kwh_equivalent: item.kwh_equivalent || 0,
-              // Keep original data for reference
               ...item
             }))
           : []
@@ -193,25 +183,19 @@ const EnergyProfileTabContent = ({
     fetchConsumptions()
   }, [fetchConsumptions])
 
-  // Function to prepare data by consumption period
   const preparePeriodsData = useCallback(() => {
     if (!consumptions.length) return []
 
-    // Group consumptions by their exact date ranges
     const periodMap = new Map()
 
-    // Process each consumption entry
     consumptions.forEach(consumption => {
       const startDate = new Date(consumption.start_date)
       const endDate = new Date(consumption.end_date)
 
-      // Skip invalid dates
       if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return
 
-      // Create a unique key for this period
       const periodKey = `${consumption.start_date}|${consumption.end_date}`
 
-      // Format dates for display
       const formatDate = date => {
         return date.toLocaleDateString(language === 'en' ? 'en-US' : 'el-GR', {
           day: '2-digit',
@@ -220,13 +204,11 @@ const EnergyProfileTabContent = ({
         })
       }
 
-      // Create period label
       const periodLabel =
         startDate.getTime() === endDate.getTime()
           ? formatDate(startDate)
           : `${formatDate(startDate)} - ${formatDate(endDate)}`
 
-      // Initialize period if not exists
       if (!periodMap.has(periodKey)) {
         periodMap.set(periodKey, {
           periodKey,
@@ -241,7 +223,6 @@ const EnergyProfileTabContent = ({
         })
       }
 
-      // Add this consumption to the right energy source in this period
       const periodData = periodMap.get(periodKey)
       switch (consumption.energy_source?.toLowerCase()) {
         case 'electricity':
@@ -263,15 +244,13 @@ const EnergyProfileTabContent = ({
       }
     })
 
-    // Convert to array and sort by start date
     return Array.from(periodMap.values()).sort(
       (a, b) => b.startDate - a.startDate
-    ) // newest first
+    )
   }, [consumptions, language])
 
   const periodsData = preparePeriodsData()
 
-  // Function to prepare data for pie charts
   const preparePieData = period => {
     const data = []
 
@@ -310,7 +289,6 @@ const EnergyProfileTabContent = ({
     return data
   }
 
-  // Define columns for the data grid
   const columns = [
     {
       field: 'energy_source',
@@ -454,7 +432,7 @@ const EnergyProfileTabContent = ({
         />
       </Card>
 
-      {/* Commenting out Energy Consumption Charts section for now
+      {/*
       
       <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'var(--color-primary)', mt: 4, mb: 2 }}>
         {translations.energyConsumptionChart || "Energy Consumption Chart"}
@@ -523,7 +501,6 @@ const EnergyProfileTabContent = ({
       
       */}
 
-      {/* Energy Consumption Modal */}
       <EnergyConsumptionModal
         open={open}
         handleClose={handleClose}
@@ -533,7 +510,6 @@ const EnergyProfileTabContent = ({
         editItem={editItem}
       />
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
         <DialogTitle>
           {translations.deleteDialog?.title || 'Delete Energy Consumption'}

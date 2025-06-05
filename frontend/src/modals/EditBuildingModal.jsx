@@ -1,4 +1,3 @@
-// filepath: c:\Users\glyras\BEMAT\frontend\src\modals\EditBuildingModal.jsx
 import React, { useState, useEffect } from 'react'
 import $ from 'jquery'
 import Cookies from 'universal-cookie'
@@ -245,7 +244,6 @@ function EditBuildingModalForm ({
               />
             </div>
 
-            {/* Building Characteristics Section */}
             <div className='border-b border-gray-200 pb-4'>
               <h3 className='font-bold text-primary text-sm mb-3'>
                 {params.buildingCharacteristicsSection}
@@ -320,7 +318,6 @@ function EditBuildingModalForm ({
               )}
             </div>
 
-            {/* Areas and Floors Section */}
             <div className='border-b border-gray-200 pb-4'>
               <h3 className='font-bold text-primary text-sm mb-3'>
                 {params.areasAndFloorsSection}
@@ -386,7 +383,6 @@ function EditBuildingModalForm ({
               />
             </div>
 
-            {/* Additional Info Section */}
             <div className='border-b border-gray-200 pb-4'>
               <h3 className='font-bold text-primary text-sm mb-3'>
                 {params.additionalInfoSection}
@@ -403,8 +399,7 @@ function EditBuildingModalForm ({
                 step='0.01'
               />
             </div>
-
-            {/* Operational Info Section */}
+            
             <div className='pb-4'>
               <h3 className='font-bold text-primary text-sm mb-3'>
                 {params.operationalInfoSection}

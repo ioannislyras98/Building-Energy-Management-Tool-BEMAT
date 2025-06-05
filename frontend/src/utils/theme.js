@@ -1,13 +1,11 @@
 import { createTheme } from '@mui/material/styles'
 
-// Get CSS custom properties for consistent theming
 const getCSSCustomProperty = property => {
   if (typeof window !== 'undefined') {
     return getComputedStyle(document.documentElement)
       .getPropertyValue(property)
       .trim()
   }
-  // Fallback values for SSR or when window is not available
   const fallbacks = {
     '--color-primary': '#2d5a27',
     '--color-primary-light': '#4a7c59',
@@ -20,7 +18,6 @@ const getCSSCustomProperty = property => {
   return fallbacks[property] || ''
 }
 
-// Create Material UI theme using CSS custom properties
 export const defaultTheme = createTheme({
   palette: {
     mode: 'light',

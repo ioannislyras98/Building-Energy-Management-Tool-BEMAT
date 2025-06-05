@@ -1,4 +1,3 @@
-// filepath: c:\Users\glyras\BEMAT\frontend\src\modals\AddContactModal.jsx
 import React, { useState} from "react";
 import $ from "jquery";
 import Cookies from "universal-cookie";
@@ -42,7 +41,6 @@ function AddContactModalForm({ isOpen, onClose, onContactAdded, buildingUuid, pa
       newErrors.email = params.errorEmail || "Invalid email format";
       isValid = false;
     }
-    // Add other validations as needed (e.g., phone number format)
     setErrors(newErrors);
     return isValid;
   };
@@ -52,7 +50,7 @@ function AddContactModalForm({ isOpen, onClose, onContactAdded, buildingUuid, pa
     if (!validateForm()) return;
 
     $.ajax({
-      url: `http://127.0.0.1:8000/buildings/${buildingUuid}/contacts/create/`, // Adjust API endpoint as needed
+      url: `http://127.0.0.1:8000/buildings/${buildingUuid}/contacts/create/`, 
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -62,7 +60,7 @@ function AddContactModalForm({ isOpen, onClose, onContactAdded, buildingUuid, pa
       success: function (response) {
         onContactAdded(response);
         onClose();
-        setFormData({ name: "", role: "", email: "", phone_number: "" }); // Reset form
+        setFormData({ name: "", role: "", email: "", phone_number: "" });
       },
       error: function (error) {
         if (error.responseJSON && error.responseJSON.error) {
@@ -143,7 +141,7 @@ export default function AddContactModal({ isOpen, onClose, onContactAdded, build
       onClose={onClose}
       onContactAdded={onContactAdded}
       buildingUuid={buildingUuid}
-      params={params || {}} // Ensure params is always an object
+      params={params || {}}
     />
   );
 }

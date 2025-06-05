@@ -1,6 +1,6 @@
 import "./../css/pages.css";
 import { BsBuilding } from "react-icons/bs";
-import { useLanguage } from "../context/LanguageContext"; // Updated import
+import { useLanguage } from "../context/LanguageContext";
 import Cookies from 'universal-cookie';
 import english_text from "../languages/english.json";
 import greek_text from "../languages/greek.json";

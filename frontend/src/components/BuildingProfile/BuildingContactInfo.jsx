@@ -38,8 +38,6 @@ export default function BuildingContactInfo ({
   const cookies = new Cookies()
   const token = cookies.get('token') || ''
   const { language } = useLanguage()
-
-  // Get the appropriate text based on the current language
   const dialogText =
     language === 'en'
       ? english_text.BuildingContactInfo
@@ -73,7 +71,6 @@ export default function BuildingContactInfo ({
 
       $.ajax(settings)
         .done(function (response) {
-          // If successful, update the UI through the provided callback
           onDeleteContact(currentContact)
         })
         .fail(function (error) {
@@ -89,9 +86,7 @@ export default function BuildingContactInfo ({
       setCurrentContact(null)
     }
   }
-
-  // Remove the API call from handleContactUpdated as it will now be handled in the modal
-  const handleContactUpdated = updatedContact => {
+ const handleContactUpdated = updatedContact => {
     if (onEditContact) {
       onEditContact(updatedContact)
     }
@@ -101,7 +96,6 @@ export default function BuildingContactInfo ({
   return (
     <div className='bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden animate-fade-in-up card-hover-effect'>
       {' '}
-      {/* Header */}
       <div className='bg-gradient-to-r from-primary to-primary-dark p-4'>
         <div className='flex justify-between items-center'>
           <div className='flex items-center space-x-3'>
@@ -126,7 +120,6 @@ export default function BuildingContactInfo ({
           </button>
         </div>
       </div>
-      {/* Content */}
       <div className='p-6'>
         {contacts.length > 0 ? (
           <div className='space-y-4'>
@@ -138,7 +131,7 @@ export default function BuildingContactInfo ({
               >
                 <div className='flex justify-between items-start'>
                   <div className='flex-1 space-y-3'>
-                    {/* Contact Name */}{' '}
+                    {' '}
                     <div className='flex items-center space-x-3'>
                       <div className='w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center flex-shrink-0'>
                         <span className='text-white font-bold text-sm'>
@@ -159,7 +152,6 @@ export default function BuildingContactInfo ({
                         )}
                       </div>
                     </div>
-                    {/* Contact Details */}
                     <div className='grid grid-cols-1 gap-2 ml-13'>
                       {contact.email && (
                         <div className='flex items-center space-x-2'>
@@ -179,8 +171,6 @@ export default function BuildingContactInfo ({
                       )}
                     </div>
                   </div>
-
-                  {/* Action Buttons */}
                   <div className='flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200'>
                     <button
                       onClick={() => handleEditClick(contact)}
@@ -215,7 +205,6 @@ export default function BuildingContactInfo ({
           </div>
         )}
       </div>
-      {/* Edit Contact Modal */}
       <EditContactModal
         isOpen={editModalOpen}
         onClose={() => setEditModalOpen(false)}
@@ -223,7 +212,6 @@ export default function BuildingContactInfo ({
         contact={currentContact}
         buildingUuid={building.uuid}
       />
-      {/* Delete Confirmation Dialog */}
       <Dialog
         open={deleteDialogOpen}
         onClose={cancelDelete}

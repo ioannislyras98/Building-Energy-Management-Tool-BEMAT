@@ -17,7 +17,6 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      // Map the package name to its ESM build
       'jwt-decode': 'jwt-decode/build/esm/index.js'
     }
   }

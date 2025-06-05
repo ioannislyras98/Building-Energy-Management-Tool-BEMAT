@@ -4,7 +4,7 @@ import $ from "jquery";
 import "./../../css/forms.css";
 import InputEntry from "./InputEntry";
 import Cookies from "universal-cookie";
-import { useLanguage } from "../../context/LanguageContext"; // Updated import
+import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import { BiHide, BiShow } from "react-icons/bi";
@@ -75,7 +75,7 @@ function ResetPasswordConfirmForm({ params }) {
               id="newPassword"
               type={showPassword ? "text" : "password"}
               example={params.password_text}
-              className="pr-10" // Προσθέτουμε padding στα δεξιά για να δημιουργήσουμε χώρο για το εικονίδιο.
+              className="pr-10"
             />
             <button
               type="button"
@@ -92,7 +92,7 @@ function ResetPasswordConfirmForm({ params }) {
               id="newPasswordConfirm"
               type={showPasswordConfirm ? "text" : "password"}
               example={params.password_text}
-              className="pr-10" // Προσθέτουμε padding στα δεξιά για να δημιουργήσουμε χώρο για το εικονίδιο.
+              className="pr-10"
             />
             <button
               type="button"

@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import $ from 'jquery'
 import Cookies from 'universal-cookie'
 import InputEntry from '../pages/RegisterForms/InputEntry'
-import { useLanguage } from '../context/LanguageContext' // Updated import
-//language
+import { useLanguage } from '../context/LanguageContext' 
+
 import english_text from '../languages/english.json'
 import greek_text from '../languages/greek.json'
 import './../css/forms.css'

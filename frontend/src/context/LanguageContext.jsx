@@ -5,15 +5,12 @@ const cookies = new Cookies(null, { path: '/' });
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  // Get initial language from cookie or default to Greek
   const [language, setLanguage] = useState(cookies.get('language') || 'gr');
 
-  // Update cookie whenever language changes
   useEffect(() => {
     cookies.set('language', language, { path: '/' });
   }, [language]);
 
-  // Function to toggle language
   const toggleLanguage = () => {
     setLanguage(prevLang => prevLang === 'en' ? 'gr' : 'en');
   };
@@ -25,7 +22,6 @@ export const LanguageProvider = ({ children }) => {
   );
 };
 
-// Custom hook to use the language context
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (context === undefined) {

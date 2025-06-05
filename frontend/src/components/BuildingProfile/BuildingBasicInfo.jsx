@@ -9,7 +9,6 @@ import {
 
 const BuildingBasicInfo = ({ building, params, onEdit }) => (
   <div className='bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden animate-fade-in-up card-hover-effect'>
-    {/* Header */}
     <div className='bg-gradient-to-r from-primary to-primary-dark p-4'>
       <div className='flex justify-between items-center'>
         <div className='flex items-center space-x-3'>
@@ -32,7 +31,6 @@ const BuildingBasicInfo = ({ building, params, onEdit }) => (
       </div>
     </div>
 
-    {/* Content */}
     <div className='p-6 space-y-4'>
       <div className='flex items-start space-x-3'>
         <div className='w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1'>

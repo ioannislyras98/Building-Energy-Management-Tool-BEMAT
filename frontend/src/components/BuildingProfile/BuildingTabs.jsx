@@ -1,22 +1,15 @@
 import React, { useState } from 'react'
 import EnergyProfileTabContent from './EnergyProfileTabContent'
 import SystemsTabContent from './SystemsTabContent'
-import { ThemeProvider } from '@mui/material/styles'
-// Replace Admin with core providers
 import { AdminContext, ResourceContextProvider, Resource } from 'react-admin'
-// Import theme from external file
 import { defaultTheme } from '../../utils/theme'
-
-// Create a simple data provider that will just pass through our data
 const dataProvider = {
-  // This method returns a list of resources with pagination
   getList: (resource, params) => {
     return Promise.resolve({
-      data: [], // This will be replaced in EnergyProfileTabContent
+      data: [],
       total: 0
     })
   },
-  // These are required methods for react-admin
   getOne: () => Promise.resolve({ data: {} }),
   getMany: () => Promise.resolve({ data: [] }),
   getManyReference: () => Promise.resolve({ data: [], total: 0 }),
@@ -37,14 +30,11 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData }) => {
     params.results,
     params.images
   ]
-
-  // Ensure params and its properties are defined before trying to access them
   const energyProfileParams = {
     content: params?.energyProfileContent,
     addConsumptionBtn:
       params?.addEnergyConsumptionButton || 'Add Energy Consumption'
-    // Add other necessary translations from params if needed by EnergyProfileTabContent
-  }
+   }
 
   return (
     <div className='w-full'>
@@ -65,7 +55,6 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData }) => {
       </div>
       <div className='p-4'>
         {activeTab === 0 && (
-          // Replace Admin with AdminContext which doesn't set up routing
           <AdminContext dataProvider={dataProvider} theme={defaultTheme}>
             <ResourceContextProvider value='energy_consumptions'>
               <EnergyProfileTabContent

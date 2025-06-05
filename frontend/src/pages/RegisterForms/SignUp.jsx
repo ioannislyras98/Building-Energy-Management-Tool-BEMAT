@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import "./../../css/forms.css";
 import InputEntry from "./InputEntry";
 import Cookies from "universal-cookie";
-import { useLanguage } from "../../context/LanguageContext"; // Updated import
+import { useLanguage } from "../../context/LanguageContext"; 
 
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
@@ -15,7 +15,6 @@ function submitData(event, params, setErrorMsg) {
   event.preventDefault();
   setErrorMsg(false);
 
-  // Example payload, adjust if needed
   const payload = {
     email: $(event.currentTarget).find("#email").val(),
     password: btoa($(event.currentTarget).find("#password").val()),

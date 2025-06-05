@@ -2,64 +2,58 @@ import React, { useState, useEffect } from "react";
 import $ from "jquery";
 import Cookies from "universal-cookie";
 import "./../css/forms.css";
-import { useLanguage } from "../context/LanguageContext"; // Updated import
-//language
+import { useLanguage } from "../context/LanguageContext";
+
 import english_text from "../languages/english.json";
 import greek_text from "../languages/greek.json";
 import InputEntryModal from "./InputEntryModal";
 
 const cookies = new Cookies();
 
-// Prefecture to energy zone mapping
 const PREFECTURE_TO_ZONE = {
-  // Zone A prefectures
   'Ηρακλείου': 'A', 'Χανίων': 'A', 'Ρεθύμνου': 'A', 'Λασιθίου': 'A', 
   'Κυκλάδων': 'A', 'Δωδεκανήσου': 'A', 'Σάμου': 'A', 'Μεσσηνίας': 'A', 
   'Λακωνίας': 'A', 'Αργολίδας': 'A', 'Ζακύνθου': 'A', 'Κεφαλληνίας & Ιθάκης': 'A', 
   'Αρκαδίας': 'A',
   
-  // Zone B prefectures
   'Αττικής': 'B', 'Κορινθίας': 'B', 'Ηλείας': 'B', 'Αχαΐας': 'B', 
   'Αιτωλοακαρνανίας': 'B', 'Φθιώτιδας': 'B', 'Φωκίδας': 'B', 'Βοιωτίας': 'B', 
   'Εύβοιας': 'B', 'Μαγνησίας': 'B', 'Λέσβου': 'B', 'Χίου': 'B', 'Κέρκυρας': 'B', 
   'Λευκάδας': 'B', 'Θεσπρωτίας': 'B', 'Πρέβεζας': 'B', 'Άρτας': 'B',
   
-  // Zone C prefectures
   'Ευρυτανίας': 'C', 'Ιωαννίνων': 'C', 'Λάρισας': 'C', 'Καρδίτσας': 'C', 
   'Τρικάλων': 'C', 'Πιερίας': 'C', 'Ημαθίας': 'C', 'Πέλλας': 'C', 'Θεσσαλονίκης': 'C', 
   'Κιλκίς': 'C', 'Χαλκιδικής': 'C', 'Σερρών': 'C', 'Καβάλας': 'C', 'Ξάνθης': 'C', 
   'Ροδόπης': 'C', 'Έβρου': 'C',
   
-  // Zone D prefectures
   'Γρεβενών': 'D', 'Κοζάνης': 'D', 'Καστοριάς': 'D', 'Φλώρινας': 'D', 'Δράμας': 'D'
 };
 
-// Get a sorted array of all prefecture names for a flat dropdown
 const ALL_PREFECTURES = Object.keys(PREFECTURE_TO_ZONE).sort();
 
 function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, params }) {
   const [formData, setFormData] = useState({
-    name: "", // Building name
-    usage: "", // Building usage
-    description: "", // Building description
-    year_built: "", // Year built
-    address: "", // Address
-    prefecture: "", // New field for prefecture
-    energy_zone: "", // New field for energy zone
-    is_insulated: false, // Is insulated
-    is_certified: false, // Is energy class certified
-    energy_class: "", // Energy class
-    orientation: "", // Orientation
-    total_area: "", // Total area
-    examined_area: "", // Examined area
-    floors_examined: "1", // Number of examined floors
-    floor_height: "", // Floor height
-    construction_type: "", // Construction type (δόμηση)
-    free_facades: "", // Free facades
-    altitude: "", // Altitude
-    non_operating_days: "", // Days not operating
-    operating_hours: "", // Operating hours
-    occupants: "", // Number of people in building
+    name: "", 
+    usage: "", 
+    description: "", 
+    year_built: "",
+    address: "", 
+    prefecture: "",
+    energy_zone: "", 
+    is_insulated: false,
+    is_certified: false,
+    energy_class: "",
+    orientation: "",
+    total_area: "", 
+    examined_area: "", 
+    floors_examined: "1",
+    floor_height: "", 
+    construction_type: "",
+    free_facades: "",
+    altitude: "",
+    non_operating_days: "",
+    operating_hours: "",
+    occupants: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -67,7 +61,6 @@ function BuildingModalForm({ isOpen, onClose, onBuildingCreated, projectUuid, pa
 
   const token = cookies.get("token") || "";
 
-  // Update energy zone when prefecture changes
   useEffect(() => {
     if (formData.prefecture) {
       const zone = PREFECTURE_TO_ZONE[formData.prefecture] || "";

@@ -7,9 +7,7 @@ export default function Logout() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Remove the token cookie
     cookies.remove("token", { path: "/" });
-    // Redirect to the login page
     navigate("/login", { replace: true });
   }, [cookies, navigate]);
 

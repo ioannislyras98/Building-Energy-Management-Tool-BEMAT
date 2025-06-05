@@ -4,50 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom CSS variables for compatibility */
 :root {
-  --color-primary: #2d5a27;
-  --color-primary-bold: #4a7c59;
-  --color-primary-light: #4a7c59;
-  --color-primary-dark: #1a3a15;
-  --color-background-default: #ffffff;
-  --color-background-paper: #ffffff;
-  --color-text-primary: #213547;
-  --color-text-secondary: #6b7280;
+  --color-primary: oklch(44.15% 0.0735 147.66);
+  --color-primary-bold: oklch(57.34% 0.1369 149.89);
+  --color-primary-light: oklch(0.75 0.1369 149.89);
   --font-basic: "Noto Sans", sans-serif;
   --drop-shadow-basic: 0 3px 3px rgba(0, 128, 128, 0.25); 
-}
-
-/* Material UI theme styles */
-.mui-theme-primary {
-  color: var(--color-primary);
-}
-
-.mui-theme-primary-light {
-  color: var(--color-primary-light);
-}
-
-.mui-theme-primary-dark {
-  color: var(--color-primary-dark);
-}
-
-.mui-theme-background-default {
-  background-color: var(--color-background-default);
-}
-
-.mui-theme-background-paper {
-  background-color: var(--color-background-paper);
-}
-
-.mui-theme-text-primary {
-  color: var(--color-text-primary);
-}
-
-.mui-theme-text-secondary {
-  color: var(--color-text-secondary);
-}
-
-/* MUI DataGrid styling */
-.MuiDataGrid-root {
-  border: 1px solid #e0e0e0;
 }

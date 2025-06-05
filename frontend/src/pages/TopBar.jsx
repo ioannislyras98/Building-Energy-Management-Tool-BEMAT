@@ -1,21 +1,15 @@
-//jquery
 import $ from "jquery";
-//css
 import "./../css/topbar.css"
-//hooks
 import { useState, useRef, useEffect } from "react";
-//cookie
 import Cookies from 'universal-cookie';
-import { useLanguage } from "../context/LanguageContext"; // Updated import
+import { useLanguage } from "../context/LanguageContext"; 
 import { useNavigate } from "react-router-dom";
 
-//icons
 import { FaBell, FaCircleUser } from "react-icons/fa6";
 import { HiCog6Tooth } from "react-icons/hi2";
 import { MdLogout } from "react-icons/md";
 import { MdTranslate } from "react-icons/md";
 
-//language
 import english_text from '../languages/english.json';
 import greek_text from '../languages/greek.json';
 
@@ -30,7 +24,6 @@ export default function TopBar() {
     const navigate = useNavigate();
     const token = cookies.get("token") || "";
 
-    // Fetch user data when component mounts
     useEffect(() => {
         if (token) {
             const settings = {

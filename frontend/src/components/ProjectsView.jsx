@@ -10,7 +10,6 @@ const ProjectsView = ({ projects, params, onProjectClick, onAddProject }) => {
       </div>
 
       <div className="projects-grid">
-        {/* Κουμπί προσθήκης νέου έργου ως κάρτα */}
         <div 
           className="project-card add-project-card"
           onClick={onAddProject}
@@ -20,14 +19,12 @@ const ProjectsView = ({ projects, params, onProjectClick, onAddProject }) => {
             <span className="text-primary font-medium">{params.addNewProject}</span>
           </div>
         </div>
-
-        {/* Λίστα με τα υπάρχοντα projects */}
         {projects.length > 0 ? (
           projects.map((project) => (
             <div 
               key={project.uuid} 
               className="project-card" 
-              onClick={() => onProjectClick(project)} // This will trigger navigation via Home.jsx
+              onClick={() => onProjectClick(project)} 
             >
               <ProjectBtn 
                 uuid={project.uuid}

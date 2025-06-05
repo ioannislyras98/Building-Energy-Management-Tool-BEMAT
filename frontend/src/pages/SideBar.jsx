@@ -1,23 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
-//jquery
 import $ from "jquery";
-//css
 import "./../css/sidebar.css"
-//cookie
 import Cookies from 'universal-cookie';
-import { useLanguage } from "../context/LanguageContext"; // Updated import
-//icons
+import { useLanguage } from "../context/LanguageContext"; 
 import { FaArrowRight } from "react-icons/fa6";
 import { IoHome } from "react-icons/io5";
 
-//language
 import english_text from '../languages/english.json';
 import greek_text from '../languages/greek.json';
 
 const cookies = new Cookies(null, { path: '/' });
 
 export default function Sidenav() {
-    // Define state for sidebar expansion
     const [sidebarExpanded, setSidebarExpanded] = useState(true);
     const { language } = useLanguage();
     const params = language === "en" ? english_text.SideBar : greek_text.SideBar;
@@ -49,7 +43,6 @@ export default function Sidenav() {
                     </a>
                 </div>
 
-                {/* Expand / collapse button */}
                 <div className="pt-3 lg:inline-flex mt-auto">
                     <div className="flex-1" />
                     <div className="px-3 py-2 justify-end">

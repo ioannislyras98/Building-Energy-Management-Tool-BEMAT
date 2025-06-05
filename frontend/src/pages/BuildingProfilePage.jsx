@@ -127,7 +127,6 @@ export default function BuildingProfilePage () {
       <div id='projects-wrapper' className='main-container'>
         <div className='min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50'>
           {' '}
-          {/* Header Section with enhanced styling and animations */}
           <div className='bg-white shadow-xl border-b border-gray-200 backdrop-blur-sm'>
             <div className='p-4 md:p-6'>
               <div className='flex items-center justify-between'>
@@ -142,8 +141,7 @@ export default function BuildingProfilePage () {
                     <MdArrowBack className='mr-2' size={18} />
                     {text?.backToBuildings || 'Back to Buildings'}
                   </button>{' '}
-                  {/* Beautiful project name display with enhanced styling */}
-                  <div className='flex flex-col'>
+                   <div className='flex flex-col'>
                     <span className='text-sm text-gray-500 font-medium tracking-wide uppercase'>
                       {text?.projectLabel || 'Project'}
                     </span>
@@ -153,22 +151,10 @@ export default function BuildingProfilePage () {
                       </h1>
                     </div>
                   </div>
-                </div>{' '}
-                {/* Enhanced building name with icon */}
-                <div className='flex items-center space-x-4'>
-                  <div className='text-right'>
-                    <p className='text-sm text-gray-500 font-medium tracking-wide uppercase'>
-                      {text?.buildingLabel || 'Building'}
-                    </p>
-                    <h2 className='text-3xl font-bold text-gray-800 bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent drop-shadow-sm'>
-                      {building?.name}
-                    </h2>
-                  </div>{' '}
                 </div>
               </div>
             </div>
           </div>
-          {/* Main Content with improved spacing and styling */}
           <div className='p-4 md:p-6'>
             <div className='flex flex-col lg:flex-row gap-8'>
               <div className='lg:w-1/3 space-y-6'>

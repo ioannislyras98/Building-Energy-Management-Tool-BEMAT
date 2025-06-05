@@ -1,17 +1,10 @@
-//jquery
+
 import $ from "jquery";
-//hooks
 import React, { useState } from "react";
-//router
-import { useNavigate } from "react-router-dom";
-//css
 import "./../../css/forms.css";
-//components
 import InputEntry from "./InputEntry";
-//cookie
 import Cookies from "universal-cookie";
-import { useLanguage } from "../../context/LanguageContext"; // Updated import
-//language
+import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import { BiHide, BiShow } from "react-icons/bi";
@@ -19,7 +12,6 @@ import { BiHide, BiShow } from "react-icons/bi";
 const cookies = new Cookies(null, { path: "/" });
 
 function LogInForm({ params }) {
-  // State to control the visibility of the password
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(false);
   const [forgotPasswordMessage, setForgotPasswordMMessage] = useState(false);
@@ -65,7 +57,6 @@ function LogInForm({ params }) {
     setForgotPasswordMessageError(false);
     setEmailMissed(false);
     setLoading(true);
-    // Get email value from the email input
     const email = $("#email").val();
 
     if (!email) {
@@ -73,7 +64,6 @@ function LogInForm({ params }) {
         setLoading(false);
       return;
     }
-    // AJAX call for password reset
     var settings = {
       url: "http://127.0.0.1:8000/users/password-reset/",
       method: "POST",
@@ -120,14 +110,13 @@ function LogInForm({ params }) {
                 type="email"
                 example={params.email_example}
               />
-              {/* Password input with show/hide toggle */}
               <div className="relative">
                 <InputEntry
                   entry={params.password}
                   id="password"
                   type={showPassword ? "text" : "password"}
                   example={params.password_text}
-                  className="pr-10" // Προσθέτουμε padding στα δεξιά για να δημιουργήσουμε χώρο για το εικονίδιο.
+                  className="pr-10" 
                 />
                 <button
                   type="button"

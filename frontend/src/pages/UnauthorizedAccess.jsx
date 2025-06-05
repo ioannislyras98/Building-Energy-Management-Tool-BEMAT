@@ -1,11 +1,7 @@
-//router
-import { useNavigate } from "react-router-dom"
-//css
-import "./../css/forms.css";//components
-//cookie
+
+import "./../css/forms.css";
 import Cookies from 'universal-cookie';
-import { useLanguage } from "../context/LanguageContext"; // Updated import
-//language
+import { useLanguage } from "../context/LanguageContext";
 import english_text from '../languages/english.json';
 import greek_text from '../languages/greek.json';
 

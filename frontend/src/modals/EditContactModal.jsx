@@ -19,7 +19,6 @@ function EditContactModalForm({ isOpen, onClose, onContactUpdated, contact, para
   const [errors, setErrors] = useState({});
   const token = cookies.get("token") || "";
 
-  // Populate form data when contact changes
   useEffect(() => {
     if (contact) {
       setFormData({
@@ -152,7 +151,7 @@ export default function EditContactModal({ isOpen, onClose, onContactUpdated, co
       onClose={onClose}
       onContactUpdated={onContactUpdated}
       contact={contact}
-      params={params || {}} // Ensure params is always an object
+      params={params || {}}
       buildingUuid={buildingUuid}
     />
   );
