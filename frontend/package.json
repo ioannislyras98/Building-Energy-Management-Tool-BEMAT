@@ -2,13 +2,12 @@
   "name": "bemat-frontend",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
-  "scripts": {
+  "type": "module",  "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
-    },
+  },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -22,9 +21,11 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "react-icons": "^4.12.0",
-    "recharts": "^2.8.0",
+    "recharts": "^2.8.0",    
     "react-admin": "^4.16.0",
-    "jwt-decode": "^4.0.0"  },"devDependencies": {
+    "jwt-decode": "^4.0.0"
+  },
+  "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",

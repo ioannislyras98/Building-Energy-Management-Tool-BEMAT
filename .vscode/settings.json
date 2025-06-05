@@ -5,14 +5,20 @@
   "scss.lint.unknownAtRules": "ignore",
   "less.validate": false,
   "less.lint.unknownAtRules": "ignore",
+  "json.schemaDownload.enable": false,
   "files.associations": {
     "*.css": "css"
   },
   "emmet.includeLanguages": {
     "javascript": "javascriptreact",
     "typescript": "typescriptreact"
-  },
-  "editor.quickSuggestions": {
+  },  "editor.quickSuggestions": {
     "strings": "on"
+  },
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
   }
 }

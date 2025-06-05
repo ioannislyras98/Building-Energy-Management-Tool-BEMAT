@@ -5,8 +5,7 @@
 
 #sidebar {
     @apply  bg-white fixed flex flex-col z-40 left-0 top-0 lg:left-auto lg:top-auto lg:translate-x-0 h-screen overflow-y-scroll 
-    lg:overflow-y-auto shrink-0 border-r border-primary-light shadow-sm shadow-primary sm:translate-x-0 p-4 transition-all duration-200 overflow-hidden
-    z-50;
+    lg:overflow-y-auto shrink-0 border-r border-primary-light shadow-sm shadow-primary sm:translate-x-0 p-4 transition-all duration-200 overflow-hidden;
 }
 
 .sidebar-expanded {

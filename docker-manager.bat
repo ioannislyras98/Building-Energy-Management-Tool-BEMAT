@@ -7,7 +7,7 @@ echo ====================================
 echo.
 echo Select an option:
 echo.
-echo 1. Start Development Environment
+echo 1. Start Development Environment (Background Mode)
 echo 2. Stop All Services
 echo 3. Rebuild Containers (Force Update Dependencies)
 echo 4. View Docker Status
@@ -26,8 +26,8 @@ goto menu
 
 :dev
 echo.
-echo Starting Development Environment...
-call start-development.bat
+echo Starting Development Environment in Background Mode...
+call start-bemat.bat
 goto menu
 
 :stop

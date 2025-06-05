@@ -5,17 +5,20 @@
 ## 🚀 Γρήγορη Εκκίνηση
 
 ### **Βήμα 1**: Κλωνοποίηση
+
 ```bash
 git clone https://github.com/your-username/Building-Energy-Management-Tool-BEMAT.git
 cd Building-Energy-Management-Tool-BEMAT
 ```
 
 ### **Βήμα 2**: Εκτέλεση
+
 ```cmd
 start-bemat.bat
 ```
 
 **Αυτό είναι όλο!** Το script θα:
+
 - ✅ Χτίσει όλα τα Docker containers
 - ✅ Κάνει npm install για το frontend
 - ✅ Εκτελέσει τις Django migrations
@@ -24,47 +27,64 @@ start-bemat.bat
 ## 📋 Διαθέσιμα Scripts
 
 ### 🚀 Γρήγορη Εκτέλεση
-- **`start-bemat.bat`** - Εκτελεί όλα τα containers με μία εντολή (Development mode)
+
+- **`start-bemat.bat`** - Εκτελεί όλα τα containers σε background mode (μπορείς να κλείσεις το terminal) 🔄
 - **`start-bemat-advanced.bat`** - Προηγμένη εκκίνηση με έλεγχους και διαγνωστικά
 
-### 📋 Διαχείριση με Menu  
+### 📋 Διαχείριση με Menu
+
 - **`docker-manager.bat`** - Κεντρικό menu για όλες τις λειτουργίες
 
 ### 🛠️ Ειδικά Scripts
-- **`start-development.bat`** - Εκτέλεση Development environment
+
+- **`start-development.bat`** - Εκτέλεση Development environment (με terminal windows)
 - **`rebuild-containers.bat`** - Ανακατασκευή containers με τελευταίες dependencies
 - **`stop-all.bat`** - Σταματά όλα τα containers
 
 ## 🔧 Χρήση
 
 ### Γρήγορη Εκτέλεση (Απλούστερη)
+
 ```cmd
 start-bemat.bat
 ```
 
+**Τώρα τρέχει σε background mode! Πλεονεκτήματα:**
+
+- ✅ Μπορείς να κλείσεις το cmd window
+- ✅ Containers συνεχίζουν να τρέχουν
+- ✅ Δεν δεσμεύεται το terminal
+- ✅ Ιδανικό για καθημερινή χρήση
+
 ### Με Menu (Περισσότερες επιλογές)
+
 ```cmd
 docker-manager.bat
 ```
 
 Επιλογές menu:
-1. Start Development Environment
+
+1. Start Development Environment (Background Mode)
 2. Stop All Services
-3. **Rebuild Containers (Force Update Dependencies)** 🆕
+3. **Rebuild Containers (Force Update Dependencies)**
 4. View Docker Status
 5. Clean Docker System
 6. Exit
 
 ### Ανακατασκευή Containers (Νέο!)
+
 ```cmd
 rebuild-containers.bat
 ```
+
 Χρησιμοποιήστε αυτό όταν:
+
 - Προσθέσατε νέες dependencies
 - Αντιμετωπίζετε προβλήματα με packages
 - Θέλετε καθαρή εγκατάσταση
 
 ### Σταμάτημα όλων
+
 ```cmd
 stop-all.bat
 ```
@@ -72,6 +92,7 @@ stop-all.bat
 ## ⚙️ Τι κάνει κάθε script
 
 ### start-bemat.bat
+
 - 🔨 Χτίζει το backend (Django API + PostgreSQL)
 - 🔨 Χτίζει το frontend (React/Vite) **με npm install**
 - 🖥️ Ανοίγει 2 terminal windows
@@ -80,6 +101,7 @@ stop-all.bat
 - 📱 Προσβάσιμο στο: http://localhost:3000
 
 ### docker-manager.bat
+
 - 📋 Menu με όλες τις επιλογές
 - 📊 Status check containers
 - 🧹 Καθαρισμός Docker system
@@ -87,6 +109,7 @@ stop-all.bat
 - 🌐 **Αυτόματο άνοιγμα browsers** για development mode
 
 ### start-development.bat
+
 - 🔨 Development environment με hot reload
 - 🌐 Ανοίγει: Frontend + Backend API
 - ⏱️ Περιμένει 30 δευτερόλεπτα
@@ -106,6 +129,7 @@ stop-all.bat
 - ✅ Ports **3000, 8000, 5432** διαθέσιμα
 
 ### Έλεγχος Προαπαιτούμενων
+
 ```powershell
 # Έλεγχος Docker
 docker --version
@@ -118,11 +142,13 @@ netstat -ano | findstr :8000
 ## 🔧 Αντιμετώπιση Προβλημάτων
 
 ### ❌ Κάποιο container δεν εκτελείται
+
 1. Τρέξτε `stop-all.bat`
 2. Ελέγξτε ότι το Docker Desktop τρέχει
 3. Τρέξτε ξανά το επιθυμητό script
 
 ### ❌ Ports σε χρήση
+
 ```powershell
 # Βρες ποια διεργασία χρησιμοποιεί το port
 netstat -ano | findstr :3000
@@ -132,23 +158,27 @@ taskkill /PID <PID_NUMBER> /F
 ```
 
 ### ❌ Frontend δεν φορτώνει
+
 ```bash
 cd frontend
 docker-compose -f docker-compose.frontend.yml logs frontend
 ```
 
 ### ❌ Backend API δεν απαντά
+
 ```bash
-cd backend  
+cd backend
 docker-compose logs web
 ```
 
 ### 🧹 Γενικός καθαρισμός Docker
+
 ```cmd
 docker-manager.bat → επιλογή 5
 ```
 
 **Ή χειροκίνητα:**
+
 ```bash
 docker system prune -a -f
 docker volume prune -f
@@ -157,20 +187,23 @@ docker volume prune -f
 ## 🎯 Χρήσιμες Εντολές
 
 ### Έλεγχος κατάστασης containers
+
 ```bash
 docker ps -a
 ```
 
 ### Παρακολούθηση logs
+
 ```bash
 # Backend
 docker-compose -f backend/docker-compose.yml logs -f web
 
-# Frontend  
+# Frontend
 docker-compose -f frontend/docker-compose.frontend.yml logs -f frontend
 ```
 
 ### Μπες σε container
+
 ```bash
 # Backend
 docker exec -it backend-web-1 bash
@@ -190,6 +223,6 @@ docker exec -it frontend-frontend-1 sh
 
 ## 🎉 Έτοιμο για χρήση!
 
-**Για άμεση εκκίνηση:** `start-bemat.bat` και όλα θα ανοίξουν αυτόματα! 
+**Για άμεση εκκίνηση:** `start-bemat.bat` και όλα θα ανοίξουν αυτόματα!
 
 **Για προχωρημένη διαχείριση:** `docker-manager.bat` για menu επιλογών.

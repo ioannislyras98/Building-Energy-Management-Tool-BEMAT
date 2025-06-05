@@ -34,25 +34,36 @@ echo ⚠️  This may take 3-15 minutes depending on your system.
 echo.
 
 REM Start backend services
-echo [1/2] Starting Backend (API + Database)...
+echo [1/2] Starting Backend (API + Database) in background mode...
 cd /d "%~dp0backend"
-start "BEMAT Backend" cmd /k "docker-compose up --build"
-
-REM Wait for backend containers to initialize
-echo Waiting for backend containers to initialize...
-timeout /t 15 /nobreak > nul
+docker-compose up -d --build
+if errorlevel 1 (
+    echo ❌ Backend failed to start
+    pause
+    exit /b 1
+)
+echo ✅ Backend started successfully
 
 REM Start frontend
-echo [2/2] Starting Frontend...
+echo [2/2] Starting Frontend in background mode...
 cd /d "%~dp0frontend"  
-start "BEMAT Frontend" cmd /k "docker-compose -f docker-compose.frontend.yml up --build"
+docker-compose -f docker-compose.frontend.yml up -d --build
+if errorlevel 1 (
+    echo ❌ Frontend failed to start
+    pause
+    exit /b 1
+)
+echo ✅ Frontend started successfully
 
 echo.
 echo ====================================
-echo   ⏳ Monitoring Service Health
+echo   🎉 All Services Running in Background!
 echo ====================================
 echo.
-echo 📝 Note: First-time startup can take 10-15 minutes
+echo ⚠️  IMPORTANT: Containers are now running in background mode.
+echo    You can safely close this terminal window.
+echo    To stop services later, run: stop-all.bat
+echo.
 echo 🔄 Services are building and starting...
 
 echo.
@@ -168,6 +179,12 @@ echo Your application is now running at:
 echo   🌐 Main App:     http://localhost:3000
 echo   🔧 Backend API:  http://localhost:8000  
 echo   👤 Admin Panel:  http://localhost:8000/admin
+echo.
+echo ⚠️  CONTAINERS ARE RUNNING IN BACKGROUND MODE:
+echo   • You can safely close this terminal window
+echo   • Services will continue running
+echo   • To stop all services: run stop-all.bat
+echo   • To check status: docker ps
 echo   📖 API Docs:     http://localhost:8000/api/docs/
 echo.
 echo 🛑 To stop all services, run: stop-all.bat
