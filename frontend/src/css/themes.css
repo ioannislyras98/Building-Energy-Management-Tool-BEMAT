@@ -1,13 +1,14 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
-@import "tailwindcss";
-@plugin "@tailwindcss/forms";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme {
-    --*: initial;
-    --color-primary: oklch(44.15% 0.0735 147.66);
-    --color-primary-bold: oklch(57.34% 0.1369 149.89);
-    --color-primary-light: oklch(0.75 0.1369 149.89);
-    --font-basic: "Noto Sans", sans-serif;
-    --drop-shadow-basic: 0 3px 3px rgba(--color-primary, 0.25); 
-  }
+/* Custom CSS variables for compatibility */
+:root {
+  --color-primary: oklch(44.15% 0.0735 147.66);
+  --color-primary-bold: oklch(57.34% 0.1369 149.89);
+  --color-primary-light: oklch(0.75 0.1369 149.89);
+  --font-basic: "Noto Sans", sans-serif;
+  --drop-shadow-basic: 0 3px 3px rgba(0, 128, 128, 0.25); 
+}

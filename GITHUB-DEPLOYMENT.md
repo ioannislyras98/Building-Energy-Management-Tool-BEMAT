@@ -45,17 +45,26 @@ cd Building-Energy-Management-Tool-BEMAT
 
 ### Step 3: Quick Start (Windows)
 
-For Windows users, simply double-click the batch file:
+**Recommended:** Use the smart launcher that automatically waits for services:
 ```cmd
 start-bemat.bat
 ```
 
-This will automatically:
+This script will automatically:
+- ✅ Check Docker is running
 - ✅ Start PostgreSQL database
 - ✅ Start Django backend API
 - ✅ Install frontend dependencies
 - ✅ Start React frontend
-- ✅ Open browsers automatically
+- ✅ **Monitor services for up to 10 minutes**
+- ✅ **Show detailed progress and error messages**
+- ✅ Open browsers only when services respond
+
+**⏱️ Startup Time:** 
+- First run: 5-8 minutes (downloading images)
+- Subsequent runs: 1-3 minutes
+
+**Note**: The script provides real-time feedback, error detection, and ensures browsers open only when services are ready, preventing "connection refused" errors.
 
 ### Step 4: Manual Start (Cross-Platform)
 

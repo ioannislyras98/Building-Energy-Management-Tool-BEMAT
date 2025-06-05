@@ -1,6 +1,4 @@
 @import "./themes.css";
-@import "tailwindcss";
-@plugin "@tailwindcss/forms";
 
 
 #sign-screen {
@@ -15,7 +13,7 @@
 }
 
 #form-container {
-    @apply bg-neutral-100 px-6 text-gray-900 rounded-md w-md h-auto;
+    @apply bg-neutral-100 px-6 text-gray-900 rounded-md w-96 h-auto;
 }
 
 #register-form,

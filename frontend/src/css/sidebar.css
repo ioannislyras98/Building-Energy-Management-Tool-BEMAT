@@ -1,19 +1,20 @@
 @import "./themes.css";
-@import "tailwindcss";
-@plugin "@tailwindcss/forms";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 #sidebar {
     @apply  bg-white fixed flex flex-col z-40 left-0 top-0 lg:left-auto lg:top-auto lg:translate-x-0 h-screen overflow-y-scroll 
     lg:overflow-y-auto shrink-0 border-r border-primary-light shadow-sm shadow-primary sm:translate-x-0 p-4 transition-all duration-200 overflow-hidden
-    z-999;
+    z-50;
 }
 
 .sidebar-expanded {
-    @apply lg:w-55  w-60;
+    @apply lg:w-56 w-60;
 }
 
 .sidebar-shrinked {
-    @apply lg:w-17 w-27;
+    @apply lg:w-16 w-24;
 }
 
 .sidebar-icon {

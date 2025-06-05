@@ -1,9 +1,10 @@
 @import "./themes.css";
-@import "tailwindcss";
-@plugin "@tailwindcss/forms";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 #topbar{
-    @apply bg-white border-primary-light shadow-sm shadow-primary fixed w-full top-0 start-0 border-b z-9999;
+    @apply bg-white border-primary-light shadow-sm shadow-primary fixed w-full top-0 start-0 border-b z-50;
 
     .topbar-items-container {
         @apply flex flex-wrap items-center justify-between h-[60px];
@@ -44,10 +45,8 @@
             @apply font-normal bg-white text-primary;
 
             ul{
-                @apply mt-4 w-[150px] text-sm border-primary-light shadow-sm shadow-primary-light border-b border-l border-r relative;
-
-                li{
-                    @apply hover:text-white transition hover:scale-102 delay-50 duration-initial ease-out cursor-pointer hover:bg-primary-bold hover:drop-shadow-none;
+                @apply mt-4 w-[150px] text-sm border-primary-light shadow-sm shadow-primary-light border-b border-l border-r relative;                li{
+                    @apply hover:text-white transition hover:scale-105 delay-75 duration-300 ease-out cursor-pointer hover:bg-primary-bold hover:drop-shadow-none;
                 }
             }
         }

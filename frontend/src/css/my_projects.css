@@ -1,6 +1,7 @@
 @import "./themes.css";
-@import "tailwindcss";
-@plugin "@tailwindcss/forms";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 #my-projects-container {
     @apply grid grid-cols-5 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1 w-full;
