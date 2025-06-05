@@ -22,19 +22,21 @@ const BuildingsView = ({
 }) => {
   const navigate = useNavigate()
 
-  const handleBuildingClick = buildingUuid => {    if (selectedProject && selectedProject.uuid && buildingUuid) {
+  const handleBuildingClick = buildingUuid => {
+    if (selectedProject && selectedProject.uuid && buildingUuid) {
       navigate(`/projects/${selectedProject.uuid}/buildings/${buildingUuid}`)
     } else {
       console.error('Missing project or building UUID for navigation')
-    }  }
-  
+    }
+  }
+
   const { language } = useLanguage()
-  
+
   const text =
     language === 'en'
       ? english_text.BuildingProfile
       : greek_text.BuildingProfile
-      
+
   return (
     <div className='buildings-view'>
       <div className='bg-white shadow-xl border-b border-gray-200 backdrop-blur-sm mb-6'>

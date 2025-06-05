@@ -37,6 +37,7 @@ export default function BuildingContactInfo ({
   const [currentContact, setCurrentContact] = useState(null)
   const cookies = new Cookies()
   const token = cookies.get('token') || ''
+  
   const { language } = useLanguage()
   const dialogText =
     language === 'en'
@@ -155,7 +156,7 @@ export default function BuildingContactInfo ({
                     <div className='grid grid-cols-1 gap-2 ml-13'>
                       {contact.email && (
                         <div className='flex items-center space-x-2'>
-                          <MdEmail className='text-blue-500' size={16} />
+                          <MdEmail className='text-primary' size={16} />
                           <span className='text-sm text-gray-700'>
                             {contact.email}
                           </span>
@@ -174,7 +175,7 @@ export default function BuildingContactInfo ({
                   <div className='flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200'>
                     <button
                       onClick={() => handleEditClick(contact)}
-                      className='p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors duration-200'
+                      className='p-2 text-primary hover:bg-opacity-30 rounded-lg transition-colors duration-200'
                       aria-label='Edit contact'
                     >
                       <MdEdit size={18} />

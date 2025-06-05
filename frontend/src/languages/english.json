@@ -171,8 +171,10 @@
     "basicInfoSection": "Basic Information",
     "buildingCharacteristicsSection": "Building Characteristics",
     "areasAndFloorsSection": "Areas and Floors",
-    "additionalInfoSection": "Additional Information",
-    "operationalInfoSection": "Operational Information"
+    "additionalInfoSection": "Additional Information",    "operationalInfoSection": "Operational Information",
+    "prefecture": "Prefecture",
+    "selectPrefecture": "Select prefecture",
+    "energyZone": "Energy Zone"
   },
   "AddContactModal": {
     "h2": "Add Contact Person",

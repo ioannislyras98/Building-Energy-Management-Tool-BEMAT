@@ -9,6 +9,60 @@ import InputEntryModal from './InputEntryModal'
 
 const cookies = new Cookies()
 
+const PREFECTURE_TO_ZONE = {
+  Ηρακλείου: 'A',
+  Χανίων: 'A',
+  Ρεθύμνου: 'A',
+  Λασιθίου: 'A',
+  Κυκλάδων: 'A',
+  Δωδεκανήσου: 'A',
+  Σάμου: 'A',
+  Μεσσηνίας: 'A',
+  Λακωνίας: 'A',
+  Αργολίδας: 'A',
+  Αρκαδίας: 'A',
+  Κορινθίας: 'A',
+  Αχαΐας: 'A',
+  Ηλείας: 'A',
+  Αιτωλοακαρνανίας: 'B',
+  Φθιώτιδας: 'B',
+  Φωκίδας: 'B',
+  Βοιωτίας: 'B',
+  Εύβοιας: 'B',
+  Μαγνησίας: 'B',
+  Λέσβου: 'B',
+  Χίου: 'B',
+  Κέρκυρας: 'B',
+  Λευκάδας: 'B',
+  Θεσπρωτίας: 'B',
+  Πρέβεζας: 'B',
+  Άρτας: 'B',
+  Ιωαννίνων: 'B',
+  Τρικάλων: 'B',
+  Καρδίτσας: 'B',
+  Λαρίσης: 'B',
+  Πιερίας: 'B',
+  Ημαθίας: 'B',
+  Πέλλας: 'B',
+  Θεσσαλονίκης: 'C',
+  Αττικής: 'B',
+  Κιλκίς: 'C',
+  Χαλκιδικής: 'C',
+  'Σερρών (ΒΑ τμήμα)': 'C',
+  Καβάλας: 'C',
+  Ξάνθης: 'C',
+  Ροδόπης: 'C',
+  Έβρου: 'C',
+  Γρεβενών: 'D',
+  Κοζάνης: 'D',
+  Καστοριάς: 'D',
+  Φλώρινας: 'D',
+  'Σερρών (εκτός ΒΑ τμήματος)': 'D',
+  Δράμας: 'D'
+}
+
+const ALL_PREFECTURES = Object.keys(PREFECTURE_TO_ZONE).sort()
+
 function EditBuildingModalForm ({
   isOpen,
   onClose,
@@ -22,6 +76,8 @@ function EditBuildingModalForm ({
     description: '',
     year_built: '',
     address: '',
+    prefecture: '',
+    energy_zone: '',
     is_insulated: false,
     is_certified: false,
     energy_class: '',
@@ -40,7 +96,6 @@ function EditBuildingModalForm ({
   const [errors, setErrors] = useState({})
   const [showValidationErrors, setShowValidationErrors] = useState(false)
   const token = cookies.get('token') || ''
-
   useEffect(() => {
     if (building) {
       setFormData({
@@ -49,6 +104,8 @@ function EditBuildingModalForm ({
         description: building.description || '',
         year_built: building.year_built || '',
         address: building.address || '',
+        prefecture: building.prefecture || '',
+        energy_zone: building.energy_zone || '',
         is_insulated: building.is_insulated || false,
         is_certified: building.is_certified || false,
         energy_class: building.energy_class || '',
@@ -66,6 +123,16 @@ function EditBuildingModalForm ({
       })
     }
   }, [building])
+
+  useEffect(() => {
+    if (formData.prefecture) {
+      const zone = PREFECTURE_TO_ZONE[formData.prefecture] || ''
+      setFormData(prevState => ({
+        ...prevState,
+        energy_zone: zone
+      }))
+    }
+  }, [formData.prefecture])
 
   const handleChange = e => {
     const { id, value, type, checked } = e.target
@@ -94,6 +161,10 @@ function EditBuildingModalForm ({
     }
     if (!formData.address?.trim()) {
       newErrors.address = params.errorRequired || 'Field is required'
+      hasErrors = true
+    }
+    if (!formData.prefecture) {
+      newErrors.prefecture = params.errorRequired || 'Field is required'
       hasErrors = true
     }
     setErrors(newErrors)
@@ -155,15 +226,10 @@ function EditBuildingModalForm ({
   }
 
   if (!isOpen) return null
-
   const getInputClass = fieldName =>
     `input-field ${
       showValidationErrors && errors[fieldName] ? 'error-input' : ''
     }`
-  const renderError = fieldName =>
-    showValidationErrors && errors[fieldName] ? (
-      <div className='text-red-500 text-xs mt-1'>{errors[fieldName]}</div>
-    ) : null
 
   return (
     <div className='fixed inset-0 z-50 flex items-start justify-center bg-opacity-50 py-10'>
@@ -231,7 +297,7 @@ function EditBuildingModalForm ({
                 className={getInputClass('year_built')}
                 min='1800'
                 max={new Date().getFullYear()}
-              />
+              />{' '}
               <InputEntryModal
                 entry={params.address}
                 id='address'
@@ -242,8 +308,32 @@ function EditBuildingModalForm ({
                 className={getInputClass('address')}
                 required
               />
-            </div>
-
+              <InputEntryModal
+                entry={params.prefecture}
+                id='prefecture'
+                type='select'
+                value={formData.prefecture}
+                onChange={handleChange}
+                example={params.selectPrefecture}
+                options={ALL_PREFECTURES.map(prefecture => ({
+                  value: prefecture,
+                  label: prefecture
+                }))}
+                error={errors.prefecture}
+                className={getInputClass('prefecture')}
+                required
+              />
+              <InputEntryModal
+                entry={params.energyZone}
+                id='energy_zone'
+                value={formData.energy_zone}
+                onChange={handleChange}
+                error={errors.energy_zone}
+                className='block w-full p-2 border border-gray-300 bg-gray-100 rounded-md shadow-sm cursor-not-allowed'
+                readOnly
+                disabled
+              />
+            </div>{' '}
             <div className='border-b border-gray-200 pb-4'>
               <h3 className='font-bold text-primary text-sm mb-3'>
                 {params.buildingCharacteristicsSection}
@@ -258,48 +348,28 @@ function EditBuildingModalForm ({
                 error={errors.construction_type}
                 className={getInputClass('construction_type')}
               />
-              <div className='mb-4'>
-                <label htmlFor='is_insulated' className='block text-sm mb-1'>
-                  {params.isInsulated}
-                </label>
-                <select
-                  id='is_insulated'
-                  name='is_insulated'
-                  value={formData.is_insulated}
-                  onChange={handleChange}
-                  className={getInputClass('is_insulated')}
-                >
-                  <option value='false'>{params.no}</option>
-                  <option value='true'>{params.yes}</option>
-                </select>
-                {renderError('is_insulated')}
-              </div>
-
-              <div className='mb-4'>
-                <label htmlFor='is_certified' className='block text-sm mb-1'>
-                  {params.isCertified}
-                </label>
-                <select
-                  id='is_certified'
-                  name='is_certified'
-                  value={formData.is_certified}
-                  onChange={handleChange}
-                  className={getInputClass('is_certified')}
-                >
-                  <option value='false'>{params.no}</option>
-                  <option value='true'>{params.yes}</option>
-                </select>
-                {renderError('is_certified')}
-              </div>
+              <InputEntryModal
+                entry={params.isInsulated}
+                id='is_insulated'
+                type='select'
+                value={formData.is_insulated.toString()}
+                onChange={handleChange}
+                options={[
+                  { value: 'false', label: params.no },
+                  { value: 'true', label: params.yes }
+                ]}
+                error={errors.is_insulated}
+                className={getInputClass('is_insulated')}
+              />{' '}
               <InputEntryModal
                 entry={params.isCertified}
                 id='is_certified'
                 type='select'
-                value={formData.is_certified}
+                value={formData.is_certified.toString()}
                 onChange={handleChange}
                 options={[
-                  { value: 'true', label: params.yes || 'Yes' },
-                  { value: 'false', label: params.no || 'No' }
+                  { value: 'false', label: params.no },
+                  { value: 'true', label: params.yes }
                 ]}
                 error={errors.is_certified}
                 className={getInputClass('is_certified')}
@@ -316,8 +386,16 @@ function EditBuildingModalForm ({
                   className={getInputClass('energy_class')}
                 />
               )}
+              <InputEntryModal
+                entry={params.orientation}
+                id='orientation'
+                value={formData.orientation}
+                onChange={handleChange}
+                example={params.orientation_example}
+                error={errors.orientation}
+                className={getInputClass('orientation')}
+              />
             </div>
-
             <div className='border-b border-gray-200 pb-4'>
               <h3 className='font-bold text-primary text-sm mb-3'>
                 {params.areasAndFloorsSection}
@@ -382,7 +460,6 @@ function EditBuildingModalForm ({
                 max='4'
               />
             </div>
-
             <div className='border-b border-gray-200 pb-4'>
               <h3 className='font-bold text-primary text-sm mb-3'>
                 {params.additionalInfoSection}
@@ -399,7 +476,6 @@ function EditBuildingModalForm ({
                 step='0.01'
               />
             </div>
-            
             <div className='pb-4'>
               <h3 className='font-bold text-primary text-sm mb-3'>
                 {params.operationalInfoSection}

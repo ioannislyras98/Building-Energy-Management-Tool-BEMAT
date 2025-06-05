@@ -14,7 +14,7 @@ export default function ProjectBtn({ name, buildings_count, date_created }) {
     
     return (
         <>
-            <div className="project-icon drop-shadow-[0_5px_15px_rgba(53,_94,_59,_0.25)]">
+            <div className="project-icon bg-primary">
                 <BsBuildings className="p-icon text-white" />
             </div>
             <div className="info w-[180px]">

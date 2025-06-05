@@ -5,9 +5,9 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: 'oklch(44.15% 0.0735 147.66)',
-          bold: 'oklch(57.34% 0.1369 149.89)',
-          light: 'oklch(0.75 0.1369 149.89)',
+          DEFAULT: '#2d5a27',
+          bold: '#1a7c3a',
+          light: '#7dd3a0',
           dark: '#1a3a15'
         }
       },

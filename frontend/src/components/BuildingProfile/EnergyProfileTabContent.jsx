@@ -97,7 +97,7 @@ const EnergyProfileTabContent = ({
       'EnergyProfileTabContent: handleClose called, setting open to false'
     )
     setOpen(false)
-    setEditItem(null) 
+    setEditItem(null)
   }
 
   const handleEdit = item => {
@@ -394,7 +394,11 @@ const EnergyProfileTabContent = ({
         <Button
           variant='contained'
           color='primary'
-          sx={{ backgroundColor: 'var(--color-primary)', color: 'white' }}
+          sx={{
+            backgroundColor: 'var(--color-primary)',
+            color: 'white',
+            textTransform: 'none'
+          }}
           startIcon={<AddIcon />}
           onClick={handleOpen}
         >

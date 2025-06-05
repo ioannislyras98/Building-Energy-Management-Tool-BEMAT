@@ -171,8 +171,10 @@
     "basicInfoSection": "Βασικές Πληροφορίες",
     "buildingCharacteristicsSection": "Χαρακτηριστικά Κτιρίου",
     "areasAndFloorsSection": "Επιφάνειες και Όροφοι",
-    "additionalInfoSection": "Πρόσθετες Πληροφορίες",
-    "operationalInfoSection": "Πληροφορίες Λειτουργίας"
+    "additionalInfoSection": "Πρόσθετες Πληροφορίες",    "operationalInfoSection": "Πληροφορίες Λειτουργίας",
+    "prefecture": "Νομός",
+    "selectPrefecture": "Επιλέξτε νομό",
+    "energyZone": "Ενεργειακή Ζώνη"
   },
   "AddContactModal": {
     "h2": "Προσθήκη Υπευθύνου Επικοινωνίας",
