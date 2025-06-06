@@ -1,17 +1,16 @@
-#!/bin/sh
+#!/bin/bash
 
-if [ "$DATABASE" = "postgres" ]
-then
-    echo "Waiting for postgres..."
+echo "Waiting for PostgreSQL..."
+while ! nc -z db 5432; do
+  sleep 0.1
+done
+echo "PostgreSQL started"
 
-    while ! nc -z $SQL_HOST $SQL_PORT; do
-      sleep 0.1
-    done
-
-    echo "PostgreSQL started"
-fi
-
-python manage.py flush --no-input
+echo "Running database migrations..."
 python manage.py migrate
 
-exec "$@"
+echo "Collecting static files..."
+python manage.py collectstatic --noinput
+
+echo "Starting Django server..."
+exec python manage.py runserver 0.0.0.0:8000

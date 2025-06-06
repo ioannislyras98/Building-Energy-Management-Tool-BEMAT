@@ -1,0 +1,26 @@
+# Set default line ending behavior
+* text=auto
+
+# Ensure shell scripts always have LF line endings
+*.sh text eol=lf
+
+# Ensure Dockerfile always has LF line endings
+Dockerfile text eol=lf
+**/Dockerfile text eol=lf
+
+# Ensure Python files have LF line endings (for consistency with containers)
+*.py text eol=lf
+
+# Ensure JavaScript/TypeScript files follow standard conventions
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+
+# Binary files should be left untouched
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
