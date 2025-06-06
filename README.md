@@ -19,6 +19,16 @@ git clone https://github.com/your-username/Building-Energy-Management-Tool-BEMAT
 cd Building-Energy-Management-Tool-BEMAT
 ```
 
+### **⚠️ ΣΗΜΑΝΤΙΚΟ - Αν χρησιμοποιείτε Windows:**
+
+Αν αντιμετωπίσετε το σφάλμα `exec format error` κατά την εκκίνηση του Docker container, τρέξτε:
+
+```cmd
+fix-line-endings.bat
+```
+
+Αυτό διορθώνει τα line endings των shell scripts που μπορεί να έχουν μετατραπεί από το Git σε Windows format.
+
 ### **Βήμα 3**: Εκτέλεση με ένα κλικ
 
 ```cmd
