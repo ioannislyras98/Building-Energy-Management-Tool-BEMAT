@@ -19,12 +19,9 @@ cd Building-Energy-Management-Tool-BEMAT
 
 ### **Βήμα 3**: Εκτέλεση με ένα κλικ
 
-```cmd
-# Εκκίνηση εφαρμογής
-start-bemat.bat
-
-# Σταμάτημα εφαρμογής
-stop-all.bat
+```powershell
+# Εκκίνηση BEMAT Control Center
+.\bemat.ps1
 ```
 
 ✅ Αυτόματα ξεκινούν όλα τα services  
@@ -32,27 +29,33 @@ stop-all.bat
 ✅ Γίνεται npm install για το frontend  
 ✅ Εκτελούνται οι migrations
 
-## 📋 Διαθέσιμα Scripts
+## 📋 Διαθέσιμες Λειτουργίες
 
-| Script            | Περιγραφή                 | Browser Auto-Open | Πότε να χρησιμοποιηθεί |
-| ----------------- | ------------------------- | ----------------- | ---------------------- |
-| `start-bemat.bat` | Γρήγορη εκκίνηση          | ✅                | Καθημερινή χρήση       |
-| `stop-all.bat`    | Σταματά όλα τα containers | ❌                | Τέλος εργασίας         |
+| Επιλογή | Περιγραφή         | Browser Auto-Open | Πότε να χρησιμοποιηθεί |
+| ------- | ----------------- | ----------------- | ---------------------- |
+| `1`     | Start BEMAT       | ✅                | Καθημερινή χρήση       |
+| `2`     | Stop All Services | ❌                | Τέλος εργασίας         |
+| `0`     | Exit              | ❌                | Έξοδος από το script   |
 
-### 🔧 Επιλογή του κατάλληλου script:
+### 🔧 Επιλογή της κατάλληλης λειτουργίας:
 
-- **Νέος χρήστης**: `start-bemat.bat` (συνιστάται)
-- **Τέλος εργασίας**: `stop-all.bat`
+- **Νέος χρήστης**: Επιλογή `1` - Start BEMAT (συνιστάται)
+- **Τέλος εργασίας**: Επιλογή `2` - Stop All Services
 
-## ⚙️ Τι κάνει κάθε script
+## ⚙️ Τι κάνει το BEMAT Control Center
 
-### start-bemat.bat
+### bemat.ps1
 
-- 🔨 Χτίζει το backend (Django API + PostgreSQL) σε background mode
-- 🔨 Χτίζει το frontend (React/Vite) **με npm install**
+Το κεντρικό script που παρέχει ένα απλό μενού με επιλογές:
+
+**Επιλογή 1 - Start BEMAT:**
+
+- 🔨 Ελέγχει αν το Docker τρέχει
+- 🔨 Χτίζει το backend (Django API + PostgreSQL) πρώτα
+- 🔨 Χτίζει το frontend (React/Vite) δεύτερο **με npm install**
 - 🌐 **Αυτόματα ανοίγει τα browsers** στο Frontend & Backend
 
-### stop-all.bat
+**Επιλογή 2 - Stop All Services:**
 
 - 🛑 Σταματά όλα τα running containers
 - 🧹 Καθαρό κλείσιμο όλων των services
@@ -89,12 +92,12 @@ netstat -ano | findstr :8000
 
 1. **"Failed to resolve import" errors**
 
-   - Χρησιμοποιήστε `stop-all.bat` και μετά `start-bemat.bat` για fresh start
+   - Χρησιμοποιήστε `.\bemat.ps1` -> επιλογή "2" (Stop All Services) και μετά επιλογή "1" (Start BEMAT) για fresh start
 
 2. **Containers δεν ξεκινούν**
 
    - Ελέγξτε ότι το Docker Desktop τρέχει
-   - Τρέξτε `stop-all.bat` και μετά `start-bemat.bat`
+   - Τρέξτε `.\bemat.ps1` -> επιλογή "2" και μετά επιλογή "1"
 
 3. **Port conflicts**
 
@@ -103,16 +106,17 @@ netstat -ano | findstr :8000
 
 4. **Frontend crashes after clone**
 
-   - Τρέξτε `stop-all.bat` και μετά `start-bemat.bat`
+   - Τρέξτε `.\bemat.ps1` -> επιλογή "2" και μετά επιλογή "1"
 
 5. **Performance issues**
    - Κάντε καθαρισμό Docker και fresh restart
 
 ### Καθαρισμός Docker
 
-```cmd
+```powershell
 # Σταματήστε όλα τα services πρώτα
-stop-all.bat
+.\bemat.ps1
+# Επιλέξτε "2" - Stop All Services
 
 # Καθαρισμός Docker
 docker system prune -a -f
@@ -204,8 +208,7 @@ docker exec -it frontend-frontend-1 sh
 
 ```
 BEMAT/
-├── start-bemat.bat       # Κύριο script εκκίνησης
-├── stop-all.bat          # Σταμάτημα όλων των services
+├── bemat.ps1             # Κύριο PowerShell script εκκίνησης & διαχείρισης
 ├── backend/              # Django REST API
 │   ├── app/             # Django εφαρμογή
 │   │   ├── backend/     # Core settings
@@ -243,21 +246,21 @@ BEMAT/
 **DevOps:**
 
 - Docker & Docker Compose
-- Automated batch scripts
+- PowerShell automation script
 - Auto browser opening
 
 ## 🏆 Best Practices
 
-1. **Πάντα χρησιμοποιείτε `start-bemat.bat` για εκκίνηση**
-2. **Επιλέξτε `stop-all.bat` πριν κλείσετε τον υπολογιστή**
+1. **Πάντα χρησιμοποιείτε `.\bemat.ps1` για εκκίνηση**
+2. **Επιλέξτε "Stop All Services" (2) πριν κλείσετε τον υπολογιστή**
 3. **Τρέξτε καθαρισμό Docker αν έχετε προβλήματα**
 4. **Κρατήστε το Docker Desktop ενημερωμένο**
 
 ## 🎉 Έτοιμο για χρήση!
 
-**Για άμεση εκκίνηση:** Απλά τρέξτε `start-bemat.bat`
+**Για άμεση εκκίνηση:** Απλά τρέξτε `.\bemat.ps1` και επιλέξτε "1"
 
-**Για σταμάτημα:** Τρέξτε `stop-all.bat`
+**Για σταμάτημα:** Τρέξτε `.\bemat.ps1` και επιλέξτε "2"
 
 ## 📄 Πληροφορίες
 
