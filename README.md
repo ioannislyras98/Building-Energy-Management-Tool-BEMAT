@@ -17,30 +17,99 @@ git clone https://github.com/your-username/Building-Energy-Management-Tool-BEMAT
 cd Building-Energy-Management-Tool-BEMAT
 ```
 
-### Step 3: Run
+### **Βήμα 3**: Εκτέλεση με ένα κλικ
 
-**PowerShell (Recommended):**
-```powershell
-.\bemat.ps1
+```cmd
+# Γρήγορη εκκίνηση (συνιστάται)
+start-bemat.bat
+
+# Για προβλήματα με Docker/Ports
+start-bemat-advanced.bat
+
+# Για development με debugging
+start-development.bat
 ```
 
-**That's it!** The script will give you options for:
+✅ Αυτόματα ξεκινούν όλα τα services  
+✅ Ανοίγουν τα browsers στο Frontend & Backend  
+✅ Γίνεται npm install για το frontend  
+✅ Εκτελούνται οι migrations  
+✅ Health checking - περιμένει να είναι έτοιμα (3-15 λεπτά)
 
-- **Quick Start** - Fast startup (recommended)
-- **Advanced Start** - With diagnostics for troubleshooting  
-- **Development Mode** - For debugging
-- **Fix Dependencies** - Fix installation issues
-- **System Status** - Check system status
-- **Clean Reset** - Clean and restart
+## 📋 Διαθέσιμα Scripts
 
-**Automatic features:**
-- Starts all services (Backend + Frontend + Database)
-- Opens browsers at correct URLs
-- Installs dependencies
-- Runs database migrations
-- Health checking (waits until ready, 3-15 minutes)
+| Script                     | Περιγραφή                            | Browser Auto-Open | Πότε να χρησιμοποιηθεί     |
+| -------------------------- | ------------------------------------ | ----------------- | -------------------------- |
+| `start-bemat.bat`          | Γρήγορη εκκίνηση με health checking  | ✅                | Καθημερινή χρήση           |
+| `start-bemat-advanced.bat` | Εκκίνηση με έλεγχους και διαγνωστικά | ✅                | Προβλήματα με Docker/ports |
+| `start-bemat-detached.bat` | Γρήγορη εκκίνηση χωρίς περιμονή      | ❌                | Όταν ξέρετε ότι δουλεύει   |
+| `start-development.bat`    | Development με terminal windows      | ✅                | Debugging/development      |
+| `rebuild-containers.bat`   | Ανακατασκευή από την αρχή            | ✅                | Προβλήματα dependencies    |
+| `check-dependencies.bat`   | Έλεγχος dependencies                 | ❌                | Troubleshooting            |
+| `docker-manager.bat`       | Κεντρικό menu διαχείρισης            | Varies            | Γενική διαχείριση          |
+| `stop-all.bat`             | Σταματά όλα τα containers            | ❌                | Τέλος εργασίας             |
 
-## URLs after startup
+### 🔧 Επιλογή του κατάλληλου script:
+
+- **Νέος χρήστης**: `start-bemat.bat` (συνιστάται)
+- **Προβλήματα με ports/Docker**: `start-bemat-advanced.bat`
+- **Γρήγορη εκκίνηση χωρίς περιμονή**: `start-bemat-detached.bat`
+- **Προβλήματα με dependencies**: `rebuild-containers.bat` ή `check-dependencies.bat`
+- **Development/debugging**: `start-development.bat`
+
+## ⚙️ Τι κάνει κάθε script
+
+### start-bemat.bat
+
+- 🔨 Χτίζει το backend (Django API + PostgreSQL) σε background mode
+- 🔨 Χτίζει το frontend (React/Vite) **με npm install**
+- ⏱️ Health checking - περιμένει να είναι έτοιμα τα services (15 λεπτά max)
+- 🌐 **Αυτόματα ανοίγει τα browsers** στο Frontend & Backend όταν είναι έτοιμα
+
+### start-bemat-advanced.bat
+
+- ✅ Ελέγχει αν το Docker Desktop τρέχει
+- ✅ Σταματά τυχόν υπάρχοντα containers για clean start
+- ✅ Ελέγχει διαθεσιμότητα ports (3000, 8000, 5432)
+- ✅ Παρέχει προειδοποιήσεις για conflicts
+- ✅ Περισσότερα διαγνωστικά μηνύματα
+- ✅ Επιλογές διαχείρισης σε περίπτωση αποτυχίας
+
+### start-bemat-detached.bat
+
+- ⚡ Γρήγορη εκκίνηση χωρίς health checking
+- 🔨 Χτίζει containers σε background mode
+- ❌ Δεν περιμένει να είναι έτοιμα
+- ❌ Δεν ανοίγει browsers αυτόματα
+
+### start-development.bat
+
+- 🔨 Development environment με hot reload
+- 🖥️ Ανοίγει terminal windows για debugging
+- 🌐 Ανοίγει: Frontend + Backend API
+- ⏱️ Health checking για έτοιμα services
+
+### check-dependencies.bat
+
+- 📦 Ελέγχει dependencies στο backend και frontend
+- 🔧 Εγκαθιστά missing dependencies αυτόματα
+- ✅ Επαληθεύει ότι όλα είναι ενημερωμένα
+
+### rebuild-containers.bat
+
+- 🗑️ Διαγράφει παλιά containers και images
+- 🔨 Ανακατασκευάζει από την αρχή
+- 📦 Εγκαθιστά fresh dependencies
+- 🌐 Ανοίγει browsers όταν τελειώσει
+
+### docker-manager.bat
+
+- 📋 Menu με όλες τις επιλογές
+- 📊 Status check containers
+- 🧹 Καθαρισμός Docker system
+- ⏹️ Stop όλων των services
+
+## 🌐 URLs μετά την εκκίνηση
 
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
