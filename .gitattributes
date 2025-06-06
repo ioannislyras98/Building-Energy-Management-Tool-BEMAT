@@ -3,10 +3,12 @@
 
 # Ensure shell scripts always have LF line endings
 *.sh text eol=lf
+*.bat text eol=crlf
 
 # Ensure Dockerfile always has LF line endings
 Dockerfile text eol=lf
 **/Dockerfile text eol=lf
+.dockerignore text eol=lf
 
 # Ensure Python files have LF line endings (for consistency with containers)
 *.py text eol=lf
@@ -16,6 +18,40 @@ Dockerfile text eol=lf
 *.jsx text eol=lf
 *.ts text eol=lf
 *.tsx text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+
+# Ensure Node.js specific files have LF line endings
+package.json text eol=lf
+package-lock.json text eol=lf
+*.json text eol=lf
+
+# Configuration files
+*.config.js text eol=lf
+*.config.ts text eol=lf
+*.config.mjs text eol=lf
+vite.config.* text eol=lf
+tailwind.config.* text eol=lf
+postcss.config.* text eol=lf
+eslint.config.* text eol=lf
+.eslintrc* text eol=lf
+
+# HTML and CSS files
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.sass text eol=lf
+*.less text eol=lf
+
+# Markdown files
+*.md text eol=lf
+
+# Environment files
+.env* text eol=lf
+
+# Lock files and manifests
+yarn.lock text eol=lf
+pnpm-lock.yaml text eol=lf
 
 # Binary files should be left untouched
 *.png binary
@@ -24,3 +60,9 @@ Dockerfile text eol=lf
 *.gif binary
 *.ico binary
 *.pdf binary
+*.svg binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.avif binary

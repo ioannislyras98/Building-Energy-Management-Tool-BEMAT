@@ -10,4 +10,9 @@ README.md
 coverage
 .coverage
 dist
+.vscode
+*.log
+.DS_Store
+Thumbs.db
+dist
 build
