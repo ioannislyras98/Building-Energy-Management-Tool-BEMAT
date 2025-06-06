@@ -13,7 +13,7 @@ Software for Building Energy Management Support - Integrated application with Dj
 ### Step 2: Clone
 
 ```bash
-git clone https://github.com/your-username/Building-Energy-Management-Tool-BEMAT.git
+git clone https://github.com/ioannislyras98/Building-Energy-Management-Tool-BEMAT.git
 cd Building-Energy-Management-Tool-BEMAT
 ```
 
