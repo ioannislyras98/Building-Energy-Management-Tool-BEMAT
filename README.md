@@ -249,23 +249,9 @@ BEMAT/
 - PowerShell automation script
 - Auto browser opening
 
-## 🏆 Best Practices
-
-1. **Πάντα χρησιμοποιείτε `.\bemat.ps1` για εκκίνηση**
-2. **Επιλέξτε "Stop All Services" (2) πριν κλείσετε τον υπολογιστή**
-3. **Τρέξτε καθαρισμό Docker αν έχετε προβλήματα**
-4. **Κρατήστε το Docker Desktop ενημερωμένο**
-
-## 🎉 Έτοιμο για χρήση!
-
-**Για άμεση εκκίνηση:** Απλά τρέξτε `.\bemat.ps1` και επιλέξτε "1"
-
-**Για σταμάτημα:** Τρέξτε `.\bemat.ps1` και επιλέξτε "2"
-
 ## 📄 Πληροφορίες
 
 1. [Κλιματικές Ζώνες](https://www.monodomiki.gr/ell/blog-details/klimatikes-zones-kai-oria-syntelesti-thermoperatotitas)
 
 ## 📄 Άδεια
 
-Αυτό το project είναι ανοιχτού κώδικα και διαθέσιμο κάτω από την MIT License.
