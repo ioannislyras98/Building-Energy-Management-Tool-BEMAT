@@ -51,14 +51,6 @@ start-development.bat
 | `docker-manager.bat`       | Κεντρικό menu διαχείρισης               | Varies            | Γενική διαχείριση          |
 | `stop-all.bat`             | Σταματά όλα τα containers               | ❌                | Τέλος εργασίας             |
 
-### 🔧 Επιλογή του κατάλληλου script:
-
-- **Νέος χρήστης**: `start-bemat.bat` (συνιστάται)
-- **Προβλήματα με ports/Docker**: `start-bemat-advanced.bat`
-- **Γρήγορη εκκίνηση χωρίς περιμονή**: `start-bemat-detached.bat`
-- **Προβλήματα με dependencies**: `rebuild-containers.bat` ή `check-dependencies.bat`
-- **Development/debugging**: `start-development.bat`
-
 ## ⚙️ Τι κάνει κάθε script
 
 ### start-bemat.bat
