@@ -78,7 +78,7 @@ start-development.bat
 
 ### start-development.bat
 
-- 🔨 Development environment με hot reload
+- 🔨 Development environment
 - 🖥️ Ανοίγει terminal windows για debugging
 - 🌐 Ανοίγει: Frontend + Backend API
 - ⏱️ Health checking για έτοιμα services
