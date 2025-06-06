@@ -16,7 +16,7 @@ REM Check if Docker is running
 echo Checking Docker status...
 docker info >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ❌ ERROR: Docker is not running!
+    echo ERROR: Docker is not running!
     echo.
     echo Please:
     echo 1. Start Docker Desktop
@@ -26,11 +26,11 @@ if %errorlevel% neq 0 (
     pause
     exit /b 1
 )
-echo ✅ Docker is running
+echo Docker is running
 
 echo.
 echo Starting all Docker containers...
-echo ⚠️  This may take 3-15 minutes depending on your system.
+echo This may take 3-15 minutes depending on your system.
 echo.
 
 REM Start backend services
@@ -38,33 +38,33 @@ echo [1/2] Starting Backend (API + Database) in background mode...
 cd /d "%~dp0backend"
 docker-compose up -d --build
 if errorlevel 1 (
-    echo ❌ Backend failed to start
+    echo Backend failed to start
     pause
     exit /b 1
 )
-echo ✅ Backend started successfully
+echo Backend started successfully
 
 REM Start frontend
 echo [2/2] Starting Frontend in background mode...
 cd /d "%~dp0frontend"  
 docker-compose -f docker-compose.frontend.yml up -d --build
 if errorlevel 1 (
-    echo ❌ Frontend failed to start
+    echo Frontend failed to start
     pause
     exit /b 1
 )
-echo ✅ Frontend started successfully
+echo Frontend started successfully
 
 echo.
 echo ====================================
-echo   🎉 All Services Running in Background!
+echo   All Services Running in Background!
 echo ====================================
 echo.
-echo ⚠️  IMPORTANT: Containers are now running in background mode.
+echo IMPORTANT: Containers are now running in background mode.
 echo    You can safely close this terminal window.
 echo    To stop services later, run: stop-all.bat
 echo.
-echo 🔄 Services are building and starting...
+echo Services are building and starting...
 
 echo.
 
@@ -80,26 +80,26 @@ REM Check backend
 if !backend_ready! equ 0 (
     powershell -Command "try { $response = Invoke-WebRequest -Uri 'http://localhost:8000' -TimeoutSec 3 -UseBasicParsing; if ($response.StatusCode -eq 200) { exit 0 } else { exit 1 } } catch { exit 1 }" >nul 2>&1
     if !errorlevel! equ 0 (
-        echo ✅ Backend is ready! (http://localhost:8000)
+        echo Backend is ready! (http://localhost:8000)
         set backend_ready=1
     ) else (
-        echo ⏳ Backend still starting... (Database + Django API)
+        echo Backend still starting... (Database + Django API)
     )
 ) else (
-    echo ✅ Backend ready
+    echo Backend ready
 )
 
 REM Check frontend  
 if !frontend_ready! equ 0 (
     powershell -Command "try { $response = Invoke-WebRequest -Uri 'http://localhost:3000' -TimeoutSec 3 -UseBasicParsing; if ($response.StatusCode -eq 200) { exit 0 } else { exit 1 } } catch { exit 1 }" >nul 2>&1
     if !errorlevel! equ 0 (
-        echo ✅ Frontend is ready! (http://localhost:3000)
+        echo Frontend is ready! (http://localhost:3000)
         set frontend_ready=1
     ) else (
-        echo ⏳ Frontend still starting... (React + Vite build)
+        echo Frontend still starting... (React + Vite build)
     )
 ) else (
-    echo ✅ Frontend ready
+    echo Frontend ready
 )
 
 REM Check if both are ready
@@ -110,18 +110,18 @@ if !backend_ready! equ 1 if !frontend_ready! equ 1 (
 REM Provide helpful updates at certain intervals
 if !attempt! equ 10 (
     echo.
-    echo 💡 Still loading... This is normal for first-time setup.
+    echo Still loading... This is normal for first-time setup.
     echo    Docker is downloading images and installing dependencies.
     echo.
 )
 if !attempt! equ 30 (
     echo.
-    echo 💡 Taking longer than usual... This can happen if:
+    echo Taking longer than usual... This can happen if:
     echo    - First time running (downloading Docker images)
     echo    - Slow internet connection
     echo    - System resource constraints
     echo.
-    echo 📊 Check the Docker terminal windows for detailed progress.
+    echo Check the Docker terminal windows for detailed progress.
     echo.
 )
 
@@ -129,15 +129,15 @@ REM Check if we've reached max attempts (15 minutes)
 set /a attempt+=1
 if !attempt! gtr !max_attempts! (
     echo.
-    echo ⚠️  TIMEOUT: Services took longer than 15 minutes to start.
+    echo TIMEOUT: Services took longer than 15 minutes to start.
     echo.
     echo This could indicate:
-    echo 1. 🐌 Slow system or internet connection
-    echo 2. 🔧 Docker configuration issues  
-    echo 3. 📦 Missing dependencies or images
-    echo 4. 💾 Insufficient disk space or memory
+    echo 1. Slow system or internet connection
+    echo 2. Docker configuration issues  
+    echo 3. Missing dependencies or images
+    echo 4. Insufficient disk space or memory
     echo.
-    echo 🔍 TROUBLESHOOTING:
+    echo TROUBLESHOOTING:
     echo    Check the Docker terminal windows for error messages.
     echo    Look for red error text or "failed" messages.
     echo.
@@ -156,76 +156,76 @@ goto health_check_loop
 :services_ready
 echo.
 echo ====================================
-echo   🎉 All Services Ready!
+echo   All Services Ready!
 echo ====================================
 echo.
-echo ⏱️  Total startup time: !attempt!0 seconds
+echo ⏱Total startup time: !attempt!0 seconds
 echo.
 echo Opening browsers in 3 seconds...
 timeout /t 3 /nobreak
 
-echo 🌐 Opening BEMAT application...
+echo Opening BEMAT application...
 start http://localhost:3000
 timeout /t 2 /nobreak > nul
-echo 🔧 Opening admin panel...
+echo Opening admin panel...
 start http://localhost:8000/admin
 
 echo.
 echo ====================================
-echo   ✅ BEMAT Successfully Started!
+echo   BEMAT Successfully Started!
 echo ====================================
 echo.
 echo Your application is now running at:
-echo   🌐 Main App:     http://localhost:3000
-echo   🔧 Backend API:  http://localhost:8000  
-echo   👤 Admin Panel:  http://localhost:8000/admin
+echo   Main App:     http://localhost:3000
+echo   Backend API:  http://localhost:8000  
+echo   Admin Panel:  http://localhost:8000/admin
 echo.
-echo ⚠️  CONTAINERS ARE RUNNING IN BACKGROUND MODE:
+echo  CONTAINERS ARE RUNNING IN BACKGROUND MODE:
 echo   • You can safely close this terminal window
 echo   • Services will continue running
 echo   • To stop all services: run stop-all.bat
 echo   • To check status: docker ps
-echo   📖 API Docs:     http://localhost:8000/api/docs/
+echo   API Docs:     http://localhost:8000/api/docs/
 echo.
-echo 🛑 To stop all services, run: stop-all.bat
+echo To stop all services, run: stop-all.bat
 echo.
 goto end_script
 
 :ask_user_action
-echo ❓ What would you like to do?
+echo  What would you like to do?
 echo.
-echo [1] 🌐 Open browsers anyway (services might still be loading)
-echo [2] ⏰ Wait 5 more minutes  
-echo [3] ❌ Exit and troubleshoot manually
+echo [1] Open browsers anyway (services might still be loading)
+echo [2] Wait 5 more minutes  
+echo [3] Exit and troubleshoot manually
 echo.
 set /p user_choice="Enter your choice (1, 2, or 3): "
 
 if "!user_choice!"=="1" (
     echo.
-    echo 🌐 Opening browsers...
+    echo Opening browsers...
     start http://localhost:3000
     timeout /t 2 /nobreak > nul
     start http://localhost:8000
     echo.
-    echo ⚠️  If pages show errors, wait a moment and refresh.
+    echo  If pages show errors, wait a moment and refresh.
     echo    Services might still be finishing their startup.
     goto end_script
 ) else if "!user_choice!"=="2" (
     echo.
-    echo ⏰ Waiting 5 more minutes...
+    echo Waiting 5 more minutes...
     set max_attempts=120
     set attempt=90
     goto health_check_loop
 ) else (
     echo.
-    echo ❌ Exiting. You can check the services manually:
+    echo Exiting. You can check the services manually:
     echo.
-    echo 🔍 Check Docker terminal windows for errors
-    echo 🌐 Try these URLs later:
+    echo  Check Docker terminal windows for errors
+    echo  Try these URLs later:
     echo    - http://localhost:3000 (Frontend)
     echo    - http://localhost:8000 (Backend)
     echo.
-    echo 💡 If issues persist:
+    echo  If issues persist:
     echo    1. Run: stop-all.bat
     echo    2. Restart Docker Desktop
     echo    3. Run: rebuild-containers.bat
