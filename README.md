@@ -39,7 +39,7 @@ cd Building-Energy-Management-Tool-BEMAT
 
 ### 🔧 Επιλογή της κατάλληλης λειτουργίας:
 
-- **Νέος χρήστης**: Επιλογή `1` - Start BEMAT (συνιστάται)
+- **Νέος χρήστης**: Επιλογή `1` - Start BEMAT
 - **Τέλος εργασίας**: Επιλογή `2` - Stop All Services
 
 ## Τι κάνει το BEMAT Control Center
