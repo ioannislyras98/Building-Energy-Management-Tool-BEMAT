@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from "react-router-dom";
 import "./../css/main.css";
 import "./../css/my_projects.css";
 import { useLanguage } from "../context/LanguageContext";
 import ProjectsView from "../components/ProjectsView";
 import BuildingsView from "../components/BuildingsView";
 import { Modals } from "../components/Modals";
+import ConfirmationDialog from "../components/ConfirmationDialog";
 import { useProjects } from "../hooks/useProjects";
 import { useBuildings } from "../hooks/useBuildings";
 import { useModals } from "../hooks/useModals";
@@ -14,29 +15,30 @@ import greek_text from "../languages/greek.json";
 
 export default function Home() {
   const [selectedProject, setSelectedProject] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { language } = useLanguage();
   const paramsText = language === "en" ? english_text.Home : greek_text.Home;
 
   const navigate = useNavigate();
   const { projectUuid } = useParams();
 
-  const { 
-    projects, 
+  const {
+    projects,
     loading: projectsLoading,
-    handleProjectCreated, 
-    handleProjectUpdated, 
+    handleProjectCreated,
+    handleProjectUpdated,
     handleDeleteProject,
-    updateBuildingCount 
+    updateBuildingCount,
   } = useProjects();
-  
-  const { 
-    buildings, 
-    fetchBuildings, 
+
+  const {
+    buildings,
+    fetchBuildings,
     handleBuildingCreated: addBuildingToState,
-    clearBuildings 
+    clearBuildings,
   } = useBuildings();
-  
-  const { 
+
+  const {
     isModalOpen,
     isBuildingModalOpen,
     isUpdateProjectModalOpen,
@@ -45,16 +47,18 @@ export default function Home() {
     openBuildingModal,
     closeBuildingModal,
     openUpdateProjectModal,
-    closeUpdateProjectModal
+    closeUpdateProjectModal,
   } = useModals();
 
   useEffect(() => {
     if (projectUuid && projects.length > 0) {
-      const projectFromUrl = projects.find(p => p.uuid === projectUuid);
+      const projectFromUrl = projects.find((p) => p.uuid === projectUuid);
       setSelectedProject(projectFromUrl || null);
-      if (!projectFromUrl && !projectsLoading) { 
-        console.warn(`Project with UUID ${projectUuid} not found. Redirecting to home.`);
-        navigate('/'); 
+      if (!projectFromUrl && !projectsLoading) {
+        console.warn(
+          `Project with UUID ${projectUuid} not found. Redirecting to home.`
+        );
+        navigate("/");
       }
     } else if (!projectUuid) {
       setSelectedProject(null);
@@ -71,23 +75,33 @@ export default function Home() {
 
   const handleProjectClick = (project) => {
     navigate(`/projects/${project.uuid}`);
-    setSelectedProject(project); 
+    setSelectedProject(project);
   };
 
   const backToProjects = () => {
-    navigate('/');
+    navigate("/");
   };
 
-  const handleProjectDeleteConfirm = () => { 
+  const handleProjectDeleteConfirm = () => {
     if (selectedProject) {
-      handleDeleteProject(selectedProject.uuid, paramsText) 
+      handleDeleteProject(selectedProject.uuid, paramsText)
         .then(() => {
-          backToProjects(); 
+          backToProjects();
+          setDeleteDialogOpen(false);
         })
-        .catch(err => {
+        .catch((err) => {
           console.error("Error deleting project from Home:", err);
+          setDeleteDialogOpen(false);
         });
     }
+  };
+
+  const handleProjectDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteDialogClose = () => {
+    setDeleteDialogOpen(false);
   };
 
   const handleProjectUpdateSuccess = (updatedProjectData) => {
@@ -98,9 +112,9 @@ export default function Home() {
   };
 
   const handleBuildingAdd = (newBuilding) => {
-    addBuildingToState(newBuilding); 
+    addBuildingToState(newBuilding);
     if (selectedProject) {
-      updateBuildingCount(selectedProject.uuid, true); 
+      updateBuildingCount(selectedProject.uuid, true);
     }
   };
 
@@ -108,24 +122,37 @@ export default function Home() {
     <>
       <div id="projects-wrapper" className="main-container">
         {!selectedProject ? (
-          <ProjectsView 
-            projects={projects} 
+          <ProjectsView
+            projects={projects}
             params={paramsText}
-            onProjectClick={handleProjectClick} 
+            onProjectClick={handleProjectClick}
             onAddProject={openProjectModal}
           />
         ) : (
-          <BuildingsView 
-            buildings={buildings} 
-            selectedProject={selectedProject} 
-            params={paramsText} 
+          <BuildingsView
+            buildings={buildings}
+            selectedProject={selectedProject}
+            params={paramsText}
             onBackClick={backToProjects}
-            onUpdateProject={() => openUpdateProjectModal(selectedProject)} 
-            onDeleteProject={handleProjectDeleteConfirm}
-            onAddBuilding={() => openBuildingModal(selectedProject.uuid)} 
+            onUpdateProject={() => openUpdateProjectModal(selectedProject)}
+            onDeleteProject={handleProjectDeleteClick}
+            onAddBuilding={() => openBuildingModal(selectedProject.uuid)}
           />
         )}
       </div>
+      <ConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteDialogClose}
+        onConfirm={handleProjectDeleteConfirm}
+        title={paramsText?.deleteProjectTitle || "Delete Project"}
+        message={
+          paramsText?.confirmDelete ||
+          "Are you sure you want to delete this project? This action cannot be undone."
+        }
+        confirmText={paramsText?.deleteButton || "Delete"}
+        cancelText={paramsText?.cancelButton || "Cancel"}
+        confirmColor="error"
+      />
       <Modals
         isModalOpen={isModalOpen}
         isBuildingModalOpen={isBuildingModalOpen}
@@ -136,8 +163,10 @@ export default function Home() {
         handleProjectCreated={handleProjectCreated}
         handleBuildingCreated={handleBuildingAdd}
         handleProjectUpdated={handleProjectUpdateSuccess}
-        selectedProject={isUpdateProjectModalOpen ? selectedProject : null} 
-       projectUuid={isBuildingModalOpen && selectedProject ? selectedProject.uuid : null}
+        selectedProject={isUpdateProjectModalOpen ? selectedProject : null}
+        projectUuid={
+          isBuildingModalOpen && selectedProject ? selectedProject.uuid : null
+        }
       />
     </>
   );

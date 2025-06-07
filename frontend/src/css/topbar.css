@@ -1,78 +1,73 @@
-@import "./themes.css";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+#topbar {
+  @apply bg-white border-primary-light shadow-sm shadow-primary fixed w-full top-0 start-0 border-b z-50;
 
-#topbar{
-    @apply bg-white border-primary-light shadow-sm shadow-primary fixed w-full top-0 start-0 border-b z-50;
+  .topbar-items-container {
+    @apply flex flex-wrap items-center justify-between h-[60px];
 
-    .topbar-items-container {
-        @apply flex flex-wrap items-center justify-between h-[60px];
+    .logo {
+      @apply flex items-center space-x-3 rtl:space-x-reverse;
 
-        .logo{
-            @apply flex items-center space-x-3 rtl:space-x-reverse;
-
-            span{
-                @apply self-center text-2xl font-semibold whitespace-nowrap text-primary;
-            }
-        }
-
-        .nav-title{
-            @apply self-center font-normal leading-[15px] text-[20px] ;
-        }
-
-        #logo-image {
-            @apply h-8 bg-[url(../images/svg-test.png)] bg-cover size-10 ml-5;
-        }
-
-        .topbar-right{
-            @apply h-[6vh] flex flex-col font-medium p-4 md:p-0 mt-4 border text-primary rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0;
-        }
-
-        .topbar-right-item{
-            @apply mt-[18px];
-        }
-
-        #user-dropdown-btn{
-            @apply flex items-center justify-between md:hover:bg-transparent md:border-0 md:p-0 md:w-auto;
-        }
-
-        #topbar-username{
-            @apply text-primary pr-2 text-[16px] font-normal;
-        }
-
-        #user-dropdown{
-            @apply font-normal bg-white text-primary;
-
-            ul{
-                @apply mt-4 w-[150px] text-sm border-primary-light shadow-sm shadow-primary-light border-b border-l border-r relative;                li{
-                    @apply hover:text-white transition hover:scale-105 delay-75 duration-300 ease-out cursor-pointer hover:bg-primary-bold hover:drop-shadow-none;
-                }
-            }
-        }
+      span {
+        @apply self-center text-2xl font-semibold whitespace-nowrap text-primary;
+      }
     }
+
+    .nav-title {
+      @apply self-center font-normal leading-[15px] text-[20px];
+    }
+
+    #logo-image {
+      @apply h-8 bg-[url(../images/svg-test.png)] bg-cover size-10 ml-5;
+    }
+
+    .topbar-right {
+      @apply h-[6vh] flex flex-col font-medium p-4 md:p-0 mt-4 border text-primary rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0;
+    }
+
+    .topbar-right-item {
+      @apply mt-[18px];
+    }
+
+    #user-dropdown-btn {
+      @apply flex items-center justify-between md:hover:bg-transparent md:border-0 md:p-0 md:w-auto;
+    }
+
+    #topbar-username {
+      @apply text-primary pr-2 text-[16px] font-normal;
+    }
+
+    #user-dropdown {
+      @apply font-normal bg-white text-primary;
+
+      ul {
+        @apply mt-4 w-[150px] text-sm border-primary-light shadow-sm shadow-primary-light border-b border-l border-r relative;
+        li {
+          @apply hover:text-white transition hover:scale-105 delay-75 duration-300 ease-out cursor-pointer hover:bg-primary-bold hover:drop-shadow-none;
+        }
+      }
+    }
+  }
 }
 
-
-
 .topbar-item {
-    @apply text-primary hover:text-primary-bold transition delay-150 duration-300 ease-in-out hover:scale-105 cursor-pointer hover:drop-shadow-basic;
+  @apply text-primary hover:text-primary-bold transition delay-150 duration-300 ease-in-out hover:scale-105 cursor-pointer hover:drop-shadow-basic;
 }
 
 .user-info {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .user-info span {
-    font-size: 0.95rem;
+  font-size: 0.95rem;
 }
 
-.language-toggle, .logout-btn {
-    padding: 0.5rem;
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    font-size: 0.9rem;
-    transition: color 0.2s;
+.language-toggle,
+.logout-btn {
+  padding: 0.5rem;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
 }

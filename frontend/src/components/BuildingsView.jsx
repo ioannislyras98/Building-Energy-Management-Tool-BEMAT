@@ -66,7 +66,7 @@ const BuildingsView = ({
             <div className='flex gap-2'>
               <button
                 onClick={onUpdateProject}
-                className='inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5'
+                className='inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5'
                 aria-label={params.update}
               >
                 <MdEdit size={18} className='mr-2' />
@@ -74,7 +74,7 @@ const BuildingsView = ({
               </button>
               <button
                 onClick={onDeleteProject}
-                className='inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5'
+                className='inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-red-700 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5'
                 aria-label={params.delete}
               >
                 <MdDelete size={18} className='mr-2' />

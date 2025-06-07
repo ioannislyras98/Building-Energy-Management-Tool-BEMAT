@@ -57,7 +57,7 @@
     "h2": "Δημιουργία νέου έργου",
     "projectName": "Εισαγετε όνομα για το νέο σας έργο",
     "projectName_example": "Έργο 1",
-    "projectElectricityCost": "Κόστος ανά kWh ρεύματος(€)", 
+    "projectElectricityCost": "Κόστος ανά kWh ρεύματος(€)",
     "projectElectricityCost_example": "0.123",
     "projectFuelCost": "Κόστος ανά kWh καυσίμου(€)",
     "projectFuelCost_example": "0.153",
@@ -171,7 +171,8 @@
     "basicInfoSection": "Βασικές Πληροφορίες",
     "buildingCharacteristicsSection": "Χαρακτηριστικά Κτιρίου",
     "areasAndFloorsSection": "Επιφάνειες και Όροφοι",
-    "additionalInfoSection": "Πρόσθετες Πληροφορίες",    "operationalInfoSection": "Πληροφορίες Λειτουργίας",
+    "additionalInfoSection": "Πρόσθετες Πληροφορίες",
+    "operationalInfoSection": "Πληροφορίες Λειτουργίας",
     "prefecture": "Νομός",
     "selectPrefecture": "Επιλέξτε νομό",
     "energyZone": "Ενεργειακή Ζώνη"
@@ -223,13 +224,21 @@
     "backToProjects": "Πίσω στα Έργα",
     "update": "Ενημέρωση",
     "delete": "Διαγραφή",
+    "deleteProjectTitle": "Διαγραφή Έργου",
     "confirmDelete": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό το έργο; Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
-    "deleteError": "Παρουσιάστηκε σφάλμα κατά την προσπάθεια διαγραφής του έργου."
-  },  "BuildingProfile": {
+    "deleteError": "Παρουσιάστηκε σφάλμα κατά την προσπάθεια διαγραφής του έργου.",
+    "deleteButton": "Διαγραφή",
+    "cancelButton": "Άκύρωση"
+  },
+  "BuildingProfile": {
     "loading": "Φόρτωση προφίλ κτιρίου...",
     "backToBuildings": "Επιστροφή στα Κτίρια",
     "projectLabel": "Έργο",
     "buildingLabel": "Κτίριο",
+    "deleteBuildingTitle": "Διαγραφή Κτιρίου",
+    "deleteBuildingConfirmation": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό το κτίριο; Αυτή η ενέργεια δεν μπορεί να αναιρεθεί και θα διαγράψει επίσης όλα τα σχετικά δεδομένα.",
+    "deleteButton": "Διαγραφή",
+    "cancelButton": "Άκυρο",
     "basicInfo": {
       "title": "Βασικές Πληροφορίες",
       "name": "Όνομα Κτιρίου",
@@ -344,7 +353,8 @@
     "saving": "Αποθήκευση...",
     "errorAuth": "Απαιτείται έλεγχος ταυτότητας.",
     "errorFailed": "Αποτυχία προσθήκης κατανάλωσης ενέργειας."
-  },  "EnergyConsumptionModal": {
+  },
+  "EnergyConsumptionModal": {
     "h2": "Δημιουργία Νέας Κατανάλωσης Ενέργειας",
     "h2_edit": "Επεξεργασία Κατανάλωσης Ενέργειας",
     "energySource": "Πηγή Ενέργειας",

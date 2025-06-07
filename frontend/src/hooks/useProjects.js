@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
-import $ from 'jquery';
-import Cookies from 'universal-cookie';
+import { useState, useEffect } from "react";
+import $ from "jquery";
+import Cookies from "universal-cookie";
 
 export const useProjects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   const cookies = new Cookies();
   const token = cookies.get("token") || "";
-  
+
   const fetchProjects = () => {
     setLoading(true);
-    
+
     const settings = {
       url: "http://127.0.0.1:8000/projects/get/",
       method: "GET",
@@ -37,11 +37,11 @@ export const useProjects = () => {
         setLoading(false);
       });
   };
-  
+
   const handleProjectCreated = (newProject) => {
     setProjects((prevProjects) => [...prevProjects, newProject]);
   };
-  
+
   const handleProjectUpdated = (updatedProject) => {
     setProjects((prevProjects) =>
       prevProjects.map((project) =>
@@ -50,46 +50,42 @@ export const useProjects = () => {
     );
     return updatedProject;
   };
-  
-  const handleDeleteProject = (projectUuid, params) => {
-    if (window.confirm(params.confirmDelete)) {
-      const settings = {
-        url: `http://127.0.0.1:8000/projects/delete/${projectUuid}/`,
-        method: "DELETE",
-        timeout: 0,
-        headers: {
-          Authorization: `token ${token}`,
-        },
-      };
 
-      return new Promise((resolve, reject) => {
-        $.ajax(settings)
-          .done(function (response) {
-            setProjects((prevProjects) =>
-              prevProjects.filter((project) => project.uuid !== projectUuid)
-            );
-            resolve(response);
-          })
-          .fail(function (error) {
-            console.error("Failed to delete project:", error);
-            alert(params.deleteError);
-            reject(error);
-          });
-      });
-    }
-    
-    return Promise.reject(new Error("Delete cancelled"));
+  const handleDeleteProject = (projectUuid, params) => {
+    const settings = {
+      url: `http://127.0.0.1:8000/projects/delete/${projectUuid}/`,
+      method: "DELETE",
+      timeout: 0,
+      headers: {
+        Authorization: `token ${token}`,
+      },
+    };
+
+    return new Promise((resolve, reject) => {
+      $.ajax(settings)
+        .done(function (response) {
+          setProjects((prevProjects) =>
+            prevProjects.filter((project) => project.uuid !== projectUuid)
+          );
+          resolve(response);
+        })
+        .fail(function (error) {
+          console.error("Failed to delete project:", error);
+          alert(params.deleteError);
+          reject(error);
+        });
+    });
   };
-  
+
   const updateBuildingCount = (projectUuid, increment = true) => {
     setProjects((prevProjects) =>
       prevProjects.map((project) =>
         project.uuid === projectUuid
-          ? { 
-              ...project, 
-              buildings_count: increment 
-                ? (project.buildings_count || 0) + 1 
-                : Math.max(0, (project.buildings_count || 1) - 1) 
+          ? {
+              ...project,
+              buildings_count: increment
+                ? (project.buildings_count || 0) + 1
+                : Math.max(0, (project.buildings_count || 1) - 1),
             }
           : project
       )
@@ -101,7 +97,7 @@ export const useProjects = () => {
       fetchProjects();
     }
   }, [token]);
-  
+
   return {
     projects,
     loading,
@@ -110,6 +106,6 @@ export const useProjects = () => {
     handleProjectCreated,
     handleProjectUpdated,
     handleDeleteProject,
-    updateBuildingCount
+    updateBuildingCount,
   };
 };
