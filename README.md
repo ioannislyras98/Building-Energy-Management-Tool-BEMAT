@@ -24,25 +24,25 @@ cd Building-Energy-Management-Tool-BEMAT
 .\bemat.ps1
 ```
 
-✅ Αυτόματα ξεκινούν όλα τα services  
-✅ Ανοίγουν τα browsers στο Frontend & Backend  
-✅ Γίνεται npm install για το frontend  
-✅ Εκτελούνται οι migrations
+1. Αυτόματα ξεκινούν όλα τα services  
+2. Ανοίγουν τα browsers στο Frontend & Backend  
+3. Γίνεται npm install για το frontend  
+4. Εκτελούνται οι migrations
 
 ## 📋 Διαθέσιμες Λειτουργίες
 
-| Επιλογή | Περιγραφή         | Browser Auto-Open | Πότε να χρησιμοποιηθεί |
-| ------- | ----------------- | ----------------- | ---------------------- |
-| `1`     | Start BEMAT       | ✅                | Καθημερινή χρήση       |
-| `2`     | Stop All Services | ❌                | Τέλος εργασίας         |
-| `0`     | Exit              | ❌                | Έξοδος από το script   |
+| Επιλογή | Περιγραφή         | Πότε να χρησιμοποιηθεί |
+| ------- | ----------------- | ---------------------- |
+| `1`     | Start BEMAT       | Καθημερινή χρήση       |
+| `2`     | Stop All Services | Τέλος εργασίας         |
+| `0`     | Exit              | Έξοδος από το script   |
 
 ### 🔧 Επιλογή της κατάλληλης λειτουργίας:
 
 - **Νέος χρήστης**: Επιλογή `1` - Start BEMAT (συνιστάται)
 - **Τέλος εργασίας**: Επιλογή `2` - Stop All Services
 
-## ⚙️ Τι κάνει το BEMAT Control Center
+## Τι κάνει το BEMAT Control Center
 
 ### bemat.ps1
 
@@ -50,17 +50,17 @@ cd Building-Energy-Management-Tool-BEMAT
 
 **Επιλογή 1 - Start BEMAT:**
 
-- 🔨 Ελέγχει αν το Docker τρέχει
-- 🔨 Χτίζει το backend (Django API + PostgreSQL) πρώτα
-- 🔨 Χτίζει το frontend (React/Vite) δεύτερο **με npm install**
-- 🌐 **Αυτόματα ανοίγει τα browsers** στο Frontend & Backend
+- Ελέγχει αν το Docker τρέχει
+- Χτίζει το backend (Django API + PostgreSQL) πρώτα
+- Χτίζει το frontend (React/Vite) δεύτερο **με npm install**
+- **Αυτόματα ανοίγει τα browsers** στο Frontend & Backend
 
 **Επιλογή 2 - Stop All Services:**
 
-- 🛑 Σταματά όλα τα running containers
-- 🧹 Καθαρό κλείσιμο όλων των services
+- Σταματά όλα τα running containers
+- Καθαρό κλείσιμο όλων των services
 
-## 🌐 URLs μετά την εκκίνηση
+## URLs μετά την εκκίνηση
 
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
@@ -68,7 +68,7 @@ cd Building-Energy-Management-Tool-BEMAT
 - **API Documentation**: http://localhost:8000/api/docs/
 - **Database**: PostgreSQL (port 5432)
 
-## 🛠️ Προαπαιτούμενα
+## Προαπαιτούμενα
 
 - ✅ **Docker Desktop** εγκατεστημένο και ενεργό
 - ✅ **Git** (για κλωνοποίηση)
@@ -123,7 +123,7 @@ docker system prune -a -f
 docker volume prune -f
 ```
 
-## 📚 Χειροκίνητη Εκτέλεση (Advanced Users)
+## Χειροκίνητη Εκτέλεση (Advanced Users)
 
 Αν θέλετε να τρέξετε τα components χειροκίνητα:
 
@@ -142,7 +142,7 @@ cd frontend
 docker-compose -f docker-compose.frontend.yml up -d --build
 ```
 
-## 👤 Δημιουργία Admin User
+## Δημιουργία Admin User
 
 ```bash
 # Μπες στο web container
@@ -152,7 +152,7 @@ docker exec -it backend-web-1 bash
 python manage.py createsuperuser
 ```
 
-## 🗄️ Διαχείριση Database
+## Διαχείριση Database
 
 ### Σύνδεση στη βάση
 
@@ -174,7 +174,7 @@ python manage.py makemigrations myapp
 python manage.py migrate
 ```
 
-## 🎯 Χρήσιμες Εντολές
+## Χρήσιμες Εντολές
 
 ### Έλεγχος κατάστασης containers
 
@@ -204,7 +204,7 @@ docker exec -it backend-web-1 bash
 docker exec -it frontend-frontend-1 sh
 ```
 
-## 🏗️ Αρχιτεκτονική
+## Αρχιτεκτονική
 
 ```
 BEMAT/
@@ -225,7 +225,7 @@ BEMAT/
 └── README.md
 ```
 
-## 📦 Tech Stack
+## Tech Stack
 
 **Backend:**
 
@@ -249,9 +249,8 @@ BEMAT/
 - PowerShell automation script
 - Auto browser opening
 
-## 📄 Πληροφορίες
+## Πληροφορίες
 
 1. [Κλιματικές Ζώνες](https://www.monodomiki.gr/ell/blog-details/klimatikes-zones-kai-oria-syntelesti-thermoperatotitas)
 
-## 📄 Άδεια
 
