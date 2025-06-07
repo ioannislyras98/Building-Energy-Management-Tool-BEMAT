@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "coolingSystem",
     "heatingSystem",
     "domesticHotWaterSystem",
+    "solarCollectors",
 ]
 
 MIDDLEWARE = [

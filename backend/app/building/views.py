@@ -1,178 +1,119 @@
-import json
 import logging
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotAllowed
-from django.views.decorators.csrf import csrf_exempt
 from django.dispatch import receiver
 from django.db.models.signals import post_save, post_delete
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+
 from .models import Building
 from .serializer import BuildingSerializer
 from project.models import Project
-from rest_framework.authtoken.models import Token
 from contact.models import Contact
 from contact.serializers import ContactSerializer
+from common.utils import (
+    get_user_from_token, 
+    standard_error_response, 
+    standard_success_response,
+    validate_uuid,
+    check_user_ownership
+)
 
 logger = logging.getLogger(__name__)
 
-def get_user_from_token(token):
-    try:
-        token_obj = Token.objects.get(key=token)
-        return token_obj.user
-    except Token.DoesNotExist:
-        return None
-
 # Update the create_building function to match new fields
-@csrf_exempt
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def create_building(request):
-    if request.method == "POST":
-        # Έλεγχος για το token στο header
-        auth_header = request.META.get("HTTP_AUTHORIZATION")
-        if not auth_header:
-            return JsonResponse({"error": "Authorization token required"}, status=401)
-        try:
-            token = auth_header.split()[1]
-        except IndexError:
-            return JsonResponse({"error": "Invalid Authorization header format"}, status=401)
+    try:
+        data = request.data
         
-        user = get_user_from_token(token)
-        if not user:
-            return JsonResponse({"error": "Invalid or expired token"}, status=401)
-        
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON data"}, status=400)
-
-        # Ορισμός των required πεδίων
+        # Validate required fields
         required_fields = ["name", "usage", "description", "address", "total_area", "examined_area", "floors_examined", "project"]
         for field in required_fields:
             if field not in data or not data.get(field):
-                return JsonResponse({field: "This field is required"}, status=400)
+                return standard_error_response(f"{field} is required", status.HTTP_400_BAD_REQUEST)
         
-        # Έλεγχος αν το project υπάρχει
+        # Validate project UUID
+        if not validate_uuid(data.get("project")):
+            return standard_error_response("Invalid project UUID", status.HTTP_400_BAD_REQUEST)
+        
+        # Check project exists and user has permission
         try:
             project = Project.objects.get(uuid=data.get("project"))
         except Project.DoesNotExist:
-            return JsonResponse({"project": "Project not found"}, status=404)
+            return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
         
-        # Έλεγχος αν ο χρήστης έχει δικαίωμα να προσθέσει building στο project
-        if project.user != user:
-            return JsonResponse({"error": "Access denied: You do not own this project"}, status=403)
+        if not check_user_ownership(request.user, project):
+            return standard_error_response("Access denied: You do not own this project", status.HTTP_403_FORBIDDEN)
         
-        try:
-            building = Building.objects.create(
-                user=user,
-                project=project,
-                name=data.get("name"),
-                usage=data.get("usage"),
-                description=data.get("description"),
-                year_built=data.get("year_built"),
-                address=data.get("address", ""),
-                is_insulated=data.get("is_insulated", False),
-                is_certified=data.get("is_certified", False),
-                energy_class=data.get("energy_class", ""),
-                orientation=data.get("orientation", ""),
-                total_area=data.get("total_area"),
-                examined_area=data.get("examined_area"),
-                floors_examined=data.get("floors_examined", 1),
-                floor_height=data.get("floor_height"),
-                construction_type=data.get("construction_type", ""),
-                free_facades=data.get("free_facades"),
-                altitude=data.get("altitude"),
-                non_operating_days=data.get("non_operating_days", ""),
-                operating_hours=data.get("operating_hours", ""),
-                occupants=data.get("occupants")
-            )
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
-
-        return JsonResponse({
-            "uuid": str(building.uuid),
-            "message": "Building created successfully"
-        }, status=201)
-    
-    else:
-        return HttpResponseBadRequest("Only POST method is allowed")
+        # Create building
+        building = Building.objects.create(
+            user=request.user,
+            project=project,
+            name=data.get("name"),
+            usage=data.get("usage"),
+            description=data.get("description"),
+            year_built=data.get("year_built"),
+            address=data.get("address", ""),
+            is_insulated=data.get("is_insulated", False),
+            is_certified=data.get("is_certified", False),
+            energy_class=data.get("energy_class", ""),
+            orientation=data.get("orientation", ""),
+            total_area=data.get("total_area"),
+            examined_area=data.get("examined_area"),
+            floors_examined=data.get("floors_examined", 1),
+            floor_height=data.get("floor_height"),
+            construction_type=data.get("construction_type", ""),
+            free_facades=data.get("free_facades"),
+            altitude=data.get("altitude"),
+            non_operating_days=data.get("non_operating_days", ""),
+            operating_hours=data.get("operating_hours", ""),
+            occupants=data.get("occupants")
+        )
+        
+        serializer = BuildingSerializer(building)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+    except Exception as e:
+        return standard_error_response(str(e), status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 # Update the get_buildings function to return all fields
-@csrf_exempt
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_buildings(request):
-    if request.method != "GET":
-        return HttpResponseNotAllowed(["GET"])
-    auth_header = request.META.get("HTTP_AUTHORIZATION")
-    if not auth_header:
-        return JsonResponse({"error": "Authorization token required"}, status=401)
     try:
-        token = auth_header.split()[1]
-    except IndexError:
-        return JsonResponse({"error": "Invalid Authorization header format"}, status=401)
-    user = get_user_from_token(token)
-    if not user:
-        return JsonResponse({"error": "Invalid or expired token"}, status=401)
-    
-    project_uuid = request.GET.get("project")
-    if project_uuid:
-        buildings = Building.objects.filter(user=user, project__uuid=project_uuid)
-    else:
-        buildings = Building.objects.filter(user=user)
-    
-    buildings_list = [{
-        "uuid": str(b.uuid),
-        "name": b.name,
-        "project": str(b.project.uuid),
-        "usage": b.usage,
-        "user": str(b.user.email),
-        "description": b.description,
-        "year_built": b.year_built,
-        "address": b.address,
-        "is_insulated": b.is_insulated,
-        "is_certified": b.is_certified,
-        "energy_class": b.energy_class,
-        "orientation": b.orientation,
-        "total_area": str(b.total_area),
-        "examined_area": str(b.examined_area),
-        "floors_examined": b.floors_examined,
-        "floor_height": str(b.floor_height) if b.floor_height else None,
-        "construction_type": b.construction_type,
-        "free_facades": b.free_facades,
-        "altitude": str(b.altitude) if b.altitude else None,
-        "non_operating_days": b.non_operating_days,
-        "operating_hours": b.operating_hours,
-        "occupants": b.occupants,
-        "date_created": b.date_created.strftime("%d-%m-%Y")
-    } for b in buildings]
-    
-    return JsonResponse({"buildings": buildings_list}, status=200)
+        project_uuid = request.GET.get("project")
+        
+        if project_uuid:
+            if not validate_uuid(project_uuid):
+                return standard_error_response("Invalid project UUID", status.HTTP_400_BAD_REQUEST)
+            buildings = Building.objects.filter(user=request.user, project__uuid=project_uuid)
+        else:
+            buildings = Building.objects.filter(user=request.user)
+        
+        serializer = BuildingSerializer(buildings, many=True)
+        return standard_success_response(serializer.data)
+        
+    except Exception as e:
+        return standard_error_response(str(e), status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@csrf_exempt
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_building_detail(request, uuid):
     """
     Endpoint για την ανάκτηση λεπτομερειών ενός συγκεκριμένου κτιρίου.
     """
-    if request.method != "GET":
-        return HttpResponseNotAllowed(["GET"])
-    
-    auth_header = request.META.get("HTTP_AUTHORIZATION")
-    if not auth_header:
-        return JsonResponse({"error": "Authorization token required"}, status=401)
     try:
-        token = auth_header.split()[1]
-    except IndexError:
-        return JsonResponse({"error": "Invalid Authorization header format"}, status=401)
-    
-    user = get_user_from_token(token)
-    if not user:
-        return JsonResponse({"error": "Invalid or expired token"}, status=401)
-    
-    try:
+        if not validate_uuid(uuid):
+            return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
+            
         building = Building.objects.get(uuid=uuid)
         
         # Έλεγχος αν ο authenticated χρήστης έχει δικαίωμα πρόσβασης στο κτίριο
-        if building.user != user:
-            return JsonResponse({"error": "Access denied: You do not own this building"}, status=403)
+        if not check_user_ownership(request.user, building):
+            return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
         
         # Ανάκτηση των επαφών για το κτίριο
         contacts = Contact.objects.filter(building=building)
@@ -205,44 +146,33 @@ def get_building_detail(request, uuid):
             "contacts": contacts_data
         }
         
-        return JsonResponse(building_data, status=200)
+        return standard_success_response(building_data)
     
     except Building.DoesNotExist:
-        return JsonResponse({"error": "Building not found"}, status=404)
+        return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        # Log the exception for debugging
-        print(f"Error in get_building_detail: {e}")
-        import traceback
-        traceback.print_exc()
-        return JsonResponse({"error": "An unexpected error occurred: " + str(e)}, status=500)
+        logger.error(f"Error in get_building_detail: {e}")
+        return standard_error_response(f"An unexpected error occurred: {str(e)}", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@csrf_exempt
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def delete_building(request, building_uuid):
-    if request.method != "DELETE":
-        return HttpResponseNotAllowed(["DELETE"])
-    
-    auth_header = request.META.get("HTTP_AUTHORIZATION")
-    if not auth_header:
-        return JsonResponse({"error": "Authorization token required"}, status=401)
     try:
-        token = auth_header.split()[1]
-    except IndexError:
-        return JsonResponse({"error": "Invalid Authorization header format"}, status=401)
-    
-    user = get_user_from_token(token)
-    if not user:
-        return JsonResponse({"error": "Invalid or expired token"}, status=401)
-    
-    try:
+        if not validate_uuid(building_uuid):
+            return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
+            
         building = Building.objects.get(uuid=building_uuid)
+        
+        if not check_user_ownership(request.user, building):
+            return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
+        
+        building.delete()
+        return standard_success_response({"message": "Building deleted successfully"})
+        
     except Building.DoesNotExist:
-        return JsonResponse({"error": "Building not found"}, status=404)
-    
-    if building.user != user:
-        return JsonResponse({"error": "Access denied: You do not own this building"}, status=403)
-    
-    building.delete()
-    return JsonResponse({"message": "Building deleted successfully"}, status=200)
+        return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return standard_error_response(str(e), status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @receiver(post_save, sender=Building)
 def building_post_save_update_project_buildings_count(sender, instance, **kwargs):

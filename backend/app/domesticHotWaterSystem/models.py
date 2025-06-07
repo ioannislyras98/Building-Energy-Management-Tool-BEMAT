@@ -20,6 +20,12 @@ class DomesticHotWaterSystem(models.Model):
         verbose_name='Χρήστης'
     )
     # New specific fields for domestic hot water system
+    heating_system_type = models.CharField(
+        max_length=255,
+        verbose_name="Τύπος Συστήματος Θέρμανσης",
+        null=True,
+        blank=True
+    )
     boiler_type = models.CharField(max_length=255, null=True, blank=True)
     power_kw = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     thermal_efficiency = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
