@@ -20,6 +20,40 @@ class CoolingSystem(models.Model):
         blank=True,
         verbose_name='Χρήστης'
     )
+    # Cooling System Type Choices
+    COOLING_SYSTEM_TYPE_CHOICES = [
+        ('central_air', 'Κεντρικό Κλιματισμού'),
+        ('split_unit', 'Split Unit'),
+        ('window_unit', 'Μονάδα Παραθύρου'),
+        ('portable', 'Φορητό'),
+        ('evaporative', 'Εξατμιστικό'),
+        ('heat_pump', 'Αντλία Θερμότητας'),
+        ('chiller', 'Ψύκτης'),
+        ('other', 'Άλλο')
+    ]
+    
+    # Cooling Unit Accessibility Choices
+    ACCESSIBILITY_CHOICES = [
+        ('easy', 'Εύκολη Πρόσβαση'),
+        ('moderate', 'Μέτρια Πρόσβαση'),
+        ('difficult', 'Δύσκολη Πρόσβαση'),
+        ('restricted', 'Περιορισμένη Πρόσβαση')
+    ]
+    
+    cooling_system_type = models.CharField(
+        max_length=50, 
+        choices=COOLING_SYSTEM_TYPE_CHOICES,
+        verbose_name="Τύπος Συστήματος Ψύξης",
+        null=True,
+        blank=True
+    )
+    cooling_unit_accessibility = models.CharField(
+        max_length=50,
+        choices=ACCESSIBILITY_CHOICES,
+        verbose_name="Δυνατότητα Πρόσβασης στη Μονάδα Ψύξης",
+        null=True,
+        blank=True
+    )
     heat_pump_type = models.CharField(max_length=255, verbose_name="Heat Pump Type")
     power_kw = models.FloatField(verbose_name="Power (kW)")
     construction_year = models.IntegerField(verbose_name="Year of Construction")
@@ -31,4 +65,5 @@ class CoolingSystem(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"Cooling System for {self.building.name} - {self.heat_pump_type}"
+        system_type = self.get_cooling_system_type_display() if self.cooling_system_type else "Unknown Type"
+        return f"Cooling System for {self.building.name} - {system_type}"

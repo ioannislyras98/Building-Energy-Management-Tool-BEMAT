@@ -14,8 +14,8 @@ export default function BuildingBtn({ name, usage, date_created }) {
 
   return (
     <>
-      <div className="project-icon bg-primary">
-        <BsBuilding className="p-icon text-white" />
+      <div className="project-icon !bg-primary">
+        <BsBuilding className="p-icon !text-white" />
       </div>
       <div className="info w-[180px]">
         <label className="building-name opacity-80 font-bold text-primary">

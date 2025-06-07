@@ -75,6 +75,8 @@ def create_cooling_system(request):
                 building=building,
                 project=project,
                 user=user,
+                cooling_system_type=data.get("cooling_system_type"),
+                cooling_unit_accessibility=data.get("cooling_unit_accessibility"),
                 heat_pump_type=data.get("heat_pump_type"),
                 power_kw=data.get("power_kw"),
                 construction_year=data.get("construction_year"),
@@ -88,6 +90,8 @@ def create_cooling_system(request):
         
         return JsonResponse({
             "uuid": str(cooling_system.uuid),
+            "cooling_system_type": cooling_system.cooling_system_type,
+            "cooling_unit_accessibility": cooling_system.cooling_unit_accessibility,
             "heat_pump_type": cooling_system.heat_pump_type,
             "power_kw": float(cooling_system.power_kw) if cooling_system.power_kw is not None else None,
             "construction_year": cooling_system.construction_year,
@@ -133,6 +137,8 @@ def get_building_cooling_systems(request, building_uuid):
             data.append({
                 'uuid': str(system.uuid),
                 'project': str(system.project.uuid) if system.project else None,
+                'cooling_system_type': system.cooling_system_type,
+                'cooling_unit_accessibility': system.cooling_unit_accessibility,
                 'heat_pump_type': system.heat_pump_type,
                 'power_kw': float(system.power_kw) if system.power_kw is not None else None,
                 'construction_year': system.construction_year,

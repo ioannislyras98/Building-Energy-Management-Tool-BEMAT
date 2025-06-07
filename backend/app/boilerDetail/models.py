@@ -59,6 +59,12 @@ class BoilerDetail(models.Model):
         blank=True,
         verbose_name='Έτος Κατασκευής'
     )
+    fuel_type = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        verbose_name='Είδος Καυσίμου'
+    )
     
     # Μετρήσεις καυσαερίων
     nitrogen_monoxide = models.DecimalField(
