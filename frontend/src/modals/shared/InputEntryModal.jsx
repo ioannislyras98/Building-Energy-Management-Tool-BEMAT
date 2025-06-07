@@ -1,52 +1,51 @@
-import React from 'react'
-import './../css/forms.css'
+import React from "react";
+import "./../../assets/styles/forms.css";
 
-export default function InputEntryModal ({
+export default function InputEntryModal({
   entry,
   id,
-  type = 'text',
+  type = "text",
   value,
   onChange,
   example,
   error,
   required = false,
-  className = '',
+  className = "",
   options = [],
   ...props
 }) {
-  const hasError = error && error.length > 0
+  const hasError = error && error.length > 0;
   const inputClasses = `input-field ${
-    hasError ? 'error-input' : ''
-  } ${className}`
+    hasError ? "error-input" : ""
+  } ${className}`;
 
   const renderInput = () => {
-    if (type === 'select') {
+    if (type === "select") {
       return (
         <select
           id={id}
           name={id}
-          value={value || ''}
+          value={value || ""}
           onChange={onChange}
           className={inputClasses}
           required={required}
-          {...props}
-        >
-          {example && <option value=''>{example}</option>}
+          {...props}>
+          {example && <option value="">{example}</option>}
           {options.map((option, index) => (
             <option key={index} value={option.value || option}>
               {option.label || option}
             </option>
           ))}
         </select>
-      )
+      );
     }
 
-    if (type === 'textarea') {
+    if (type === "textarea") {
       return (
         <textarea
           id={id}
           name={id}
-          value={value || ''}
+          value={value || ""}
           onChange={onChange}
           placeholder={example}
           className={inputClasses}
@@ -54,7 +53,7 @@ export default function InputEntryModal ({
           rows={3}
           {...props}
         />
-      )
+      );
     }
 
     return (
@@ -62,24 +61,24 @@ export default function InputEntryModal ({
         id={id}
         name={id}
         type={type}
-        value={value || ''}
+        value={value || ""}
         onChange={onChange}
         placeholder={example}
         className={inputClasses}
         required={required}
         {...props}
       />
-    )
-  }
+    );
+  };
 
   return (
-    <div className='mb-4'>
-      <label htmlFor={id} className='label-name'>
+    <div className="mb-4">
+      <label htmlFor={id} className="label-name">
         {entry}
-        {required && <span className='text-red-500 ml-1'>*</span>}
+        {required && <span className="text-red-500 ml-1">*</span>}
       </label>
       {renderInput()}
-      {hasError && <div className='text-red-500 text-xs mt-1'>{error}</div>}
+      {hasError && <div className="text-red-500 text-xs mt-1">{error}</div>}
     </div>
-  )
+  );
 }

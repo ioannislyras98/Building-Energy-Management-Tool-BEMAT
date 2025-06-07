@@ -1,15 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import $ from "jquery";
 import Cookies from "universal-cookie";
-import "./../css/forms.css";
-import { useLanguage } from "../context/LanguageContext";
-import english_text from "../languages/english.json";
-import greek_text from "../languages/greek.json";
-import InputEntryModal from "./InputEntryModal";
+import "./../../assets/styles/forms.css";
+import { useLanguage } from "../../context/LanguageContext";
+import english_text from "../../languages/english.json";
+import greek_text from "../../languages/greek.json";
+import InputEntryModal from "../shared/InputEntryModal";
 
 const cookies = new Cookies();
 
-function EditContactModalForm({ isOpen, onClose, onContactUpdated, contact, params, buildingUuid }) {
+function AddContactModalForm({
+  isOpen,
+  onClose,
+  onContactAdded,
+  buildingUuid,
+  params,
+}) {
   const [formData, setFormData] = useState({
     name: "",
     role: "",
@@ -18,17 +24,6 @@ function EditContactModalForm({ isOpen, onClose, onContactUpdated, contact, para
   });
   const [errors, setErrors] = useState({});
   const token = cookies.get("token") || "";
-
-  useEffect(() => {
-    if (contact) {
-      setFormData({
-        name: contact.name || "",
-        role: contact.role || "",
-        email: contact.email || "",
-        phone_number: contact.phone_number || "",
-      });
-    }
-  }, [contact]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -61,27 +56,30 @@ function EditContactModalForm({ isOpen, onClose, onContactUpdated, contact, para
     if (!validateForm()) return;
 
     $.ajax({
-      url: `http://127.0.0.1:8000/buildings/${buildingUuid}/contacts/${contact.uuid}/update/`,
-      method: "PUT",
+      url: `http://127.0.0.1:8000/buildings/${buildingUuid}/contacts/create/`,
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `token ${token}`,
       },
       data: JSON.stringify(formData),
       success: function (response) {
-        onContactUpdated(response);
+        onContactAdded(response);
         onClose();
+        setFormData({ name: "", role: "", email: "", phone_number: "" });
       },
       error: function (error) {
         if (error.responseJSON && error.responseJSON.error) {
-            const backendErrors = error.responseJSON.error;
-            if (typeof backendErrors === 'string') {
-                setErrors({ general: backendErrors });
-            } else {
-                setErrors(backendErrors);
-            }
+          const backendErrors = error.responseJSON.error;
+          if (typeof backendErrors === "string") {
+            setErrors({ general: backendErrors });
+          } else {
+            setErrors(backendErrors);
+          }
         } else {
-          setErrors({ general: params.errorGeneral || "Failed to update contact." });
+          setErrors({
+            general: params.errorGeneral || "Failed to add contact.",
+          });
         }
       },
     });
@@ -93,8 +91,12 @@ function EditContactModalForm({ isOpen, onClose, onContactUpdated, contact, para
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-50">
       <div className="rounded-lg p-6 w-96 border-primary-light border-2 bg-white shadow-lg">
         <form onSubmit={handleSubmit}>
-          <h2 className="text-lg font-bold mb-4 text-center">{params.h2 || "Edit Contact"}</h2>
-          {errors.general && <p className="text-red-500 text-sm mb-2 text-center">{errors.general}</p>}
+          <h2 className="text-lg font-bold mb-4 text-center">{params.h2}</h2>
+          {errors.general && (
+            <p className="text-red-500 text-sm mb-2 text-center">
+              {errors.general}
+            </p>
+          )}
           <InputEntryModal
             entry={params.contactName}
             id="name"
@@ -132,8 +134,12 @@ function EditContactModalForm({ isOpen, onClose, onContactUpdated, contact, para
             error={errors.phone_number}
           />
           <div className="flex justify-between mt-6">
-            <button type="button" onClick={onClose} className="close-modal">{params.cancel || "Cancel"}</button>
-            <button type="submit" className="confirm-button">{params.updateContact || "Update Contact"}</button>
+            <button type="button" onClick={onClose} className="close-modal">
+              {params.cancel}
+            </button>
+            <button type="submit" className="confirm-button">
+              {params.addContact}
+            </button>
           </div>
         </form>
       </div>
@@ -141,18 +147,25 @@ function EditContactModalForm({ isOpen, onClose, onContactUpdated, contact, para
   );
 }
 
-export default function EditContactModal({ isOpen, onClose, onContactUpdated, contact, buildingUuid }) {
+export default function AddContactModal({
+  isOpen,
+  onClose,
+  onContactAdded,
+  buildingUuid,
+}) {
   const { language } = useLanguage();
-  const params = language === "en" ? english_text.EditContactModal : greek_text.EditContactModal;
+  const params =
+    language === "en"
+      ? english_text.AddContactModal
+      : greek_text.AddContactModal;
 
   return (
-    <EditContactModalForm
+    <AddContactModalForm
       isOpen={isOpen}
       onClose={onClose}
-      onContactUpdated={onContactUpdated}
-      contact={contact}
-      params={params || {}}
+      onContactAdded={onContactAdded}
       buildingUuid={buildingUuid}
+      params={params || {}}
     />
   );
 }

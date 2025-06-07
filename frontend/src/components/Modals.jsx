@@ -1,10 +1,10 @@
-import React from 'react';
-import ProjectModal from '../modals/ProjectModal';
-import BuildingModal from '../modals/BuildingModal';
-import EditBuildingModal from '../modals/EditBuildingModal';
-import AddContactModal from '../modals/AddContactModal';
+import React from "react";
+import ProjectModal from "../modals/project/ProjectModal";
+import BuildingModal from "../modals/building/BuildingModal";
+import EditBuildingModal from "../modals/building/EditBuildingModal";
+import AddContactModal from "../modals/contact/AddContactModal";
 
-export const Modals = ({ 
+export const Modals = ({
   isModalOpen,
   isBuildingModalOpen,
   isUpdateProjectModalOpen,
@@ -25,7 +25,7 @@ export const Modals = ({
   isAddContactModalOpen,
   closeAddContactModal,
   targetBuildingUuidForContact,
-  handleContactAdded
+  handleContactAdded,
 }) => {
   return (
     <>

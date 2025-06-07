@@ -1,7 +1,16 @@
-import "./../../css/forms.css";
+import "./../../assets/styles/forms.css";
 
-export default function InputEntry({ entry, id, type, example, value, onChange }) {
-  const classType = ["Name", "Surname"].includes(entry) ? "flex-auto w-1/2" : "block";
+export default function InputEntry({
+  entry,
+  id,
+  type,
+  example,
+  value,
+  onChange,
+}) {
+  const classType = ["Name", "Surname"].includes(entry)
+    ? "flex-auto w-1/2"
+    : "block";
 
   return (
     <label className={classType}>

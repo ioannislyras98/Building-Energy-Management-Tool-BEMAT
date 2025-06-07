@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import "./../css/main.css";
-import "./../css/my_projects.css";
+import "./../assets/styles/main.css";
+import "./../assets/styles/my_projects.css";
 import { useLanguage } from "../context/LanguageContext";
-import ProjectsView from "../components/ProjectsView";
-import BuildingsView from "../components/BuildingsView";
+import ProjectsView from "../components/features/projects/ProjectsView";
+import BuildingsView from "../components/features/building/BuildingsView";
 import { Modals } from "../components/Modals";
-import ConfirmationDialog from "../components/ConfirmationDialog";
+import ConfirmationDialog from "../components/ui/dialogs/ConfirmationDialog";
 import { useProjects } from "../hooks/useProjects";
 import { useBuildings } from "../hooks/useBuildings";
 import { useModals } from "../hooks/useModals";

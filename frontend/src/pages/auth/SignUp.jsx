@@ -1,9 +1,9 @@
 import $ from "jquery";
 import React, { useState } from "react";
-import "./../../css/forms.css";
+import "./../../assets/styles/forms.css";
 import InputEntry from "./InputEntry";
 import Cookies from "universal-cookie";
-import { useLanguage } from "../../context/LanguageContext"; 
+import { useLanguage } from "../../context/LanguageContext";
 
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
@@ -43,8 +43,8 @@ function submitData(event, params, setErrorMsg) {
     .fail((response) => {
       console.log(response);
       if (response.status === 400) {
-          setErrorMsg(true);
-        }
+        setErrorMsg(true);
+      }
     });
 }
 
@@ -55,13 +55,17 @@ function SignUpForm({ params }) {
   const [errorMsg, setErrorMsg] = useState(false);
 
   function handleConfirmPassword() {
-    const value = document.getElementById("confirm-password").value === document.getElementById("password").value;
+    const value =
+      document.getElementById("confirm-password").value ===
+      document.getElementById("password").value;
     setPasswordsMatch(value);
   }
 
   return (
     <div id="form-container" className="">
-      <form id="register-form" onSubmit={(event) => submitData(event, params, setErrorMsg)}>
+      <form
+        id="register-form"
+        onSubmit={(event) => submitData(event, params, setErrorMsg)}>
         <div>
           <div className="logo-img"></div>
           <h2 className="register-title">{params.h2}</h2>
@@ -75,18 +79,37 @@ function SignUpForm({ params }) {
           <div className="mt-4 grid grid-cols-1 items-start gap-3">
             <div className="grid grid-cols-1 gap-3">
               <div className="flex gap-2">
-                <InputEntry entry={params.name} id="name" type="text" example={params.name_example} />
-                <InputEntry entry={params.surname} id="surname" type="text" example={params.surname_example} />
+                <InputEntry
+                  entry={params.name}
+                  id="name"
+                  type="text"
+                  example={params.name_example}
+                />
+                <InputEntry
+                  entry={params.surname}
+                  id="surname"
+                  type="text"
+                  example={params.surname_example}
+                />
               </div>
-              <InputEntry entry={params.email} id="email" type="email" example={params.email_example} />
+              <InputEntry
+                entry={params.email}
+                id="email"
+                type="email"
+                example={params.email_example}
+              />
               <div className="relative">
-                <InputEntry entry={params.password} id="password" type={showPassword ? "text" : "password"} example={params.password_text} />
+                <InputEntry
+                  entry={params.password}
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  example={params.password_text}
+                />
                 <button
                   type="button"
                   id="show-password"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-2 flex items-center bg-transparent border-none cursor-pointer mt-[25px] pr-[9px] hover:text-primary"
-                >
+                  className="absolute inset-y-0 right-2 flex items-center bg-transparent border-none cursor-pointer mt-[25px] pr-[9px] hover:text-primary">
                   {showPassword ? <BiShow /> : <BiHide />}
                 </button>
               </div>
@@ -102,8 +125,7 @@ function SignUpForm({ params }) {
                   type="button"
                   id="show-confirm-password"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-2 flex items-center bg-transparent border-none cursor-pointer mt-[25px] pr-[9px] hover:text-primary"
-                >
+                  className="absolute inset-y-0 right-2 flex items-center bg-transparent border-none cursor-pointer mt-[25px] pr-[9px] hover:text-primary">
                   {showConfirmPassword ? <BiShow /> : <BiHide />}
                 </button>
               </div>

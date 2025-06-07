@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import $ from "jquery";
-import "./../../css/forms.css";
+import "./../../assets/styles/forms.css";
 import InputEntry from "./InputEntry";
 import Cookies from "universal-cookie";
 import { useLanguage } from "../../context/LanguageContext";
@@ -65,27 +65,27 @@ function ResetPasswordConfirmForm({ params }) {
   return (
     <div id="form-container" className="w-md h-md">
       <form id="register-form" onSubmit={handleSubmit}>
-      <div className="logo-img"></div>
-      <h2 className="register-title">{params.reset_password}</h2>
-      <div className="mt-8 grid grid-cols-1 items-start gap-3">
-      <div className="grid grid-cols-1 gap-3">
-          <div className="relative">
-            <InputEntry
-              entry={params.new_password}
-              id="newPassword"
-              type={showPassword ? "text" : "password"}
-              example={params.password_text}
-              className="pr-10"
-            />
-            <button
-              type="button"
-              id="show_password"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute inset-y-0 right-2 flex items-center bg-transparent border-none cursor-pointer mt-[25px] pr-[9px] hover:text-primary">
-              {showPassword ? <BiShow /> : <BiHide />}
-            </button>
+        <div className="logo-img"></div>
+        <h2 className="register-title">{params.reset_password}</h2>
+        <div className="mt-8 grid grid-cols-1 items-start gap-3">
+          <div className="grid grid-cols-1 gap-3">
+            <div className="relative">
+              <InputEntry
+                entry={params.new_password}
+                id="newPassword"
+                type={showPassword ? "text" : "password"}
+                example={params.password_text}
+                className="pr-10"
+              />
+              <button
+                type="button"
+                id="show_password"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-2 flex items-center bg-transparent border-none cursor-pointer mt-[25px] pr-[9px] hover:text-primary">
+                {showPassword ? <BiShow /> : <BiHide />}
+              </button>
+            </div>
           </div>
-        </div>
           <div className="relative">
             <InputEntry
               entry={params.confirm_new_password}
@@ -127,7 +127,8 @@ function ResetPasswordConfirmForm({ params }) {
 }
 export default function ResetPasswordConfirm(data) {
   const { language, toggleLanguage } = useLanguage();
-  const params = language === "en" ? english_text.ResetPassword : greek_text.ResetPassword;
+  const params =
+    language === "en" ? english_text.ResetPassword : greek_text.ResetPassword;
 
   return (
     <div id="sign-screen">

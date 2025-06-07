@@ -7,10 +7,10 @@ import {
   MdSquareFoot,
   MdEnergySavingsLeaf,
 } from "react-icons/md";
-import ConfirmationDialog from "../ConfirmationDialog";
-import { useLanguage } from "../../context/LanguageContext";
-import english_text from "../../languages/english.json";
-import greek_text from "../../languages/greek.json";
+import ConfirmationDialog from "../../../ui/dialogs/ConfirmationDialog";
+import { useLanguage } from "../../../../context/LanguageContext";
+import english_text from "../../../../languages/english.json";
+import greek_text from "../../../../languages/greek.json";
 
 const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);

@@ -9,13 +9,13 @@ import {
   MdPerson,
   MdWork,
 } from "react-icons/md";
-import ConfirmationDialog from "../ConfirmationDialog";
-import EditContactModal from "../../modals/EditContactModal";
+import ConfirmationDialog from "../../../ui/dialogs/ConfirmationDialog";
+import EditContactModal from "../../../../modals/contact/EditContactModal";
 import $ from "jquery";
 import Cookies from "universal-cookie";
-import { useLanguage } from "../../context/LanguageContext";
-import english_text from "../../languages/english.json";
-import greek_text from "../../languages/greek.json";
+import { useLanguage } from "../../../../context/LanguageContext";
+import english_text from "../../../../languages/english.json";
+import greek_text from "../../../../languages/greek.json";
 
 export default function BuildingContactInfo({
   building,
@@ -166,7 +166,7 @@ export default function BuildingContactInfo({
                   <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <button
                       onClick={() => handleEditClick(contact)}
-                      className="p-2 text-primary hover:bg-opacity-30 rounded-lg transition-colors duration-200"
+                      className="p-2 text-primary hover:bg-primary hover:bg-opacity-10 hover:text-primary-dark hover:scale-110 rounded-lg transition-all duration-200 hover:shadow-md"
                       aria-label="Edit contact">
                       <MdEdit size={18} />
                     </button>
