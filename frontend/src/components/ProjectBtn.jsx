@@ -1,32 +1,33 @@
 import "./../assets/styles/pages.css";
-import { BsBuilding } from "react-icons/bs";
-import { useLanguage } from "../context/LanguageContext";
 import Cookies from "universal-cookie";
+import { useLanguage } from "../context/LanguageContext";
+import { formatDate } from "../utils/dateUtils";
+import { BsBuildings } from "react-icons/bs";
 import english_text from "../languages/english.json";
 import greek_text from "../languages/greek.json";
 
 const cookies = new Cookies(null, { path: "/" });
 
-export default function BuildingBtn({ name, usage, date_created }) {
+export default function ProjectBtn({ name, buildings_count, date_created }) {
   const { language } = useLanguage();
   const params =
-    language === "en" ? english_text.BuildingBtn : greek_text.BuildingBtn;
+    language === "en" ? english_text.ProjectBtn : greek_text.ProjectBtn;
 
   return (
     <>
       <div className="project-icon !bg-primary">
-        <BsBuilding className="p-icon !text-white" />
+        <BsBuildings className="p-icon !text-white" />
       </div>
       <div className="info w-[180px]">
-        <label className="building-name opacity-80 font-bold text-primary">
+        <label className="poject-name opacity-80 font-bold text-primary">
           {name}
         </label>
-        <div className="building-details flex flex-col">
+        <div className="project-details flex flex-col">
           <span className="opacity-80 font-medium text-primary text-[13px]">
-            {params.usage}: {usage}
+            {params.buildings}: {buildings_count}
           </span>
           <span className="opacity-80 font-extrabold text-primary text-[12px]">
-            {params.created}: {date_created}
+            {params.created}: {formatDate(date_created)}
           </span>
         </div>
       </div>

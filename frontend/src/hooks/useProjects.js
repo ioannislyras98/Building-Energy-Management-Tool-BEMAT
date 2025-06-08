@@ -27,7 +27,7 @@ export const useProjects = () => {
         console.log("Projects fetched successfully:", response);
         const projectsArray = Array.isArray(response)
           ? response
-          : response.projects || response.data || [];
+          : response.projects || response.data.projects || [];
         setProjects(projectsArray);
         setLoading(false);
       })

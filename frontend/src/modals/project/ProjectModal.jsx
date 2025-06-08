@@ -49,7 +49,7 @@ function ProjectModalForm({
       method: method,
       timeout: 0,
       headers: {
-        Authorization: `token ${token}`,
+        Authorization: `Token ${token}`,
         "Content-Type": "application/json",
       },
       data: JSON.stringify({

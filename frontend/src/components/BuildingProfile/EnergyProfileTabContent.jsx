@@ -13,11 +13,11 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import ConfirmationDialog from "../../../ui/dialogs/ConfirmationDialog";
-import { useLanguage } from "../../../../context/LanguageContext";
-import english_text from "../../../../languages/english.json";
-import greek_text from "../../../../languages/greek.json";
-import EnergyConsumptionModal from "../../../../modals/building/EnergyConsumptionModal";
+import ConfirmationDialog from "../dialogs/ConfirmationDialog";
+import { useLanguage } from "../../context/LanguageContext";
+import english_text from "../../languages/english.json";
+import greek_text from "../../languages/greek.json";
+import EnergyConsumptionModal from "../../modals/building/EnergyConsumptionModal";
 import {
   AreaChart,
   Area,

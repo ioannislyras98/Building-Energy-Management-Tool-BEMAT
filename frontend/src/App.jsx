@@ -6,6 +6,7 @@ import LogIn from "./pages/auth/LogIn";
 import Logout from "./pages/auth/Logout";
 import ResetPasswordConfirm from "./pages/auth/ResetPasswordConfirm";
 import Home from "./pages/Home";
+import ProjectView from "./pages/ProjectView";
 import Layout from "./tools/Layout";
 import PageNotFound from "./pages/PageNotFound";
 import BuildingProfilePage from "./pages/BuildingProfilePage";
@@ -31,7 +32,7 @@ function App() {
           <Route element={<RequireAuth />}>
             <Route element={<MainLayout />}>
               <Route path="" element={<Home />} />
-              <Route path="/projects/:projectUuid" element={<Home />} />
+              <Route path="/projects/:projectUuid" element={<ProjectView />} />
               <Route
                 path="/projects/:projectUuid/buildings/:buildingUuid"
                 element={<BuildingProfilePage />}

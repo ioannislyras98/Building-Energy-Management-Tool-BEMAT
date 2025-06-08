@@ -122,7 +122,7 @@ def get_building_detail(request, uuid):
             "uuid": str(building.uuid),
             "name": building.name,
             "project": str(building.project.uuid),
-            "project_name": building.project.name,  # Added project name
+            "project_name": building.project.name, 
             "usage": building.usage,
             "user": str(building.user.email),
             "description": building.description,
@@ -151,7 +151,6 @@ def get_building_detail(request, uuid):
     except Building.DoesNotExist:
         return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        logger.error(f"Error in get_building_detail: {e}")
         return standard_error_response(f"An unexpected error occurred: {str(e)}", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['DELETE'])

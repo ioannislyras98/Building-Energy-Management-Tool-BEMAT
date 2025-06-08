@@ -47,12 +47,8 @@ def create_heating_system(request):
         return Response(error_data, status=status_code)
     
     # Check ownership
-    has_permission, error_msg = check_user_ownership(
-        building, user, "You don't have permission to add heating systems to this building"
-    )
-    if not has_permission:
-        error_data, status_code = standard_error_response(error_msg, 403)
-        return Response(error_data, status=status_code)
+    if not check_user_ownership(user, building):
+        return standard_error_response("You don't have permission to add heating systems to this building", 403)
     
     # Validate project if provided
     project = None
@@ -64,15 +60,10 @@ def create_heating_system(request):
         
         try:
             project = Project.objects.get(uuid=project_uuid)
-            has_permission, error_msg = check_user_ownership(
-                project, user, "You don't have permission to use this project"
-            )
-            if not has_permission:
-                error_data, status_code = standard_error_response(error_msg, 403)
-                return Response(error_data, status=status_code)
+            if not check_user_ownership(user, project):
+                return standard_error_response("You don't have permission to use this project", 403)
         except Project.DoesNotExist:
-            error_data, status_code = standard_error_response("Project not found", 404)
-            return Response(error_data, status=status_code)
+            return standard_error_response("Project not found", 404)
     
     # Create heating system using serializer
     serializer_data = data.copy()
@@ -84,12 +75,11 @@ def create_heating_system(request):
     serializer = HeatingSystemSerializer(data=serializer_data)
     if serializer.is_valid():
         heating_system = serializer.save()
-        response_data, status_code = standard_success_response(
+        return standard_success_response(
             serializer.data, 
             "Heating system created successfully", 
             201
         )
-        return Response(response_data, status=status_code)
     else:
         error_data, status_code = standard_error_response(
             f"Validation errors: {serializer.errors}"
@@ -117,19 +107,14 @@ def get_building_heating_systems(request, building_uuid):
         return Response(error_data, status=status_code)
     
     # Check ownership
-    has_permission, error_msg = check_user_ownership(
-        building, user, "You don't have permission to view heating systems for this building"
-    )
-    if not has_permission:
-        error_data, status_code = standard_error_response(error_msg, 403)
-        return Response(error_data, status=status_code)
+    if not check_user_ownership(user, building):
+        return standard_error_response("You don't have permission to view heating systems for this building", 403)
     
     # Get heating systems
     heating_systems = HeatingSystem.objects.filter(building=building, user=user)
     serializer = HeatingSystemSerializer(heating_systems, many=True)
     
-    response_data, status_code = standard_success_response(serializer.data)
-    return Response(response_data, status=status_code)
+    return standard_success_response(serializer.data)
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -186,18 +171,13 @@ def delete_heating_system(request, system_uuid):
         return Response(error_data, status=status_code)
     
     # Check ownership
-    has_permission, error_msg = check_user_ownership(
-        heating_system, user, "You don't have permission to delete this heating system"
-    )
-    if not has_permission:
-        error_data, status_code = standard_error_response(error_msg, 403)
-        return Response(error_data, status=status_code)
+    if not check_user_ownership(user, heating_system):
+        return standard_error_response("You don't have permission to delete this heating system", 403)
     
     heating_system.delete()
     
-    response_data, status_code = standard_success_response(
+    return standard_success_response(
         None, 
         "Heating system deleted successfully",
         204
     )
-    return Response(response_data, status=status_code)

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import EnergyProfileTabContent from "./EnergyProfileTabContent";
 import SystemsTabContent from "./SystemsTabContent";
 import { AdminContext, ResourceContextProvider, Resource } from "react-admin";
-import { defaultTheme } from "../../../../utils/theme";
+import { defaultTheme } from "../../utils/theme";
 const dataProvider = {
   getList: (resource, params) => {
     return Promise.resolve({

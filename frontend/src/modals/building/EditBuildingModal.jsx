@@ -207,7 +207,7 @@ function EditBuildingModalForm({
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `token ${token}`,
+        Authorization: `Token ${token}`,
       },
       data: JSON.stringify(buildingData),
       success: function (response) {

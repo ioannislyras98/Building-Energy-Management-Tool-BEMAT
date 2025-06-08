@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import $ from "jquery";
-import "./../assets/styles/sidebar.css";
+import "./../../assets/styles/sidebar.css";
 import Cookies from "universal-cookie";
-import { useLanguage } from "../context/LanguageContext";
+import { useLanguage } from "../../context/LanguageContext";
 import { FaArrowRight } from "react-icons/fa6";
 import { IoHome } from "react-icons/io5";
 
-import english_text from "../languages/english.json";
-import greek_text from "../languages/greek.json";
+import english_text from "../../languages/english.json";
+import greek_text from "../../languages/greek.json";
 
 const cookies = new Cookies(null, { path: "/" });
 

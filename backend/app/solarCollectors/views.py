@@ -30,50 +30,37 @@ def create_solar_collector(request):
     required_fields = ["building"]
     missing_fields = [field for field in required_fields if not data.get(field)]
     if missing_fields:
-        error_data, status_code = standard_error_response(
+        return standard_error_response(
             f"Missing required fields: {', '.join(missing_fields)}"
         )
-        return Response(error_data, status=status_code)
     
     # Validate building
     building_uuid = validate_uuid(data.get("building"))
     if not building_uuid:
-        error_data, status_code = standard_error_response("Invalid building UUID")
-        return Response(error_data, status=status_code)
+        return standard_error_response("Invalid building UUID")
     
     try:
         building = Building.objects.get(uuid=building_uuid)
     except Building.DoesNotExist:
-        error_data, status_code = standard_error_response("Building not found", 404)
-        return Response(error_data, status=status_code)
+        return standard_error_response("Building not found", 404)
     
     # Check ownership
-    has_permission, error_msg = check_user_ownership(
-        building, user, "You don't have permission to add solar collectors to this building"
-    )
-    if not has_permission:
-        error_data, status_code = standard_error_response(error_msg, 403)
-        return Response(error_data, status=status_code)
+    if not check_user_ownership(user, building):
+        return standard_error_response("You don't have permission to add solar collectors to this building", 403)
     
     # Validate project if provided
     project = None
     if data.get("project"):
         project_uuid = validate_uuid(data.get("project"))
         if not project_uuid:
-            error_data, status_code = standard_error_response("Invalid project UUID")
-            return Response(error_data, status=status_code)
+            return standard_error_response("Invalid project UUID")
         
         try:
             project = Project.objects.get(uuid=project_uuid)
-            has_permission, error_msg = check_user_ownership(
-                project, user, "You don't have permission to use this project"
-            )
-            if not has_permission:
-                error_data, status_code = standard_error_response(error_msg, 403)
-                return Response(error_data, status=status_code)
+            if not check_user_ownership(user, project):
+                return standard_error_response("You don't have permission to use this project", 403)
         except Project.DoesNotExist:
-            error_data, status_code = standard_error_response("Project not found", 404)
-            return Response(error_data, status=status_code)
+            return standard_error_response("Project not found", 404)
     
     # Create solar collector using serializer
     serializer_data = data.copy()
@@ -85,17 +72,15 @@ def create_solar_collector(request):
     serializer = SolarCollectorSerializer(data=serializer_data)
     if serializer.is_valid():
         solar_collector = serializer.save()
-        response_data, status_code = standard_success_response(
+        return standard_success_response(
             serializer.data, 
             "Solar collector created successfully", 
             201
         )
-        return Response(response_data, status=status_code)
     else:
-        error_data, status_code = standard_error_response(
+        return standard_error_response(
             f"Validation errors: {serializer.errors}"
         )
-        return Response(error_data, status=status_code)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -118,19 +103,14 @@ def get_building_solar_collectors(request, building_uuid):
         return Response(error_data, status=status_code)
     
     # Check ownership
-    has_permission, error_msg = check_user_ownership(
-        building, user, "You don't have permission to view solar collectors for this building"
-    )
-    if not has_permission:
-        error_data, status_code = standard_error_response(error_msg, 403)
-        return Response(error_data, status=status_code)
+    if not check_user_ownership(user, building):
+        return standard_error_response("You don't have permission to view solar collectors for this building", 403)
     
     # Get solar collectors
     solar_collectors = SolarCollector.objects.filter(building=building, user=user)
     serializer = SolarCollectorSerializer(solar_collectors, many=True)
     
-    response_data, status_code = standard_success_response(serializer.data)
-    return Response(response_data, status=status_code)
+    return standard_success_response(serializer.data)
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -188,18 +168,13 @@ def delete_solar_collector(request, system_uuid):
         return Response(error_data, status=status_code)
     
     # Check ownership
-    has_permission, error_msg = check_user_ownership(
-        solar_collector, user, "You don't have permission to delete this solar collector"
-    )
-    if not has_permission:
-        error_data, status_code = standard_error_response(error_msg, 403)
-        return Response(error_data, status=status_code)
+    if not check_user_ownership(user, solar_collector):
+        return standard_error_response("You don't have permission to delete this solar collector", 403)
     
     solar_collector.delete()
     
-    response_data, status_code = standard_success_response(
+    return standard_success_response(
         None, 
         "Solar collector deleted successfully",
         204
     )
-    return Response(response_data, status=status_code)

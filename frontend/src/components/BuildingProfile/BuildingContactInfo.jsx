@@ -9,13 +9,13 @@ import {
   MdPerson,
   MdWork,
 } from "react-icons/md";
-import ConfirmationDialog from "../../../ui/dialogs/ConfirmationDialog";
-import EditContactModal from "../../../../modals/contact/EditContactModal";
+import ConfirmationDialog from "../dialogs/ConfirmationDialog";
+import EditContactModal from "../../modals/contact/EditContactModal";
 import $ from "jquery";
 import Cookies from "universal-cookie";
-import { useLanguage } from "../../../../context/LanguageContext";
-import english_text from "../../../../languages/english.json";
-import greek_text from "../../../../languages/greek.json";
+import { useLanguage } from "../../context/LanguageContext";
+import english_text from "../../languages/english.json";
+import greek_text from "../../languages/greek.json";
 
 export default function BuildingContactInfo({
   building,

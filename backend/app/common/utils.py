@@ -27,10 +27,10 @@ def standard_error_response(message, status_code=400):
     """
     Standard error response format.
     """
-    return {
+    return Response({
         'status': 'error',
         'message': message
-    }, status_code
+    }, status=status_code)
 
 
 def standard_success_response(data, message=None, status_code=200):
@@ -43,29 +43,31 @@ def standard_success_response(data, message=None, status_code=200):
     }
     if message:
         response['message'] = message
-    return response, status_code
+    return Response(response, status=status_code)
 
 
 def validate_uuid(uuid_string):
     """
-    Validate and convert string to UUID.
+    Validate UUID string or object.
+    Returns True if valid, False otherwise.
     """
+    if isinstance(uuid_string, uuid.UUID):
+        return True
     try:
-        return uuid.UUID(uuid_string)
-    except (ValueError, AttributeError):
-        return None
+        uuid.UUID(uuid_string)
+        return True
+    except (ValueError, AttributeError, TypeError):
+        return False
 
 
-def check_user_ownership(obj, user, error_message=None):
+def check_user_ownership(user, obj):
     """
     Check if user owns the object.
+    Returns True if user owns the object, False otherwise.
     """
-    if not error_message:
-        error_message = "You don't have permission to access this resource"
-    
     if hasattr(obj, 'user') and obj.user != user:
-        return False, error_message
+        return False
     elif hasattr(obj, 'project') and hasattr(obj.project, 'user') and obj.project.user != user:
-        return False, error_message
+        return False
     
-    return True, None
+    return True

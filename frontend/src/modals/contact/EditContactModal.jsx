@@ -72,7 +72,7 @@ function EditContactModalForm({
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `token ${token}`,
+        Authorization: `Token ${token}`,
       },
       data: JSON.stringify(formData),
       success: function (response) {

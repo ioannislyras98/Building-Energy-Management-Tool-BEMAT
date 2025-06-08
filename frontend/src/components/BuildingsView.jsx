@@ -7,9 +7,9 @@ import {
 } from "react-icons/md";
 import BuildingBtn from "./BuildingBtn";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "../../../context/LanguageContext";
-import english_text from "../../../languages/english.json";
-import greek_text from "../../../languages/greek.json";
+import { useLanguage } from "../context/LanguageContext";
+import english_text from "../languages/english.json";
+import greek_text from "../languages/greek.json";
 
 const BuildingsView = ({
   buildings,

@@ -1,8 +1,8 @@
 import $ from "jquery";
-import "./../assets/styles/topbar.css";
+import "./../../assets/styles/topbar.css";
 import { useState, useRef, useEffect } from "react";
 import Cookies from "universal-cookie";
-import { useLanguage } from "../context/LanguageContext";
+import { useLanguage } from "../../context/LanguageContext";
 import { useNavigate } from "react-router-dom";
 
 import { FaBell, FaCircleUser } from "react-icons/fa6";
@@ -10,8 +10,8 @@ import { HiCog6Tooth } from "react-icons/hi2";
 import { MdLogout } from "react-icons/md";
 import { MdTranslate } from "react-icons/md";
 
-import english_text from "../languages/english.json";
-import greek_text from "../languages/greek.json";
+import english_text from "../../languages/english.json";
+import greek_text from "../../languages/greek.json";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -31,7 +31,7 @@ export default function TopBar() {
         method: "GET",
         timeout: 0,
         headers: {
-          Authorization: `token ${token}`,
+          Authorization: `Token ${token}`,
         },
       };
 
