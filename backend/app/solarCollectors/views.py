@@ -85,96 +85,87 @@ def create_solar_collector(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_building_solar_collectors(request, building_uuid):
-    """
-    Get all solar collectors for a specific building.
-    """
-    user = request.user
-    
-    # Validate UUID
-    building_uuid = validate_uuid(building_uuid)
-    if not building_uuid:
-        error_data, status_code = standard_error_response("Invalid building UUID")
-        return Response(error_data, status=status_code)
-    
     try:
-        building = Building.objects.get(uuid=building_uuid)
-    except Building.DoesNotExist:
-        error_data, status_code = standard_error_response("Building not found", 404)
-        return Response(error_data, status=status_code)
-    
-    # Check ownership
-    if not check_user_ownership(user, building):
-        return standard_error_response("You don't have permission to view solar collectors for this building", 403)
-    
-    # Get solar collectors
-    solar_collectors = SolarCollector.objects.filter(building=building, user=user)
-    serializer = SolarCollectorSerializer(solar_collectors, many=True)
-    
-    return standard_success_response(serializer.data)
+        # Validate building UUID
+        if not validate_uuid(building_uuid):
+            return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
+        
+        # Check building exists and user has permission
+        try:
+            building = Building.objects.get(uuid=building_uuid)
+        except Building.DoesNotExist:
+            return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
+        
+        if not check_user_ownership(request.user, building):
+            return standard_error_response("Access denied: You do not have permission to view systems for this building", status.HTTP_403_FORBIDDEN)
+        
+        # Get solar collectors for building
+        solar_collectors = SolarCollector.objects.filter(
+            building=building, 
+            user=request.user
+        )
+        
+        serializer = SolarCollectorSerializer(solar_collectors, many=True)
+        return standard_success_response(serializer.data)
+        
+    except Exception as e:
+        return standard_error_response(str(e), status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_solar_collector(request, system_uuid):
-    """
-    Endpoint για την ενημέρωση των λεπτομερειών ηλιακών συλλεκτών.
-    """
     try:
-        system_uuid = uuid.UUID(system_uuid)
-        solar_collector = SolarCollector.objects.get(uuid=system_uuid)
+        # Validate system UUID
+        if not validate_uuid(system_uuid):
+            return standard_error_response("Invalid system UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check if the user has permission to update this solar collector
-        if solar_collector.user != request.user:
-            return Response(
-                {"error": "You don't have permission to update this solar collector"},
-                status=status.HTTP_403_FORBIDDEN
-            )
+        # Get solar collector
+        try:
+            solar_collector = SolarCollector.objects.get(uuid=system_uuid)
+        except SolarCollector.DoesNotExist:
+            return standard_error_response("Solar collector not found", status.HTTP_404_NOT_FOUND)
         
-        serializer = SolarCollectorSerializer(solar_collector, data=request.data, partial=True)
+        # Check user permission
+        if not check_user_ownership(request.user, solar_collector):
+            return standard_error_response("Access denied: You do not have permission to update this system", status.HTTP_403_FORBIDDEN)
+        
+        # Update system
+        serializer = SolarCollectorSerializer(
+            solar_collector, 
+            data=request.data, 
+            partial=True
+        )
+        
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-    
-    except SolarCollector.DoesNotExist:
-        return Response(
-            {"error": "Solar collector not found"}, 
-            status=status.HTTP_404_NOT_FOUND
-        )
+        
     except Exception as e:
-        return Response(
-            {"error": str(e)},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return standard_error_response(str(e), status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_solar_collector(request, system_uuid):
-    """
-    Delete a solar collector.
-    """
-    user = request.user
-    
-    # Validate UUID
-    system_uuid = validate_uuid(system_uuid)
-    if not system_uuid:
-        error_data, status_code = standard_error_response("Invalid solar collector UUID")
-        return Response(error_data, status=status_code)
-    
     try:
-        solar_collector = SolarCollector.objects.get(uuid=system_uuid)
-    except SolarCollector.DoesNotExist:
-        error_data, status_code = standard_error_response("Solar collector not found", 404)
-        return Response(error_data, status=status_code)
-    
-    # Check ownership
-    if not check_user_ownership(user, solar_collector):
-        return standard_error_response("You don't have permission to delete this solar collector", 403)
-    
-    solar_collector.delete()
-    
-    return standard_success_response(
-        None, 
-        "Solar collector deleted successfully",
-        204
-    )
+        # Validate system UUID
+        if not validate_uuid(system_uuid):
+            return standard_error_response("Invalid system UUID", status.HTTP_400_BAD_REQUEST)
+        
+        # Get solar collector
+        try:
+            solar_collector = SolarCollector.objects.get(uuid=system_uuid)
+        except SolarCollector.DoesNotExist:
+            return standard_error_response("Solar collector not found", status.HTTP_404_NOT_FOUND)
+        
+        # Check user permission
+        if not check_user_ownership(request.user, solar_collector):
+            return standard_error_response("Access denied: You do not have permission to delete this system", status.HTTP_403_FORBIDDEN)
+        
+        # Delete system
+        solar_collector.delete()
+        return standard_success_response("Solar collector deleted successfully")
+        
+    except Exception as e:
+        return standard_error_response(str(e), status.HTTP_500_INTERNAL_SERVER_ERROR)

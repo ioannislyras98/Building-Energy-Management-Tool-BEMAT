@@ -76,7 +76,7 @@ export default function BuildingProfilePage() {
     if (buildingUuid) {
       fetchBuildingDetails();
     }
-  }, [buildingUuid, text]);
+  }, [buildingUuid]);
 
   const handleEditBasicInfo = () => {
     if (building) {

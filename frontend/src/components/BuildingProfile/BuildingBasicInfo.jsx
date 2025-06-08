@@ -73,8 +73,8 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
 
         <div className="p-6 space-y-4">
           <div className="flex items-start space-x-3">
-            <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-              <MdBusiness className="text-gray-600" size={16} />
+            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+              <MdBusiness className="text-green-600" size={16} />
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-500 mb-1">
@@ -87,8 +87,8 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
           </div>
 
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <MdSquareFoot className="text-blue-600" size={16} />
+            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <MdSquareFoot className="text-green-600" size={16} />
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-500">
