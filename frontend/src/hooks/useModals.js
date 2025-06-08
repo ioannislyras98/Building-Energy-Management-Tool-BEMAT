@@ -1,12 +1,14 @@
-import { useState } from 'react';
-import $ from 'jquery';
+import { useState } from "react";
+import $ from "jquery";
 
 export const useModals = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBuildingModalOpen, setIsBuildingModalOpen] = useState(false);
-  const [isUpdateProjectModalOpen, setIsUpdateProjectModalOpen] = useState(false);
+  const [isUpdateProjectModalOpen, setIsUpdateProjectModalOpen] =
+    useState(false);
   const [isEditBuildingModalOpen, setIsEditBuildingModalOpen] = useState(false);
   const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
+  const [isEditContactModalOpen, setIsEditContactModalOpen] = useState(false);
 
   const openProjectModal = () => {
     $("#projects-wrapper").addClass("modal-open");
@@ -57,7 +59,17 @@ export const useModals = () => {
     setIsAddContactModalOpen(false);
     $("#projects-wrapper").removeClass("modal-open");
   };
-  
+
+  const openEditContactModal = () => {
+    $("#projects-wrapper").addClass("modal-open");
+    setIsEditContactModalOpen(true);
+  };
+
+  const closeEditContactModal = () => {
+    setIsEditContactModalOpen(false);
+    $("#projects-wrapper").removeClass("modal-open");
+  };
+
   return {
     isModalOpen,
     isBuildingModalOpen,
@@ -73,6 +85,9 @@ export const useModals = () => {
     closeEditBuildingModal,
     isAddContactModalOpen,
     openAddContactModal,
-    closeAddContactModal
+    closeAddContactModal,
+    isEditContactModalOpen,
+    openEditContactModal,
+    closeEditContactModal,
   };
 };

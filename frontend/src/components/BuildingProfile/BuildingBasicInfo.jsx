@@ -16,6 +16,8 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { language } = useLanguage();
 
+  console.log("BuildingBasicInfo received props:", { building, params });
+
   const dialogText =
     language === "en"
       ? english_text.BuildingProfile
@@ -47,7 +49,7 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">
-                  {building?.name || params.loading}
+                  {building.data?.name || params.loading}
                 </h2>
                 <p className="text-blue-100 text-sm">Basic Information</p>
               </div>
@@ -79,7 +81,7 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
                 {params.description}
               </p>
               <p className="text-gray-800 leading-relaxed">
-                {building?.description || "N/A"}
+                {building.data?.description || "N/A"}
               </p>
             </div>
           </div>
@@ -93,7 +95,7 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
                 {params.examined_area}
               </p>
               <p className="text-gray-800 font-semibold">
-                {building?.examined_area || "N/A"} m²
+                {building.data?.examined_area || "N/A"} m²
               </p>
             </div>
           </div>
@@ -107,7 +109,7 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
                 {params.yearBuilt}
               </p>
               <p className="text-gray-800 font-semibold">
-                {building?.year_built || "N/A"}
+                {building.data?.year_built || "N/A"}
               </p>
             </div>
           </div>
@@ -122,7 +124,7 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
               </p>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-800 font-semibold">
-                  {building?.energy_class || "N/A"}
+                  {building.data?.energy_class || "N/A"}
                 </p>
               </div>
             </div>

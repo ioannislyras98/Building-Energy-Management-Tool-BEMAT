@@ -16,6 +16,8 @@ function AddContactModalForm({
   buildingUuid,
   params,
 }) {
+  console.log("AddContactModal - isOpen:", isOpen, "params:", params);
+
   const [formData, setFormData] = useState({
     name: "",
     role: "",
@@ -53,10 +55,17 @@ function AddContactModalForm({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("AddContactModal - handleSubmit called");
+    console.log("AddContactModal - buildingUuid:", buildingUuid);
+    console.log("AddContactModal - formData:", formData);
+
     if (!validateForm()) return;
 
+    const submitUrl = `http://127.0.0.1:8000/buildings/${buildingUuid}/contacts/create/`;
+    console.log("AddContactModal - Submit URL:", submitUrl);
+
     $.ajax({
-      url: `http://127.0.0.1:8000/buildings/${buildingUuid}/contacts/create/`,
+      url: submitUrl,
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -87,9 +96,13 @@ function AddContactModalForm({
 
   if (!isOpen) return null;
 
+  console.log("AddContactModal - Rendering modal content");
+  console.log("AddContactModal - params:", params);
+  console.log("AddContactModal - buildingUuid:", buildingUuid);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-50">
-      <div className="rounded-lg p-6 w-96 border-primary-light border-2 bg-white shadow-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="rounded-lg p-6 w-96 bg-white shadow-lg">
         <form onSubmit={handleSubmit}>
           <h2 className="text-lg font-bold mb-4 text-center">{params.h2}</h2>
           {errors.general && (

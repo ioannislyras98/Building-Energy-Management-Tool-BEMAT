@@ -3,6 +3,7 @@ import ProjectModal from "../modals/project/ProjectModal";
 import BuildingModal from "../modals/building/BuildingModal";
 import EditBuildingModal from "../modals/building/EditBuildingModal";
 import AddContactModal from "../modals/contact/AddContactModal";
+import EditContactModal from "../modals/contact/EditContactModal";
 
 export const Modals = ({
   isModalOpen,
@@ -26,7 +27,18 @@ export const Modals = ({
   closeAddContactModal,
   targetBuildingUuidForContact,
   handleContactAdded,
+  // Props for EditContactModal
+  isEditContactModalOpen,
+  closeEditContactModal,
+  currentContact,
+  handleContactUpdated,
 }) => {
+  console.log("Modals - AddContact props:", {
+    isAddContactModalOpen,
+    targetBuildingUuidForContact,
+    shouldRenderModal: isAddContactModalOpen && targetBuildingUuidForContact,
+  });
+
   return (
     <>
       {isModalOpen && (
@@ -65,14 +77,31 @@ export const Modals = ({
         />
       )}
 
-      {isAddContactModalOpen && targetBuildingUuidForContact && (
+      {isAddContactModalOpen && (
         <AddContactModal
           isOpen={isAddContactModalOpen}
           onClose={closeAddContactModal}
-          buildingUuid={targetBuildingUuidForContact}
+          buildingUuid={targetBuildingUuidForContact || ""}
           onContactAdded={handleContactAdded}
         />
       )}
+
+      {isEditContactModalOpen && currentContact && (
+        <EditContactModal
+          isOpen={isEditContactModalOpen}
+          onClose={closeEditContactModal}
+          contact={currentContact}
+          buildingUuid={targetBuildingUuidForContact || ""}
+          onContactUpdated={handleContactUpdated}
+        />
+      )}
+
+      {/* Debug: Log when AddContactModal should render */}
+      {isAddContactModalOpen &&
+        console.log(
+          "Modals - Rendering AddContactModal with buildingUuid:",
+          targetBuildingUuidForContact
+        )}
     </>
   );
 };

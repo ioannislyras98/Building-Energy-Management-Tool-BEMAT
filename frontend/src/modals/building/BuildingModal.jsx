@@ -329,7 +329,7 @@ function BuildingModalForm({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-opacity-50 py-20">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 py-20">
       <div className="rounded-lg p-6 w-full max-w-xl border-primary-light border-2 bg-white shadow-lg flex flex-col max-h-[80vh]">
         <h2 className="text-lg font-bold mb-2 text-center sticky top-0 bg-white pb-2 z-10">
           {params.h2}

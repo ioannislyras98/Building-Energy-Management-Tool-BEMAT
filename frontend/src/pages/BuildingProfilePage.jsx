@@ -34,7 +34,12 @@ export default function BuildingProfilePage() {
     isAddContactModalOpen,
     openAddContactModal,
     closeAddContactModal,
+    isEditContactModalOpen,
+    openEditContactModal,
+    closeEditContactModal,
   } = useModals();
+
+  const [currentContact, setCurrentContact] = useState(null);
 
   const fetchBuildingDetails = () => {
     const token = cookies.get("token");
@@ -51,6 +56,7 @@ export default function BuildingProfilePage() {
         Authorization: `Token ${token}`,
       },
       success: (data) => {
+        console.log("Building data received from API:", data);
         setBuilding(data);
         setLoading(false);
       },
@@ -73,16 +79,20 @@ export default function BuildingProfilePage() {
   }, [buildingUuid, text]);
 
   const handleEditBasicInfo = () => {
-    console.log("Edit Basic Info button clicked");
     if (building) {
       openEditBuildingModal();
     }
   };
 
   const handleAddContact = () => {
-    console.log("Add Contact button clicked");
+    console.log("BuildingProfilePage - handleAddContact called");
+    console.log("Building object:", building);
+    console.log("Building UUID:", building?.uuid);
     if (building) {
+      console.log("Opening AddContactModal...");
       openAddContactModal();
+    } else {
+      console.log("Building is null/undefined, cannot open modal");
     }
   };
 
@@ -96,6 +106,13 @@ export default function BuildingProfilePage() {
 
   const handleContactEdited = (editedContact) => {
     fetchBuildingDetails();
+    closeEditContactModal();
+    setCurrentContact(null);
+  };
+
+  const handleEditContact = (contact) => {
+    setCurrentContact(contact);
+    openEditContactModal();
   };
 
   const handleContactDeleted = (deletedContact) => {
@@ -198,7 +215,7 @@ export default function BuildingProfilePage() {
                   building={building}
                   params={text?.contactInfo || {}}
                   onAddContact={handleAddContact}
-                  onEditContact={handleContactEdited}
+                  onEditContact={handleEditContact}
                   onDeleteContact={handleContactDeleted}
                 />
               </div>
@@ -221,8 +238,12 @@ export default function BuildingProfilePage() {
         handleBuildingUpdated={handleBuildingUpdated}
         isAddContactModalOpen={isAddContactModalOpen}
         closeAddContactModal={closeAddContactModal}
-        targetBuildingUuidForContact={building?.uuid}
+        targetBuildingUuidForContact={building?.uuid || buildingUuid}
         handleContactAdded={handleContactAdded}
+        isEditContactModalOpen={isEditContactModalOpen}
+        closeEditContactModal={closeEditContactModal}
+        currentContact={currentContact}
+        handleContactUpdated={handleContactEdited}
       />
     </>
   );

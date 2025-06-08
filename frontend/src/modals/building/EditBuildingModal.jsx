@@ -99,27 +99,27 @@ function EditBuildingModalForm({
   useEffect(() => {
     if (building) {
       setFormData({
-        name: building.name || "",
-        usage: building.usage || "",
-        description: building.description || "",
-        year_built: building.year_built || "",
-        address: building.address || "",
-        prefecture: building.prefecture || "",
-        energy_zone: building.energy_zone || "",
-        is_insulated: building.is_insulated || false,
-        is_certified: building.is_certified || false,
-        energy_class: building.energy_class || "",
-        orientation: building.orientation || "",
-        total_area: building.total_area || "",
-        examined_area: building.examined_area || "",
-        floors_examined: building.floors_examined || "1",
-        floor_height: building.floor_height || "",
-        construction_type: building.construction_type || "",
-        free_facades: building.free_facades || "",
-        altitude: building.altitude || "",
-        non_operating_days: building.non_operating_days || "",
-        operating_hours: building.operating_hours || "",
-        occupants: building.occupants || "",
+        name: building.data.name || "",
+        usage: building.data.usage || "",
+        description: building.data.description || "",
+        year_built: building.data.year_built || "",
+        address: building.data.address || "",
+        prefecture: building.data.prefecture || "",
+        energy_zone: building.data.energy_zone || "",
+        is_insulated: building.data.is_insulated || false,
+        is_certified: building.data.is_certified || false,
+        energy_class: building.data.energy_class || "",
+        orientation: building.data.orientation || "",
+        total_area: building.data.total_area || "",
+        examined_area: building.data.examined_area || "",
+        floors_examined: building.data.floors_examined || "1",
+        floor_height: building.data.floor_height || "",
+        construction_type: building.data.construction_type || "",
+        free_facades: building.data.free_facades || "",
+        altitude: building.data.altitude || "",
+        non_operating_days: building.data.non_operating_days || "",
+        operating_hours: building.data.operating_hours || "",
+        occupants: building.data.occupants || "",
       });
     }
   }, [building]);
@@ -203,7 +203,7 @@ function EditBuildingModalForm({
     });
 
     $.ajax({
-      url: `http://127.0.0.1:8000/buildings/update/${building.uuid}/`,
+      url: `http://127.0.0.1:8000/buildings/update/${building.data.uuid}/`,
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -232,7 +232,7 @@ function EditBuildingModalForm({
     }`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-opacity-50 py-10">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 py-10">
       <div className="rounded-lg p-6 w-full max-w-xl border-primary-light border-2 bg-white shadow-lg flex flex-col max-h-[90vh]">
         <h2 className="text-lg font-bold mb-2 text-center sticky top-0 bg-white pb-2 z-10">
           {params.h2}

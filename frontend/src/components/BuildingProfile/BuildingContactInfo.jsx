@@ -10,7 +10,6 @@ import {
   MdWork,
 } from "react-icons/md";
 import ConfirmationDialog from "../dialogs/ConfirmationDialog";
-import EditContactModal from "../../modals/contact/EditContactModal";
 import $ from "jquery";
 import Cookies from "universal-cookie";
 import { useLanguage } from "../../context/LanguageContext";
@@ -24,9 +23,8 @@ export default function BuildingContactInfo({
   onEditContact,
   onDeleteContact,
 }) {
-  const contacts = building?.contacts || [];
+  const contacts = building.data?.contacts || [];
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentContact, setCurrentContact] = useState(null);
   const cookies = new Cookies();
   const token = cookies.get("token") || "";
@@ -38,8 +36,7 @@ export default function BuildingContactInfo({
       : greek_text.BuildingContactInfo;
 
   const handleEditClick = (contact) => {
-    setCurrentContact(contact);
-    setEditModalOpen(true);
+    onEditContact(contact);
   };
 
   const handleDeleteClick = (contact) => {
@@ -55,7 +52,7 @@ export default function BuildingContactInfo({
   const confirmDelete = () => {
     if (currentContact && onDeleteContact) {
       const settings = {
-        url: `http://127.0.0.1:8000/buildings/${building.uuid}/contacts/${currentContact.uuid}/delete/`,
+        url: `http://127.0.0.1:8000/buildings/${building.data.uuid}/contacts/${currentContact.uuid}/delete/`,
         method: "DELETE",
         timeout: 0,
         headers: {
@@ -79,13 +76,6 @@ export default function BuildingContactInfo({
       setDeleteDialogOpen(false);
       setCurrentContact(null);
     }
-  };
-  const handleContactUpdated = (updatedContact) => {
-    if (onEditContact) {
-      onEditContact(updatedContact);
-    }
-    setEditModalOpen(false);
-    setCurrentContact(null);
   };
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden animate-fade-in-up card-hover-effect">
@@ -195,23 +185,6 @@ export default function BuildingContactInfo({
           </div>
         )}
       </div>
-      <EditContactModal
-        isOpen={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
-        onContactUpdated={handleContactUpdated}
-        contact={currentContact}
-        buildingUuid={building.uuid}
-      />
-      <ConfirmationDialog
-        open={deleteDialogOpen}
-        onClose={cancelDelete}
-        onConfirm={confirmDelete}
-        title={dialogText.deleteContactTitle}
-        message={dialogText.deleteContactConfirmation}
-        confirmText={dialogText.deleteButton}
-        cancelText={dialogText.cancelButton}
-        confirmColor="error"
-      />
     </div>
   );
 }

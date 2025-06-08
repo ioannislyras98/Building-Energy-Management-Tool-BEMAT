@@ -87,7 +87,7 @@ function ProjectModalForm({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="rounded-lg p-6 w-80 border-primary-light border-2 bg-white shadow-lg">
         <form id="project-form" onSubmit={handleSubmit}>
           <div>
