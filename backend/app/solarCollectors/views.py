@@ -35,12 +35,11 @@ def create_solar_collector(request):
         )
     
     # Validate building
-    building_uuid = validate_uuid(data.get("building"))
-    if not building_uuid:
+    if not validate_uuid(data.get("building")):
         return standard_error_response("Invalid building UUID")
     
     try:
-        building = Building.objects.get(uuid=building_uuid)
+        building = Building.objects.get(uuid=data.get("building"))
     except Building.DoesNotExist:
         return standard_error_response("Building not found", 404)
     
@@ -51,12 +50,11 @@ def create_solar_collector(request):
     # Validate project if provided
     project = None
     if data.get("project"):
-        project_uuid = validate_uuid(data.get("project"))
-        if not project_uuid:
+        if not validate_uuid(data.get("project")):
             return standard_error_response("Invalid project UUID")
         
         try:
-            project = Project.objects.get(uuid=project_uuid)
+            project = Project.objects.get(uuid=data.get("project"))
             if not check_user_ownership(user, project):
                 return standard_error_response("You don't have permission to use this project", 403)
         except Project.DoesNotExist:

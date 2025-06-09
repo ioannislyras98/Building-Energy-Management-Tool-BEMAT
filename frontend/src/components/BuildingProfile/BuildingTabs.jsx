@@ -38,60 +38,151 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData }) => {
 
   return (
     <div className="w-full">
-      <div className="flex border-b">
-        {tabs.map((tab, index) => (
-          <button
-            key={index}
-            className={`py-2 px-4 font-medium ${
-              activeTab === index
-                ? "border-b-2 border-primary text-primary"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab(index)}>
-            {tab}
-          </button>
-        ))}
+      {/* Enhanced Tab Navigation */}
+      <div className="relative bg-gray-100 rounded-xl p-1.5 mb-6 shadow-inner">
+        <div className="flex relative gap-1">
+          {tabs.map((tab, index) => (
+            <button
+              key={index}
+              className={`flex-1 py-4 px-6 text-sm font-semibold rounded-lg transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 ${
+                activeTab === index
+                  ? "text-white bg-primary shadow-lg transform scale-[1.02] border-2 border-primary"
+                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/70 bg-transparent"
+              }`}
+              onClick={() => setActiveTab(index)}>
+              <span
+                className={`${
+                  activeTab === index ? "font-bold" : "font-medium"
+                }`}>
+                {tab}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="p-4">
-        {activeTab === 0 && (
-          <AdminContext dataProvider={dataProvider} theme={defaultTheme}>
-            <ResourceContextProvider value="energy_consumptions">
-              <EnergyProfileTabContent
+
+      {/* Tab Content with Enhanced Styling */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+        <div className="p-6 min-h-[400px]">
+          {activeTab === 0 && (
+            <div className="animate-fadeIn">
+              <AdminContext dataProvider={dataProvider} theme={defaultTheme}>
+                <ResourceContextProvider value="energy_consumptions">
+                  <EnergyProfileTabContent
+                    buildingUuid={buildingUuid}
+                    projectUuid={projectUuid}
+                    buildingData={buildingData}
+                    params={energyProfileParams}
+                  />
+                </ResourceContextProvider>
+              </AdminContext>
+            </div>
+          )}
+          {activeTab === 1 && (
+            <div className="animate-fadeIn">
+              <SystemsTabContent
                 buildingUuid={buildingUuid}
                 projectUuid={projectUuid}
                 buildingData={buildingData}
-                params={energyProfileParams}
+                params={params}
               />
-            </ResourceContextProvider>
-          </AdminContext>
-        )}
-        {activeTab === 1 && (
-          <SystemsTabContent
-            buildingUuid={buildingUuid}
-            projectUuid={projectUuid}
-            buildingData={buildingData}
-            params={params}
-          />
-        )}
-        {activeTab === 2 && (
-          <div>
-            {params?.thermalZonesContent ||
-              "Thermal zones content not available."}
-          </div>
-        )}
-        {activeTab === 3 && (
-          <div>
-            {params?.scenariosContent || "Scenarios content not available."}
-          </div>
-        )}
-        {activeTab === 4 && (
-          <div>
-            {params?.resultsContent || "Results content not available."}
-          </div>
-        )}
-        {activeTab === 5 && (
-          <div>{params?.imagesContent || "Images content not available."}</div>
-        )}
+            </div>
+          )}
+          {activeTab === 2 && (
+            <div className="animate-fadeIn">
+              <div className="flex items-center justify-center h-32 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                <div className="text-center">
+                  <svg
+                    className="mx-auto h-8 w-8 text-gray-400 mb-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                    />
+                  </svg>
+                  <p className="text-sm font-medium">
+                    {params?.thermalZonesContent ||
+                      "Thermal zones content not available."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          {activeTab === 3 && (
+            <div className="animate-fadeIn">
+              <div className="flex items-center justify-center h-32 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                <div className="text-center">
+                  <svg
+                    className="mx-auto h-8 w-8 text-gray-400 mb-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                    />
+                  </svg>
+                  <p className="text-sm font-medium">
+                    {params?.scenariosContent ||
+                      "Scenarios content not available."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          {activeTab === 4 && (
+            <div className="animate-fadeIn">
+              <div className="flex items-center justify-center h-32 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                <div className="text-center">
+                  <svg
+                    className="mx-auto h-8 w-8 text-gray-400 mb-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <p className="text-sm font-medium">
+                    {params?.resultsContent || "Results content not available."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          {activeTab === 5 && (
+            <div className="animate-fadeIn">
+              <div className="flex items-center justify-center h-32 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                <div className="text-center">
+                  <svg
+                    className="mx-auto h-8 w-8 text-gray-400 mb-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <p className="text-sm font-medium">
+                    {params?.imagesContent || "Images content not available."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

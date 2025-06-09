@@ -175,34 +175,6 @@ function CoolingSystemModalForm({
     });
     setErrors({});
   };
-  const coolingSystemTypes = [
-    { value: "", label: params.selectOption || "Επιλέξτε τύπο συστήματος" },
-    {
-      value: "central_air",
-      label: params.centralAir || "Κεντρικό Κλιματισμού",
-    },
-    { value: "split_unit", label: params.splitUnit || "Split Unit" },
-    { value: "window_unit", label: params.windowUnit || "Μονάδα Παραθύρου" },
-    { value: "portable", label: params.portable || "Φορητό" },
-    { value: "evaporative", label: params.evaporative || "Εξατμιστικό" },
-    { value: "heat_pump", label: params.heatPump || "Αντλία Θερμότητας" },
-    { value: "chiller", label: params.chiller || "Ψύκτης" },
-    { value: "other", label: params.other || "Άλλο" },
-  ];
-
-  const accessibilityOptions = [
-    {
-      value: "",
-      label: params.selectOption || "Επιλέξτε δυνατότητα πρόσβασης",
-    },
-    { value: "easy", label: params.easyAccess || "Εύκολη Πρόσβαση" },
-    { value: "moderate", label: params.moderateAccess || "Μέτρια Πρόσβαση" },
-    { value: "difficult", label: params.difficultAccess || "Δύσκολη Πρόσβαση" },
-    {
-      value: "restricted",
-      label: params.restrictedAccess || "Περιορισμένη Πρόσβαση",
-    },
-  ];
 
   const submitButtonText = isEditMode
     ? params.update || "Ενημέρωση"
@@ -231,48 +203,47 @@ function CoolingSystemModalForm({
               <label htmlFor="cooling_system_type" className="label-name">
                 {params.coolingSystemType || "Τύπος Συστήματος Ψύξης"}{" "}
                 <span className="text-red-500 ml-1">*</span>
-              </label>
-              <select
+              </label>{" "}
+              <input
+                type="text"
                 id="cooling_system_type"
                 value={formData.cooling_system_type}
                 onChange={handleChange}
                 className={`input-field ${
                   errors.cooling_system_type ? "error-input" : ""
                 }`}
-                required>
-                {coolingSystemTypes.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                placeholder={
+                  params.coolingSystemTypePlaceholder ||
+                  "Εισάγετε τον τύπο του συστήματος ψύξης"
+                }
+                required
+              />
               {errors.cooling_system_type && (
                 <div className="text-red-500 text-xs mt-1">
                   {errors.cooling_system_type}
                 </div>
               )}
-            </div>
+            </div>{" "}
             <div className="mb-4">
-              {" "}
               <label
                 htmlFor="cooling_unit_accessibility"
                 className="label-name">
                 {params.coolingUnitAccessibility ||
                   "Δυνατότητα Πρόσβασης στη Μονάδα Ψύξης"}
               </label>
-              <select
+              <input
+                type="text"
                 id="cooling_unit_accessibility"
                 value={formData.cooling_unit_accessibility}
                 onChange={handleChange}
                 className={`input-field ${
                   errors.cooling_unit_accessibility ? "error-input" : ""
-                }`}>
-                {accessibilityOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                }`}
+                placeholder={
+                  params.coolingUnitAccessibilityPlaceholder ||
+                  "Εισάγετε τη δυνατότητα πρόσβασης στη μονάδα ψύξης"
+                }
+              />
               {errors.cooling_unit_accessibility && (
                 <div className="text-red-500 text-xs mt-1">
                   {errors.cooling_unit_accessibility}

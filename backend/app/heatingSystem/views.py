@@ -21,36 +21,42 @@ from common.utils import (
 def create_heating_system(request):
     try:
         data = request.data
+        print(f"Received data: {data}")  # Debug log
+        print(f"User: {request.user}")   # Debug log
         
         # Validate required fields
         if not data.get("building"):
             return standard_error_response("Building is required", status.HTTP_400_BAD_REQUEST)
         
+        if not data.get("project"):
+            return standard_error_response("Project is required", status.HTTP_400_BAD_REQUEST)
+        
         # Validate building UUID
         if not validate_uuid(data.get("building")):
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
         
+        # Validate project UUID
+        if not validate_uuid(data.get("project")):
+            return standard_error_response("Invalid project UUID", status.HTTP_400_BAD_REQUEST)
+        
         # Check building exists and user has permission
         try:
             building = Building.objects.get(uuid=data.get("building"))
+            print(f"Found building: {building}, owner: {building.user}")  # Debug log
         except Building.DoesNotExist:
+            print(f"Building with UUID {data.get('building')} not found")  # Debug log
             return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
         
         if not check_user_ownership(request.user, building):
             return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
         
-        # Check project exists and user has permission (if provided)
-        project = None
-        if data.get("project"):
-            if not validate_uuid(data.get("project")):
-                return standard_error_response("Invalid project UUID", status.HTTP_400_BAD_REQUEST)
-            
-            try:
-                project = Project.objects.get(uuid=data.get("project"))
-                if not check_user_ownership(request.user, project):
-                    return standard_error_response("Access denied: You do not own this project", status.HTTP_403_FORBIDDEN)
-            except Project.DoesNotExist:
-                return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
+        # Check project exists and user has permission
+        try:
+            project = Project.objects.get(uuid=data.get("project"))
+            if not check_user_ownership(request.user, project):
+                return standard_error_response("Access denied: You do not own this project", status.HTTP_403_FORBIDDEN)
+        except Project.DoesNotExist:
+            return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
         
         # Create heating system
         heating_system = HeatingSystem.objects.create(
@@ -58,14 +64,14 @@ def create_heating_system(request):
             project=project,
             user=request.user,
             heating_system_type=data.get("heating_system_type"),
-            fuel_type=data.get("fuel_type"),
-            heating_unit_accessibility=data.get("heating_unit_accessibility"),
-            heat_pump_type=data.get("heat_pump_type"),
+            exchanger_type=data.get("exchanger_type"),
+            central_boiler_system=data.get("central_boiler_system"),
+            central_heat_pump_system=data.get("central_heat_pump_system"),
+            local_heating_system=data.get("local_heating_system"),
             power_kw=data.get("power_kw"),
             construction_year=data.get("construction_year"),
-            energy_efficiency_ratio=data.get("energy_efficiency_ratio"),
-            maintenance_period=data.get("maintenance_period"),
-            operating_hours=data.get("operating_hours")
+            cop=data.get("cop"),
+            distribution_network_state=data.get("distribution_network_state")
         )
         
         serializer = HeatingSystemSerializer(heating_system)

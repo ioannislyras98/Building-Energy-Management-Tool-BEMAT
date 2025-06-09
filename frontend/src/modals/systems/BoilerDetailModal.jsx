@@ -182,7 +182,6 @@ function BoilerDetailModalForm({
       });
     }
   };
-
   const resetForm = () => {
     setFormData({
       nominal_power: "",
@@ -197,17 +196,6 @@ function BoilerDetailModalForm({
     });
     setErrors({});
   };
-  const fuelTypes = [
-    { value: "", label: params.selectOption || "Επιλέξτε είδος καυσίμου" },
-    { value: "natural_gas", label: params.naturalGas || "Φυσικό Αέριο" },
-    { value: "heating_oil", label: params.heatingOil || "Πετρέλαιο Θέρμανσης" },
-    { value: "wood", label: params.wood || "Ξύλο" },
-    { value: "pellets", label: params.pellets || "Pellets" },
-    { value: "electricity", label: params.electricity || "Ηλεκτρισμός" },
-    { value: "lpg", label: params.lpg || "Υγραέριο" },
-    { value: "coal", label: params.coal || "Κάρβουνο" },
-    { value: "other", label: params.other || "Άλλο" },
-  ];
 
   if (!open) {
     return null;
@@ -219,7 +207,7 @@ function BoilerDetailModalForm({
 
   const submitButtonText = isEditMode
     ? params.update || "Ενημέρωση"
-    : params.submit || "Αποθήκευση";
+    : params.save || "Αποθήκευση";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -265,26 +253,25 @@ function BoilerDetailModalForm({
               error={errors.manufacturing_year}
               min="1900"
               max={new Date().getFullYear()}
-            />
+            />{" "}
             <div className="mb-4">
               <label htmlFor="fuel_type" className="label-name">
                 {params.fuelType || "Είδος Καυσίμου"}{" "}
                 <span className="text-red-500 ml-1">*</span>
               </label>
-              <select
+              <input
+                type="text"
                 id="fuel_type"
                 value={formData.fuel_type}
                 onChange={handleChange}
                 className={`input-field ${
                   errors.fuel_type ? "error-input" : ""
                 }`}
-                required>
-                {fuelTypes.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                placeholder={
+                  params.fuelTypePlaceholder || "Εισάγετε το είδος καυσίμου"
+                }
+                required
+              />
               {errors.fuel_type && (
                 <div className="text-red-500 text-xs mt-1">
                   {errors.fuel_type}
