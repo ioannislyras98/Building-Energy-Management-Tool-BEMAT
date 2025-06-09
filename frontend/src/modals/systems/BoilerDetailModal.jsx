@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import $ from "jquery";
 import Cookies from "universal-cookie";
 import { useLanguage } from "../../context/LanguageContext";
+import { useModalBlur } from "../../hooks/useModals";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import InputEntryModal from "../shared/InputEntryModal";
@@ -17,7 +18,9 @@ function BoilerDetailModalForm({
   onSubmitSuccess,
   editItem,
   params,
-}) {
+}) {  // Apply blur effect when modal is open
+  useModalBlur(open);
+
   const [formData, setFormData] = useState({
     nominal_power: "",
     internal_efficiency: "",
@@ -152,8 +155,7 @@ function BoilerDetailModalForm({
       },
       data: JSON.stringify(apiData),
       success: (response) => {
-        console.log("Boiler detail saved:", response);
-        onSubmitSuccess(response);
+        console.log("Boiler detail saved:", response);        onSubmitSuccess(response);
         resetForm();
         onClose();
       },
@@ -330,9 +332,7 @@ function BoilerDetailModalForm({
               error={errors.room_temperature}
               step="0.01"
             />
-          </div>
-
-          <div className="flex justify-between mt-6">
+          </div>          <div className="flex justify-between mt-6">
             <button type="button" onClick={onClose} className="close-modal">
               {params.cancel || "Ακύρωση"}
             </button>

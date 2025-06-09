@@ -3,6 +3,7 @@ import $ from "jquery";
 import Cookies from "universal-cookie";
 import "./../../assets/styles/forms.css";
 import { useLanguage } from "../../context/LanguageContext";
+import { useModalBlur } from "../../hooks/useModals";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import InputEntryModal from "../shared/InputEntryModal";
@@ -25,6 +26,9 @@ function EditContactModalForm({
   });
   const [errors, setErrors] = useState({});
   const token = cookies.get("token") || "";
+
+  // Apply blur effect when modal is open
+  useModalBlur(isOpen);
 
   useEffect(() => {
     if (contact) {

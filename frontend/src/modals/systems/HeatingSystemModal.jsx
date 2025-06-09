@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import $ from "jquery";
 import Cookies from "universal-cookie";
 import { useLanguage } from "../../context/LanguageContext";
+import { useModalBlur } from "../../hooks/useModals";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import InputEntryModal from "../shared/InputEntryModal";
@@ -29,9 +30,11 @@ function HeatingSystemModalForm({
     cop: "",
     distribution_network_state: "",
   });
-
   const [errors, setErrors] = useState({});
   const token = cookies.get("token") || "";
+
+  // Apply blur effect using hook
+  useModalBlur(open);
 
   useEffect(() => {
     if (editItem) {

@@ -3,6 +3,7 @@ import $ from "jquery";
 import Cookies from "universal-cookie";
 import "./../../assets/styles/forms.css";
 import { useLanguage } from "../../context/LanguageContext";
+import { useModalBlur } from "../../hooks/useModals";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import InputEntryModal from "../shared/InputEntryModal";
@@ -17,6 +18,9 @@ function AddContactModalForm({
   params,
 }) {
   console.log("AddContactModal - isOpen:", isOpen, "params:", params);
+
+  // Apply blur effect when modal is open
+  useModalBlur(isOpen);
 
   const [formData, setFormData] = useState({
     name: "",

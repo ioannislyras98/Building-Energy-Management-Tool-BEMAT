@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./../assets/styles/main.css";
 import "./../assets/styles/my_projects.css";
@@ -6,7 +6,7 @@ import { useLanguage } from "../context/LanguageContext";
 import ProjectsView from "../components/ProjectsView";
 import { Modals } from "../components/Modals";
 import { useProjects } from "../hooks/useProjects";
-import { useModals } from "../hooks/useModals";
+import { useModalBlur } from "../hooks/useModals";
 import english_text from "../languages/english.json";
 import greek_text from "../languages/greek.json";
 
@@ -18,7 +18,14 @@ export default function Home() {
 
   const { projects, handleProjectCreated } = useProjects();
 
-  const { isModalOpen, openProjectModal, closeProjectModal } = useModals();
+  // Individual modal state management
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  
+  // Apply blur effect for project modal
+  useModalBlur(isProjectModalOpen);
+
+  const openProjectModal = () => setIsProjectModalOpen(true);
+  const closeProjectModal = () => setIsProjectModalOpen(false);
 
   const handleProjectClick = (project) => {
     navigate(`/projects/${project.uuid}`);
@@ -36,7 +43,7 @@ export default function Home() {
       </div>
 
       <Modals
-        isModalOpen={isModalOpen}
+        isModalOpen={isProjectModalOpen}
         isBuildingModalOpen={false}
         isUpdateProjectModalOpen={false}
         closeProjectModal={closeProjectModal}

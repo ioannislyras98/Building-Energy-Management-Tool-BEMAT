@@ -3,6 +3,7 @@ import $ from "jquery";
 import Cookies from "universal-cookie";
 import InputEntry from "../../pages/auth/InputEntry";
 import { useLanguage } from "../../context/LanguageContext";
+import { useModalBlur } from "../../hooks/useModals";
 
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
@@ -19,6 +20,9 @@ function ProjectModalForm({
   isEditMode,
   params,
 }) {
+  // Apply blur effect when modal is open
+  useModalBlur(isOpen);
+  
   const [formData, setFormData] = useState(
     isEditMode && project
       ? {
@@ -165,7 +169,6 @@ export default function ProjectModal({
     language === "en" ? english_text.ProjectModal : greek_text.ProjectModal;
 
   return (
-    <div className="form-wrapper">
       <ProjectModalForm
         isOpen={isOpen}
         onClose={onClose}
@@ -175,6 +178,5 @@ export default function ProjectModal({
         isEditMode={isEditMode}
         params={params}
       />
-    </div>
   );
 }

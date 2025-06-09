@@ -96,7 +96,6 @@ export const Modals = ({
         />
       )}
 
-      {/* Debug: Log when AddContactModal should render */}
       {isAddContactModalOpen &&
         console.log(
           "Modals - Rendering AddContactModal with buildingUuid:",

@@ -41,7 +41,6 @@ const SystemsTabContent = ({
   const [loading, setLoading] = useState(true);
   const token = cookies.get("token") || "";
 
-  // Fetch systems data on component mount
   useEffect(() => {
     if (buildingUuid) {
       fetchSystemsData();
@@ -273,7 +272,6 @@ const SystemsTabContent = ({
   };
 
   const renderSystemDetails = (systemType, data) => {
-    // Get labels from translations with fallbacks
     const labels = translations.labels || {};
 
     switch (systemType) {
@@ -568,7 +566,6 @@ const SystemsTabContent = ({
         systems.solarCollectors
       )}
 
-      {/* Modals */}
       <BoilerDetailModal
         open={modals.boiler.open}
         onClose={() => handleCloseModal("boiler")}
@@ -614,7 +611,6 @@ const SystemsTabContent = ({
         editItem={modals.solarCollectors.editItem}
       />
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmationDialog
         open={deleteDialog.open}
         onClose={() =>

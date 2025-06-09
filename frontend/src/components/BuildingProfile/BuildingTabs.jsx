@@ -38,7 +38,6 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData }) => {
 
   return (
     <div className="w-full">
-      {/* Enhanced Tab Navigation */}
       <div className="relative bg-gray-100 rounded-xl p-1.5 mb-6 shadow-inner">
         <div className="flex relative gap-1">
           {tabs.map((tab, index) => (
@@ -61,7 +60,6 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData }) => {
         </div>
       </div>
 
-      {/* Tab Content with Enhanced Styling */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 min-h-[400px]">
           {activeTab === 0 && (

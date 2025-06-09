@@ -8,13 +8,22 @@ import { Modals } from "../components/Modals";
 import ConfirmationDialog from "../components/dialogs/ConfirmationDialog";
 import { useProjects } from "../hooks/useProjects";
 import { useBuildings } from "../hooks/useBuildings";
-import { useModals } from "../hooks/useModals";
+import { useModalBlur } from "../hooks/useModals";
 import english_text from "../languages/english.json";
 import greek_text from "../languages/greek.json";
 
 export default function ProjectView() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  
+  // Individual modal state management
+  const [isBuildingModalOpen, setIsBuildingModalOpen] = useState(false);
+  const [isUpdateProjectModalOpen, setIsUpdateProjectModalOpen] = useState(false);
+  
+  // Apply blur effects for each modal
+  useModalBlur(isBuildingModalOpen);
+  useModalBlur(isUpdateProjectModalOpen);
+  
   const { language } = useLanguage();
   const paramsText = language === "en" ? english_text.Home : greek_text.Home;
 
@@ -28,7 +37,6 @@ export default function ProjectView() {
     handleDeleteProject,
     updateBuildingCount,
   } = useProjects();
-
   const {
     buildings,
     fetchBuildings,
@@ -36,16 +44,14 @@ export default function ProjectView() {
     clearBuildings,
   } = useBuildings();
 
-  const {
-    isBuildingModalOpen,
-    isUpdateProjectModalOpen,
-    openBuildingModal,
-    closeBuildingModal,
-    openUpdateProjectModal,
-    closeUpdateProjectModal,
-  } = useModals();
-
-  // Find the selected project based on UUID from URL
+  // Modal control functions
+  const openBuildingModal = () => setIsBuildingModalOpen(true);
+  const closeBuildingModal = () => setIsBuildingModalOpen(false);
+  const openUpdateProjectModal = (project) => {
+    setSelectedProject(project);
+    setIsUpdateProjectModalOpen(true);
+  };
+  const closeUpdateProjectModal = () => setIsUpdateProjectModalOpen(false);
   useEffect(() => {
     if (projectUuid && projects.length > 0) {
       const projectFromUrl = projects.find((p) => p.uuid === projectUuid);
@@ -61,7 +67,6 @@ export default function ProjectView() {
     }
   }, [projectUuid, projects, navigate, projectsLoading]);
 
-  // Fetch buildings when project is selected
   useEffect(() => {
     if (selectedProject) {
       fetchBuildings(selectedProject.uuid);
@@ -110,9 +115,8 @@ export default function ProjectView() {
     }
   };
 
-  // Show loading or redirect if no project is selected
   if (!selectedProject && !projectsLoading) {
-    return null; // Will redirect to home via useEffect
+    return null; 
   }
 
   if (projectsLoading) {
@@ -132,10 +136,9 @@ export default function ProjectView() {
           buildings={buildings}
           selectedProject={selectedProject}
           params={paramsText}
-          onBackClick={backToProjects}
-          onUpdateProject={() => openUpdateProjectModal(selectedProject)}
+          onBackClick={backToProjects}          onUpdateProject={() => openUpdateProjectModal(selectedProject)}
           onDeleteProject={handleProjectDeleteClick}
-          onAddBuilding={() => openBuildingModal(selectedProject.uuid)}
+          onAddBuilding={() => openBuildingModal()}
         />
       </div>
 

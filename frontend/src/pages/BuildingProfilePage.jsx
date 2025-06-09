@@ -9,7 +9,7 @@ import BuildingContactInfo from "../components/BuildingProfile/BuildingContactIn
 import BuildingTabs from "../components/BuildingProfile/BuildingTabs";
 import Cookies from "universal-cookie";
 import $ from "jquery";
-import { useModals } from "../hooks/useModals";
+import { useModalBlur } from "../hooks/useModals";
 import { Modals } from "../components/Modals";
 
 const cookies = new Cookies(null, { path: "/" });
@@ -27,17 +27,23 @@ export default function BuildingProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const {
-    isEditBuildingModalOpen,
-    openEditBuildingModal,
-    closeEditBuildingModal,
-    isAddContactModalOpen,
-    openAddContactModal,
-    closeAddContactModal,
-    isEditContactModalOpen,
-    openEditContactModal,
-    closeEditContactModal,
-  } = useModals();
+  // Individual modal state management
+  const [isEditBuildingModalOpen, setIsEditBuildingModalOpen] = useState(false);
+  const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
+  const [isEditContactModalOpen, setIsEditContactModalOpen] = useState(false);
+  
+  // Apply blur effects for each modal
+  useModalBlur(isEditBuildingModalOpen);
+  useModalBlur(isAddContactModalOpen);
+  useModalBlur(isEditContactModalOpen);
+
+  // Modal control functions
+  const openEditBuildingModal = () => setIsEditBuildingModalOpen(true);
+  const closeEditBuildingModal = () => setIsEditBuildingModalOpen(false);
+  const openAddContactModal = () => setIsAddContactModalOpen(true);
+  const closeAddContactModal = () => setIsAddContactModalOpen(false);
+  const openEditContactModal = () => setIsEditContactModalOpen(true);
+  const closeEditContactModal = () => setIsEditContactModalOpen(false);
 
   const [currentContact, setCurrentContact] = useState(null);
 
@@ -127,7 +133,7 @@ export default function BuildingProfilePage() {
     }
 
     const settings = {
-      url: `http://127.0.0.1:8000/buildings/delete/${buildingToDelete.uuid}/`,
+      url: `http://127.0.0.1:8000/buildings/delete/${buildingToDelete.data.uuid}/`,
       method: "DELETE",
       timeout: 0,
       headers: {
@@ -138,7 +144,6 @@ export default function BuildingProfilePage() {
     $.ajax(settings)
       .done(function (response) {
         console.log("Building deleted successfully:", response);
-        // Navigate back to buildings list
         navigate(`/projects/${projectUuid}`);
       })
       .fail(function (error) {

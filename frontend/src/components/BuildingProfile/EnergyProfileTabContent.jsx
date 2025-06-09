@@ -378,57 +378,73 @@ const EnergyProfileTabContent = ({
   console.log("EnergyProfileTabContent: Rendering, open state is:", open);
 
   return (
-    <div>
-      <Typography
-        variant="h5"
-        gutterBottom
-        sx={{ fontWeight: "bold", color: "var(--color-primary)", mb: 2 }}>
-        {translations.title}
-      </Typography>
-      <Box display="flex" justifyContent="flex-start" gap={2} mb={2}>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{
-            backgroundColor: "var(--color-primary)",
-            color: "white",
-            textTransform: "none",
-          }}
-          startIcon={<AddIcon />}
-          onClick={handleOpen}>
-          {translations.addButton}
-        </Button>
-      </Box>
+    <div className="space-y-8 p-6 bg-gray-50 min-h-screen">
+      <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-primary">
+        <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+          <span className="bg-primary/10 p-2 rounded-full mr-3">
+            <svg
+              className="w-6 h-6 text-primary"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
+            </svg>
+          </span>
+          {translations.title || "Energy Profile"}
+        </h2>
+      </div>
 
-      <Card variant="outlined" sx={{ height: 400, width: "100%" }}>
-        <DataGrid
-          rows={consumptions}
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5, 10, 25]}
-          checkboxSelection
-          disableSelectionOnClick
-          loading={loading}
-          getRowId={(row) => row.id}
-          sx={{
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "#e0e0e0",
-              borderBottom: "2px solid #e0e0e0",
-            },
-            "& .MuiDataGrid-cell": {
-              borderBottom: "1px solid #e0e0e0",
-            },
-            "& .MuiDataGrid-row:hover": {
-              backgroundColor: "#e0e0e0",
-            },
-          }}
-          initialState={{
-            sorting: {
-              sortModel: [{ field: "start_date", sort: "desc" }],
-            },
-          }}
-        />
-      </Card>
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <Box display="flex" justifyContent="flex-start" gap={2} mb={2}>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{
+              backgroundColor: "var(--color-primary)",
+              color: "white",
+              textTransform: "none",
+            }}
+            startIcon={<AddIcon />}
+            onClick={handleOpen}>
+            {translations.addButton}
+          </Button>
+        </Box>
+
+        <Card variant="outlined" sx={{ height: 400, width: "100%" }}>
+          <DataGrid
+            rows={consumptions}
+            columns={columns}
+            pageSize={5}
+            rowsPerPageOptions={[5, 10, 25]}
+            checkboxSelection
+            disableSelectionOnClick
+            loading={loading}
+            getRowId={(row) => row.id}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#e0e0e0",
+                borderBottom: "2px solid #e0e0e0",
+              },
+              "& .MuiDataGrid-cell": {
+                borderBottom: "1px solid #e0e0e0",
+              },
+              "& .MuiDataGrid-row:hover": {
+                backgroundColor: "#e0e0e0",
+              },
+            }}
+            initialState={{
+              sorting: {
+                sortModel: [{ field: "start_date", sort: "desc" }],
+              },
+            }}
+          />
+        </Card>
+      </div>
 
       {/*
       

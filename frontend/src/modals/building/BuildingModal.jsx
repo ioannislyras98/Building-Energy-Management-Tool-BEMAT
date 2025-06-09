@@ -3,6 +3,7 @@ import $ from "jquery";
 import Cookies from "universal-cookie";
 import "./../../assets/styles/forms.css";
 import { useLanguage } from "../../context/LanguageContext";
+import { useModalBlur } from "../../hooks/useModals";
 
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
@@ -71,6 +72,9 @@ function BuildingModalForm({
   projectUuid,
   params,
 }) {
+
+  useModalBlur(isOpen);
+  
   const [formData, setFormData] = useState({
     name: "",
     usage: "",
@@ -758,14 +762,12 @@ export default function BuildingModal({
     language === "en" ? english_text.BuildingModal : greek_text.BuildingModal;
 
   return (
-    <div className="form-wrapper">
-      <BuildingModalForm
-        isOpen={isOpen}
-        onClose={onClose}
-        onBuildingCreated={onBuildingCreated}
-        projectUuid={projectUuid}
-        params={params}
-      />
-    </div>
+    <BuildingModalForm
+      isOpen={isOpen}
+      onClose={onClose}
+      onBuildingCreated={onBuildingCreated}
+      projectUuid={projectUuid}
+      params={params}
+    />
   );
 }

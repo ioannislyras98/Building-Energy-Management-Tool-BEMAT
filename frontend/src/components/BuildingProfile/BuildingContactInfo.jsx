@@ -185,6 +185,20 @@ export default function BuildingContactInfo({
           </div>
         )}
       </div>
+      
+      <ConfirmationDialog
+        open={deleteDialogOpen}
+        title={dialogText?.deleteConfirmTitle || "Delete Contact"}
+        message={
+          dialogText?.deleteConfirmMessage ||
+          `Are you sure you want to delete ${currentContact?.name || "this contact"}? This action cannot be undone.`
+        }
+        confirmText={dialogText?.deleteConfirmButton || "Delete"}
+        cancelText={dialogText?.cancelButton || "Cancel"}
+        onConfirm={confirmDelete}
+        onClose={cancelDelete}
+        confirmColor="error"
+      />
     </div>
   );
 }

@@ -57,6 +57,8 @@ def create_building(request):
             description=data.get("description"),
             year_built=data.get("year_built"),
             address=data.get("address", ""),
+            prefecture=data.get("prefecture", ""),  # Προσθήκη prefecture
+            energy_zone=data.get("energy_zone", ""),  # Προσθήκη energy_zone
             is_insulated=data.get("is_insulated", False),
             is_certified=data.get("is_certified", False),
             energy_class=data.get("energy_class", ""),
@@ -70,7 +72,7 @@ def create_building(request):
             altitude=data.get("altitude"),
             non_operating_days=data.get("non_operating_days", ""),
             operating_hours=data.get("operating_hours", ""),
-            occupants=data.get("occupants")
+            occupants=data.get("occupants"),
         )
         
         serializer = BuildingSerializer(building)
@@ -143,8 +145,10 @@ def get_building_detail(request, uuid):
             "operating_hours": building.operating_hours,
             "occupants": building.occupants,
             "date_created": building.date_created.strftime("%d-%m-%Y"),
-            "contacts": contacts_data
-        }
+            "contacts": contacts_data,
+            "prefecture": building.prefecture,
+            "energy_zone": building.energy_zone,
+            }
         
         return standard_success_response(building_data)
     
@@ -155,12 +159,12 @@ def get_building_detail(request, uuid):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def delete_building(request, building_uuid):
+def delete_building(request, uuid):
     try:
-        if not validate_uuid(building_uuid):
+        if not validate_uuid(uuid):
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
             
-        building = Building.objects.get(uuid=building_uuid)
+        building = Building.objects.get(uuid=uuid)
         
         if not check_user_ownership(request.user, building):
             return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
@@ -214,6 +218,8 @@ def update_building(request, uuid):
     Endpoint για την ενημέρωση ενός building.
     """
     try:
+        print(f"Received data for building update: {request.data}")  # Debug log
+        
         building = Building.objects.get(uuid=uuid)
         
         if building.project.user != request.user:
@@ -224,9 +230,11 @@ def update_building(request, uuid):
         
         serializer = BuildingSerializer(building, data=request.data, partial=True)
         if serializer.is_valid():
+            print(f"Serializer valid, saving building...")  # Debug log
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         
+        print(f"Serializer errors: {serializer.errors}")  # Debug log
         return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
     except Building.DoesNotExist:

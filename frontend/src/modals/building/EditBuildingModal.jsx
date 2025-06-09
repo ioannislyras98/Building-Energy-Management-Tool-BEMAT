@@ -3,6 +3,7 @@ import $ from "jquery";
 import Cookies from "universal-cookie";
 import "./../../assets/styles/forms.css";
 import { useLanguage } from "../../context/LanguageContext";
+import { useModalBlur } from "../../hooks/useModals";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import InputEntryModal from "../shared/InputEntryModal";
@@ -70,6 +71,9 @@ function EditBuildingModalForm({
   building,
   params,
 }) {
+  // Apply blur effect when modal is open
+  useModalBlur(isOpen);
+  
   const [formData, setFormData] = useState({
     name: "",
     usage: "",
@@ -97,6 +101,7 @@ function EditBuildingModalForm({
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const token = cookies.get("token") || "";
   useEffect(() => {
+    console.log("Building",building)
     if (building) {
       setFormData({
         name: building.data.name || "",
@@ -202,6 +207,8 @@ function EditBuildingModalForm({
         buildingData[field] = parseInt(buildingData[field], 10);
     });
 
+    console.log("Sending building data:", buildingData); // Debug log
+    
     $.ajax({
       url: `http://127.0.0.1:8000/buildings/update/${building.data.uuid}/`,
       method: "PUT",
@@ -215,6 +222,7 @@ function EditBuildingModalForm({
         onClose();
       },
       error: function (error) {
+        console.error("Error updating building:", error); // Debug log
         setShowValidationErrors(true);
         if (error.responseJSON && error.responseJSON.error) {
           setErrors(error.responseJSON.error);
@@ -267,7 +275,7 @@ function EditBuildingModalForm({
               <InputEntryModal
                 entry={params.usage}
                 id="usage"
-                type="select"
+                type="text"
                 value={formData.usage}
                 onChange={handleChange}
                 options={params.usageOptions || []}

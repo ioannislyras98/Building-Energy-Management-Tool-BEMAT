@@ -34,12 +34,12 @@ class CoolingSystem(models.Model):
         blank=True,
         help_text="Εισάγετε τη δυνατότητα πρόσβασης στη μονάδα ψύξης"
     )
-    heat_pump_type = models.CharField(max_length=255, verbose_name="Heat Pump Type")
-    power_kw = models.FloatField(verbose_name="Power (kW)")
-    construction_year = models.IntegerField(verbose_name="Year of Construction")
-    energy_efficiency_ratio = models.FloatField(verbose_name="Energy Efficiency Ratio (EER)")
-    maintenance_period = models.CharField(max_length=255, verbose_name="Maintenance Period")
-    operating_hours = models.CharField(max_length=255, verbose_name="Operating Hours")
+    heat_pump_type = models.CharField(max_length=255, verbose_name="Heat Pump Type", null=True, blank=True)
+    power_kw = models.FloatField(verbose_name="Power (kW)", null=True, blank=True)
+    construction_year = models.IntegerField(verbose_name="Year of Construction", null=True, blank=True)
+    energy_efficiency_ratio = models.FloatField(verbose_name="Energy Efficiency Ratio (EER)", null=True, blank=True)
+    maintenance_period = models.CharField(max_length=255, verbose_name="Maintenance Period", null=True, blank=True)
+    operating_hours = models.CharField(max_length=255, verbose_name="Operating Hours", null=True, blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
