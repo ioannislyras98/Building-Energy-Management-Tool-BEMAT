@@ -37,10 +37,16 @@ function ElectricalConsumptionModalForm({
   const [energyConsumptions, setEnergyConsumptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
   const { language } = useLanguage();
   const cookies = new Cookies(null, { path: "/" });
   const token = cookies.get("token");
   const isEditMode = !!editItem;
+
+  // Return null if modal is not open (like EnergyConsumptionModal)
+  if (!open) {
+    return null;
+  }
 
   // Consumption type choices
   const consumptionTypes = [
@@ -145,6 +151,7 @@ function ElectricalConsumptionModalForm({
   };
 
   const loadTypes = getLoadTypeOptions(formData.consumption_type);
+
   const resetForm = () => {
     setFormData({
       consumption_type: "",
@@ -158,6 +165,28 @@ function ElectricalConsumptionModalForm({
     });
     setErrors({});
   };
+
+  useEffect(() => {
+    if (open) {
+      fetchThermalZones();
+      fetchEnergyConsumptions();
+
+      if (editItem) {
+        setFormData({
+          consumption_type: editItem.consumption_type || "",
+          thermal_zone: editItem.thermal_zone || "",
+          period: editItem.period || "",
+          energy_consumption: editItem.energy_consumption || "",
+          load_type: editItem.load_type || "",
+          load_power: editItem.load_power || "",
+          quantity: editItem.quantity || "",
+          operating_hours_per_year: editItem.operating_hours_per_year || "",
+        });
+      } else {
+        resetForm();
+      }
+    }
+  }, [open, editItem]);
 
   const fetchThermalZones = () => {
     if (!buildingUuid || !token) return;
@@ -196,28 +225,6 @@ function ElectricalConsumptionModalForm({
       },
     });
   };
-
-  useEffect(() => {
-    if (open) {
-      fetchThermalZones();
-      fetchEnergyConsumptions();
-
-      if (editItem) {
-        setFormData({
-          consumption_type: editItem.consumption_type || "",
-          thermal_zone: editItem.thermal_zone || "",
-          period: editItem.period || "",
-          energy_consumption: editItem.energy_consumption || "",
-          load_type: editItem.load_type || "",
-          load_power: editItem.load_power || "",
-          quantity: editItem.quantity || "",
-          operating_hours_per_year: editItem.operating_hours_per_year || "",
-        });
-      } else {
-        resetForm();
-      }
-    }
-  }, [open, editItem]);
 
   const handleChange = (event) => {
     const { id, name, value } = event.target;
@@ -320,11 +327,10 @@ function ElectricalConsumptionModalForm({
   const modalTitle = isEditMode
     ? params.editTitle || "Επεξεργασία Ηλεκτρικής Κατανάλωσης"
     : params.createTitle || "Νέα Ηλεκτρική Κατανάλωση";
+
   const submitButtonText = isEditMode
     ? params.update || "Ενημέρωση"
     : params.create || "Δημιουργία";
-
-  if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -564,6 +570,7 @@ export default function ElectricalConsumptionModal({
     language === "en"
       ? english_text.ElectricalConsumptionModal || {}
       : greek_text.ElectricalConsumptionModal || {};
+
   return (
     <ElectricalConsumptionModalForm
       open={open}

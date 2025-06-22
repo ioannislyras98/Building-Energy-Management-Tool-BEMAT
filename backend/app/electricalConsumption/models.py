@@ -118,6 +118,12 @@ class ElectricalConsumption(models.Model):
     @property
     def annual_energy_consumption(self):
         """Calculate annual energy consumption in kWh"""
-        if self.load_power and self.quantity and self.operating_hours_per_year:
-            return float(self.load_power) * self.quantity * float(self.operating_hours_per_year)
-        return 0
+        try:
+            if self.load_power and self.quantity and self.operating_hours_per_year:
+                load_power = float(self.load_power) if self.load_power else 0
+                quantity = int(self.quantity) if self.quantity else 0
+                hours = float(self.operating_hours_per_year) if self.operating_hours_per_year else 0
+                return load_power * quantity * hours
+            return 0
+        except (ValueError, TypeError):
+            return 0
