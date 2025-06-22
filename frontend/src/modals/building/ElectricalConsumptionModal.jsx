@@ -21,11 +21,9 @@ function ElectricalConsumptionModalForm({
 }) {
   // Apply blur effect when modal is open
   useModalBlur(open);
-
   const [formData, setFormData] = useState({
     consumption_type: "",
     thermal_zone: "",
-    period: "",
     energy_consumption: "",
     load_type: "",
     load_power: "",
@@ -149,7 +147,6 @@ function ElectricalConsumptionModalForm({
     setFormData({
       consumption_type: "",
       thermal_zone: "",
-      period: "",
       energy_consumption: "",
       load_type: "",
       load_power: "",
@@ -201,12 +198,10 @@ function ElectricalConsumptionModalForm({
     if (open) {
       fetchThermalZones();
       fetchEnergyConsumptions();
-
       if (editItem) {
         setFormData({
           consumption_type: editItem.consumption_type || "",
           thermal_zone: editItem.thermal_zone || "",
-          period: editItem.period || "",
           energy_consumption: editItem.energy_consumption || "",
           load_type: editItem.load_type || "",
           load_power: editItem.load_power || "",
@@ -365,7 +360,6 @@ function ElectricalConsumptionModalForm({
                 </div>
               )}
             </div>
-
             {/* Thermal Zone */}
             <div className="mb-4">
               <label htmlFor="thermal_zone" className="label-name">
@@ -395,24 +389,12 @@ function ElectricalConsumptionModalForm({
                   {errors.thermal_zone}
                 </div>
               )}
-            </div>
-
-            {/* Period */}
-            <div className="mb-4">
-              <InputEntryModal
-                entry={params.period || "Περίοδος"}
-                id="period"
-                type="text"
-                value={formData.period}
-                onChange={handleChange}
-                error={errors.period}
-              />
-            </div>
-
-            {/* Energy Consumption */}
+            </div>{" "}
+            {/* Energy Consumption Reference */}
             <div className="mb-4">
               <label htmlFor="energy_consumption" className="label-name">
-                {params.energyConsumption || "Τύπος κατανάλωσης (Energy)"}
+                {params.energyConsumptionReference ||
+                  "Αναφορά Ενεργειακής Κατανάλωσης"}
               </label>
               <select
                 id="energy_consumption"
@@ -457,7 +439,6 @@ function ElectricalConsumptionModalForm({
                 </div>
               )}
             </div>
-
             {/* Load Type */}
             <div className="mb-4">
               <label htmlFor="load_type" className="label-name">
@@ -485,7 +466,6 @@ function ElectricalConsumptionModalForm({
                 </div>
               )}
             </div>
-
             {/* Load Power */}
             <div className="mb-4">
               <InputEntryModal
@@ -500,7 +480,6 @@ function ElectricalConsumptionModalForm({
                 required
               />
             </div>
-
             {/* Quantity */}
             <div className="mb-4">
               <InputEntryModal
@@ -514,7 +493,6 @@ function ElectricalConsumptionModalForm({
                 required
               />
             </div>
-
             {/* Operating Hours per Year */}
             <div className="mb-4">
               <InputEntryModal

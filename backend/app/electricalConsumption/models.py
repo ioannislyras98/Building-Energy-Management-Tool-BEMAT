@@ -57,8 +57,7 @@ class ElectricalConsumption(models.Model):
         verbose_name='Θερμική ζώνη'
     )
     period = models.CharField(
-        max_length=255,
-        blank=True,
+        max_length=255,        blank=True,
         null=True,
         verbose_name='Περίοδος'
     )
@@ -68,7 +67,7 @@ class ElectricalConsumption(models.Model):
         null=True,
         blank=True,
         related_name='electrical_consumptions',
-        verbose_name='Τύπος κατανάλωσης (Energy Consumption)'
+        verbose_name='Αναφορά Ενεργειακής Κατανάλωσης'
     )
     load_type = models.CharField(
         max_length=50,

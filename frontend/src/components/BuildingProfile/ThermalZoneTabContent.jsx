@@ -248,6 +248,7 @@ const ThermalZoneTabContent = ({
       </div>
 
       <div className="bg-white rounded-xl shadow-lg p-6">
+        {" "}
         <Box display="flex" justifyContent="flex-start" gap={2} mb={2}>
           <Button
             variant="contained"
@@ -256,13 +257,16 @@ const ThermalZoneTabContent = ({
               backgroundColor: "var(--color-primary)",
               color: "white",
               textTransform: "none",
+              "&:hover": {
+                backgroundColor: "var(--color-primary)",
+                opacity: 0.8,
+              },
             }}
             startIcon={<AddIcon />}
             onClick={handleOpen}>
             {translations.addButton || "Προσθήκη Θερμικής Ζώνης"}
           </Button>
         </Box>
-
         <Card variant="outlined" sx={{ height: 400, width: "100%" }}>
           <DataGrid
             rows={thermalZones}

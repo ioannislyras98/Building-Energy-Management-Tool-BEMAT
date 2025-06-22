@@ -54,7 +54,6 @@ const ElectricalConsumptionTabContent = ({
     };
     return types[type] || type;
   };
-
   const getLoadTypeDisplay = (type) => {
     const types = {
       continuous: translations.continuous || "Συνεχής",
@@ -63,15 +62,6 @@ const ElectricalConsumptionTabContent = ({
       base: translations.base || "Βάσης",
     };
     return types[type] || type;
-  };
-
-  const getConsumptionTypeColor = (type) => {
-    const colors = {
-      lighting: "warning",
-      air_conditioning: "info",
-      other_electrical_devices: "secondary",
-    };
-    return colors[type] || "default";
   };
 
   const handleOpen = () => {
@@ -150,9 +140,10 @@ const ElectricalConsumptionTabContent = ({
               consumption_type: item.consumption_type || "",
               consumption_type_display: item.consumption_type_display || "",
               thermal_zone: item.thermal_zone || "",
-              thermal_zone_usage: item.thermal_zone?.thermal_zone_usage || "",
-              period: item.period || "",
+              thermal_zone_usage:
+                item.thermal_zone_data?.thermal_zone_usage || "",
               energy_consumption: item.energy_consumption || "",
+              energy_consumption_data: item.energy_consumption_data || null,
               load_type: item.load_type || "",
               load_type_display: item.load_type_display || "",
               load_power: item.load_power || 0,
@@ -193,9 +184,16 @@ const ElectricalConsumptionTabContent = ({
       renderCell: (params) => (
         <Chip
           label={getConsumptionTypeDisplay(params.value)}
-          color={getConsumptionTypeColor(params.value)}
           size="small"
-          variant="outlined"
+          variant="filled"
+          sx={{
+            backgroundColor: "var(--color-primary)",
+            color: "white",
+            "&:hover": {
+              backgroundColor: "var(--color-primary)",
+              opacity: 0.8,
+            },
+          }}
         />
       ),
     },
@@ -222,7 +220,7 @@ const ElectricalConsumptionTabContent = ({
       renderCell: (params) => {
         const value = params.value || 0;
         return (
-          <span className="font-medium text-blue-600">
+          <span className="font-medium text-primary">
             {parseFloat(value).toFixed(2)} kW
           </span>
         );
@@ -247,8 +245,8 @@ const ElectricalConsumptionTabContent = ({
       renderCell: (params) => {
         const value = params.value || 0;
         return (
-          <span className="font-medium text-green-600">
-            {parseFloat(value).toFixed(0)} h
+          <span className="font-medium text-primary">
+            {parseFloat(value).toFixed(2)} h
           </span>
         );
       },
@@ -270,11 +268,44 @@ const ElectricalConsumptionTabContent = ({
       },
     },
     {
-      field: "period",
-      headerName: translations.columns?.period || "Περίοδος",
-      flex: 1,
-      minWidth: 120,
-      renderCell: (params) => <span>{params.value || "-"}</span>,
+      field: "energy_consumption",
+      headerName:
+        translations.columns?.energyConsumptionReference ||
+        "Αναφορά Ενεργειακής Κατανάλωσης",
+      flex: 1.2,
+      minWidth: 200,
+      renderCell: (params) => {
+        const energyData = params.row.energy_consumption_data;
+        if (energyData) {
+          const fromText = language === "en" ? "From" : "Από";
+          const toText = language === "en" ? "to" : "έως";
+          const energySourceDisplay =
+            language === "en"
+              ? {
+                  electricity: "Electricity",
+                  natural_gas: "Natural Gas",
+                  heating_oil: "Heating Oil",
+                  biomass: "Biomass",
+                }[energyData.energy_source] || energyData.energy_source
+              : {
+                  electricity: "Ηλεκτρική Ενέργεια",
+                  natural_gas: "Φυσικό Αέριο",
+                  heating_oil: "Πετρέλαιο Θέρμανσης",
+                  biomass: "Βιομάζα",
+                }[energyData.energy_source] || energyData.energy_source;
+
+          return (
+            <span className="text-sm">
+              {fromText} {energyData.start_date} {toText} {energyData.end_date}
+              <br />
+              <span className="text-xs text-gray-600">
+                ({energySourceDisplay})
+              </span>
+            </span>
+          );
+        }
+        return <span className="text-gray-400">-</span>;
+      },
     },
     {
       field: "actions",
@@ -319,6 +350,7 @@ const ElectricalConsumptionTabContent = ({
       </div>
 
       <div className="bg-white rounded-xl shadow-lg p-6">
+        {" "}
         <Box display="flex" justifyContent="flex-start" gap={2} mb={2}>
           <Button
             variant="contained"
@@ -327,13 +359,16 @@ const ElectricalConsumptionTabContent = ({
               backgroundColor: "var(--color-primary)",
               color: "white",
               textTransform: "none",
+              "&:hover": {
+                backgroundColor: "var(--color-primary)",
+                opacity: 0.8,
+              },
             }}
             startIcon={<AddIcon />}
             onClick={handleOpen}>
             {translations.addButton || "Προσθήκη Ηλεκτρικής Κατανάλωσης"}
           </Button>
         </Box>
-
         <Card variant="outlined" sx={{ height: 500, width: "100%" }}>
           <DataGrid
             rows={electricalConsumptions}
