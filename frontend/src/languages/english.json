@@ -265,7 +265,8 @@
     "tabs": {
       "energyProfile": "Energy Profile",
       "systems": "Systems",
-      "thermalZones": "Thermal Zones & Consumption",
+      "thermalZones": "Thermal Zones",
+      "electricalConsumptions": "Electrical Consumptions",
       "scenarios": "Scenarios",
       "results": "Results",
       "images": "Images",
@@ -408,7 +409,7 @@
           "storageCapacityLabel": "Hot Water Storage Capacity:"
         }
       },
-      "thermalZonesContent": "Content for Thermal Zones & Consumption...",
+      "thermalZonesContent": "Content for Thermal Zones...",
       "scenariosContent": "Content for Scenarios...",
       "resultsContent": "Content for Results...",
       "imagesContent": "Content for Images..."
@@ -475,5 +476,131 @@
     "deleteConfirmation": "Are you sure you want to delete this energy consumption?",
     "unitLabel": "Unit of measurement",
     "equivalentLabel": "Equivalent"
+  },
+  "ThermalZoneModal": {
+    "h2": "Add Thermal Zone",
+    "h2_edit": "Edit Thermal Zone",
+    "thermalZoneUsage": "Thermal zone usage",
+    "description": "Description",
+    "spaceCondition": "Space condition",
+    "floor": "Floor",
+    "totalThermalZoneArea": "Total thermal zone area (m²)",
+    "save": "Save",
+    "update": "Update",
+    "cancel": "Cancel",
+    "errorRequired": "This field is required",
+    "errorPositiveNumber": "Must be a positive number",
+    "errorGeneral": "Error creating thermal zone",
+    "errorUpdate": "Error updating thermal zone"
+  },
+  "ThermalZoneTabContent": {
+    "title": "Thermal Zones",
+    "addButton": "Add Thermal Zone",
+    "loading": "Loading...",
+    "errorAuth": "Authentication required",
+    "errorFetch": "Error fetching thermal zones",
+    "errorDelete": "Error deleting thermal zone",
+    "columns": {
+      "thermalZoneUsage": "Thermal zone usage",
+      "floor": "Floor",
+      "spaceCondition": "Space condition",
+      "totalArea": "Area (m²)",
+      "description": "Description",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "deleteDialog": {
+      "title": "Delete Thermal Zone",
+      "message": "Are you sure you want to delete this thermal zone? This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "ElectricalConsumptionModal": {
+    "createTitle": "New Electrical Consumption",
+    "editTitle": "Edit Electrical Consumption",
+    "consumptionType": "Consumption Type",
+    "thermalZone": "Thermal Zone",
+    "period": "Period",
+    "energyConsumption": "Energy Consumption Reference",
+    "loadType": "Load Type",
+    "loadPower": "Load Power (kW)",
+    "quantity": "Quantity",
+    "operatingHours": "Operating Hours per Year",
+    "lighting": "Lighting",
+    "air_conditioning": "Air Conditioning",
+    "other_electrical_devices": "Other Electrical Devices",
+    "continuous": "Continuous",
+    "intermittent": "Intermittent",
+    "peak": "Peak",
+    "base": "Base",
+    "none": "None",
+    "cancel": "Cancel",
+    "create": "Create",
+    "update": "Update",
+    "saving": "Saving...",
+    "submitError": "Error saving electrical consumption",
+    "led": "LED",
+    "fluorescent": "Fluorescent",
+    "incandescent": "Incandescent",
+    "energy_saving": "Energy Saving",
+    "halogen": "Halogen",
+    "split_unit": "Split Unit",
+    "central_ac": "Central AC",
+    "heat_pump": "Heat Pump",
+    "window_unit": "Window Unit",
+    "portable_ac": "Portable AC",
+    "evaporative_cooler": "Evaporative Cooler",
+    "refrigerator": "Refrigerator",
+    "washing_machine": "Washing Machine",
+    "dishwasher": "Dishwasher",
+    "oven": "Oven",
+    "microwave": "Microwave",
+    "water_heater": "Water Heater",
+    "computer": "Computer",
+    "television": "Television",
+    "dryer": "Dryer",
+    "iron": "Iron",
+    "vacuum_cleaner": "Vacuum Cleaner",
+    "other": "Other"
+  },
+  "ElectricalConsumptionTabContent": {
+    "title": "Electrical Consumptions",
+    "addButton": "Add Electrical Consumption",
+    "loading": "Loading...",
+    "errorAuth": "Authentication required",
+    "errorFetch": "Error fetching electrical consumptions",
+    "errorDelete": "Error deleting electrical consumption",
+    "lighting": "Lighting",
+    "air_conditioning": "Air Conditioning",
+    "other_electrical_devices": "Other Electrical Devices",
+    "continuous": "Continuous",
+    "intermittent": "Intermittent",
+    "peak": "Peak",
+    "base": "Base",
+    "columns": {
+      "consumptionType": "Consumption Type",
+      "thermalZone": "Thermal Zone",
+      "loadType": "Load Type",
+      "loadPower": "Power (kW)",
+      "quantity": "Quantity",
+      "operatingHours": "Hours/year",
+      "annualConsumption": "Annual Consumption",
+      "period": "Period",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "deleteDialog": {
+      "title": "Delete Electrical Consumption",
+      "message": "Are you sure you want to delete this electrical consumption? This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    }
   }
 }

@@ -61,6 +61,8 @@ INSTALLED_APPS = [
     "heatingSystem",
     "domesticHotWaterSystem",
     "solarCollectors",
+    "thermalZone",
+    "electricalConsumption",
 ]
 
 MIDDLEWARE = [

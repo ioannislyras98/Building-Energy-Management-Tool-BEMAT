@@ -10,6 +10,8 @@ function Show-Menu {
     Write-Host ""
     Write-Host "  1. Start BEMAT (Recommended)" -ForegroundColor Green
     Write-Host "  2. Stop All Services" -ForegroundColor Gray
+    Write-Host "  3. Clean Docker & Rebuild All" -ForegroundColor Magenta
+    Write-Host "  4. System Diagnostics" -ForegroundColor Blue
     Write-Host "  0. Exit" -ForegroundColor DarkGray
     Write-Host ""
     Write-Host "================================================" -ForegroundColor Cyan
@@ -97,54 +99,190 @@ function Stop-AllServices {
     Read-Host "Press Enter to return to menu"
 }
 
-function Test-Ports {
-    Write-Host "Checking ports..." -ForegroundColor Yellow
+function Invoke-CleanDockerAndRebuild {
+    Write-Host ""
+    Write-Host "Clean Docker & Rebuild All" -ForegroundColor Magenta
+    Write-Host ""
+    Write-Host "This will:" -ForegroundColor Yellow
+    Write-Host "- Stop all containers" -ForegroundColor White
+    Write-Host "- Remove all containers" -ForegroundColor White
+    Write-Host "- Remove all images" -ForegroundColor White
+    Write-Host "- Clean Docker cache and volumes" -ForegroundColor White
+    Write-Host "- Rebuild everything from scratch" -ForegroundColor White
+    Write-Host ""
+    $confirm = Read-Host "Are you sure? This will take several minutes (y/N)"
     
-    $ports = @(3000, 8000, 5432)
-    foreach ($port in $ports) {
-        $connections = netstat -ano | Select-String ":$port"
-        if ($connections) {
-            Write-Host "WARNING: Port $port is in use" -ForegroundColor Yellow
-            $kill = Read-Host "Kill process on port $port? (y/N)"
-            if ($kill -eq "y" -or $kill -eq "Y") {
-                $processes = netstat -ano | Select-String ":$port" | ForEach-Object { ($_ -split '\s+')[-1] }
-                foreach ($pid in $processes) {
-                    try {
-                        Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
-                    }
-                    catch {
-                        # Process might not exist anymore
-                    }
-                }
-            }
-        }
+    if ($confirm -ne "y" -and $confirm -ne "Y") {
+        Write-Host "Operation cancelled" -ForegroundColor Yellow
+        Read-Host "Press Enter to return to menu"
+        return
     }
-    Write-Host "OK: Ports checked" -ForegroundColor Green
+    
+    if (!(Test-Docker)) { return }
+    
+    Write-Host ""
+    Write-Host "Step 1: Stopping all containers..." -ForegroundColor Yellow
+    try {
+        docker stop $(docker ps -aq) 2>$null
+        Write-Host "All containers stopped" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "No containers to stop" -ForegroundColor Cyan
+    }
+    
+    Write-Host ""
+    Write-Host "Step 2: Removing all containers..." -ForegroundColor Yellow
+    try {
+        docker rm $(docker ps -aq) 2>$null
+        Write-Host "All containers removed" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "No containers to remove" -ForegroundColor Cyan
+    }
+    
+    Write-Host ""
+    Write-Host "Step 3: Removing all images..." -ForegroundColor Yellow
+    try {
+        docker rmi $(docker images -q) -f 2>$null
+        Write-Host "All images removed" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "No images to remove" -ForegroundColor Cyan
+    }
+    
+    Write-Host ""
+    Write-Host "Step 4: Cleaning Docker cache and volumes..." -ForegroundColor Yellow
+    try {
+        docker system prune -af --volumes 2>$null
+        Write-Host "Docker cache cleaned" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "Error cleaning cache" -ForegroundColor Red
+    }
+    
+    Write-Host ""
+    Write-Host "Step 5: Rebuilding everything from scratch..." -ForegroundColor Yellow
+    Write-Host "This will take several minutes..." -ForegroundColor Cyan
+    
+    # Build backend
+    Write-Host ""
+    Write-Host "Building backend..." -ForegroundColor Yellow
+    Set-Location "$PSScriptRoot\backend"
+    docker-compose up -d --build --force-recreate
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Backend built successfully" -ForegroundColor Green
+    } else {
+        Write-Host "Backend build failed" -ForegroundColor Red
+        Set-Location $PSScriptRoot
+        Read-Host "Press Enter to return to menu"
+        return
+    }
+    
+    # Build frontend
+    Write-Host ""
+    Write-Host "Building frontend..." -ForegroundColor Yellow
+    Set-Location "$PSScriptRoot\frontend"
+    docker-compose -f docker-compose.frontend.yml up -d --build --force-recreate
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Frontend built successfully" -ForegroundColor Green
+    } else {
+        Write-Host "Frontend build failed" -ForegroundColor Red
+        Set-Location $PSScriptRoot
+        Read-Host "Press Enter to return to menu"
+        return
+    }
+    
+    Set-Location $PSScriptRoot
+    
+    Write-Host ""
+    Write-Host "CLEAN REBUILD COMPLETED!" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Services are now running fresh:" -ForegroundColor Green
+    Write-Host "- Frontend: http://localhost:3000" -ForegroundColor White
+    Write-Host "- Backend:  http://localhost:8000" -ForegroundColor White
+    Write-Host ""
+    
+    $openBrowser = Read-Host "Open browsers? (Y/n)"
+    if ($openBrowser -ne "n" -and $openBrowser -ne "N") {
+        Open-Browsers
+    }
+    
+    Read-Host "Press Enter to return to menu"
 }
 
 function Show-Diagnostics {
+    Write-Host ""
+    Write-Host "System Diagnostics" -ForegroundColor Blue
+    Write-Host ""
     Write-Host "Running full system diagnostics..." -ForegroundColor Yellow
     Write-Host ""
+    
     Write-Host "System Information:" -ForegroundColor Yellow
     Write-Host "OS: $env:OS" -ForegroundColor White
     Write-Host "Processor: $env:PROCESSOR_ARCHITECTURE" -ForegroundColor White
     Write-Host ""
     
     # Check disk space
-    $drive = Get-WmiObject -Class Win32_LogicalDisk -Filter "DeviceID='C:'"
-    $freeGB = [math]::Round($drive.FreeSpace / 1GB, 2)
-    Write-Host "C: Drive Free Space: $freeGB GB" -ForegroundColor White
-    Write-Host ""
-    
-    Write-Host "Docker System Info:" -ForegroundColor Yellow
     try {
-        docker system df
+        $drive = Get-WmiObject -Class Win32_LogicalDisk -Filter "DeviceID='C:'"
+        $freeGB = [math]::Round($drive.FreeSpace / 1GB, 2)
+        $totalGB = [math]::Round($drive.Size / 1GB, 2)
+        Write-Host "C: Drive: $freeGB GB free of $totalGB GB total" -ForegroundColor White
     }
     catch {
-        Write-Host "ERROR: Cannot get Docker system info" -ForegroundColor Red
+        Write-Host "Could not get disk space information" -ForegroundColor Yellow
     }
     Write-Host ""
-    Write-Host "OK: Diagnostics complete" -ForegroundColor Green
+    
+    # Test Docker
+    Write-Host "Docker Status:" -ForegroundColor Yellow
+    if (Test-Docker) {
+        Write-Host "Docker is running" -ForegroundColor Green
+        
+        Write-Host ""
+        Write-Host "Docker Containers:" -ForegroundColor Yellow
+        try {
+            docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+        }
+        catch {
+            Write-Host "No containers running" -ForegroundColor Gray
+        }
+        
+        Write-Host ""
+        Write-Host "Docker Images:" -ForegroundColor Yellow
+        try {
+            docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
+        }
+        catch {
+            Write-Host "No images found" -ForegroundColor Gray
+        }
+        
+        Write-Host ""
+        Write-Host "Docker System Usage:" -ForegroundColor Yellow
+        try {
+            docker system df
+        }
+        catch {
+            Write-Host "Cannot get Docker system info" -ForegroundColor Red
+        }
+    } else {
+        Write-Host "Docker is not running" -ForegroundColor Red
+    }
+    
+    Write-Host ""
+    Write-Host "Port Status:" -ForegroundColor Yellow
+    $ports = @(3000, 8000, 5432)
+    foreach ($port in $ports) {
+        $connections = netstat -ano | Select-String ":$port"
+        if ($connections) {
+            Write-Host "Port $port : IN USE" -ForegroundColor Red
+        } else {
+            Write-Host "Port $port : FREE" -ForegroundColor Green
+        }
+    }
+    
+    Write-Host ""
+    Write-Host "Diagnostics complete" -ForegroundColor Green
 }
 
 # Main script loop
@@ -152,11 +290,16 @@ $Host.UI.RawUI.WindowTitle = "BEMAT Control Center"
 
 do {
     Show-Menu
-    $choice = Read-Host "Choose option (0-2)"
+    $choice = Read-Host "Choose option (0-4)"
     
     switch ($choice) {
         "1" { Start-BEMAT }
         "2" { Stop-AllServices }
+        "3" { Invoke-CleanDockerAndRebuild }
+        "4" { 
+            Show-Diagnostics
+            Read-Host "Press Enter to return to menu"
+        }
         "0" { 
             Write-Host ""
             Write-Host "Thanks for using BEMAT!" -ForegroundColor Green

@@ -260,7 +260,8 @@
     "tabs": {
       "energyProfile": "Ενεργειακό Προφίλ",
       "systems": "Συστήματα",
-      "thermalZones": "Θερμικές Ζώνες & Καταναλώσεις",
+      "thermalZones": "Θερμικές Ζώνες",
+      "electricalConsumptions": "Ηλεκτρικές Καταναλώσεις",
       "scenarios": "Σενάρια",
       "results": "Αποτελέσματα",
       "images": "Εικόνες",
@@ -403,7 +404,7 @@
           "storageCapacityLabel": "Χωρητικότητα Ζ.Ν.Χ.:"
         }
       },
-      "thermalZonesContent": "Περιεχόμενο για Θερμικές Ζώνες & Καταναλώσεις...",
+      "thermalZonesContent": "Περιεχόμενο για Θερμικές Ζώνες...",
       "scenariosContent": "Περιεχόμενο για Σενάρια...",
       "resultsContent": "Περιεχόμενο για Αποτελέσματα...",
       "imagesContent": "Περιεχόμενο για Εικόνες..."
@@ -475,5 +476,131 @@
     "deleteConfirmation": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτή την κατανάλωση ενέργειας?",
     "unitLabel": "Μονάδα μέτρησης",
     "equivalentLabel": "Ισοδύναμο"
+  },
+  "ThermalZoneModal": {
+    "h2": "Προσθήκη Θερμικής Ζώνης",
+    "h2_edit": "Επεξεργασία Θερμικής Ζώνης",
+    "thermalZoneUsage": "Χρήση θερμικής ζώνης",
+    "description": "Περιγραφή",
+    "spaceCondition": "Κατάσταση χώρου",
+    "floor": "Όροφος",
+    "totalThermalZoneArea": "Συνολική επιφάνεια θερμικής ζώνης (m²)",
+    "save": "Αποθήκευση",
+    "update": "Ενημέρωση",
+    "cancel": "Ακύρωση",
+    "errorRequired": "Το πεδίο είναι υποχρεωτικό",
+    "errorPositiveNumber": "Πρέπει να είναι θετικός αριθμός",
+    "errorGeneral": "Προέκυψε σφάλμα κατά τη δημιουργία της θερμικής ζώνης",
+    "errorUpdate": "Προέκυψε σφάλμα κατά την ενημέρωση της θερμικής ζώνης"
+  },
+  "ThermalZoneTabContent": {
+    "title": "Θερμικές Ζώνες",
+    "addButton": "Προσθήκη Θερμικής Ζώνης",
+    "loading": "Φόρτωση...",
+    "errorAuth": "Απαιτείται έλεγχος ταυτότητας",
+    "errorFetch": "Σφάλμα κατά την ανάκτηση των θερμικών ζωνών",
+    "errorDelete": "Σφάλμα κατά τη διαγραφή της θερμικής ζώνης",
+    "columns": {
+      "thermalZoneUsage": "Χρήση θερμικής ζώνης",
+      "floor": "Όροφος",
+      "spaceCondition": "Κατάσταση χώρου",
+      "totalArea": "Επιφάνεια (m²)",
+      "description": "Περιγραφή",
+      "actions": "Ενέργειες"
+    },
+    "actions": {
+      "edit": "Επεξεργασία",
+      "delete": "Διαγραφή"
+    },
+    "deleteDialog": {
+      "title": "Διαγραφή Θερμικής Ζώνης",
+      "message": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτή τη θερμική ζώνη; Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
+      "confirm": "Διαγραφή",
+      "cancel": "Ακύρωση"
+    }
+  },
+  "ElectricalConsumptionModal": {
+    "createTitle": "Νέα Ηλεκτρική Κατανάλωση",
+    "editTitle": "Επεξεργασία Ηλεκτρικής Κατανάλωσης",
+    "consumptionType": "Τύπος Κατανάλωσης",
+    "thermalZone": "Θερμική Ζώνη",
+    "period": "Περίοδος",
+    "energyConsumption": "Αναφορά Ενεργειακής Κατανάλωσης",
+    "loadType": "Τύπος Φορτίου",
+    "loadPower": "Ισχύς Φορτίου (kW)",
+    "quantity": "Πλήθος",
+    "operatingHours": "Ώρες Λειτουργίας ανά Έτος",
+    "lighting": "Φωτισμός",
+    "air_conditioning": "Κλιματισμός",
+    "other_electrical_devices": "Άλλες Ηλεκτρικές Συσκευές",
+    "continuous": "Συνεχής",
+    "intermittent": "Διαλείπων",
+    "peak": "Αιχμής",
+    "base": "Βάσης",
+    "none": "Κανένα",
+    "cancel": "Ακύρωση",
+    "create": "Δημιουργία",
+    "update": "Ενημέρωση",
+    "saving": "Αποθήκευση...",
+    "submitError": "Σφάλμα κατά την αποθήκευση της ηλεκτρικής κατανάλωσης",
+    "led": "LED",
+    "fluorescent": "Φθορισμού",
+    "incandescent": "Πυρακτώσεως",
+    "energy_saving": "Λαμπτήρας Οικονομίας",
+    "halogen": "Αλογόνου",
+    "split_unit": "Split Unit",
+    "central_ac": "Κεντρικό Κλιματισμό",
+    "heat_pump": "Αντλία Θερμότητας",
+    "window_unit": "Μονάδα Παραθύρου",
+    "portable_ac": "Φορητό Κλιματιστικό",
+    "evaporative_cooler": "Εξατμιστικό Ψύκτη",
+    "refrigerator": "Ψυγείο",
+    "washing_machine": "Πλυντήριο",
+    "dishwasher": "Πλυντήριο Πιάτων",
+    "oven": "Φούρνος",
+    "microwave": "Φούρνος Μικροκυμάτων",
+    "water_heater": "Θερμοσίφωνας",
+    "computer": "Υπολογιστής",
+    "television": "Τηλεόραση",
+    "dryer": "Στεγνωτήριο",
+    "iron": "Σίδερο",
+    "vacuum_cleaner": "Ηλεκτρική Σκούπα",
+    "other": "Άλλο"
+  },
+  "ElectricalConsumptionTabContent": {
+    "title": "Ηλεκτρικές Καταναλώσεις",
+    "addButton": "Προσθήκη Ηλεκτρικής Κατανάλωσης",
+    "loading": "Φόρτωση...",
+    "errorAuth": "Απαιτείται έλεγχος ταυτότητας",
+    "errorFetch": "Σφάλμα κατά την ανάκτηση των ηλεκτρικών καταναλώσεων",
+    "errorDelete": "Σφάλμα κατά τη διαγραφή της ηλεκτρικής κατανάλωσης",
+    "lighting": "Φωτισμός",
+    "air_conditioning": "Κλιματισμός",
+    "other_electrical_devices": "Άλλες Ηλεκτρικές Συσκευές",
+    "continuous": "Συνεχής",
+    "intermittent": "Διαλείπων",
+    "peak": "Αιχμής",
+    "base": "Βάσης",
+    "columns": {
+      "consumptionType": "Τύπος Κατανάλωσης",
+      "thermalZone": "Θερμική Ζώνη",
+      "loadType": "Τύπος Φορτίου",
+      "loadPower": "Ισχύς (kW)",
+      "quantity": "Πλήθος",
+      "operatingHours": "Ώρες/έτος",
+      "annualConsumption": "Ετήσια Κατανάλωση",
+      "period": "Περίοδος",
+      "actions": "Ενέργειες"
+    },
+    "actions": {
+      "edit": "Επεξεργασία",
+      "delete": "Διαγραφή"
+    },
+    "deleteDialog": {
+      "title": "Διαγραφή Ηλεκτρικής Κατανάλωσης",
+      "message": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτή την ηλεκτρική κατανάλωση; Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
+      "confirm": "Διαγραφή",
+      "cancel": "Ακύρωση"
+    }
   }
 }
