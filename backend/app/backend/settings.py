@@ -63,6 +63,8 @@ INSTALLED_APPS = [
     "solarCollectors",
     "thermalZone",
     "electricalConsumption",
+    "materials",
+    "thermalInsulation",
 ]
 
 MIDDLEWARE = [

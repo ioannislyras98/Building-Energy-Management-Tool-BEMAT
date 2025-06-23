@@ -3,6 +3,7 @@ import EnergyProfileTabContent from "./EnergyProfileTabContent";
 import SystemsTabContent from "./SystemsTabContent";
 import ThermalZoneTabContent from "./ThermalZoneTabContent";
 import ElectricalConsumptionTabContent from "./ElectricalConsumptionTabContent";
+import ScenariosTabContent from "./ScenariosTabContent";
 import { AdminContext, ResourceContextProvider, Resource } from "react-admin";
 import { defaultTheme } from "../../utils/theme";
 const dataProvider = {
@@ -111,26 +112,12 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData }) => {
           )}
           {activeTab === 4 && (
             <div className="animate-fadeIn">
-              <div className="flex items-center justify-center h-32 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                <div className="text-center">
-                  <svg
-                    className="mx-auto h-8 w-8 text-gray-400 mb-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                    />
-                  </svg>
-                  <p className="text-sm font-medium">
-                    {params?.scenariosContent ||
-                      "Scenarios content not available."}
-                  </p>
-                </div>
-              </div>
+              <ScenariosTabContent
+                buildingUuid={buildingUuid}
+                projectUuid={projectUuid}
+                buildingData={buildingData}
+                params={params}
+              />
             </div>
           )}
           {activeTab === 5 && (

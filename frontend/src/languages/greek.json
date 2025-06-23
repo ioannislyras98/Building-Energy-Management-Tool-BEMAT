@@ -261,6 +261,7 @@
       "energyProfile": "Ενεργειακό Προφίλ",
       "systems": "Συστήματα",
       "thermalZones": "Θερμικές Ζώνες",
+      "thermalInsulation": "Θερμομόνωση",
       "electricalConsumptions": "Ηλεκτρικές Καταναλώσεις",
       "scenarios": "Σενάρια",
       "results": "Αποτελέσματα",
@@ -519,6 +520,54 @@
       "cancel": "Ακύρωση"
     }
   },
+  "ThermalInsulationTabContent": {
+    "title": "Θερμομόνωση Εξωτερικής Τοιχοποιίας",
+    "addButton": "Προσθήκη Θερμομόνωσης",
+    "loading": "Φόρτωση...",
+    "errorAuth": "Απαιτείται έλεγχος ταυτότητας",
+    "errorFetch": "Σφάλμα κατά την ανάκτηση των θερμομονώσεων",
+    "errorDelete": "Σφάλμα κατά τη διαγραφή της θερμομόνωσης",
+    "columns": {
+      "uCoefficient": "Συντελεστής U (W/m²K)",
+      "oldMaterials": "Παλιά Υλικά",
+      "newMaterials": "Νέα Υλικά",
+      "totalCost": "Συνολικό Κόστος",
+      "annualBenefit": "Ετήσιο Όφελος",
+      "npv": "NPV",
+      "actions": "Ενέργειες"
+    },
+    "actions": {
+      "edit": "Επεξεργασία",
+      "delete": "Διαγραφή"
+    },
+    "deleteDialog": {
+      "title": "Διαγραφή Θερμομόνωσης",
+      "message": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτή τη θερμομόνωση; Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
+      "confirm": "Διαγραφή",
+      "cancel": "Ακύρωση"
+    }
+  },
+  "ThermalInsulationPage": {
+    "title": "Θερμομόνωση Εξωτερικής Τοιχοποιίας",
+    "editTitle": "Επεξεργασία Θερμομόνωσης",
+    "newTitle": "Νέα Θερμομόνωση",
+    "saveButton": "Αποθήκευση",
+    "backButton": "Επιστροφή",
+    "oldMaterialsTab": "Παλιά Υλικά",
+    "newMaterialsTab": "Νέα Υλικά",
+    "heatingCoolingTab": "Θέρμανση & Ψύξη",
+    "economicAnalysisTab": "Οικονομική Ανάλυση",
+    "addOldMaterial": "Προσθήκη Παλιού Υλικού",
+    "addNewMaterial": "Προσθήκη Νέου Υλικού",
+    "loading": "Φόρτωση...",
+    "saveSuccess": "Η θερμομόνωση αποθηκεύτηκε επιτυχώς!",
+    "updateSuccess": "Τα δεδομένα ενημερώθηκαν επιτυχώς!",
+    "materialSaveSuccess": "Το υλικό αποθηκεύτηκε επιτυχώς!",
+    "materialDeleteSuccess": "Το υλικό διαγράφηκε επιτυχώς!",
+    "errorSave": "Σφάλμα κατά την αποθήκευση",
+    "errorLoad": "Σφάλμα κατά τη φόρτωση δεδομένων",
+    "errorMaterialDelete": "Σφάλμα κατά τη διαγραφή του υλικού"
+  },
   "ElectricalConsumptionModal": {
     "createTitle": "Νέα Ηλεκτρική Κατανάλωση",
     "editTitle": "Επεξεργασία Ηλεκτρικής Κατανάλωσης",
@@ -602,5 +651,13 @@
       "confirm": "Διαγραφή",
       "cancel": "Ακύρωση"
     }
+  },
+  "ScenariosTabContent": {
+    "title": "Σενάρια Ενεργειακής Αναβάθμισης",
+    "subtitle": "Επιλέξτε ένα σενάριο για ανάλυση και βελτιστοποίηση",
+    "thermalInsulation": "Θερμομόνωση Εξωτερικής Τοιχοποιίας",
+    "thermalInsulationDesc": "Ανάλυση και βελτιστοποίηση θερμομόνωσης του κτιρίου",
+    "edit": "Επεξεργασία",
+    "backToScenarios": "← Επιστροφή στα Σενάρια"
   }
 }

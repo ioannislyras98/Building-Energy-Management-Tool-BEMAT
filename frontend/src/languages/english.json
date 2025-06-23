@@ -266,6 +266,7 @@
       "energyProfile": "Energy Profile",
       "systems": "Systems",
       "thermalZones": "Thermal Zones",
+      "thermalInsulation": "Thermal Insulation",
       "electricalConsumptions": "Electrical Consumptions",
       "scenarios": "Scenarios",
       "results": "Results",
@@ -519,6 +520,54 @@
       "cancel": "Cancel"
     }
   },
+  "ThermalInsulationTabContent": {
+    "title": "External Wall Thermal Insulation",
+    "addButton": "Add Thermal Insulation",
+    "loading": "Loading...",
+    "errorAuth": "Authentication required",
+    "errorFetch": "Error fetching thermal insulations",
+    "errorDelete": "Error deleting thermal insulation",
+    "columns": {
+      "uCoefficient": "U Coefficient (W/m²K)",
+      "oldMaterials": "Old Materials",
+      "newMaterials": "New Materials",
+      "totalCost": "Total Cost",
+      "annualBenefit": "Annual Benefit",
+      "npv": "NPV",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "deleteDialog": {
+      "title": "Delete Thermal Insulation",
+      "message": "Are you sure you want to delete this thermal insulation? This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "ThermalInsulationPage": {
+    "title": "External Wall Thermal Insulation",
+    "editTitle": "Edit Thermal Insulation",
+    "newTitle": "New Thermal Insulation",
+    "saveButton": "Save",
+    "backButton": "Back",
+    "oldMaterialsTab": "Old Materials",
+    "newMaterialsTab": "New Materials",
+    "heatingCoolingTab": "Heating & Cooling",
+    "economicAnalysisTab": "Economic Analysis",
+    "addOldMaterial": "Add Old Material",
+    "addNewMaterial": "Add New Material",
+    "loading": "Loading...",
+    "saveSuccess": "Thermal insulation saved successfully!",
+    "updateSuccess": "Data updated successfully!",
+    "materialSaveSuccess": "Material saved successfully!",
+    "materialDeleteSuccess": "Material deleted successfully!",
+    "errorSave": "Error saving data",
+    "errorLoad": "Error loading data",
+    "errorMaterialDelete": "Error deleting material"
+  },
   "ElectricalConsumptionModal": {
     "createTitle": "New Electrical Consumption",
     "editTitle": "Edit Electrical Consumption",
@@ -602,5 +651,13 @@
       "confirm": "Delete",
       "cancel": "Cancel"
     }
+  },
+  "ScenariosTabContent": {
+    "title": "Energy Upgrade Scenarios",
+    "subtitle": "Select a scenario for analysis and optimization",
+    "thermalInsulation": "External Wall Thermal Insulation",
+    "thermalInsulationDesc": "Analysis and optimization of building thermal insulation",
+    "edit": "Edit",
+    "backToScenarios": "← Back to Scenarios"
   }
 }

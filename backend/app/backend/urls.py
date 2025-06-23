@@ -15,4 +15,6 @@ urlpatterns = [
     path('solar_collectors/', include('solarCollectors.urls')),
     path('thermal_zones/', include('thermalZone.urls')),
     path('electrical_consumptions/', include('electricalConsumption.urls')),
+    path('materials/', include('materials.urls')),
+    path('thermal_insulations/', include('thermalInsulation.urls')),
 ]
