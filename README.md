@@ -251,5 +251,6 @@ BEMAT/
 ## Πληροφορίες
 
 1. [Κλιματικές Ζώνες](https://www.monodomiki.gr/ell/blog-details/klimatikes-zones-kai-oria-syntelesti-thermoperatotitas)
-2. [ΟΔΗΓΟΣ ΘΕΡΜΟΜΟΝΩΣΗΣ ΚΤΙΡΙΩΝ Επιφανειακες αντιστασεις](https://www.kalivis.gr/uploads/20161019article_H_Shmasia_Tis_Thermomonosis_Ton_Ktirion/ODIGOS%20THERMOMONOSIS%20KTIRION_DEC2007.pdf)
-3. [Υλικα και συντελεστης θερμικης αγωγιμοτητας λ](https://www.wands.gr/el/faq/oikonomia-apo-tin-thermomonosi)
+2. [ΟΔΗΓΟΣ ΘΕΡΜΟΜΟΝΩΣΗΣ ΚΤΙΡΙΩΝ (Επιφανειακες αντιστασεις σελ 30 pdf 16)](https://www.kalivis.gr/uploads/20161019article_H_Shmasia_Tis_Thermomonosis_Ton_Ktirion/ODIGOS%20THERMOMONOSIS%20KTIRION_DEC2007.pdf)
+3. [Υλικα και συντελεστης θερμικης αγωγιμοτητας λ(Συγκριτικός Πίνακας Συντελεστών Διαφορετικών Δομικών Υλικών
+)](https://www.wands.gr/el/faq/oikonomia-apo-tin-thermomonosi)
