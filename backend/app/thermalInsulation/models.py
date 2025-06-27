@@ -114,8 +114,7 @@ class ExternalWallThermalInsulation(models.Model):
         """
         R_si = 0.13  # Internal surface resistance
         R_se = 0.04  # External surface resistance
-        
-        # Calculate sum of all NEW material resistances only
+          # Calculate sum of all NEW material resistances only
         materials_r_sum = 0
         for material_layer in self.material_layers.filter(material_type='new'):
             if material_layer.material.thermal_conductivity > 0:
@@ -143,14 +142,80 @@ class ExternalWallThermalInsulation(models.Model):
         
         return npv
 
+    def calculate_annual_benefit(self):
+        """
+        Calculate annual benefit from energy savings
+        Formula: (difference in winter hourly losses × cooling hours per year + 
+                  difference in summer hourly losses × heating hours per year) × electricity cost per kWh
+        """
+        if not all([self.heating_hours_per_year, self.cooling_hours_per_year, self.project.cost_per_kwh_electricity]):
+            return 0
+        
+        # Calculate hourly losses for old and new materials
+        old_materials = self.material_layers.filter(material_type='old')
+        new_materials = self.material_layers.filter(material_type='new')
+        
+        # Calculate winter hourly losses (kW) for both old and new materials
+        winter_losses_old = self._calculate_hourly_losses(old_materials, 72)  # 72°C difference for winter
+        winter_losses_new = self._calculate_hourly_losses(new_materials, 72)
+        
+        # Calculate summer hourly losses (kW) for both old and new materials  
+        summer_losses_old = self._calculate_hourly_losses(old_materials, 12.5)  # 12.5°C difference for summer
+        summer_losses_new = self._calculate_hourly_losses(new_materials, 12.5)
+        
+        # Calculate differences (savings)
+        winter_losses_difference = winter_losses_old - winter_losses_new
+        summer_losses_difference = summer_losses_old - summer_losses_new
+        
+        # Calculate annual energy savings (kWh/year)
+        annual_energy_savings = (
+            winter_losses_difference * float(self.cooling_hours_per_year) +
+            summer_losses_difference * float(self.heating_hours_per_year)
+        )
+        
+        # Calculate annual benefit (€/year)
+        electricity_cost = float(self.project.cost_per_kwh_electricity)
+        annual_benefit = annual_energy_savings * electricity_cost
+        
+        return max(0, annual_benefit)  # Ensure non-negative value
+
+    def _calculate_hourly_losses(self, materials, temperature_difference):
+        """
+        Helper method to calculate hourly losses for a set of materials
+        Formula: U × A × ΔT / 1000 (kW)
+        """
+        if not materials.exists():
+            return 0
+        
+        # Calculate U coefficient for these materials
+        R_si = 0.13  # Internal surface resistance
+        R_se = 0.04  # External surface resistance
+        
+        materials_r_sum = 0
+        total_area = 0
+        
+        for material_layer in materials:
+            if material_layer.material.thermal_conductivity > 0:
+                r_material = material_layer.thickness / material_layer.material.thermal_conductivity
+                materials_r_sum += r_material
+            total_area += material_layer.surface_area
+        
+        r_total = R_si + R_se + materials_r_sum
+        u_coefficient = 1 / r_total if r_total > 0 else 0
+          # Calculate hourly losses: U × A × ΔT / 1000 (kW)
+        hourly_losses = (u_coefficient * total_area * temperature_difference) / 1000
+        return hourly_losses
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # Recalculate U coefficient and NPV after saving
+        # Recalculate U coefficient, annual benefit, and NPV after saving
         self.u_coefficient = self.calculate_u_coefficient()
+        self.annual_benefit = self.calculate_annual_benefit()
         self.net_present_value = self.calculate_npv()
         if self.pk:  # Only update if object exists (avoid recursion)
             ExternalWallThermalInsulation.objects.filter(pk=self.pk).update(
                 u_coefficient=self.u_coefficient,
+                annual_benefit=self.annual_benefit,
                 net_present_value=self.net_present_value
             )
 

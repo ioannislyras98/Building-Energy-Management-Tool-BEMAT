@@ -138,3 +138,24 @@ textarea:focus {
 .close-modal {
   @apply mr-2 px-4 py-2 bg-transparent rounded-lg text-primary border-2 border-primary hover:text-primary-bold hover:border-primary-bold transition-all duration-300 ease-in-out cursor-pointer;
 }
+
+.error-input {
+    border-color: #dc2626 !important;
+    border-width: 2px !important;
+    background-color: #fef2f2 !important;
+}
+
+.error-input:focus {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2) !important;
+    outline: none !important;
+}
+
+.label-name-required {
+    @apply text-red-600 font-basic text-sm font-bold ml-4;
+}
+
+.label-name-required::after {
+    content: " *";
+    color: #dc2626;
+}

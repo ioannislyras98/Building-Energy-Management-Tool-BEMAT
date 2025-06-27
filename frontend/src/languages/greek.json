@@ -16,6 +16,10 @@
     "confirm_password": "Κωδικός πρόσβασης (επανάληψη)",
     "save": "Εγγραφή",
     "passwords_not_match": "Οι κωδικοί πρόσβασης δεν ταιριάζουν.",
+    "autoCalculated": "Αυτόματος Υπολογισμός",
+    "autoCalculatedCost": "Υπολογίζεται αυτόματα από το άθροισμα των κοστών των νέων υλικών",
+    "autoCalculatedBenefit": "Υπολογίζεται αυτόματα βάσει διαφοράς απωλειών, ωρών λειτουργίας και κόστους ρεύματος",
+    "materialManagement": "Διαχείριση παλιών και νέων υλικών θερμομόνωσης",
     "errorMessage": "Υπάρχει ήδη χρήστης με αυτό το email."
   },
   "LogIn": {
@@ -566,7 +570,55 @@
     "materialDeleteSuccess": "Το υλικό διαγράφηκε επιτυχώς!",
     "errorSave": "Σφάλμα κατά την αποθήκευση",
     "errorLoad": "Σφάλμα κατά τη φόρτωση δεδομένων",
-    "errorMaterialDelete": "Σφάλμα κατά τη διαγραφή του υλικού"
+    "errorMaterialDelete": "Σφάλμα κατά τη διαγραφή του υλικού",
+    "buildingLabel": "Κτίριο:",
+    "uCoefficientLabel": "Συντελεστής U:",
+    "autoCalculated": "Αυτόματος υπολογισμός",
+    "autoCalculatedCost": "Υπολογίζεται αυτόματα από το άθροισμα των κοστών των νέων υλικών",
+    "autoCalculatedBenefit": "Υπολογίζεται αυτόματα βάσει διαφοράς απωλειών, ωρών λειτουργίας και κόστους ρεύματος",
+    "materialManagement": "Διαχείριση παλιών και νέων υλικών θερμομόνωσης",
+    "columns": {
+      "material": "Υλικό",
+      "surfaceType": "Τύπος Επιφάνειας",
+      "thickness": "Πάχος (m)",
+      "surfaceArea": "Επιφάνεια (m²)",
+      "cost": "Κόστος (€)",
+      "thermalResistance": "R (m²K/W)",
+      "actions": "Ενέργειες"
+    },
+    "fields": {
+      "winterHourlyLosses": "Ωριαίες απώλειες χειμερινών μηνών (kW)",
+      "summerHourlyLosses": "Ωριαίες απώλειες θερινών μηνών (kW)",
+      "heatingHoursPerYear": "Ώρες θέρμανσης ανά έτος",
+      "coolingHoursPerYear": "Ώρες ψύξης ανά έτος",
+      "totalCost": "Συνολικό κόστος (€)",
+      "annualBenefit": "Ετήσιο όφελος (€)",
+      "timePeriodYears": "Χρονικό διάστημα (έτη)",
+      "annualOperatingCosts": "Λειτουργικά έξοδα ανά έτος (€)",
+      "discountRate": "Επιτόκιο αναγωγής (%)",
+      "netPresentValue": "Καθαρή παρούσα αξία (€)"
+    },
+    "tooltips": {
+      "edit": "Επεξεργασία",
+      "delete": "Διαγραφή"
+    },
+    "sections": {
+      "heatingCoolingParams": "Παράμετροι Θέρμανσης και Ψύξης",
+      "economicAnalysis": "Οικονομική Ανάλυση"
+    },
+    "confirmDelete": {
+      "title": "Διαγραφή Υλικού",
+      "message": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό το υλικό;",
+      "confirm": "Διαγραφή",
+      "cancel": "Ακύρωση"
+    },
+    "calculations": {
+      "oldMaterials": "Θερμικοί Υπολογισμοί (Παλιά Υλικά)",
+      "newMaterials": "Θερμικοί Υπολογισμοί (Νέα Υλικά)",
+      "uCoefficient": "Συντελεστής Θερμοπερατότητας (U)",
+      "winterLosses": "Χειμερινές Ωριαίες Απώλειες",
+      "summerLosses": "Καλοκαιρινές Ωριαίες Απώλειες"
+    }
   },
   "ElectricalConsumptionModal": {
     "createTitle": "Νέα Ηλεκτρική Κατανάλωση",

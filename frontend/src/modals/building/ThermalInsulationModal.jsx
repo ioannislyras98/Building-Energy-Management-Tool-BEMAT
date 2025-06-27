@@ -421,9 +421,6 @@ const ThermalInsulationModal = ({
           <TabPanel value={tabValue} index={0}>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <Typography variant="h6" className="text-gray-800">
-                  Παλιά Υλικά Τοιχοποιίας
-                </Typography>{" "}
                 <Button
                   variant="outlined"
                   size="small"
@@ -504,9 +501,6 @@ const ThermalInsulationModal = ({
           <TabPanel value={tabValue} index={1}>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <Typography variant="h6" className="text-gray-800">
-                  Νέα Υλικά Θερμομόνωσης
-                </Typography>{" "}
                 <Button
                   variant="outlined"
                   size="small"

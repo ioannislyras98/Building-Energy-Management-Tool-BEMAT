@@ -36,23 +36,25 @@ class ExternalWallThermalInsulationSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.username', read_only=True)
     building_name = serializers.CharField(source='building.name', read_only=True)
     project_name = serializers.CharField(source='project.name', read_only=True)
+    project_electricity_cost = serializers.DecimalField(source='project.cost_per_kwh_electricity', read_only=True, max_digits=6, decimal_places=3)
     total_materials_cost = serializers.SerializerMethodField()
     total_surface_area = serializers.SerializerMethodField()
+    calculated_annual_benefit = serializers.SerializerMethodField()
     
     class Meta:
         model = ExternalWallThermalInsulation
         fields = [
             'uuid', 'user', 'user_name', 'building', 'building_name', 
-            'project', 'project_name', 'u_coefficient', 'winter_hourly_losses',
+            'project', 'project_name', 'project_electricity_cost', 'u_coefficient', 'winter_hourly_losses',
             'summer_hourly_losses', 'heating_hours_per_year', 'cooling_hours_per_year',
-            'total_cost', 'annual_benefit', 'time_period_years', 'annual_operating_costs',
+            'total_cost', 'annual_benefit', 'calculated_annual_benefit', 'time_period_years', 'annual_operating_costs',
             'discount_rate', 'net_present_value', 'material_layers', 'old_materials',
             'new_materials', 'total_materials_cost', 'total_surface_area',
             'created_at', 'updated_at'
         ]
         read_only_fields = [
             'uuid', 'created_at', 'updated_at', 'u_coefficient', 
-            'net_present_value', 'total_materials_cost', 'total_surface_area'
+            'net_present_value', 'total_materials_cost', 'total_surface_area', 'annual_benefit'
         ]
 
     def get_old_materials(self, obj):
@@ -68,6 +70,9 @@ class ExternalWallThermalInsulationSerializer(serializers.ModelSerializer):
 
     def get_total_surface_area(self, obj):
         return sum(material.surface_area for material in obj.material_layers.all())
+
+    def get_calculated_annual_benefit(self, obj):
+        return obj.calculate_annual_benefit()
 
     def create(self, validated_data):
         # Set user to current user

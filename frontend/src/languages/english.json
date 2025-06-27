@@ -566,7 +566,55 @@
     "materialDeleteSuccess": "Material deleted successfully!",
     "errorSave": "Error saving data",
     "errorLoad": "Error loading data",
-    "errorMaterialDelete": "Error deleting material"
+    "errorMaterialDelete": "Error deleting material",
+    "buildingLabel": "Building:",
+    "uCoefficientLabel": "U Coefficient:",
+    "autoCalculated": "Auto-calculated",
+    "autoCalculatedCost": "Automatically calculated from the sum of new materials costs",
+    "autoCalculatedBenefit": "Automatically calculated based on loss differences, operating hours and electricity cost",
+    "materialManagement": "Old and new thermal insulation materials management",
+    "columns": {
+      "material": "Material",
+      "surfaceType": "Surface Type",
+      "thickness": "Thickness (m)",
+      "surfaceArea": "Surface Area (m²)",
+      "cost": "Cost (€)",
+      "thermalResistance": "R (m²K/W)",
+      "actions": "Actions"
+    },
+    "fields": {
+      "winterHourlyLosses": "Winter hourly losses (kW)",
+      "summerHourlyLosses": "Summer hourly losses (kW)",
+      "heatingHoursPerYear": "Heating hours per year",
+      "coolingHoursPerYear": "Cooling hours per year",
+      "totalCost": "Total cost (€)",
+      "annualBenefit": "Annual benefit (€)",
+      "timePeriodYears": "Time period (years)",
+      "annualOperatingCosts": "Annual operating costs (€)",
+      "discountRate": "Discount rate (%)",
+      "netPresentValue": "Net present value (€)"
+    },
+    "tooltips": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "sections": {
+      "heatingCoolingParams": "Heating and Cooling Parameters",
+      "economicAnalysis": "Economic Analysis"
+    },
+    "confirmDelete": {
+      "title": "Delete Material",
+      "message": "Are you sure you want to delete this material?",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "calculations": {
+      "oldMaterials": "Thermal Calculations (Old Materials)",
+      "newMaterials": "Thermal Calculations (New Materials)",
+      "uCoefficient": "Thermal Transmittance Coefficient (U)",
+      "winterLosses": "Winter Hourly Losses",
+      "summerLosses": "Summer Hourly Losses"
+    }
   },
   "ElectricalConsumptionModal": {
     "createTitle": "New Electrical Consumption",
