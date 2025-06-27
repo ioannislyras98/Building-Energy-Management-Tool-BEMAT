@@ -297,7 +297,3 @@ NPV = -Initial_Investment + Σ(Annual_Net_Benefit / (1 + discount_rate)^year)
    - Frontend calculations for immediate feedback
    - Backend calculations for data persistence
    - Calculations only triggered when necessary data is available
-
----
-
-*This documentation covers all calculation types used in the Thermal Insulation System as of the current implementation. For technical implementation details, refer to the source code in the respective backend models and frontend components.*
