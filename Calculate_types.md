@@ -1,338 +1,334 @@
-# Thermal Insulation System - Calculation Types Documentation
+# Σύστημα Θερμομόνωσης - Τεκμηρίωση Τύπων Υπολογισμών
 
-This document provides comprehensive documentation of all calculations used in the Thermal Insulation System for External Walls in the Building Energy Management Tool (BEMAT).
+Αυτό το έγγραφο παρέχει εκτενή τεκμηρίωση όλων των υπολογισμών που χρησιμοποιούνται στο Σύστημα Θερμομόνωσης για Εξωτερικούς Τοίχους στο Εργαλείο Διαχείρισης Ενέργειας Κτιρίων (BEMAT).
 
-## Table of Contents
+## Πίνακας Περιεχομένων
 
-1. [Thermal Resistance Calculations](#thermal-resistance-calculations)
-2. [U-Coefficient (Thermal Transmittance) Calculations](#u-coefficient-thermal-transmittance-calculations)
-3. [Heat Loss Calculations](#heat-loss-calculations)
-4. [Surface Area Calculations](#surface-area-calculations)
-5. [Cost Calculations](#cost-calculations)
-6. [Annual Energy Benefit Calculations](#annual-energy-benefit-calculations)
-7. [Economic Analysis Calculations](#economic-analysis-calculations)
-8. [Constants and Parameters](#constants-and-parameters)
-9. [Notes and Best Practices](#notes-and-best-practices)
+1. [Υπολογισμοί Θερμικής Αντίστασης](#υπολογισμοί-θερμικής-αντίστασης)
+2. [Υπολογισμοί Συντελεστή U (Θερμικής Διαπερατότητας)](#υπολογισμοί-συντελεστή-u-θερμικής-διαπερατότητας)
+3. [Υπολογισμοί Θερμικών Απωλειών](#υπολογισμοί-θερμικών-απωλειών)
+4. [Υπολογισμοί Επιφάνειας](#υπολογισμοί-επιφάνειας)
+5. [Υπολογισμοί Κόστους](#υπολογισμοί-κόστους)
+6. [Υπολογισμοί Ετήσιου Ενεργειακού Οφέλους](#υπολογισμοί-ετήσιου-ενεργειακού-οφέλους)
+7. [Υπολογισμοί Οικονομικής Ανάλυσης](#υπολογισμοί-οικονομικής-ανάλυσης)
+8. [Σταθερές και Παράμετροι](#σταθερές-και-παράμετροι)
+9. [Σημειώσεις και Βέλτιστες Πρακτικές](#σημειώσεις-και-βέλτιστες-πρακτικές)
 
 ---
 
-## Thermal Resistance Calculations
+## Υπολογισμοί Θερμικής Αντίστασης
 
-### Individual Material Thermal Resistance (R)
+### Θερμική Αντίσταση Μεμονωμένου Υλικού (R)
 
-**Formula:**
+**Τύπος:**
 
 ```
 R = d / λ
 ```
 
-**Where:**
+**Όπου:**
 
-- `R` = Thermal resistance (m²K/W)
-- `d` = Material thickness (m)
-- `λ` = Thermal conductivity of material (W/mK)
+- `R` = Θερμική αντίσταση (m²K/W)
+- `d` = Πάχος υλικού (m)
+- `λ` = Θερμική αγωγιμότητα υλικού (W/mK)
 
-**Implementation:**
+**Υλοποίηση:**
 
-- **Backend:** Auto-calculated property in thermal insulation models
-- **Frontend:** Real-time calculation during data entry
+- **Backend:** Αυτόματα υπολογιζόμενη ιδιότητα στα μοντέλα θερμομόνωσης
+- **Frontend:** Υπολογισμός σε πραγματικό χρόνο κατά την εισαγωγή δεδομένων
 
-### Total Thermal Resistance (R_total)
+### Συνολική Θερμική Αντίσταση (R_total)
 
-**Formula:**
+**Τύπος:**
 
 ```
 R_total = R_si + R_se + ΣR_materials
 ```
 
-**Where:**
+**Όπου:**
 
-- `R_si` = Internal surface resistance = 0.13 m²K/W
-- `R_se` = External surface resistance = 0.04 m²K/W
-- `ΣR_materials` = Sum of thermal resistances of all material layers
+- `R_si` = Εσωτερική επιφανειακή αντίσταση = 0.13 m²K/W
+- `R_se` = Εξωτερική επιφανειακή αντίσταση = 0.04 m²K/W
+- `ΣR_materials` = Άθροισμα θερμικών αντιστάσεων όλων των στρωμάτων υλικών
 
-**Implementation:**
+**Υλοποίηση:**
 
-- **Backend:** Used in `calculate_u_coefficient()` method
-- **Frontend:** `calculateRTotal(materials)` function
+- **Backend:** Χρησιμοποιείται στη μέθοδο `calculate_u_coefficient()`
+- **Frontend:** Συνάρτηση `calculateRTotal(materials)`
 
 ---
 
-## U-Coefficient (Thermal Transmittance) Calculations
+## Υπολογισμοί Συντελεστή U (Θερμικής Διαπερατότητας)
 
-### U-Coefficient Calculation
+### Υπολογισμός Συντελεστή U
 
-**Formula:**
+**Τύπος:**
 
 ```
 U = 1 / R_total
 ```
 
-**Where:**
+**Όπου:**
 
-- `U` = Thermal transmittance coefficient (W/m²K)
-- `R_total` = Total thermal resistance (m²K/W)
+- `U` = Συντελεστής θερμικής διαπερατότητας (W/m²K)
+- `R_total` = Συνολική θερμική αντίσταση (m²K/W)
 
-**Important Notes:**
+**Σημαντικές Σημειώσεις:**
 
-- U-coefficient is calculated **ONLY for NEW materials** in the backend
-- Lower U-values indicate better insulation performance
-- If R_total ≤ 0, U-coefficient defaults to 0
+- Ο συντελεστής U υπολογίζεται **ΜΟΝΟ για ΝΕΑ υλικά** στο backend
+- Χαμηλότερες τιμές U δείχνουν καλύτερη μονωτική απόδοση
+- Αν R_total ≤ 0, ο συντελεστής U εξ' ορισμού γίνεται 0
 
-**Implementation:**
+**Υλοποίηση:**
 
-- **Backend:** `ExternalWallThermalInsulation.calculate_u_coefficient()` method
-- **Frontend:** `calculateUCoefficient(materials)` function
+- **Backend:** Μέθοδος `ExternalWallThermalInsulation.calculate_u_coefficient()`
+- **Frontend:** Συνάρτηση `calculateUCoefficient(materials)`
 
 ---
 
-## Heat Loss Calculations
+## Υπολογισμοί Θερμικών Απωλειών
 
-### Hourly Heat Losses
+### Ωριαίες Θερμικές Απώλειες
 
-**Formula:**
+**Τύπος:**
 
 ```
 Q = (U × A × ΔT) / 1000
 ```
 
-**Where:**
+**Όπου:**
 
-- `Q` = Hourly heat losses (kW)
-- `U` = Thermal transmittance coefficient (W/m²K)
-- `A` = Total surface area (m²)
-- `ΔT` = Temperature difference (K or °C)
-- Division by 1000 converts W to kW
+- `Q` = Ωριαίες θερμικές απώλειες (kW)
+- `U` = Συντελεστής θερμικής διαπερατότητας (W/m²K)
+- `A` = Συνολική επιφάνεια (m²)
+- `ΔT` = Διαφορά θερμοκρασίας (K ή °C)
+- Διαίρεση με 1000 μετατρέπει W σε kW
 
-### Temperature Differences Used
+### Διαφορές Θερμοκρασίας που Χρησιμοποιούνται
 
-| Season | Temperature Difference (ΔT) | Usage                |
-| ------ | --------------------------- | -------------------- |
-| Winter | 72°C                        | Heating calculations |
-| Summer | 12.5°C                      | Cooling calculations |
+| Εποχή     | Διαφορά Θερμοκρασίας (ΔT) | Χρήση                   |
+| --------- | ------------------------- | ----------------------- |
+| Χειμώνας  | 72°C                      | Υπολογισμοί θέρμανσης   |
+| Καλοκαίρι | 12.5°C                    | Υπολογισμοί κλιματισμού |
 
-### Winter Hourly Losses
+### Χειμερινές Ωριαίες Απώλειες
 
-**Implementation:**
+**Υλοποίηση:**
 
-- **Backend:** `_calculate_hourly_losses(materials, 72)` helper method
-- **Frontend:** `calculateWinterHourlyLosses(materials)` function
+- **Backend:** Βοηθητική μέθοδος `_calculate_hourly_losses(materials, 72)`
+- **Frontend:** Συνάρτηση `calculateWinterHourlyLosses(materials)`
 
-### Summer Hourly Losses
+### Καλοκαιρινές Ωριαίες Απώλειες
 
-**Implementation:**
+**Υλοποίηση:**
 
-- **Backend:** `_calculate_hourly_losses(materials, 12.5)` helper method
-- **Frontend:** `calculateSummerHourlyLosses(materials)` function
+- **Backend:** Βοηθητική μέθοδος `_calculate_hourly_losses(materials, 12.5)`
+- **Frontend:** Συνάρτηση `calculateSummerHourlyLosses(materials)`
 
 ---
 
-## Surface Area Calculations
+## Υπολογισμοί Επιφάνειας
 
-### Total Surface Area
+### Συνολική Επιφάνεια
 
-**Formula:**
+**Τύπος:**
 
 ```
 A_total = ΣA_materials
 ```
 
-**Where:**
+**Όπου:**
 
-- `A_total` = Total surface area (m²)
-- `A_materials` = Surface area of each material layer (m²)
+- `A_total` = Συνολική επιφάνεια (m²)
+- `A_materials` = Επιφάνεια κάθε στρώματος υλικού (m²)
 
-**Implementation:**
+**Υλοποίηση:**
 
-- **Frontend:** `calculateTotalSurfaceArea(materials)` function
+- **Frontend:** Συνάρτηση `calculateTotalSurfaceArea(materials)`
 
 ---
 
-## Cost Calculations
+## Υπολογισμοί Κόστους
 
-### Total Material Cost
+### Συνολικό Κόστος Υλικών
 
-**Formula:**
+**Τύπος:**
 
 ```
 C_total = ΣC_materials
 ```
 
-**Where:**
+**Όπου:**
 
-- `C_total` = Total cost (€)
-- `C_materials` = Cost of each material layer (€)
+- `C_total` = Συνολικό κόστος (€)
+- `C_materials` = Κόστος κάθε στρώματος υλικού (€)
 
-**Important Notes:**
+**Σημαντικές Σημειώσεις:**
 
-- Cost calculation applies **ONLY to NEW materials**
-- Old materials do not have cost column in the interface
-- Total cost field is read-only and auto-calculated
-- **Automatically calculated from the sum of new materials costs** / **Υπολογίζεται αυτόματα από το άθροισμα των κοστών των νέων υλικών**
+- Ο υπολογισμός κόστους εφαρμόζεται **ΜΟΝΟ στα ΝΕΑ υλικά**
+- Τα παλιά υλικά δεν έχουν στήλη κόστους στη διεπαφή
+- Το πεδίο συνολικού κόστους είναι μόνο για ανάγνωση και υπολογίζεται αυτόματα
+- **Υπολογίζεται αυτόματα από το άθροισμα των κοστών των νέων υλικών**
 
-**Implementation:**
+**Υλοποίηση:**
 
-- **Frontend:** `calculateTotalCost(materials)` function
+- **Frontend:** Συνάρτηση `calculateTotalCost(materials)`
 
 ---
 
-## Annual Energy Benefit Calculations
+## Υπολογισμοί Ετήσιου Ενεργειακού Οφέλους
 
-### Annual Energy Savings
+### Ετήσια Ενεργειακή Εξοικονόμηση
 
-**Formula:**
+**Τύπος:**
 
 ```
 Annual_Energy_Savings = (ΔQ_winter × Hours_cooling) + (ΔQ_summer × Hours_heating)
 ```
 
-**Where:**
+**Όπου:**
 
-- `ΔQ_winter` = Difference in winter hourly losses between old and new materials (kW)
-- `ΔQ_summer` = Difference in summer hourly losses between old and new materials (kW)
-- `Hours_cooling` = Cooling hours per year
-- `Hours_heating` = Heating hours per year
+- `ΔQ_winter` = Διαφορά χειμερινών ωριαίων απωλειών μεταξύ παλιών και νέων υλικών (kW)
+- `ΔQ_summer` = Διαφορά καλοκαιρινών ωριαίων απωλειών μεταξύ παλιών και νέων υλικών (kW)
+- `Hours_cooling` = Ώρες κλιματισμού ανά έτος
+- `Hours_heating` = Ώρες θέρμανσης ανά έτος
 
-### Annual Benefit Calculation
+### Υπολογισμός Ετήσιου Οφέλους
 
-**Formula:**
+**Τύπος:**
 
 ```
 Annual_Benefit = Annual_Energy_Savings × Electricity_Cost_per_kWh
 ```
 
-**Where:**
+**Όπου:**
 
-- `Annual_Benefit` = Annual energy cost savings (€/year)
-- `Annual_Energy_Savings` = Total energy savings (kWh/year)
-- `Electricity_Cost_per_kWh` = Project electricity cost (€/kWh)
+- `Annual_Benefit` = Ετήσια εξοικονόμηση κόστους ενέργειας (€/έτος)
+- `Annual_Energy_Savings` = Συνολική ενεργειακή εξοικονόμηση (kWh/έτος)
+- `Electricity_Cost_per_kWh` = Κόστος ηλεκτρικής ενέργειας έργου (€/kWh)
 
-**Important Notes:**
+**Σημαντικές Σημειώσεις:**
 
-- Annual benefit is auto-calculated and read-only
-- Formula ensures energy savings (old materials should have higher losses than new materials)
-- Minimum value is 0 (non-negative constraint)
-- **Automatically calculated based on loss differences, operating hours and electricity cost** / **Υπολογίζεται αυτόματα βάσει διαφοράς απωλειών, ωρών λειτουργίας και κόστους ρεύματος**
+- Το ετήσιο όφελος υπολογίζεται αυτόματα και είναι μόνο για ανάγνωση
+- Ο τύπος εξασφαλίζει ενεργειακή εξοικονόμηση (τα παλιά υλικά πρέπει να έχουν μεγαλύτερες απώλειες από τα νέα)
+- Ελάχιστη τιμή είναι 0 (περιορισμός μη αρνητικής τιμής)
+- **Υπολογίζεται αυτόματα βάσει διαφοράς απωλειών, ωρών λειτουργίας και κόστους ρεύματος**
 
-**Implementation:**
+**Υλοποίηση:**
 
-- **Backend:** `calculate_annual_benefit()` method (auto-calculated on save)
-- **Frontend:** `calculateAnnualBenefit()` function (display purposes)
+- **Backend:** Μέθοδος `calculate_annual_benefit()` (αυτόματος υπολογισμός κατά την αποθήκευση)
+- **Frontend:** Συνάρτηση `calculateAnnualBenefit()` (σκοποί εμφάνισης)
 
 ---
 
-## Economic Analysis Calculations
+## Υπολογισμοί Οικονομικής Ανάλυσης
 
-### Net Present Value (NPV)
+### Καθαρή Παρούσα Αξία (NPV)
 
-**Formula:**
+**Τύπος:**
 
 ```
 NPV = -Initial_Investment + Σ(Annual_Net_Benefit / (1 + discount_rate)^year)
 ```
 
-**Where:**
+**Όπου:**
 
-- `Initial_Investment` = Total cost of materials and installation (€)
-- `Annual_Net_Benefit` = Annual benefit - Annual operating costs (€/year)
-- `discount_rate` = Discount rate as decimal (e.g., 5% = 0.05)
-- `year` = Each year from 1 to time_period_years
+- `Initial_Investment` = Συνολικό κόστος υλικών και εγκατάστασης (€)
+- `Annual_Net_Benefit` = Ετήσιο όφελος - Ετήσια λειτουργικά κόστη (€/έτος)
+- `discount_rate` = Προεξοφλητικό επιτόκιο ως δεκαδικός (π.χ., 5% = 0.05)
+- `year` = Κάθε έτος από 1 έως time_period_years
 
-**Implementation:**
+**Υλοποίηση:**
 
-- **Backend:** `calculate_npv()` method
-
----
-
-## Constants and Parameters
-
-### Surface Resistances
-
-| Parameter | Value | Unit  | Description                 |
-| --------- | ----- | ----- | --------------------------- |
-| R_si      | 0.13  | m²K/W | Internal surface resistance |
-| R_se      | 0.04  | m²K/W | External surface resistance |
-
-### Temperature Differences
-
-| Parameter | Value | Unit | Description                           |
-| --------- | ----- | ---- | ------------------------------------- |
-| ΔT_winter | 72    | °C   | Winter heating temperature difference |
-| ΔT_summer | 12.5  | °C   | Summer cooling temperature difference |
-
-### Default Values
-
-| Parameter     | Default Value | Unit  | Description                   |
-| ------------- | ------------- | ----- | ----------------------------- |
-| Time Period   | 20            | years | Investment evaluation period  |
-| Discount Rate | 5             | %     | NPV calculation discount rate |
-| Min Hours     | 0             | hours | Minimum heating/cooling hours |
-| Max Hours     | 8760          | hours | Maximum hours per year        |
-
-### Surface Types
-
-- **Primary:** "Εξωτερικοί τοίχοι σε επαφή με τον εξωτερικό αέρα" (External walls in contact with outdoor air)
-- **Other options:** Internal, External, Intermediate (legacy support)
+- **Backend:** Μέθοδος `calculate_npv()`
 
 ---
 
-## Calculation Flow
+## Σταθερές και Παράμετροι
 
-### Material Addition/Update Process
+### Επιφανειακές Αντιστάσεις
 
-1. **Material Properties Input:**
+| Παράμετρος | Τιμή | Μονάδα | Περιγραφή                       |
+| ---------- | ---- | ------ | ------------------------------- |
+| R_si       | 0.13 | m²K/W  | Εσωτερική επιφανειακή αντίσταση |
+| R_se       | 0.04 | m²K/W  | Εξωτερική επιφανειακή αντίσταση |
 
-   - Material selection (thermal conductivity λ)
-   - Thickness (d)
-   - Surface area (A)
-   - Cost (for new materials only)
+### Διαφορές Θερμοκρασίας
 
-2. **Automatic Calculations:**
+| Παράμετρος | Τιμή | Μονάδα | Περιγραφή                                    |
+| ---------- | ---- | ------ | -------------------------------------------- |
+| ΔT_winter  | 72   | °C     | Χειμερινή διαφορά θερμοκρασίας θέρμανσης     |
+| ΔT_summer  | 12.5 | °C     | Καλοκαιρινή διαφορά θερμοκρασίας κλιματισμού |
 
-   - Individual thermal resistance: R = d/λ
-   - Total thermal resistance: R_total = R_si + R_se + ΣR_materials
-   - U-coefficient: U = 1/R_total
-   - Hourly losses: Q = (U × A × ΔT) / 1000
+### Προεπιλεγμένες Τιμές
 
-3. **Economic Calculations:**
-   - Total cost (new materials only)
-   - Annual energy savings
-   - Annual benefit
-   - Net Present Value (NPV)
+| Παράμετρος             | Προεπιλεγμένη Τιμή | Μονάδα | Περιγραφή                              |
+| ---------------------- | ------------------ | ------ | -------------------------------------- |
+| Χρονική Περίοδος       | 20                 | έτη    | Περίοδος αξιολόγησης επένδυσης         |
+| Προεξοφλητικό Επιτόκιο | 5                  | %      | Προεξοφλητικό επιτόκιο υπολογισμού NPV |
+| Ελάχιστες Ώρες         | 0                  | ώρες   | Ελάχιστες ώρες θέρμανσης/κλιματισμού   |
+| Μέγιστες Ώρες          | 8760               | ώρες   | Μέγιστες ώρες ανά έτος                 |
 
-### Auto-Calculation Triggers
+### Τύποι Επιφανειών
 
-- **Frontend:** Real-time calculations during data entry
-- **Backend:** Automatic recalculation on model save
-- **Fields auto-calculated:** U-coefficient, Annual benefit, NPV, Total cost
-
----
-
-## Notes and Best Practices
-
-1. **Material Type Distinction:**
-
-   - **Old and new thermal insulation materials management** / **Διαχείριση παλιών και νέων υλικών θερμομόνωσης**
-   - Old materials: Used for baseline energy performance
-   - New materials: Used for improved energy performance with cost analysis
-
-2. **Data Validation:**
-
-   - Thermal conductivity must be > 0
-   - Thickness and surface area must be > 0
-   - Hours per year: 0 ≤ hours ≤ 8760
-
-3. **Units Consistency:**
-
-   - All thermal calculations use SI units
-   - Power conversions: W → kW (÷1000)
-   - Economic calculations in Euros (€)
-
-4. **Performance Optimization:**
-   - Frontend calculations for immediate feedback
-   - Backend calculations for data persistence
-   - Calculations only triggered when necessary data is available
+- **Κύριος:** "Εξωτερικοί τοίχοι σε επαφή με τον εξωτερικό αέρα" (Εξωτερικοί τοίχοι σε επαφή με εξωτερικό αέρα)
+- **Άλλες επιλογές:** Εσωτερικός, Εξωτερικός, Ενδιάμεσος (υποστήριξη παλαιών εκδόσεων)
 
 ---
 
-_This documentation covers all calculation types used in the Thermal Insulation System as of the current implementation. For technical implementation details, refer to the source code in the respective backend models and frontend components._
+## Ροή Υπολογισμών
+
+### Διαδικασία Προσθήκης/Ενημέρωσης Υλικών
+
+1. **Εισαγωγή Ιδιοτήτων Υλικού:**
+
+   - Επιλογή υλικού (θερμική αγωγιμότητα λ)
+   - Πάχος (d)
+   - Επιφάνεια (A)
+   - Κόστος (μόνο για νέα υλικά)
+
+2. **Αυτόματοι Υπολογισμοί:**
+
+   - Μεμονωμένη θερμική αντίσταση: R = d/λ
+   - Συνολική θερμική αντίσταση: R_total = R_si + R_se + ΣR_materials
+   - Συντελεστής U: U = 1/R_total
+   - Ωριαίες απώλειες: Q = (U × A × ΔT) / 1000
+
+3. **Οικονομικοί Υπολογισμοί:**
+   - Συνολικό κόστος (μόνο νέα υλικά)
+   - Ετήσια ενεργειακή εξοικονόμηση
+   - Ετήσιο όφελος
+   - Καθαρή Παρούσα Αξία (NPV)
+
+### Ενεργοποιητές Αυτόματου Υπολογισμού
+
+- **Frontend:** Υπολογισμοί σε πραγματικό χρόνο κατά την εισαγωγή δεδομένων
+- **Backend:** Αυτόματος επανυπολογισμός κατά την αποθήκευση μοντέλου
+- **Πεδία που υπολογίζονται αυτόματα:** Συντελεστής U, Ετήσιο όφελος, NPV, Συνολικό κόστος
+
+---
+
+## Σημειώσεις και Βέλτιστες Πρακτικές
+
+1. **Διάκριση Τύπου Υλικού:**
+
+   - **Διαχείριση παλιών και νέων υλικών θερμομόνωσης**
+   - Παλιά υλικά: Χρησιμοποιούνται για βασική ενεργειακή απόδοση
+   - Νέα υλικά: Χρησιμοποιούνται για βελτιωμένη ενεργειακή απόδοση με ανάλυση κόστους
+
+2. **Επικύρωση Δεδομένων:**
+
+   - Η θερμική αγωγιμότητα πρέπει να είναι > 0
+   - Το πάχος και η επιφάνεια πρέπει να είναι > 0
+   - Ώρες ανά έτος: 0 ≤ ώρες ≤ 8760
+
+3. **Συνέπεια Μονάδων:**
+
+   - Όλοι οι θερμικοί υπολογισμοί χρησιμοποιούν μονάδες SI
+   - Μετατροπές ισχύος: W → kW (÷1000)
+   - Οικονομικοί υπολογισμοί σε Ευρώ (€)
+
+4. **Βελτιστοποίηση Απόδοσης:**
+   - Υπολογισμοί frontend για άμεση ανταπόκριση
+   - Υπολογισμοί backend για διατήρηση δεδομένων
+   - Υπολογισμοί ενεργοποιούνται μόνο όταν είναι διαθέσιμα τα απαραίτητα δεδομένα
