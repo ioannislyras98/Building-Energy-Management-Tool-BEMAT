@@ -328,7 +328,7 @@ NPV = -Initial_Investment + Σ(Annual_Net_Benefit / (1 + discount_rate)^year)
    - Μετατροπές ισχύος: W → kW (÷1000)
    - Οικονομικοί υπολογισμοί σε Ευρώ (€)
 
-4. **Βελτιστοποίηση Απόδοσης:**
-   - Υπολογισμοί frontend για άμεση ανταπόκριση
-   - Υπολογισμοί backend για διατήρηση δεδομένων
-   - Υπολογισμοί ενεργοποιούνται μόνο όταν είναι διαθέσιμα τα απαραίτητα δεδομένα
+4. **Performance Optimization:**
+   - Frontend calculations for immediate feedback
+   - Backend calculations for data persistence
+   - Calculations only triggered when necessary data is available
