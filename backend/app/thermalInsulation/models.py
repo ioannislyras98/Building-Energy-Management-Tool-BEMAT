@@ -114,7 +114,8 @@ class ExternalWallThermalInsulation(models.Model):
         """
         R_si = 0.13  # Internal surface resistance
         R_se = 0.04  # External surface resistance
-          # Calculate sum of all NEW material resistances only
+        
+        # Calculate sum of all NEW material resistances only
         materials_r_sum = 0
         for material_layer in self.material_layers.filter(material_type='new'):
             if material_layer.material.thermal_conductivity > 0:
@@ -122,15 +123,14 @@ class ExternalWallThermalInsulation(models.Model):
                 materials_r_sum += r_material
         
         r_total = R_si + R_se + materials_r_sum
-        
         if r_total > 0:
             return 1 / r_total
         return 0
 
     def calculate_npv(self):
         """Calculate Net Present Value"""
-        if not all([self.annual_benefit, self.annual_operating_costs, 
-                   self.discount_rate, self.time_period_years, self.total_cost]):
+        if (self.annual_benefit is None or self.annual_operating_costs is None or 
+            self.discount_rate is None or self.time_period_years is None or self.total_cost is None):
             return 0
         
         npv = -self.total_cost  # Initial investment (negative)
@@ -140,7 +140,7 @@ class ExternalWallThermalInsulation(models.Model):
         for year in range(1, self.time_period_years + 1):
             npv += annual_net_benefit / ((1 + discount_rate_decimal) ** year)
         
-        return npv
+        return round(npv, 2)  # Round to 2 decimal places
 
     def calculate_annual_benefit(self):
         """
@@ -202,7 +202,8 @@ class ExternalWallThermalInsulation(models.Model):
         
         r_total = R_si + R_se + materials_r_sum
         u_coefficient = 1 / r_total if r_total > 0 else 0
-          # Calculate hourly losses: U × A × ΔT / 1000 (kW)
+        
+        # Calculate hourly losses: U × A × ΔT / 1000 (kW)
         hourly_losses = (u_coefficient * total_area * temperature_difference) / 1000
         return hourly_losses
 

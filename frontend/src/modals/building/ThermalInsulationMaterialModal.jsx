@@ -23,12 +23,12 @@ const ThermalInsulationMaterialModal = ({
       surface_area: "",
       material_type: materialType,
     };
-    
+
     // Only include cost for new materials
     if (materialType === "new") {
       baseData.cost = "";
     }
-    
+
     return baseData;
   };
 
@@ -55,7 +55,8 @@ const ThermalInsulationMaterialModal = ({
   ];
 
   useEffect(() => {
-    fetchAvailableMaterials();    if (editItem) {
+    fetchAvailableMaterials();
+    if (editItem) {
       const editData = {
         material: editItem.material || "",
         surface_type: editItem.surface_type || "external_walls_outdoor",
@@ -63,12 +64,12 @@ const ThermalInsulationMaterialModal = ({
         surface_area: editItem.surface_area || "",
         material_type: editItem.material_type || materialType,
       };
-      
+
       // Only include cost for new materials
       if (materialType === "new") {
         editData.cost = editItem.cost || "";
       }
-      
+
       setFormData(editData);
 
       // Find and set the selected material for display
@@ -132,30 +133,31 @@ const ThermalInsulationMaterialModal = ({
       formData.thickness &&
       selectedMaterial.thermal_conductivity > 0
     ) {
-      const thermalResistance = parseFloat(formData.thickness) / selectedMaterial.thermal_conductivity;
+      const thermalResistance =
+        parseFloat(formData.thickness) / selectedMaterial.thermal_conductivity;
       return 1 / thermalResistance; // U = 1/R
     }
     return 0;
   };
   const validateForm = () => {
     const errors = {};
-    
+
     if (!formData.material) {
       errors.material = "Παρακαλώ επιλέξτε υλικό";
     }
-    
+
     if (!formData.thickness) {
       errors.thickness = "Παρακαλώ εισάγετε το πάχος";
     }
-      if (!formData.surface_area) {
+    if (!formData.surface_area) {
       errors.surface_area = "Παρακαλώ εισάγετε την επιφάνεια";
     }
-    
+
     // Only validate cost for new materials
     if (materialType === "new" && !formData.cost) {
       errors.cost = "Παρακαλώ εισάγετε το κόστος";
     }
-    
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -202,7 +204,8 @@ const ThermalInsulationMaterialModal = ({
         setLoading(false);
       },
     });
-  };  const handleCancel = () => {
+  };
+  const handleCancel = () => {
     const resetData = {
       material: "",
       surface_type: "external_walls_outdoor",
@@ -210,12 +213,12 @@ const ThermalInsulationMaterialModal = ({
       surface_area: "",
       material_type: materialType,
     };
-    
+
     // Only include cost for new materials
     if (materialType === "new") {
       resetData.cost = "";
     }
-    
+
     setFormData(resetData);
     setSelectedMaterial(null);
     setError(null);
@@ -224,19 +227,25 @@ const ThermalInsulationMaterialModal = ({
   };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="rounded-lg p-6 w-full max-w-4xl border-primary-light border-2 bg-white shadow-lg max-h-[90vh] overflow-y-auto">        <h2 className="text-lg font-bold mb-4 text-center">
+      <div className="rounded-lg p-6 w-full max-w-4xl border-primary-light border-2 bg-white shadow-lg max-h-[90vh] overflow-y-auto">
+        {" "}
+        <h2 className="text-lg font-bold mb-4 text-center">
           {editItem ? "Επεξεργασία" : "Προσθήκη"}{" "}
           {materialType === "old" ? "Παλιού" : "Νέου"} Υλικού
         </h2>
-
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-4">
             {error}
           </div>
         )}
-
-        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">            {/* Material Selection */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {" "}
+            {/* Material Selection */}
             <div className="md:col-span-2">
               <label htmlFor="material" className="label-name text-red-600">
                 Υλικό <span className="text-red-600">*</span>
@@ -245,12 +254,15 @@ const ThermalInsulationMaterialModal = ({
                 id="material"
                 value={formData.material}
                 onChange={(e) => handleInputChange("material", e.target.value)}
-                className={`input-field ${validationErrors.material ? "error-input" : ""}`}
+                className={`input-field ${
+                  validationErrors.material ? "error-input" : ""
+                }`}
                 required>
                 <option value="">Επιλέξτε υλικό</option>
                 {availableMaterials.map((material) => (
                   <option key={material.uuid} value={material.uuid}>
-                    {material.name} - λ = {material.thermal_conductivity} W/mK | {material.category_display}
+                    {material.name} - λ = {material.thermal_conductivity} W/mK |{" "}
+                    {material.category_display}
                   </option>
                 ))}
               </select>
@@ -260,24 +272,26 @@ const ThermalInsulationMaterialModal = ({
                 </div>
               )}
             </div>
-
             {/* Material Info Display */}
             {selectedMaterial && (
               <div className="md:col-span-2">
                 <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
                   <h4 className="text-sm font-semibold text-gray-700 mb-2">
                     Επιλεγμένο Υλικό: {selectedMaterial.name}
-                  </h4>                  <p className="text-sm text-gray-600 mb-1">
-                    Συντελεστής θερμικής αγωγιμότητας: {selectedMaterial.thermal_conductivity} W/mK
+                  </h4>{" "}
+                  <p className="text-sm text-gray-600 mb-1">
+                    Συντελεστής θερμικής αγωγιμότητας:{" "}
+                    {selectedMaterial.thermal_conductivity} W/mK
                   </p>
                   {formData.thickness && (
                     <p className="text-sm font-medium text-primary">
-                      Συντελεστής Θερμοπερατότητας (U): {calculateUCoefficient().toFixed(3)} W/m²K
+                      Συντελεστής Θερμοπερατότητας (U):{" "}
+                      {calculateUCoefficient().toFixed(3)} W/m²K
                     </p>
-                  )}                </div>
+                  )}{" "}
+                </div>
               </div>
             )}
-
             {/* Surface Type - Fixed to External Walls */}
             <div className="md:col-span-2">
               <label htmlFor="surface_type" className="label-name text-red-600">
@@ -286,7 +300,9 @@ const ThermalInsulationMaterialModal = ({
               <select
                 id="surface_type"
                 value={formData.surface_type}
-                onChange={(e) => handleInputChange("surface_type", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("surface_type", e.target.value)
+                }
                 className="input-field"
                 required>
                 {surfaceTypeOptions.map((option) => (
@@ -295,7 +311,8 @@ const ThermalInsulationMaterialModal = ({
                   </option>
                 ))}
               </select>
-            </div>            {/* Thickness */}
+            </div>{" "}
+            {/* Thickness */}
             <div>
               <label htmlFor="thickness" className="label-name text-red-600">
                 Πάχος (m) <span className="text-red-600">*</span>
@@ -305,19 +322,24 @@ const ThermalInsulationMaterialModal = ({
                 type="number"
                 value={formData.thickness}
                 onChange={(e) => handleInputChange("thickness", e.target.value)}
-                className={`input-field ${validationErrors.thickness ? "error-input" : ""}`}
+                className={`input-field ${
+                  validationErrors.thickness ? "error-input" : ""
+                }`}
                 step="0.001"
                 min="0.001"
                 placeholder="π.χ. 0.050"
                 required
               />
-              <p className="text-xs text-gray-500 mt-1">Πάχος του υλικού σε μέτρα</p>
+              <p className="text-xs text-gray-500 mt-1">
+                Πάχος του υλικού σε μέτρα
+              </p>
               {validationErrors.thickness && (
                 <div className="text-red-500 text-xs mt-1">
                   {validationErrors.thickness}
                 </div>
               )}
-            </div>            {/* Surface Area */}
+            </div>{" "}
+            {/* Surface Area */}
             <div>
               <label htmlFor="surface_area" className="label-name text-red-600">
                 Επιφάνεια (m²) <span className="text-red-600">*</span>
@@ -326,20 +348,26 @@ const ThermalInsulationMaterialModal = ({
                 id="surface_area"
                 type="number"
                 value={formData.surface_area}
-                onChange={(e) => handleInputChange("surface_area", e.target.value)}
-                className={`input-field ${validationErrors.surface_area ? "error-input" : ""}`}
+                onChange={(e) =>
+                  handleInputChange("surface_area", e.target.value)
+                }
+                className={`input-field ${
+                  validationErrors.surface_area ? "error-input" : ""
+                }`}
                 step="0.01"
                 min="0.01"
                 placeholder="π.χ. 25.50"
                 required
               />
-              <p className="text-xs text-gray-500 mt-1">Επιφάνεια σε τετραγωνικά μέτρα</p>
+              <p className="text-xs text-gray-500 mt-1">
+                Επιφάνεια σε τετραγωνικά μέτρα
+              </p>
               {validationErrors.surface_area && (
                 <div className="text-red-500 text-xs mt-1">
                   {validationErrors.surface_area}
                 </div>
-              )}            </div>
-
+              )}{" "}
+            </div>
             {/* Cost - Only for new materials */}
             {materialType === "new" && (
               <div className="md:col-span-2">
@@ -351,13 +379,17 @@ const ThermalInsulationMaterialModal = ({
                   type="number"
                   value={formData.cost}
                   onChange={(e) => handleInputChange("cost", e.target.value)}
-                  className={`input-field ${validationErrors.cost ? "error-input" : ""}`}
+                  className={`input-field ${
+                    validationErrors.cost ? "error-input" : ""
+                  }`}
                   step="0.01"
                   min="0"
                   placeholder="π.χ. 1250.00"
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1">Κόστος του υλικού και εργασίας σε ευρώ</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Κόστος του υλικού και εργασίας σε ευρώ
+                </p>
                 {validationErrors.cost && (
                   <div className="text-red-500 text-xs mt-1">
                     {validationErrors.cost}
@@ -375,10 +407,7 @@ const ThermalInsulationMaterialModal = ({
               className="close-modal">
               Ακύρωση
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="confirm-button">
+            <button type="submit" disabled={loading} className="confirm-button">
               {loading ? "Αποθήκευση..." : editItem ? "Ενημέρωση" : "Προσθήκη"}
             </button>
           </div>

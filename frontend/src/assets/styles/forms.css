@@ -1,6 +1,5 @@
 @import "./themes.css";
 
-
 #sign-screen {
   @apply h-full w-full bg-cover bg-linear-to-t bg-center bg-[url(../images/bemat_alt.avif)] flex flex-col relative min-h-screen;
 }
@@ -9,25 +8,25 @@
   @apply text-neutral-500 hover:text-neutral-100 absolute top-0 right-0 pr-6 pt-3;
 }
 .form-wrapper {
-  @apply  h-full absolute inset-0 flex justify-center items-center z-10;
+  @apply h-full absolute inset-0 flex justify-center items-center z-10;
 }
 
 #form-container {
-    @apply bg-neutral-100 px-6 text-gray-900 rounded-md w-96 h-auto;
+  @apply bg-neutral-100 px-6 text-gray-900 rounded-md w-96 h-auto;
 }
 
 #register-form,
 #login-form {
-    @apply mx-auto max-w-xl py-8 md:max-w-4xl;
-  }
+  @apply mx-auto max-w-xl py-8 md:max-w-4xl;
+}
 
 .logo-img {
   @apply bg-[url(../images/bemat_alt.avif)] bg-cover size-16 justify-self-center mb-8;
 }
 
-  #submit-form {
-   @apply bg-primary hover:bg-primary-bold text-white font-bold py-2 px-4 rounded-full w-full float-right mb-8;
-  }
+#submit-form {
+  @apply bg-primary hover:bg-primary-bold text-white font-bold py-2 px-4 rounded-full w-full float-right mb-8;
+}
 
 .register-title {
   @apply font-bold text-primary-bold text-center text-[24px];
@@ -38,51 +37,51 @@
 }
 
 .label-name {
-    @apply text-neutral-500 font-basic text-sm font-bold ml-4;
+  @apply text-neutral-500 font-basic text-sm font-bold ml-4;
 }
 
 .input-field {
-    @apply form-input mt-1 block w-full rounded-lg border-neutral-200 placeholder:text-neutral-400 
-    transition-all duration-200 ease-in-out shadow-sm hover:shadow-md px-4 py-3; 
-    border-color: #e5e7eb;
+  @apply form-input mt-1 block w-full rounded-lg border-neutral-200 placeholder:text-neutral-400 
+    transition-all duration-200 ease-in-out shadow-sm hover:shadow-md px-4 py-3;
+  border-color: #e5e7eb;
 }
 
 .input-field:focus {
-    @apply outline-none ring-2;
-    border-color: #2d5a27 !important;
-    ring-color: rgba(45, 90, 39, 0.2) !important;
-    box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.2) !important;
+  @apply outline-none ring-2;
+  border-color: #2d5a27 !important;
+  ring-color: rgba(45, 90, 39, 0.2) !important;
+  box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.2) !important;
 }
 
 /* Custom styling for select and textarea to maintain consistency */
 .input-field select,
 .input-field textarea {
-    @apply rounded-lg transition-all duration-200 ease-in-out;
-    border-color: #e5e7eb;
-    border-radius: 0.5rem !important;
+  @apply rounded-lg transition-all duration-200 ease-in-out;
+  border-color: #e5e7eb;
+  border-radius: 0.5rem !important;
 }
 
 select,
 textarea {
-    border-radius: 0.5rem !important;
-    border-color: #e5e7eb;
-    transition: all 0.2s ease-in-out;
+  border-radius: 0.5rem !important;
+  border-color: #e5e7eb;
+  transition: all 0.2s ease-in-out;
 }
 
 .input-field select:focus,
 .input-field textarea:focus {
-    @apply outline-none ring-2;
-    border-color: #2d5a27 !important;
-    ring-color: rgba(45, 90, 39, 0.2) !important;
-    box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.2) !important;
+  @apply outline-none ring-2;
+  border-color: #2d5a27 !important;
+  ring-color: rgba(45, 90, 39, 0.2) !important;
+  box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.2) !important;
 }
 
 .input-field select:not([multiple]) {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
 }
 input[type="text"],
 input[type="email"],
@@ -92,9 +91,9 @@ input[type="date"],
 input[type="time"],
 input[type="url"],
 input[type="tel"] {
-    border-radius: 0.5rem !important; /* rounded-lg equivalent */
-    border-color: #e5e7eb;
-    transition: all 0.2s ease-in-out;
+  border-radius: 0.5rem !important; /* rounded-lg equivalent */
+  border-color: #e5e7eb;
+  transition: all 0.2s ease-in-out;
 }
 
 input[type="text"]:focus,
@@ -107,28 +106,27 @@ input[type="url"]:focus,
 input[type="tel"]:focus,
 select:focus,
 textarea:focus {
-    border-color: #2d5a27 !important;
-    ring-color: rgba(45, 90, 39, 0.2) !important;
-    box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.2) !important;
-    outline: none !important;
+  border-color: #2d5a27 !important;
+  ring-color: rgba(45, 90, 39, 0.2) !important;
+  box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.2) !important;
+  outline: none !important;
 }
 
 input:not([type="checkbox"]):not([type="radio"]),
 select,
 textarea {
-    border-radius: 0.5rem !important;
-    border-width: 1px;
-    border-color: #e5e7eb;
-    transition: all 0.2s ease-in-out;
+  border-radius: 0.5rem !important;
+  border-width: 1px;
+  border-color: #e5e7eb;
+  transition: all 0.2s ease-in-out;
 }
-
 
 input:not([type="checkbox"]):not([type="radio"]):focus,
 select:focus,
 textarea:focus {
-    border-color: #2d5a27 !important;
-    box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.2) !important;
-    outline: none !important;
+  border-color: #2d5a27 !important;
+  box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.2) !important;
+  outline: none !important;
 }
 
 .confirm-button {
@@ -140,22 +138,22 @@ textarea:focus {
 }
 
 .error-input {
-    border-color: #dc2626 !important;
-    border-width: 2px !important;
-    background-color: #fef2f2 !important;
+  border-color: #dc2626 !important;
+  border-width: 2px !important;
+  background-color: #fef2f2 !important;
 }
 
 .error-input:focus {
-    border-color: #dc2626 !important;
-    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2) !important;
-    outline: none !important;
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2) !important;
+  outline: none !important;
 }
 
 .label-name-required {
-    @apply text-red-600 font-basic text-sm font-bold ml-4;
+  @apply text-red-600 font-basic text-sm font-bold ml-4;
 }
 
 .label-name-required::after {
-    content: " *";
-    color: #dc2626;
+  content: " *";
+  color: #dc2626;
 }

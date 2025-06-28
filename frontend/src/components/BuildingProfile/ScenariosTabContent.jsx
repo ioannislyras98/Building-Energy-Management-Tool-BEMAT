@@ -27,7 +27,8 @@ const ScenariosTabContent = ({
   const translations =
     language === "en"
       ? english_text.ScenariosTabContent || {}
-      : greek_text.ScenariosTabContent || {};  const scenarioTypes = [
+      : greek_text.ScenariosTabContent || {};
+  const scenarioTypes = [
     {
       id: "thermal-insulation",
       title:
@@ -40,13 +41,15 @@ const ScenariosTabContent = ({
       disabled: false,
     },
     // Μπορούμε να προσθέσουμε άλλα σενάρια στο μέλλον
-  ];  const handleScenarioSelect = (scenarioId) => {
+  ];
+  const handleScenarioSelect = (scenarioId) => {
     setSelectedScenario(scenarioId);
   };
 
   const handleBackToScenarios = () => {
     setSelectedScenario(null);
-  };  if (selectedScenario) {
+  };
+  if (selectedScenario) {
     if (selectedScenario === "thermal-insulation") {
       return (
         <div>
@@ -76,7 +79,7 @@ const ScenariosTabContent = ({
         </div>
       );
     }
-    
+
     // For future scenarios
     return (
       <div>
@@ -133,7 +136,9 @@ const ScenariosTabContent = ({
       <div className="bg-white rounded-xl shadow-lg p-6">
         <Grid container spacing={4}>
           {scenarioTypes.map((scenario) => (
-            <Grid item xs={12} md={6} lg={4} key={scenario.id}>              <Card
+            <Grid item xs={12} md={6} lg={4} key={scenario.id}>
+              {" "}
+              <Card
                 className="h-full cursor-pointer transform hover:scale-105 hover:shadow-xl transition-transform"
                 onClick={() => handleScenarioSelect(scenario.id)}
                 sx={{
@@ -142,7 +147,8 @@ const ScenariosTabContent = ({
                   "&:hover": {
                     boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
                   },
-                }}><CardContent className="p-6">
+                }}>
+                <CardContent className="p-6">
                   <div className="flex items-center mb-4">
                     <div className="bg-white/20 p-3 rounded-full mr-4">
                       {scenario.icon}

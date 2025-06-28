@@ -1,7 +1,6 @@
 import React from "react";
 import ProjectModal from "../modals/project/ProjectModal";
 import BuildingModal from "../modals/building/BuildingModal";
-import EditBuildingModal from "../modals/building/EditBuildingModal";
 import AddContactModal from "../modals/contact/AddContactModal";
 import EditContactModal from "../modals/contact/EditContactModal";
 
@@ -69,11 +68,12 @@ export const Modals = ({
       )}
 
       {isEditBuildingModalOpen && editingBuilding && (
-        <EditBuildingModal
+        <BuildingModal
           isOpen={isEditBuildingModalOpen}
           onClose={closeEditBuildingModal}
-          building={editingBuilding}
-          onBuildingUpdated={handleBuildingUpdated}
+          onBuildingCreated={handleBuildingUpdated}
+          projectUuid={editingBuilding?.project || projectUuid}
+          editItem={editingBuilding}
         />
       )}
 

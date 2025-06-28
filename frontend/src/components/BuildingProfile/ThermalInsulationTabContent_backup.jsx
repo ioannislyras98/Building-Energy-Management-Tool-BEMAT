@@ -1,7 +1,12 @@
 // Simple test component
 import React from "react";
 
-const ThermalInsulationTabContent = ({ buildingUuid, projectUuid, buildingData, params }) => {
+const ThermalInsulationTabContent = ({
+  buildingUuid,
+  projectUuid,
+  buildingData,
+  params,
+}) => {
   return (
     <div>
       <h2>Thermal Insulation Tab Content</h2>

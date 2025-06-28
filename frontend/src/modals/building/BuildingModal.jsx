@@ -70,11 +70,12 @@ function BuildingModalForm({
   onClose,
   onBuildingCreated,
   projectUuid,
+  editItem = null,
   params,
 }) {
-
   useModalBlur(isOpen);
-  
+  const isEdit = !!editItem;
+
   const [formData, setFormData] = useState({
     name: "",
     usage: "",
@@ -103,6 +104,63 @@ function BuildingModalForm({
   const [showValidationErrors, setShowValidationErrors] = useState(false);
 
   const token = cookies.get("token") || "";
+
+  // Initialize form data based on edit mode
+  useEffect(() => {
+    if (isEdit && editItem) {
+      const buildingData = editItem.data;
+      setFormData({
+        name: buildingData.name ?? "",
+        usage: buildingData.usage ?? "",
+        description: buildingData.description ?? "",
+        year_built: buildingData.year_built ?? "",
+        address: buildingData.address ?? "",
+        prefecture: buildingData.prefecture ?? "",
+        energy_zone: buildingData.energy_zone ?? "",
+        is_insulated: Boolean(buildingData.is_insulated),
+        is_certified: Boolean(buildingData.is_certified),
+        energy_class: buildingData.energy_class ?? "",
+        orientation: buildingData.orientation ?? "",
+        total_area: buildingData.total_area ?? "",
+        examined_area: buildingData.examined_area ?? "",
+        floors_examined: buildingData.floors_examined ?? "1",
+        floor_height: buildingData.floor_height ?? "",
+        construction_type: buildingData.construction_type ?? "",
+        free_facades: buildingData.free_facades ?? "",
+        altitude: buildingData.altitude ?? "",
+        non_operating_days: buildingData.non_operating_days ?? "",
+        operating_hours: buildingData.operating_hours ?? "",
+        occupants: buildingData.occupants ?? "",
+      });
+    } else {
+      // Reset form for create mode
+      setFormData({
+        name: "",
+        usage: "",
+        description: "",
+        year_built: "",
+        address: "",
+        prefecture: "",
+        energy_zone: "",
+        is_insulated: false,
+        is_certified: false,
+        energy_class: "",
+        orientation: "",
+        total_area: "",
+        examined_area: "",
+        floors_examined: "1",
+        floor_height: "",
+        construction_type: "",
+        free_facades: "",
+        altitude: "",
+        non_operating_days: "",
+        operating_hours: "",
+        occupants: "",
+      });
+    }
+    setErrors({});
+    setShowValidationErrors(false);
+  }, [isEdit, editItem, isOpen]);
 
   useEffect(() => {
     if (formData.prefecture) {
@@ -256,9 +314,19 @@ function BuildingModalForm({
       }
     });
 
+    const url = isEdit
+      ? `http://127.0.0.1:8000/buildings/update/${editItem.data.uuid}/`
+      : "http://127.0.0.1:8000/buildings/create/";
+
+    const method = isEdit ? "PUT" : "POST";
+    
+    console.log("BuildingModal - URL:", url);
+    console.log("BuildingModal - Method:", method);
+    console.log("BuildingModal - editItem:", editItem);
+
     $.ajax({
-      url: "http://127.0.0.1:8000/buildings/create/",
-      method: "POST",
+      url: url,
+      method: method,
       timeout: 0,
       headers: {
         "Content-Type": "application/json",
@@ -266,11 +334,11 @@ function BuildingModalForm({
       },
       data: JSON.stringify(buildingData),
       success: function (response) {
-        const newBuilding = {
-          ...buildingData,
-          uuid: response.uuid,
-        };
-        onBuildingCreated(newBuilding);
+        const updatedBuilding = isEdit
+          ? { ...editItem, data: { ...editItem.data, ...buildingData } }
+          : { ...buildingData, uuid: response.uuid };
+
+        onBuildingCreated(updatedBuilding);
         onClose();
       },
       error: function (jqXHR) {
@@ -336,7 +404,7 @@ function BuildingModalForm({
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 py-20">
       <div className="rounded-lg p-6 w-full max-w-xl border-primary-light border-2 bg-white shadow-lg flex flex-col max-h-[80vh]">
         <h2 className="text-lg font-bold mb-2 text-center sticky top-0 bg-white pb-2 z-10">
-          {params.h2}
+          {isEdit ? params.h2Edit || "Επεξεργασία Κτιρίου" : params.h2}
         </h2>
         <p className="text-sm text-gray-500 text-center mb-4 sticky top-8 bg-white z-10">
           <span className="text-red-500">*</span> {params.requiredFieldsNote}
@@ -743,7 +811,7 @@ function BuildingModalForm({
             type="button"
             onClick={handleSubmit}
             className="confirm-button">
-            {params.create}
+            {isEdit ? params.update || "Ενημέρωση" : params.create}
           </button>
         </div>
       </div>
@@ -756,6 +824,7 @@ export default function BuildingModal({
   onClose,
   onBuildingCreated,
   projectUuid,
+  editItem = null,
 }) {
   const { language } = useLanguage();
   const params =
@@ -767,6 +836,7 @@ export default function BuildingModal({
       onClose={onClose}
       onBuildingCreated={onBuildingCreated}
       projectUuid={projectUuid}
+      editItem={editItem}
       params={params}
     />
   );

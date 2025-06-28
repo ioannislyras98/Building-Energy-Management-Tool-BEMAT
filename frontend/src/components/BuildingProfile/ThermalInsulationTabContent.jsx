@@ -140,7 +140,8 @@ const ThermalInsulationTabContent = ({
       annual_operating_costs: 0,
       discount_rate: 5,
       net_present_value: 0,
-    };    $.ajax({
+    };
+    $.ajax({
       url: "http://127.0.0.1:8000/thermal_insulations/create/",
       method: "POST",
       headers: {
@@ -157,7 +158,10 @@ const ThermalInsulationTabContent = ({
       },
       error: (jqXHR) => {
         console.error("Error creating thermal insulation:", jqXHR);
-        setError(translations.errorLoad || "Σφάλμα κατά τη δημιουργία νέας θερμομόνωσης");
+        setError(
+          translations.errorLoad ||
+            "Σφάλμα κατά τη δημιουργία νέας θερμομόνωσης"
+        );
         setLoading(false);
       },
     });
@@ -190,12 +194,18 @@ const ThermalInsulationTabContent = ({
       data: JSON.stringify(updatedThermalInsulation),
       success: (data) => {
         setThermalInsulation(data);
-        setSuccess(translations.saveSuccess || "Η θερμομόνωση αποθηκεύτηκε επιτυχώς!");
+        setSuccess(
+          translations.saveSuccess || "Η θερμομόνωση αποθηκεύτηκε επιτυχώς!"
+        );
         setLoading(false);
       },
       error: (jqXHR) => {
         console.error("Error saving thermal insulation:", jqXHR);
-        setError(jqXHR.responseJSON?.detail || (translations.errorSave || "Σφάλμα κατά την αποθήκευση"));
+        setError(
+          jqXHR.responseJSON?.detail ||
+            translations.errorSave ||
+            "Σφάλμα κατά την αποθήκευση"
+        );
         setLoading(false);
       },
     });
@@ -240,11 +250,16 @@ const ThermalInsulationTabContent = ({
         }
         setDeleteDialogOpen(false);
         setDeletingMaterial(null);
-        setSuccess(translations.materialDeleteSuccess || "Το υλικό διαγράφηκε επιτυχώς!");
+        setSuccess(
+          translations.materialDeleteSuccess || "Το υλικό διαγράφηκε επιτυχώς!"
+        );
       },
       error: (jqXHR) => {
         console.error("Error deleting material:", jqXHR);
-        setError(translations.errorMaterialDelete || "Σφάλμα κατά τη διαγραφή του υλικού");
+        setError(
+          translations.errorMaterialDelete ||
+            "Σφάλμα κατά τη διαγραφή του υλικού"
+        );
         setDeleteDialogOpen(false);
       },
     });
@@ -266,7 +281,9 @@ const ThermalInsulationTabContent = ({
       });
     }
     setMaterialModalOpen(false);
-    setSuccess(translations.materialSaveSuccess || "Το υλικό αποθηκεύτηκε επιτυχώς!");
+    setSuccess(
+      translations.materialSaveSuccess || "Το υλικό αποθηκεύτηκε επιτυχώς!"
+    );
   };
 
   // Calculation functions
@@ -313,9 +330,11 @@ const ThermalInsulationTabContent = ({
   };
 
   const calculateAnnualBenefit = () => {
-    if (!thermalInsulation.heating_hours_per_year || 
-        !thermalInsulation.cooling_hours_per_year || 
-        !thermalInsulation.project_electricity_cost) {
+    if (
+      !thermalInsulation.heating_hours_per_year ||
+      !thermalInsulation.cooling_hours_per_year ||
+      !thermalInsulation.project_electricity_cost
+    ) {
       return 0;
     }
 
@@ -323,7 +342,7 @@ const ThermalInsulationTabContent = ({
     const winterLossesOld = calculateWinterHourlyLosses(oldMaterials);
     const winterLossesNew = calculateWinterHourlyLosses(newMaterials);
 
-    // Calculate summer hourly losses (kW) for both old and new materials  
+    // Calculate summer hourly losses (kW) for both old and new materials
     const summerLossesOld = calculateSummerHourlyLosses(oldMaterials);
     const summerLossesNew = calculateSummerHourlyLosses(newMaterials);
 
@@ -332,13 +351,16 @@ const ThermalInsulationTabContent = ({
     const summerLossesDifference = summerLossesOld - summerLossesNew;
 
     // Calculate annual energy savings (kWh/year)
-    const annualEnergySavings = (
-      winterLossesDifference * parseFloat(thermalInsulation.cooling_hours_per_year) +
-      summerLossesDifference * parseFloat(thermalInsulation.heating_hours_per_year)
-    );
+    const annualEnergySavings =
+      winterLossesDifference *
+        parseFloat(thermalInsulation.cooling_hours_per_year) +
+      summerLossesDifference *
+        parseFloat(thermalInsulation.heating_hours_per_year);
 
     // Calculate annual benefit (€/year)
-    const electricityCost = parseFloat(thermalInsulation.project_electricity_cost);
+    const electricityCost = parseFloat(
+      thermalInsulation.project_electricity_cost
+    );
     const annualBenefit = annualEnergySavings * electricityCost;
 
     return Math.max(0, annualBenefit); // Ensure non-negative value
@@ -445,7 +467,9 @@ const ThermalInsulationTabContent = ({
       <div className="flex items-center justify-center h-32">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-gray-600">{translations.loading || "Φόρτωση..."}</p>
+          <p className="text-gray-600">
+            {translations.loading || "Φόρτωση..."}
+          </p>
         </div>
       </div>
     );
@@ -458,11 +482,14 @@ const ThermalInsulationTabContent = ({
           <div className="flex items-center">
             <span className="bg-primary/10 p-2 rounded-full mr-3">
               <ThermostatIcon className="w-6 h-6 text-primary" />
-            </span>            <div>
+            </span>{" "}
+            <div>
               <h2 className="text-2xl font-bold text-gray-800">
                 {translations.title || "Θερμομόνωση Εξωτερικής Τοιχοποιίας"}
-              </h2>              <p className="text-gray-600 mt-1">
-                {translations.materialManagement || "Διαχείριση παλιών και νέων υλικών θερμομόνωσης"}
+              </h2>{" "}
+              <p className="text-gray-600 mt-1">
+                {translations.materialManagement ||
+                  "Διαχείριση παλιών και νέων υλικών θερμομόνωσης"}
               </p>
             </div>
           </div>
@@ -481,7 +508,6 @@ const ThermalInsulationTabContent = ({
           </Button>
         </div>
       </div>
-
       {/* Alerts */}
       {error && (
         <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
@@ -496,7 +522,6 @@ const ThermalInsulationTabContent = ({
           {success}
         </Alert>
       )}
-
       {/* Tabs */}
       <div className="bg-white rounded-xl shadow-md">
         <Tabs
@@ -518,16 +543,21 @@ const ThermalInsulationTabContent = ({
             "& .MuiTabs-indicator": {
               backgroundColor: "var(--color-primary)",
             },
-          }}>          <Tab label={translations.oldMaterialsTab || "Παλιά Υλικά"} />
+          }}>
+          {" "}
+          <Tab label={translations.oldMaterialsTab || "Παλιά Υλικά"} />
           <Tab label={translations.newMaterialsTab || "Νέα Υλικά"} />
           <Tab label={translations.heatingCoolingTab || "Θέρμανση & Ψύξη"} />
-          <Tab label={translations.economicAnalysisTab || "Οικονομική Ανάλυση"} />
+          <Tab
+            label={translations.economicAnalysisTab || "Οικονομική Ανάλυση"}
+          />
         </Tabs>
-
         {/* Tab 1: Παλιά Υλικά */}
         <TabPanel value={tabValue} index={0}>
           <div className="space-y-4">
-            <div className="flex items-center justify-between">              <Button
+            <div className="flex items-center justify-between">
+              {" "}
+              <Button
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => handleAddMaterial("old")}
@@ -539,7 +569,8 @@ const ThermalInsulationTabContent = ({
                 }}>
                 {translations.addOldMaterial || "Προσθήκη Υλικού"}
               </Button>
-            </div>            <div style={{ height: 400, width: "100%" }}>
+            </div>{" "}
+            <div style={{ height: 400, width: "100%" }}>
               <DataGrid
                 rows={oldMaterials}
                 columns={oldMaterialColumns}
@@ -558,11 +589,13 @@ const ThermalInsulationTabContent = ({
                   },
                 }}
               />
-            </div>            {/* Calculation Card for Old Materials */}
+            </div>{" "}
+            {/* Calculation Card for Old Materials */}
             <Card sx={{ mt: 3, backgroundColor: "#f8f9fa" }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  {translations.calculations?.oldMaterials || "Θερμικοί Υπολογισμοί (Παλιά Υλικά)"}
+                  {translations.calculations?.oldMaterials ||
+                    "Θερμικοί Υπολογισμοί (Παλιά Υλικά)"}
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={12} md={4}>
@@ -570,7 +603,8 @@ const ThermalInsulationTabContent = ({
                       variant="body2"
                       color="text.secondary"
                       gutterBottom>
-                      {translations.calculations?.uCoefficient || "Συντελεστής Θερμοπερατότητας (U)"}
+                      {translations.calculations?.uCoefficient ||
+                        "Συντελεστής Θερμοπερατότητας (U)"}
                     </Typography>
                     <Typography variant="h6" color="error">
                       {calculateUCoefficient(oldMaterials).toFixed(3)} W/m²K
@@ -581,7 +615,8 @@ const ThermalInsulationTabContent = ({
                       variant="body2"
                       color="text.secondary"
                       gutterBottom>
-                      {translations.calculations?.winterLosses || "Χειμερινές Ωριαίες Απώλειες"}
+                      {translations.calculations?.winterLosses ||
+                        "Χειμερινές Ωριαίες Απώλειες"}
                     </Typography>
                     <Typography variant="h6" color="error">
                       {calculateWinterHourlyLosses(oldMaterials).toFixed(3)} kW
@@ -592,7 +627,8 @@ const ThermalInsulationTabContent = ({
                       variant="body2"
                       color="text.secondary"
                       gutterBottom>
-                      {translations.calculations?.summerLosses || "Καλοκαιρινές Ωριαίες Απώλειες"}
+                      {translations.calculations?.summerLosses ||
+                        "Καλοκαιρινές Ωριαίες Απώλειες"}
                     </Typography>
                     <Typography variant="h6" color="error">
                       {calculateSummerHourlyLosses(oldMaterials).toFixed(3)} kW
@@ -603,11 +639,12 @@ const ThermalInsulationTabContent = ({
             </Card>
           </div>
         </TabPanel>
-
         {/* Tab 2: Νέα Υλικά */}
         <TabPanel value={tabValue} index={1}>
           <div className="space-y-4">
-            <div className="flex items-center justify-between">              <Button
+            <div className="flex items-center justify-between">
+              {" "}
+              <Button
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => handleAddMaterial("new")}
@@ -619,7 +656,8 @@ const ThermalInsulationTabContent = ({
                 }}>
                 {translations.addNewMaterial || "Προσθήκη Υλικού"}
               </Button>
-            </div>            <div style={{ height: 400, width: "100%" }}>
+            </div>{" "}
+            <div style={{ height: 400, width: "100%" }}>
               <DataGrid
                 rows={newMaterials}
                 columns={newMaterialColumns}
@@ -638,11 +676,13 @@ const ThermalInsulationTabContent = ({
                   },
                 }}
               />
-            </div>            {/* Calculation Card for New Materials */}
+            </div>{" "}
+            {/* Calculation Card for New Materials */}
             <Card sx={{ mt: 3, backgroundColor: "#e8f5e8" }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  {translations.calculations?.newMaterials || "Θερμικοί Υπολογισμοί (Νέα Υλικά)"}
+                  {translations.calculations?.newMaterials ||
+                    "Θερμικοί Υπολογισμοί (Νέα Υλικά)"}
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={12} md={4}>
@@ -650,7 +690,8 @@ const ThermalInsulationTabContent = ({
                       variant="body2"
                       color="text.secondary"
                       gutterBottom>
-                      {translations.calculations?.uCoefficient || "Συντελεστής Θερμοπερατότητας (U)"}
+                      {translations.calculations?.uCoefficient ||
+                        "Συντελεστής Θερμοπερατότητας (U)"}
                     </Typography>
                     <Typography variant="h6" color="success.main">
                       {calculateUCoefficient(newMaterials).toFixed(3)} W/m²K
@@ -661,7 +702,8 @@ const ThermalInsulationTabContent = ({
                       variant="body2"
                       color="text.secondary"
                       gutterBottom>
-                      {translations.calculations?.winterLosses || "Χειμερινές Ωριαίες Απώλειες"}
+                      {translations.calculations?.winterLosses ||
+                        "Χειμερινές Ωριαίες Απώλειες"}
                     </Typography>
                     <Typography variant="h6" color="success.main">
                       {calculateWinterHourlyLosses(newMaterials).toFixed(3)} kW
@@ -672,7 +714,8 @@ const ThermalInsulationTabContent = ({
                       variant="body2"
                       color="text.secondary"
                       gutterBottom>
-                      {translations.calculations?.summerLosses || "Καλοκαιρινές Ωριαίες Απώλειες"}
+                      {translations.calculations?.summerLosses ||
+                        "Καλοκαιρινές Ωριαίες Απώλειες"}
                     </Typography>
                     <Typography variant="h6" color="success.main">
                       {calculateSummerHourlyLosses(newMaterials).toFixed(3)} kW
@@ -682,16 +725,21 @@ const ThermalInsulationTabContent = ({
               </CardContent>
             </Card>
           </div>
-        </TabPanel>        {/* Tab 3: Θέρμανση & Ψύξη */}
+        </TabPanel>{" "}
+        {/* Tab 3: Θέρμανση & Ψύξη */}
         <TabPanel value={tabValue} index={2}>
           <Typography variant="h6" gutterBottom>
-            {translations.sections?.heatingCoolingParams || "Παράμετροι Θέρμανσης & Ψύξης"}
+            {translations.sections?.heatingCoolingParams ||
+              "Παράμετροι Θέρμανσης & Ψύξης"}
           </Typography>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label={translations.fields?.heatingHoursPerYear || "Ώρες θέρμανσης ανά έτος"}
+                label={
+                  translations.fields?.heatingHoursPerYear ||
+                  "Ώρες θέρμανσης ανά έτος"
+                }
                 type="number"
                 value={thermalInsulation.heating_hours_per_year || ""}
                 onChange={(e) =>
@@ -706,7 +754,10 @@ const ThermalInsulationTabContent = ({
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label={translations.fields?.coolingHoursPerYear || "Ώρες ψύξης ανά έτος"}
+                label={
+                  translations.fields?.coolingHoursPerYear ||
+                  "Ώρες ψύξης ανά έτος"
+                }
                 type="number"
                 value={thermalInsulation.cooling_hours_per_year || ""}
                 onChange={(e) =>
@@ -720,20 +771,28 @@ const ThermalInsulationTabContent = ({
             </Grid>
           </Grid>
         </TabPanel>
-
         {/* Tab 4: Οικονομική Ανάλυση */}
-        <TabPanel value={tabValue} index={3}>          <Typography variant="h6" gutterBottom>
+        <TabPanel value={tabValue} index={3}>
+          {" "}
+          <Typography variant="h6" gutterBottom>
             {translations.sections?.economicAnalysis || "Οικονομική Ανάλυση"}
           </Typography>
-          <Grid container spacing={3}>            <Grid item xs={12} md={6}>
+          <Grid container spacing={3}>
+            {" "}
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label={`${translations.fields?.totalCost || "Συνολικό κόστος (€)"} - ${translations.autoCalculated || "Αυτόματος Υπολογισμός"}`}
+                label={`${
+                  translations.fields?.totalCost || "Συνολικό κόστος (€)"
+                } - ${translations.autoCalculated || "Αυτόματος Υπολογισμός"}`}
                 type="text"
-                value={calculateTotalCost(newMaterials).toLocaleString('el-GR', { 
-                  minimumFractionDigits: 2, 
-                  maximumFractionDigits: 2 
-                })}
+                value={calculateTotalCost(newMaterials).toLocaleString(
+                  "el-GR",
+                  {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }
+                )}
                 InputProps={{ readOnly: true }}
                 sx={{
                   "& .MuiInputBase-input": {
@@ -744,16 +803,22 @@ const ThermalInsulationTabContent = ({
                     color: "var(--color-primary)",
                   },
                 }}
-                helperText={translations.autoCalculatedCost || "Υπολογίζεται αυτόματα από το άθροισμα των κοστών των νέων υλικών"}
+                helperText={
+                  translations.autoCalculatedCost ||
+                  "Υπολογίζεται αυτόματα από το άθροισμα των κοστών των νέων υλικών"
+                }
               />
-            </Grid>            <Grid item xs={12} md={6}>
+            </Grid>{" "}
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label={`${translations.fields?.annualBenefit || "Ετήσιο όφελος (€)"} - ${translations.autoCalculated || "Αυτόματος Υπολογισμός"}`}
+                label={`${
+                  translations.fields?.annualBenefit || "Ετήσιο όφελος (€)"
+                } - ${translations.autoCalculated || "Αυτόματος Υπολογισμός"}`}
                 type="text"
-                value={calculateAnnualBenefit().toLocaleString('el-GR', { 
-                  minimumFractionDigits: 2, 
-                  maximumFractionDigits: 2 
+                value={calculateAnnualBenefit().toLocaleString("el-GR", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
                 })}
                 InputProps={{ readOnly: true }}
                 sx={{
@@ -765,13 +830,19 @@ const ThermalInsulationTabContent = ({
                     color: "var(--color-success)",
                   },
                 }}
-                helperText={translations.autoCalculatedBenefit || "Υπολογίζεται αυτόματα βάσει διαφοράς απωλειών, ωρών λειτουργίας και κόστους ρεύματος"}
+                helperText={
+                  translations.autoCalculatedBenefit ||
+                  "Υπολογίζεται αυτόματα βάσει διαφοράς απωλειών, ωρών λειτουργίας και κόστους ρεύματος"
+                }
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label={translations.fields?.timePeriodYears || "Χρονικό διάστημα (έτη)"}
+                label={
+                  translations.fields?.timePeriodYears ||
+                  "Χρονικό διάστημα (έτη)"
+                }
                 type="number"
                 value={thermalInsulation.time_period_years || 20}
                 onChange={(e) =>
@@ -786,7 +857,10 @@ const ThermalInsulationTabContent = ({
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label={translations.fields?.annualOperatingCosts || "Λειτουργικά έξοδα ανά έτος (€)"}
+                label={
+                  translations.fields?.annualOperatingCosts ||
+                  "Λειτουργικά έξοδα ανά έτος (€)"
+                }
                 type="number"
                 value={thermalInsulation.annual_operating_costs || ""}
                 onChange={(e) =>
@@ -798,7 +872,9 @@ const ThermalInsulationTabContent = ({
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label={translations.fields?.discountRate || "Επιτόκιο αναγωγής (%)"}
+                label={
+                  translations.fields?.discountRate || "Επιτόκιο αναγωγής (%)"
+                }
                 type="number"
                 value={thermalInsulation.discount_rate || 5}
                 onChange={(e) =>
@@ -810,7 +886,10 @@ const ThermalInsulationTabContent = ({
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label={translations.fields?.netPresentValue || "Καθαρή παρούσα αξία (€)"}
+                label={
+                  translations.fields?.netPresentValue ||
+                  "Καθαρή παρούσα αξία (€)"
+                }
                 type="number"
                 value={thermalInsulation.net_present_value || 0}
                 InputProps={{ readOnly: true }}
@@ -828,7 +907,6 @@ const ThermalInsulationTabContent = ({
           </Grid>
         </TabPanel>
       </div>
-
       {/* Material Modal */}
       {materialModalOpen && (
         <ThermalInsulationMaterialModal
@@ -840,13 +918,16 @@ const ThermalInsulationTabContent = ({
           onSubmitSuccess={onMaterialSaveSuccess}
         />
       )}
-
-      {/* Delete Confirmation Dialog */}      <ConfirmationDialog
+      {/* Delete Confirmation Dialog */}{" "}
+      <ConfirmationDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDeleteMaterial}
         title={translations.confirmDelete?.title || "Διαγραφή Υλικού"}
-        message={translations.confirmDelete?.message || "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό το υλικό;"}
+        message={
+          translations.confirmDelete?.message ||
+          "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό το υλικό;"
+        }
         confirmText={translations.confirmDelete?.confirm || "Διαγραφή"}
         cancelText={translations.confirmDelete?.cancel || "Ακύρωση"}
         confirmColor="error"
