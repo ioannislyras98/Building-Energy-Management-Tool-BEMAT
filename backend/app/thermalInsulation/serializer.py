@@ -55,8 +55,7 @@ class ExternalWallThermalInsulationSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'uuid', 'created_at', 'updated_at', 'u_coefficient', 
             'net_present_value', 'total_materials_cost', 'total_surface_area', 'annual_benefit'
-        ]
-
+        ]    
     def get_old_materials(self, obj):
         old_materials = obj.material_layers.filter(material_type='old')
         return ThermalInsulationMaterialLayerSerializer(old_materials, many=True).data
@@ -66,13 +65,17 @@ class ExternalWallThermalInsulationSerializer(serializers.ModelSerializer):
         return ThermalInsulationMaterialLayerSerializer(new_materials, many=True).data
 
     def get_total_materials_cost(self, obj):
-        return sum(material.cost for material in obj.material_layers.all())
+        return sum(material.cost or 0 for material in obj.material_layers.all())
 
     def get_total_surface_area(self, obj):
-        return sum(material.surface_area for material in obj.material_layers.all())
+        return sum(material.surface_area or 0 for material in obj.material_layers.all())
 
     def get_calculated_annual_benefit(self, obj):
-        return obj.calculate_annual_benefit()
+        try:
+            return obj.calculate_annual_benefit()
+        except Exception as e:
+            print(f"Error calculating annual benefit in serializer: {e}")
+            return 0
 
     def create(self, validated_data):
         # Set user to current user

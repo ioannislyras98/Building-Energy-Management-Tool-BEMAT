@@ -36,7 +36,7 @@ class RoofThermalInsulationSerializer(serializers.ModelSerializer):
             'discount_rate', 'net_present_value', 'old_materials', 'new_materials',
             'created_at', 'updated_at', 'created_by', 'created_by_name'
         ]
-        read_only_fields = ['uuid', 'created_at', 'updated_at']
+        read_only_fields = ['uuid', 'created_at', 'updated_at', 'created_by']
 
     def get_old_materials(self, obj):
         old_materials = obj.material_layers.filter(material_type='old')

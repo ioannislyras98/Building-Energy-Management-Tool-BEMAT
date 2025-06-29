@@ -146,21 +146,23 @@ class RoofThermalInsulationMaterialLayer(models.Model):
         null=True, blank=True,
         help_text="Κόστος υλικού και εργασίας (μόνο για νέα υλικά)"
     )
-    
-    # Calculated fields (populated automatically)
+      # Calculated fields (populated automatically)
     material_name = models.CharField(
         max_length=100, 
         verbose_name="Όνομα Υλικού",
-        help_text="Αυτόματη συμπλήρωση από το επιλεγμένο υλικό"
+        help_text="Αυτόματη συμπλήρωση από το επιλεγμένο υλικό",
+        null=True, blank=True
     )
     material_thermal_conductivity = models.FloatField(
         verbose_name="Θερμική Αγωγιμότητα (W/mK)",
-        help_text="Αυτόματη συμπλήρωση από το επιλεγμένο υλικό"
+        help_text="Αυτόματη συμπλήρωση από το επιλεγμένο υλικό",
+        null=True, blank=True
     )
     surface_type_display = models.CharField(
         max_length=100,
         verbose_name="Επιφάνεια (Περιγραφή)",
-        help_text="Περιγραφή του τύπου επιφάνειας"
+        help_text="Περιγραφή του τύπου επιφάνειας",
+        null=True, blank=True
     )
     
     order = models.PositiveIntegerField(

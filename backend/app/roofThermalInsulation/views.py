@@ -12,6 +12,29 @@ from .serializer import (
 )
 from building.models import Building
 from project.models import Project
+from materials.models import Material
+from materials.serializers import MaterialListSerializer
+
+
+# Get available materials for roof thermal insulation
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_available_materials(request):
+    """Get all available materials for roof thermal insulation"""
+    try:
+        materials = Material.objects.filter(is_active=True)
+        serializer = MaterialListSerializer(materials, many=True)
+        return Response({
+            "success": True,
+            "data": serializer.data,
+            "count": len(serializer.data)
+        })
+        
+    except Exception as e:
+        return Response(
+            {"detail": str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 
 class RoofThermalInsulationListView(generics.ListAPIView):
@@ -30,6 +53,19 @@ class RoofThermalInsulationCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
+    
+    def create(self, request, *args, **kwargs):
+        try:
+            print(f"Roof thermal insulation create request data: {request.data}")
+            return super().create(request, *args, **kwargs)
+        except Exception as e:
+            print(f"Error creating roof thermal insulation: {e}")
+            import traceback
+            traceback.print_exc()
+            return Response(
+                {"detail": str(e)}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class RoofThermalInsulationDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -152,11 +188,20 @@ class RoofThermalInsulationMaterialLayerCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        # Verify that the roof thermal insulation belongs to the user
-        roof_thermal_insulation = serializer.validated_data['roof_thermal_insulation']
-        if roof_thermal_insulation.created_by != self.request.user:
-            raise PermissionError("You don't have permission to add materials to this roof thermal insulation")
-        serializer.save()
+        # Get thermal_insulation_uuid from URL kwargs if present
+        if 'thermal_insulation_uuid' in self.kwargs:
+            roof_thermal_insulation = get_object_or_404(
+                RoofThermalInsulation,
+                uuid=self.kwargs['thermal_insulation_uuid'],
+                created_by=self.request.user
+            )
+            serializer.save(roof_thermal_insulation=roof_thermal_insulation)
+        else:
+            # Verify that the roof thermal insulation belongs to the user
+            roof_thermal_insulation = serializer.validated_data['roof_thermal_insulation']
+            if roof_thermal_insulation.created_by != self.request.user:
+                raise PermissionError("You don't have permission to add materials to this roof thermal insulation")
+            serializer.save()
 
 
 class RoofThermalInsulationMaterialLayerDetailView(generics.RetrieveUpdateDestroyAPIView):

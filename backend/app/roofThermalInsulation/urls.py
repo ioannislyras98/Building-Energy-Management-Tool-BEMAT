@@ -2,6 +2,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # Available materials
+    path('materials/available/', views.get_available_materials, 
+         name='roof-available-materials'),
+    
     # Roof Thermal Insulation URLs
     path('', views.RoofThermalInsulationListView.as_view(), 
          name='roof-thermal-insulations'),
@@ -12,11 +16,13 @@ urlpatterns = [
     path('building/<uuid:building_uuid>/', views.get_roof_thermal_insulations_by_building, 
          name='roof-thermal-insulations-by-building'),
     path('project/<uuid:project_uuid>/', views.get_roof_thermal_insulations_by_project, 
-         name='roof-thermal-insulations-by-project'),
-    path('<uuid:thermal_insulation_uuid>/recalculate/', views.recalculate_u_coefficient, 
+         name='roof-thermal-insulations-by-project'),    path('<uuid:thermal_insulation_uuid>/recalculate/', views.recalculate_u_coefficient, 
          name='roof-recalculate-u-coefficient'),
     
     # Material Layer URLs
+    path('<uuid:thermal_insulation_uuid>/materials/add/', 
+         views.RoofThermalInsulationMaterialLayerCreateView.as_view(), 
+         name='roof-thermal-insulation-material-layer-create'),
     path('material-layers/create/', views.RoofThermalInsulationMaterialLayerCreateView.as_view(), 
          name='roof-material-layer-create'),
     path('material-layers/<uuid:uuid>/', views.RoofThermalInsulationMaterialLayerDetailView.as_view(), 

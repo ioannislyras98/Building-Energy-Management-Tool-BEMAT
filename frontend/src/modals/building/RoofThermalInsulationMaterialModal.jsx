@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import $ from "jquery";
 import Cookies from "universal-cookie";
 import { useLanguage } from "../../context/LanguageContext";
+import { useModalBlur } from "../../hooks/useModals";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import InputEntryModal from "../shared/InputEntryModal";
 import "../../assets/styles/forms.css";
 
 const RoofThermalInsulationMaterialModal = ({
@@ -14,6 +16,9 @@ const RoofThermalInsulationMaterialModal = ({
   editItem = null,
   onSubmitSuccess,
 }) => {
+  // Apply blur effect when modal is open
+  useModalBlur(open);
+
   // Initialize form data based on material type
   const getInitialFormData = () => {
     const baseData = {
@@ -239,86 +244,63 @@ const RoofThermalInsulationMaterialModal = ({
 
   if (!open) return null;
 
+  const modalTitle = editItem
+    ? translations.editMaterial || "Επεξεργασία Υλικού"
+    : materialType === "old"
+    ? translations.addOldMaterial || "Προσθήκη Παλιού Υλικού"
+    : translations.addNewMaterial || "Προσθήκη Νέου Υλικού";
+
   return (
-    <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>
-            {editItem
-              ? translations.editMaterial || "Επεξεργασία Υλικού"
-              : materialType === "old"
-              ? translations.addOldMaterial || "Προσθήκη Υπάρχοντος Υλικού"
-              : translations.addNewMaterial || "Προσθήκη Νέου Υλικού"}
-          </h2>
-          <button className="modal-close" onClick={handleClose}>
-            ×
-          </button>
-        </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="rounded-lg p-6 w-full max-w-4xl border-primary-light border-2 bg-white shadow-lg max-h-[90vh] overflow-y-auto">
+        <h2 className="text-lg font-bold mb-4 text-center">{modalTitle}</h2>
 
-        <div className="modal-body">
-          {error && <div className="error-message">{error}</div>}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-4">
+            {error}
+          </div>
+        )}
 
-          <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Material Selection */}
-            <div className="form-group">
-              <label htmlFor="material">
-                {translations.material || "Υλικό"} *
+            <div className="md:col-span-2">
+              <label htmlFor="material" className="label-name">
+                {translations.material || "Υλικό"}
+                <span className="text-red-500 ml-1">*</span>
               </label>
               <select
                 id="material"
                 value={formData.material}
                 onChange={handleMaterialChange}
-                className={validationErrors.material ? "error" : ""}
-                required>
+                className={`input-field ${validationErrors.material ? "error-input" : ""}`}
+                required
+              >
                 <option value="">
                   {translations.selectMaterial || "Επιλέξτε υλικό"}
-                </option>
-                {availableMaterials.map((material) => (
+                </option>                {availableMaterials.map((material) => (
                   <option key={material.uuid} value={material.uuid}>
-                    {material.name} ({material.thermal_conductivity} W/m·K)
+                    {material.name} - λ = {material.thermal_conductivity} W/mK | {material.category_display}
                   </option>
                 ))}
-              </select>
-              {validationErrors.material && (
-                <div className="error-text">{validationErrors.material}</div>
+              </select>              {validationErrors.material && (
+                <div className="text-red-500 text-xs mt-1">{validationErrors.material}</div>
               )}
             </div>
 
-            {/* Material Details Display */}
-            {selectedMaterial && (
-              <div className="material-details">
-                <h4>{translations.materialDetails || "Στοιχεία Υλικού"}</h4>
-                <p>
-                  <strong>
-                    {translations.thermalConductivity || "Θερμική Αγωγιμότητα"}:
-                  </strong>{" "}
-                  {selectedMaterial.thermal_conductivity} W/m·K
-                </p>
-                <p>
-                  <strong>{translations.density || "Πυκνότητα"}:</strong>{" "}
-                  {selectedMaterial.density} kg/m³
-                </p>
-                {selectedMaterial.description && (
-                  <p>
-                    <strong>{translations.description || "Περιγραφή"}:</strong>{" "}
-                    {selectedMaterial.description}
-                  </p>
-                )}
-              </div>
-            )}
-
             {/* Surface Type */}
-            <div className="form-group">
-              <label htmlFor="surface_type">
-                {translations.surfaceType || "Τύπος Επιφάνειας"} *
+            <div className="md:col-span-2">
+              <label htmlFor="surface_type" className="label-name">
+                {translations.surfaceType || "Τύπος Επιφάνειας"}
+                <span className="text-red-500 ml-1">*</span>
               </label>
               <select
                 id="surface_type"
                 value={formData.surface_type}
-                onChange={(e) =>
-                  handleInputChange("surface_type", e.target.value)
-                }
-                required>
+                onChange={(e) => handleInputChange("surface_type", e.target.value)}
+                className="input-field"
+                required
+              >
                 {surfaceTypeOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -328,102 +310,81 @@ const RoofThermalInsulationMaterialModal = ({
             </div>
 
             {/* Thickness */}
-            <div className="form-group">
-              <label htmlFor="thickness">
-                {translations.thickness || "Πάχος"} (m) *
-              </label>
-              <input
-                type="number"
-                id="thickness"
-                step="0.001"
-                min="0"
-                value={formData.thickness}
-                onChange={(e) => handleInputChange("thickness", e.target.value)}
-                className={validationErrors.thickness ? "error" : ""}
-                required
-              />
-              {validationErrors.thickness && (
-                <div className="error-text">{validationErrors.thickness}</div>
-              )}
-            </div>
+            <InputEntryModal
+              entry={`${translations.thickness || "Πάχος"} (m)`}
+              id="thickness"
+              type="number"
+              step="0.001"
+              min="0"
+              value={formData.thickness}
+
+              onChange={(e) => handleInputChange("thickness", e.target.value)}
+              error={validationErrors.thickness}
+              required
+            />
 
             {/* Surface Area */}
-            <div className="form-group">
-              <label htmlFor="surface_area">
-                {translations.surfaceArea || "Επιφάνεια"} (m²) *
-              </label>
-              <input
-                type="number"
-                id="surface_area"
-                step="0.01"
-                min="0"
-                value={formData.surface_area}
-                onChange={(e) =>
-                  handleInputChange("surface_area", e.target.value)
-                }
-                className={validationErrors.surface_area ? "error" : ""}
-                required
-              />
-              {validationErrors.surface_area && (
-                <div className="error-text">
-                  {validationErrors.surface_area}
-                </div>
-              )}
-            </div>
+            <InputEntryModal
+              entry={`${translations.surfaceArea || "Επιφάνεια"} (m²)`}
+              id="surface_area"
+              type="number"
+              step="0.01"
+              min="0"
+              value={formData.surface_area}
+              onChange={(e) => handleInputChange("surface_area", e.target.value)}
+              error={validationErrors.surface_area}
+              required
+            />
 
             {/* Cost (only for new materials) */}
             {materialType === "new" && (
-              <div className="form-group">
-                <label htmlFor="cost">
-                  {translations.cost || "Κόστος"} (€)
-                </label>
-                <input
-                  type="number"
-                  id="cost"
-                  step="0.01"
-                  min="0"
-                  value={formData.cost}
-                  onChange={(e) => handleInputChange("cost", e.target.value)}
-                  className={validationErrors.cost ? "error" : ""}
-                />
-                {validationErrors.cost && (
-                  <div className="error-text">{validationErrors.cost}</div>
-                )}
-              </div>
+              <InputEntryModal
+                entry={`${translations.cost || "Κόστος"} (€)`}
+                id="cost"
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.cost}
+                onChange={(e) => handleInputChange("cost", e.target.value)}
+                error={validationErrors.cost}
+              />
             )}
 
             {/* Thermal Resistance Calculation Display */}
             {selectedMaterial && formData.thickness && (
-              <div className="calculation-info">
-                <h4>{translations.thermalResistance || "Θερμική Αντίσταση"}</h4>
-                <p>
-                  R = {formData.thickness} /{" "}
-                  {selectedMaterial.thermal_conductivity} ={" "}
-                  {(
-                    parseFloat(formData.thickness) /
-                    selectedMaterial.thermal_conductivity
-                  ).toFixed(4)}{" "}
-                  m²·K/W
+              <div className="md:col-span-2 bg-green-50 border border-green-200 rounded-lg p-4">
+                <h4 className="font-semibold text-green-800 mb-2">
+                  {translations.thermalResistance || "Θερμική Αντίσταση"}
+                </h4>
+                <p className="text-sm text-green-700">
+                  R = {formData.thickness} / {selectedMaterial.thermal_conductivity} ={" "}
+                  <strong>
+                    {(
+                      parseFloat(formData.thickness) / selectedMaterial.thermal_conductivity
+                    ).toFixed(4)}{" "}
+                    m²·K/W
+                  </strong>
                 </p>
               </div>
             )}
+          </div>
 
-            <div className="modal-actions">
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={handleClose}
-                disabled={loading}>
-                {translations.cancel || "Ακύρωση"}
-              </button>
-              <button type="submit" className="btn-primary" disabled={loading}>
-                {loading
-                  ? translations.saving || "Αποθήκευση..."
-                  : translations.save || "Αποθήκευση"}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="flex justify-between mt-6 border-t border-gray-200 pt-4">
+            <button
+              type="button"
+              className="close-modal"
+              onClick={handleClose}
+              disabled={loading}
+            >
+              {translations.cancel || "Ακύρωση"}
+            </button>
+            <button type="submit" className="confirm-button" disabled={loading}>
+              {loading
+                ? translations.saving || "Αποθήκευση..."
+                : translations.save || "Αποθήκευση"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

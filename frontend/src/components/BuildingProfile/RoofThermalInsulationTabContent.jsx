@@ -513,7 +513,7 @@ const RoofThermalInsulationTabContent = ({
                 backgroundColor: "var(--color-primary-dark)",
               },
             }}>
-            {translations.saveButton || "Αποθήκευση"}
+            {translations.save || "Αποθήκευση"}
           </Button>
         </div>
       </div>
@@ -576,7 +576,7 @@ const RoofThermalInsulationTabContent = ({
                     backgroundColor: "var(--color-primary-dark)",
                   },
                 }}>
-                {translations.addOldMaterial || "Προσθήκη Υλικού"}
+                {translations.addOldMaterial || "Προσθήκη Παλιού Υλικού"}
               </Button>
             </div>{" "}
             <div style={{ height: 400, width: "100%" }}>
@@ -663,7 +663,7 @@ const RoofThermalInsulationTabContent = ({
                     backgroundColor: "var(--color-primary-dark)",
                   },
                 }}>
-                {translations.addNewMaterial || "Προσθήκη Υλικού"}
+                {translations.addNewMaterial || "Προσθήκη Νέου Υλικού"}
               </Button>
             </div>{" "}
             <div style={{ height: 400, width: "100%" }}>
