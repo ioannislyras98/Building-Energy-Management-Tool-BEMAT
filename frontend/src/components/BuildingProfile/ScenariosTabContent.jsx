@@ -11,6 +11,7 @@ import {
 import ThermostatIcon from "@mui/icons-material/Thermostat";
 import AddIcon from "@mui/icons-material/Add";
 import ThermalInsulationTabContent from "./ThermalInsulationTabContent";
+import RoofThermalInsulationTabContent from "./RoofThermalInsulationTabContent";
 
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
@@ -38,6 +39,16 @@ const ScenariosTabContent = ({
         "Ανάλυση και βελτιστοποίηση θερμομόνωσης των εξωτερικών τοίχων",
       icon: <ThermostatIcon className="w-8 h-8" />,
       color: "from-blue-500 to-blue-600",
+      disabled: false,
+    },
+    {
+      id: "roof-thermal-insulation",
+      title: translations.roofThermalInsulation || "Θερμομόνωση Οροφής",
+      description:
+        translations.roofThermalInsulationDesc ||
+        "Ανάλυση και βελτιστοποίηση θερμομόνωσης της οροφής",
+      icon: <ThermostatIcon className="w-8 h-8" />,
+      color: "from-green-500 to-green-600",
       disabled: false,
     },
     // Μπορούμε να προσθέσουμε άλλα σενάρια στο μέλλον
@@ -71,6 +82,36 @@ const ScenariosTabContent = ({
             </Button>
           </div>
           <ThermalInsulationTabContent
+            buildingUuid={buildingUuid}
+            projectUuid={projectUuid}
+            buildingData={buildingData}
+            params={params}
+          />
+        </div>
+      );
+    }
+
+    if (selectedScenario === "roof-thermal-insulation") {
+      return (
+        <div>
+          <div className="mb-4">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleBackToScenarios}
+              sx={{
+                mb: 2,
+                backgroundColor: "var(--color-primary)",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "var(--color-primary)",
+                  opacity: 0.8,
+                },
+              }}>
+              {translations.backToScenarios || "← Επιστροφή στα Σενάρια"}
+            </Button>
+          </div>
+          <RoofThermalInsulationTabContent
             buildingUuid={buildingUuid}
             projectUuid={projectUuid}
             buildingData={buildingData}
