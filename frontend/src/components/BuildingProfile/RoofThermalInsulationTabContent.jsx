@@ -320,13 +320,13 @@ const RoofThermalInsulationTabContent = ({
   const calculateWinterHourlyLosses = (materials) => {
     const uCoefficient = calculateUCoefficient(materials);
     const totalArea = calculateTotalSurfaceArea(materials);
-    return (uCoefficient * totalArea * 72) / 1000; // kW
+    return (uCoefficient * totalArea * 17) / 1000; // kW
   };
 
   const calculateSummerHourlyLosses = (materials) => {
     const uCoefficient = calculateUCoefficient(materials);
     const totalArea = calculateTotalSurfaceArea(materials);
-    return (uCoefficient * totalArea * 12.5) / 1000; // kW
+    return (uCoefficient * totalArea * 13) / 1000; // kW
   };
 
   const calculateTotalCost = (materials) => {

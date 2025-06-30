@@ -109,21 +109,21 @@ Q = (U × A × ΔT) / 1000
 
 | Εποχή     | Διαφορά Θερμοκρασίας (ΔT) | Χρήση                   |
 | --------- | ------------------------- | ----------------------- |
-| Χειμώνας  | 72K                       | Υπολογισμοί θέρμανσης   |
-| Καλοκαίρι | 12.5K                     | Υπολογισμοί κλιματισμού |
+| Χειμώνας  | 17K                       | Υπολογισμοί θέρμανσης   |
+| Καλοκαίρι | 13K                     | Υπολογισμοί κλιματισμού |
 
 ### Χειμερινές Ωριαίες Απώλειες
 
 **Υλοποίηση:**
 
-- **Backend:** Βοηθητική μέθοδος `_calculate_hourly_losses(materials, 72)` (τοίχοι και οροφές)
+- **Backend:** Βοηθητική μέθοδος `_calculate_hourly_losses(materials, 17)` (τοίχοι και οροφές)
 - **Frontend:** Συνάρτηση `calculateWinterHourlyLosses(materials)` (ThermalInsulationTabContent και RoofThermalInsulationTabContent)
 
 ### Καλοκαιρινές Ωριαίες Απώλειες
 
 **Υλοποίηση:**
 
-- **Backend:** Βοηθητική μέθοδος `_calculate_hourly_losses(materials, 12.5)` (τοίχοι και οροφές)
+- **Backend:** Βοηθητική μέθοδος `_calculate_hourly_losses(materials, 13)` (τοίχοι και οροφές)
 - **Frontend:** Συνάρτηση `calculateSummerHourlyLosses(materials)` (ThermalInsulationTabContent και RoofThermalInsulationTabContent)
 
 ---
@@ -258,8 +258,8 @@ NPV = -Initial_Investment + Σ(Annual_Net_Benefit / (1 + discount_rate)^year)
 
 | Παράμετρος | Τιμή | Μονάδα | Περιγραφή                                    |
 | ---------- | ---- | ------ | -------------------------------------------- |
-| ΔT_winter  | 72   | K      | Χειμερινή διαφορά θερμοκρασίας θέρμανσης     |
-| ΔT_summer  | 12.5 | K      | Καλοκαιρινή διαφορά θερμοκρασίας κλιματισμού |
+| ΔT_winter  | 17   | K      | Χειμερινή διαφορά θερμοκρασίας θέρμανσης     |
+| ΔT_summer  | 13 | K      | Καλοκαιρινή διαφορά θερμοκρασίας κλιματισμού |
 
 ### Προεπιλεγμένες Τιμές
 
