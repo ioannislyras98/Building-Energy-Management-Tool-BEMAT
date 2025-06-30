@@ -183,11 +183,11 @@ class ExternalWallThermalInsulation(models.Model):
             new_materials = self.material_layers.filter(material_type='new')
         
             # Calculate winter hourly losses (kW) for both old and new materials
-            winter_losses_old = self._calculate_hourly_losses(old_materials, 72)  # 72°C difference for winter
+            winter_losses_old = self._calculate_hourly_losses(old_materials, 72)  # 72Kdifference for winter
             winter_losses_new = self._calculate_hourly_losses(new_materials, 72)
         
             # Calculate summer hourly losses (kW) for both old and new materials  
-            summer_losses_old = self._calculate_hourly_losses(old_materials, 12.5)  # 12.5°C difference for summer
+            summer_losses_old = self._calculate_hourly_losses(old_materials, 12.5)  # 12.5Kdifference for summer
             summer_losses_new = self._calculate_hourly_losses(new_materials, 12.5)
         
             # Calculate differences (savings)
