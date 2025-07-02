@@ -63,7 +63,9 @@ class Material(models.Model):
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 
         verbose_name="Δημιουργός",
-        help_text="Μόνο admin μπορεί να δημιουργήσει υλικά"
+        help_text="Μόνο admin μπορεί να δημιουργήσει υλικά",
+        null=True,
+        blank=True
     )
 
     class Meta:

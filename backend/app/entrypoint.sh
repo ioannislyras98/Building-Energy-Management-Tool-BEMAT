@@ -9,6 +9,9 @@ echo "PostgreSQL started"
 echo "Running database migrations..."
 python manage.py migrate
 
+echo "Loading initial materials data..."
+python manage.py load_materials
+
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
