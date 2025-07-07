@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "thermalZone",
     "electricalConsumption",
     "materials",
+    "prefectures",
     "thermalInsulation",
     "roofThermalInsulation",
 ]

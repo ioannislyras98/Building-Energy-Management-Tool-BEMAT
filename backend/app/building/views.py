@@ -146,7 +146,15 @@ def get_building_detail(request, uuid):
             "occupants": building.occupants,
             "date_created": building.date_created.strftime("%d-%m-%Y"),
             "contacts": contacts_data,
-            "prefecture": building.prefecture,
+            "prefecture": str(building.prefecture.uuid),
+            "prefecture_data": {
+                "uuid": str(building.prefecture.uuid),
+                "name": building.prefecture.name,
+                "zone": building.prefecture.zone,
+                "zone_display": f"Ζώνη {building.prefecture.zone}",
+                "temperature_winter": building.prefecture.temperature_winter,
+                "temperature_summer": building.prefecture.temperature_summer,
+            },
             "energy_zone": building.energy_zone,
             }
         

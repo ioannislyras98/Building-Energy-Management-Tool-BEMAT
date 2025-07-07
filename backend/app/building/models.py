@@ -40,16 +40,18 @@ class Building(models.Model):
         verbose_name='Διεύθυνση'
     )
     
-    prefecture = models.CharField(
-        max_length=100,
-        blank=False,
+    prefecture = models.ForeignKey(
+        'prefectures.Prefecture',
+        on_delete=models.CASCADE,
         verbose_name='Νομός',
+        related_name='buildings'
     )
     
     energy_zone = models.CharField(
         max_length=1,
         blank=False,
         verbose_name='Ενεργειακή Ζώνη',
+        editable=False  # This will be auto-populated from prefecture
     )
     
     # Λογικές τιμές
@@ -194,6 +196,12 @@ class Building(models.Model):
         auto_now_add=True,
         verbose_name='Ημερομηνία Δημιουργίας'
     )
+    
+    def save(self, *args, **kwargs):
+        # Auto-populate energy_zone from prefecture
+        if self.prefecture:
+            self.energy_zone = self.prefecture.zone
+        super().save(*args, **kwargs)
         
     def __str__(self):
         return self.name

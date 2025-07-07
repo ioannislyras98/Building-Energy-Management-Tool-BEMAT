@@ -4,66 +4,13 @@ import Cookies from "universal-cookie";
 import "./../../assets/styles/forms.css";
 import { useLanguage } from "../../context/LanguageContext";
 import { useModalBlur } from "../../hooks/useModals";
+import { getAllPrefectures } from "../../../services/ApiService";
 
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import InputEntryModal from "../shared/InputEntryModal";
 
 const cookies = new Cookies();
-
-const PREFECTURE_TO_ZONE = {
-  Ηρακλείου: "A",
-  Χανίων: "A",
-  Ρεθύμνου: "A",
-  Λασιθίου: "A",
-  Κυκλάδων: "A",
-  Δωδεκανήσου: "A",
-  Σάμου: "A",
-  Μεσσηνίας: "A",
-  Λακωνίας: "A",
-  Αργολίδας: "A",
-  Αρκαδίας: "A",
-  Κορινθίας: "A",
-  Αχαΐας: "A",
-  Ηλείας: "A",
-  Αιτωλοακαρνανίας: "B",
-  Φθιώτιδας: "B",
-  Φωκίδας: "B",
-  Βοιωτίας: "B",
-  Εύβοιας: "B",
-  Μαγνησίας: "B",
-  Λέσβου: "B",
-  Χίου: "B",
-  Κέρκυρας: "B",
-  Λευκάδας: "B",
-  Θεσπρωτίας: "B",
-  Πρέβεζας: "B",
-  Άρτας: "B",
-  Ιωαννίνων: "B",
-  Τρικάλων: "B",
-  Καρδίτσας: "B",
-  Λαρίσης: "B",
-  Πιερίας: "B",
-  Ημαθίας: "B",
-  Πέλλας: "B",
-  Θεσσαλονίκης: "C",
-  Αττικής: "B",
-  Κιλκίς: "C",
-  Χαλκιδικής: "C",
-  "Σερρών (ΒΑ τμήμα)": "C",
-  Καβάλας: "C",
-  Ξάνθης: "C",
-  Ροδόπης: "C",
-  Έβρου: "C",
-  Γρεβενών: "D",
-  Κοζάνης: "D",
-  Καστοριάς: "D",
-  Φλώρινας: "D",
-  "Σερρών (εκτός ΒΑ τμήματος)": "D",
-  Δράμας: "D",
-};
-
-const ALL_PREFECTURES = Object.keys(PREFECTURE_TO_ZONE).sort();
 
 function BuildingModalForm({
   isOpen,
@@ -75,6 +22,9 @@ function BuildingModalForm({
 }) {
   useModalBlur(isOpen);
   const isEdit = !!editItem;
+
+  const [prefectures, setPrefectures] = useState([]);
+  const [loadingPrefectures, setLoadingPrefectures] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -115,7 +65,7 @@ function BuildingModalForm({
         description: buildingData.description ?? "",
         year_built: buildingData.year_built ?? "",
         address: buildingData.address ?? "",
-        prefecture: buildingData.prefecture ?? "",
+        prefecture: buildingData.prefecture ?? "", // This will be the UUID
         energy_zone: buildingData.energy_zone ?? "",
         is_insulated: Boolean(buildingData.is_insulated),
         is_certified: Boolean(buildingData.is_certified),
@@ -162,15 +112,36 @@ function BuildingModalForm({
     setShowValidationErrors(false);
   }, [isEdit, editItem, isOpen]);
 
+  // Load prefectures from API
   useEffect(() => {
-    if (formData.prefecture) {
-      const zone = PREFECTURE_TO_ZONE[formData.prefecture] || "";
-      setFormData((prevState) => ({
-        ...prevState,
-        energy_zone: zone,
-      }));
+    const loadPrefectures = async () => {
+      setLoadingPrefectures(true);
+      try {
+        const data = await getAllPrefectures();
+        setPrefectures(data);
+      } catch (error) {
+        console.error('Error loading prefectures:', error);
+        // Fallback to empty array if API fails
+        setPrefectures([]);
+      } finally {
+        setLoadingPrefectures(false);
+      }
+    };
+
+    loadPrefectures();
+  }, []);
+
+  useEffect(() => {
+    if (formData.prefecture && prefectures.length > 0) {
+      const selectedPrefecture = prefectures.find(p => p.uuid === formData.prefecture);
+      if (selectedPrefecture) {
+        setFormData((prevState) => ({
+          ...prevState,
+          energy_zone: selectedPrefecture.zone,
+        }));
+      }
     }
-  }, [formData.prefecture]);
+  }, [formData.prefecture, prefectures]);
 
   const handleChange = (e) => {
     const { id, value, type } = e.target;
@@ -511,12 +482,13 @@ function BuildingModalForm({
                 value={formData.prefecture}
                 onChange={handleChange}
                 example={params.selectPrefecture}
-                options={ALL_PREFECTURES.map((prefecture) => ({
-                  value: prefecture,
-                  label: prefecture,
+                options={prefectures.map((prefecture) => ({
+                  value: prefecture.uuid,
+                  label: prefecture.name,
                 }))}
                 error={showValidationErrors ? errors.prefecture : ""}
                 required
+                disabled={loadingPrefectures}
                 className={
                   errors.prefecture && showValidationErrors
                     ? "border-red-500 bg-red-50"
