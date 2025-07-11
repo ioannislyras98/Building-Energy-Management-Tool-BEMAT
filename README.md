@@ -144,25 +144,6 @@ docker volume prune -f
 
 ## Χειροκίνητη Εκτέλεση (Advanced Users)
 
-### Για Windows (με PowerShell script)
-
-```powershell
-# Εκκίνηση BEMAT Control Center
-.\bemat.ps1
-```
-
-### Για Linux/macOS (με Bash script)
-
-```bash
-# Make executable (first time only)
-chmod +x bemat.sh
-
-# Εκκίνηση BEMAT Control Center
-./bemat.sh
-```
-
-### Χειροκίνητα με Docker Compose (όλα τα platforms)
-
 #### Backend & Database
 
 ```bash
@@ -177,37 +158,11 @@ cd frontend
 docker-compose -f docker-compose.frontend.yml up --build -d
 ```
 
-#### Ολοκληρωμένη εκκίνηση (Linux/macOS)
-
-```bash
-# Clone το repository
-git clone https://github.com/ioannislyras98/Building-Energy-Management-Tool-BEMAT.git
-cd Building-Energy-Management-Tool-BEMAT
-
-# Start backend services
-cd backend
-docker-compose up --build -d
-
-# Wait for backend to be ready, then start frontend
-sleep 30
-cd ../frontend
-docker-compose -f docker-compose.frontend.yml up --build -d
-
-# Χρήσιμες πληροφορίες
-echo "Frontend: http://localhost:3000"
-echo "Backend: http://localhost:8000"
-echo "Admin: http://localhost:8000/admin"
-```
-
 ### Δημιουργία Superuser (όλα τα platforms)
 
 ```bash
 # Δημιουργία admin user
 docker-compose exec web python manage.py createsuperuser
-
-# Ή με script (προ-configured)
-docker cp create_superuser.py backend-web-1:/usr/src/app/
-docker-compose exec web python create_superuser.py
 ```
 
 ## Διαχείριση Database
@@ -312,30 +267,6 @@ BEMAT/
 └── README.md
 ```
 
-### Key Files για Cross-Platform Support
-
-#### `backend/app/entrypoint.sh`
-
-```bash
-#!/bin/bash
-# Cross-platform startup script που:
-# 1. Περιμένει το PostgreSQL να είναι έτοιμο
-# 2. Τρέχει database migrations
-# 3. Φορτώνει prefectures data (ΣΗΜΑΝΤΙΚΟ για migrations)
-# 4. Φορτώνει materials data
-# 5. Συλλέγει static files
-# 6. Ξεκινά τον Django server
-```
-
-#### `backend/app/Dockerfile`
-
-```dockerfile
-# Cross-platform compatibility features:
-# - sed command για Windows line endings (CRLF → LF)
-# - chmod +x για executable permissions
-# - Debian-based image για consistency
-```
-
 ## Tech Stack
 
 **Backend:**
@@ -359,45 +290,6 @@ BEMAT/
 - Docker & Docker Compose
 - Cross-platform automation scripts (Windows/Linux/macOS)
 - Auto browser opening
-
-## Troubleshooting
-
-### Common Issues
-
-#### 1. Migration Errors (Prefecture Dependencies)
-
-```bash
-# Error: column "prefecture_id" contains null values
-# Solution: Data is loaded automatically via entrypoint.sh
-# The entrypoint loads prefectures before running migrations
-```
-
-#### 2. Port Already in Use
-
-```bash
-# Error: port 8000 already in use
-# Solution:
-sudo lsof -i :8000  # Linux/macOS
-netstat -ano | findstr :8000  # Windows
-
-# Kill the process or use different ports
-```
-
-#### 3. Docker Permission Issues (Linux)
-
-```bash
-# Add user to docker group
-sudo usermod -aG docker $USER
-# Logout and login again
-```
-
-#### 4. Line Ending Issues (Windows development to Linux deployment)
-
-```bash
-# Already handled in Dockerfile with:
-# RUN sed -i 's/\r$//g' /usr/src/app/entrypoint.sh
-# No action needed!
-```
 
 ## Πληροφορίες
 
