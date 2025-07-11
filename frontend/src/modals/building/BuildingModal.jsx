@@ -120,7 +120,7 @@ function BuildingModalForm({
         const data = await getAllPrefectures();
         setPrefectures(data);
       } catch (error) {
-        console.error('Error loading prefectures:', error);
+        console.error("Error loading prefectures:", error);
         // Fallback to empty array if API fails
         setPrefectures([]);
       } finally {
@@ -133,7 +133,9 @@ function BuildingModalForm({
 
   useEffect(() => {
     if (formData.prefecture && prefectures.length > 0) {
-      const selectedPrefecture = prefectures.find(p => p.uuid === formData.prefecture);
+      const selectedPrefecture = prefectures.find(
+        (p) => p.uuid === formData.prefecture
+      );
       if (selectedPrefecture) {
         setFormData((prevState) => ({
           ...prevState,
@@ -290,7 +292,7 @@ function BuildingModalForm({
       : "http://127.0.0.1:8000/buildings/create/";
 
     const method = isEdit ? "PUT" : "POST";
-    
+
     console.log("BuildingModal - URL:", url);
     console.log("BuildingModal - Method:", method);
     console.log("BuildingModal - editItem:", editItem);

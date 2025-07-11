@@ -2,6 +2,17 @@
 
 Software for Building Energy Management Support - Integrated application with Django Backend & React Frontend
 
+## 🌐 Cross-Platform Support
+
+**BEMAT τρέχει σε όλα τα λειτουργικά συστήματα:**
+
+| Platform    | Script         | Status                               |
+| ----------- | -------------- | ------------------------------------ |
+| **Windows** | `bemat.ps1`    | ✅ Full automation + browser opening |
+| **Linux**   | `bemat.sh`     | ✅ Full automation + browser opening |
+| **macOS**   | `bemat.sh`     | ✅ Full automation + browser opening |
+| **Manual**  | Docker Compose | ✅ All platforms                     |
+
 ## Quick Start
 
 ### Step 1: Prerequisites
@@ -19,15 +30,29 @@ cd Building-Energy-Management-Tool-BEMAT
 
 ### **Βήμα 3**: Εκτέλεση με ένα κλικ
 
+#### Windows
+
 ```powershell
 # Εκκίνηση BEMAT Control Center
 .\bemat.ps1
 ```
 
+#### Linux/macOS
+
+```bash
+# Make script executable (first time only)
+chmod +x bemat.sh
+
+# Εκκίνηση BEMAT Control Center
+./bemat.sh
+```
+
+**Αυτόματες λειτουργίες:**
+
 1. Αυτόματα ξεκινούν όλα τα services
-2. Ανοίγουν τα browsers στο Frontend & Backend
+2. Ανοίγουν τα browsers στο Frontend & Backend (Windows/Linux/macOS)
 3. Γίνεται npm install για το frontend
-4. Εκτελούνται οι migrations
+4. Εκτελούνται οι migrations με σωστή σειρά
 
 ## 📋 Διαθέσιμες Λειτουργίες
 
@@ -47,42 +72,6 @@ cd Building-Energy-Management-Tool-BEMAT
 - **Έλεγχος συστήματος**: Επιλογή `4` - System Diagnostics
 - **Τέλος εργασίας**: Επιλογή `2` - Stop All Services
 
-## Τι κάνει το BEMAT Control Center
-
-### bemat.ps1
-
-Το κεντρικό script που παρέχει ένα απλό μενού με επιλογές:
-
-**Επιλογή 1 - Start BEMAT (Recommended):**
-
-- Ελέγχει αν το Docker τρέχει
-- Χτίζει το backend (Django API + PostgreSQL) πρώτα
-- Χτίζει το frontend (React/Vite) δεύτερο **με npm install**
-- **Αυτόματα ανοίγει τα browsers** στο Frontend & Backend
-
-**Επιλογή 2 - Stop All Services:**
-
-- Σταματά όλα τα running containers
-- Καθαρό κλείσιμο όλων των services
-
-**Επιλογή 3 - Clean Docker & Rebuild All:** 🧹
-
-- **Σταματά όλα τα containers**
-- **Διαγράφει όλα τα containers**
-- **Διαγράφει όλα τα Docker images**
-- **Καθαρίζει Docker cache και volumes**
-- **Rebuild από την αρχή** - Backend και Frontend
-- **Αυτόματα ανοίγει browsers** μετά το rebuild
-- **Χρησιμοποιήστε όταν**: Έχετε προβλήματα με cache, import errors, ή θέλετε fresh start
-
-**Επιλογή 4 - System Diagnostics:** 🔍
-
-- **Εμφανίζει πληροφορίες συστήματος** (OS, CPU, Disk space)
-- **Έλεγχος Docker status** και containers
-- **Έλεγχος διαθέσιμων ports** (3000, 8000, 5432)
-- **Docker system usage** (images, containers, volumes)
-- **Χρησιμοποιήστε όταν**: Θέλετε να ελέγξετε την κατάσταση του συστήματος
-
 ## URLs μετά την εκκίνηση
 
 - **Frontend**: http://localhost:3000
@@ -95,10 +84,17 @@ cd Building-Energy-Management-Tool-BEMAT
 
 - ✅ **Docker Desktop** εγκατεστημένο και ενεργό
 - ✅ **Git** (για κλωνοποίηση)
-- ✅ **Windows** (τα scripts είναι για Windows)
+- ✅ **Cross-Platform Support**: Windows, Linux, macOS
 - ✅ Διαθέσιμα ports: 3000, 8000, 5432
 
+### Platform-specific:
+
+- **Windows**: PowerShell scripts (bemat.ps1)
+- **Linux/macOS**: Bash scripts (bemat.sh)
+
 ### Έλεγχος Προαπαιτούμενων
+
+**Windows:**
 
 ```powershell
 # Έλεγχος Docker
@@ -109,8 +105,20 @@ netstat -ano | findstr :3000
 netstat -ano | findstr :8000
 ```
 
+**Linux/macOS:**
+
+```bash
+# Έλεγχος Docker
+docker --version
+
+# Έλεγχος διαθέσιμων ports
+lsof -i :3000
+lsof -i :8000
+```
 
 ### Καθαρισμός Docker
+
+**Windows:**
 
 ```powershell
 # Σταματήστε όλα τα services πρώτα
@@ -122,33 +130,84 @@ docker system prune -a -f
 docker volume prune -f
 ```
 
+**Linux/macOS:**
+
+```bash
+# Σταματήστε όλα τα services πρώτα
+./bemat.sh
+# Επιλέξτε "2" - Stop All Services
+
+# Καθαρισμός Docker
+docker system prune -a -f
+docker volume prune -f
+```
+
 ## Χειροκίνητη Εκτέλεση (Advanced Users)
 
-Αν θέλετε να τρέξετε τα components χειροκίνητα:
+### Για Windows (με PowerShell script)
 
-### Backend Development
+```powershell
+# Εκκίνηση BEMAT Control Center
+.\bemat.ps1
+```
+
+### Για Linux/macOS (με Bash script)
+
+```bash
+# Make executable (first time only)
+chmod +x bemat.sh
+
+# Εκκίνηση BEMAT Control Center
+./bemat.sh
+```
+
+### Χειροκίνητα με Docker Compose (όλα τα platforms)
+
+#### Backend & Database
 
 ```bash
 cd backend
-docker-compose up -d --build
-docker-compose exec web python manage.py migrate --noinput
+docker-compose up --build -d
 ```
 
-### Frontend
+#### Frontend
 
 ```bash
 cd frontend
-docker-compose -f docker-compose.frontend.yml up -d --build
+docker-compose -f docker-compose.frontend.yml up --build -d
 ```
 
-## Δημιουργία Admin User
+#### Ολοκληρωμένη εκκίνηση (Linux/macOS)
 
 ```bash
-# Μπες στο web container
-docker exec -it backend-web-1 bash
+# Clone το repository
+git clone https://github.com/ioannislyras98/Building-Energy-Management-Tool-BEMAT.git
+cd Building-Energy-Management-Tool-BEMAT
 
-# Δημιούργησε superuser
-python manage.py createsuperuser
+# Start backend services
+cd backend
+docker-compose up --build -d
+
+# Wait for backend to be ready, then start frontend
+sleep 30
+cd ../frontend
+docker-compose -f docker-compose.frontend.yml up --build -d
+
+# Χρήσιμες πληροφορίες
+echo "Frontend: http://localhost:3000"
+echo "Backend: http://localhost:8000"
+echo "Admin: http://localhost:8000/admin"
+```
+
+### Δημιουργία Superuser (όλα τα platforms)
+
+```bash
+# Δημιουργία admin user
+docker-compose exec web python manage.py createsuperuser
+
+# Ή με script (προ-configured)
+docker cp create_superuser.py backend-web-1:/usr/src/app/
+docker-compose exec web python create_superuser.py
 ```
 
 ## Διαχείριση Database
@@ -175,13 +234,16 @@ python manage.py migrate
 
 ## Χρήσιμες Εντολές
 
-### Έλεγχος κατάστασης containers
+### Έλεγχος κατάστασης containers (όλα τα platforms)
 
-```powershell
+```bash
 docker ps -a
+docker-compose ps
 ```
 
 ### Παρακολούθηση logs
+
+**Windows (PowerShell):**
 
 ```powershell
 # Backend
@@ -193,26 +255,52 @@ cd frontend
 docker-compose -f docker-compose.frontend.yml logs -f frontend
 ```
 
-### Μπες σε container
+**Linux/macOS (Bash):**
 
-```powershell
+```bash
 # Backend
-docker exec -it backend-web-1 bash
+cd backend
+docker-compose logs -f web
 
 # Frontend
+cd frontend
+docker-compose -f docker-compose.frontend.yml logs -f frontend
+```
+
+### Μπες σε container
+
+```bash
+# Backend (όλα τα platforms)
+docker exec -it backend-web-1 bash
+
+# Frontend (όλα τα platforms)
 docker exec -it frontend-frontend-1 sh
+```
+
+### Καθαρισμός Docker (όλα τα platforms)
+
+```bash
+# Σταματήστε όλα τα services πρώτα
+docker-compose down
+cd ../frontend && docker-compose -f docker-compose.frontend.yml down
+
+# Καθαρισμός Docker
+docker system prune -a -f
+docker volume prune -f
 ```
 
 ## Αρχιτεκτονική
 
 ```
 BEMAT/
-├── bemat.ps1             # Κύριο PowerShell script εκκίνησης & διαχείρισης
+├── bemat.ps1             # Κύριο PowerShell script εκκίνησης & διαχείρισης (Windows)
+├── bemat.sh              # Κύριο Bash script εκκίνησης & διαχείρισης (Linux/macOS)
 ├── backend/              # Django REST API
 │   ├── app/             # Django εφαρμογή
 │   │   ├── backend/     # Core settings
 │   │   ├── building/    # Building models
 │   │   ├── user/        # User management
+│   │   ├── entrypoint.sh # Cross-platform startup script
 │   │   └── ...          # Other Django apps
 │   └── docker-compose.yml
 ├── frontend/            # React + Vite + TailwindCSS
@@ -222,6 +310,30 @@ BEMAT/
 │   │   └── ...
 │   └── docker-compose.frontend.yml
 └── README.md
+```
+
+### Key Files για Cross-Platform Support
+
+#### `backend/app/entrypoint.sh`
+
+```bash
+#!/bin/bash
+# Cross-platform startup script που:
+# 1. Περιμένει το PostgreSQL να είναι έτοιμο
+# 2. Τρέχει database migrations
+# 3. Φορτώνει prefectures data (ΣΗΜΑΝΤΙΚΟ για migrations)
+# 4. Φορτώνει materials data
+# 5. Συλλέγει static files
+# 6. Ξεκινά τον Django server
+```
+
+#### `backend/app/Dockerfile`
+
+```dockerfile
+# Cross-platform compatibility features:
+# - sed command για Windows line endings (CRLF → LF)
+# - chmod +x για executable permissions
+# - Debian-based image για consistency
 ```
 
 ## Tech Stack
@@ -245,8 +357,47 @@ BEMAT/
 **DevOps:**
 
 - Docker & Docker Compose
-- PowerShell automation script
+- Cross-platform automation scripts (Windows/Linux/macOS)
 - Auto browser opening
+
+## Troubleshooting
+
+### Common Issues
+
+#### 1. Migration Errors (Prefecture Dependencies)
+
+```bash
+# Error: column "prefecture_id" contains null values
+# Solution: Data is loaded automatically via entrypoint.sh
+# The entrypoint loads prefectures before running migrations
+```
+
+#### 2. Port Already in Use
+
+```bash
+# Error: port 8000 already in use
+# Solution:
+sudo lsof -i :8000  # Linux/macOS
+netstat -ano | findstr :8000  # Windows
+
+# Kill the process or use different ports
+```
+
+#### 3. Docker Permission Issues (Linux)
+
+```bash
+# Add user to docker group
+sudo usermod -aG docker $USER
+# Logout and login again
+```
+
+#### 4. Line Ending Issues (Windows development to Linux deployment)
+
+```bash
+# Already handled in Dockerfile with:
+# RUN sed -i 's/\r$//g' /usr/src/app/entrypoint.sh
+# No action needed!
+```
 
 ## Πληροφορίες
 
@@ -254,4 +405,4 @@ BEMAT/
 2. [Κλιματικές Ζώνες,τιμες θερμοκρασίας πινακας Α1 για τον υπολογισμο απωλειων σε kw(τωρα εχω βαλει ενδεικτικα διαφορα μεσα εξω ανα εποχη)](https://portal.tee.gr/portal/page/portal/tptee/totee/TOTEE-20701-3-Final-TEE%203nd%20Edition.pdf?utm_source=chatgpt.com)
 3. [Οδηγός θερμομόνωσης κτηρίων (Επιφανειακες αντιστασεις σελ 30 pdf 16)](https://www.kalivis.gr/uploads/20161019article_H_Shmasia_Tis_Thermomonosis_Ton_Ktirion/ODIGOS%20THERMOMONOSIS%20KTIRION_DEC2007.pdf)
 4. [Υλικά και συντελεστής θερμικής αγωγιμότητας λ(Συγκριτικός Πίνακας Συντελεστών Διαφορετικών Δομικών Υλικών
-)](https://www.wands.gr/el/faq/oikonomia-apo-tin-thermomonosi)
+   )](https://www.wands.gr/el/faq/oikonomia-apo-tin-thermomonosi)

@@ -1,13 +1,23 @@
 #!/bin/bash
 
+# Exit on any error
+set -e
+
 echo "Waiting for PostgreSQL..."
-while ! nc -z db 5432; do
-  sleep 0.1
+until nc -z db 5432; do
+  echo "PostgreSQL is unavailable - sleeping"
+  sleep 1
 done
 echo "PostgreSQL started"
 
+# Wait a bit more to ensure PostgreSQL is fully ready
+sleep 2
+
 echo "Running database migrations..."
-python manage.py migrate
+python manage.py migrate --noinput
+
+echo "Loading initial prefectures data..."
+python manage.py populate_prefectures
 
 echo "Loading initial materials data..."
 python manage.py load_materials
