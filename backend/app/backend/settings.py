@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "prefectures",
     "thermalInsulation",
     "roofThermalInsulation",
+    "photovoltaicSystem",
 ]
 
 MIDDLEWARE = [

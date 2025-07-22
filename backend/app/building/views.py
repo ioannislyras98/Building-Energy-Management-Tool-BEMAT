@@ -30,7 +30,7 @@ def create_building(request):
         data = request.data
         
         # Validate required fields
-        required_fields = ["name", "usage", "description", "address", "total_area", "examined_area", "floors_examined", "project"]
+        required_fields = ["name", "usage", "description", "address", "total_area", "examined_area", "floors_examined", "project", "prefecture"]
         for field in required_fields:
             if field not in data or not data.get(field):
                 return standard_error_response(f"{field} is required", status.HTTP_400_BAD_REQUEST)
@@ -48,32 +48,45 @@ def create_building(request):
         if not check_user_ownership(request.user, project):
             return standard_error_response("Access denied: You do not own this project", status.HTTP_403_FORBIDDEN)
         
+        # Handle prefecture (required)
+        prefecture_id = data.get("prefecture")
+        try:
+            from prefectures.models import Prefecture
+            prefecture = Prefecture.objects.get(uuid=prefecture_id)
+        except Prefecture.DoesNotExist:
+            return standard_error_response("Prefecture not found", status.HTTP_404_NOT_FOUND)
+        except ValueError:
+            return standard_error_response("Invalid prefecture ID", status.HTTP_400_BAD_REQUEST)
+        
         # Create building
-        building = Building.objects.create(
-            user=request.user,
-            project=project,
-            name=data.get("name"),
-            usage=data.get("usage"),
-            description=data.get("description"),
-            year_built=data.get("year_built"),
-            address=data.get("address", ""),
-            prefecture=data.get("prefecture", ""),  # Προσθήκη prefecture
-            energy_zone=data.get("energy_zone", ""),  # Προσθήκη energy_zone
-            is_insulated=data.get("is_insulated", False),
-            is_certified=data.get("is_certified", False),
-            energy_class=data.get("energy_class", ""),
-            orientation=data.get("orientation", ""),
-            total_area=data.get("total_area"),
-            examined_area=data.get("examined_area"),
-            floors_examined=data.get("floors_examined", 1),
-            floor_height=data.get("floor_height"),
-            construction_type=data.get("construction_type", ""),
-            free_facades=data.get("free_facades"),
-            altitude=data.get("altitude"),
-            non_operating_days=data.get("non_operating_days", ""),
-            operating_hours=data.get("operating_hours", ""),
-            occupants=data.get("occupants"),
-        )
+        building_data = {
+            'user': request.user,
+            'project': project,
+            'name': data.get("name"),
+            'usage': data.get("usage"),
+            'description': data.get("description"),
+            'year_built': data.get("year_built"),
+            'address': data.get("address", ""),
+            'is_insulated': data.get("is_insulated", False),
+            'is_certified': data.get("is_certified", False),
+            'energy_class': data.get("energy_class", ""),
+            'orientation': data.get("orientation", ""),
+            'total_area': data.get("total_area"),
+            'examined_area': data.get("examined_area"),
+            'floors_examined': data.get("floors_examined", 1),
+            'floor_height': data.get("floor_height"),
+            'construction_type': data.get("construction_type", ""),
+            'free_facades': data.get("free_facades"),
+            'altitude': data.get("altitude"),
+            'non_operating_days': data.get("non_operating_days", ""),
+            'operating_hours': data.get("operating_hours", ""),
+            'occupants': data.get("occupants"),
+        }
+        
+        # Add prefecture (required)
+        building_data['prefecture'] = prefecture
+        
+        building = Building.objects.create(**building_data)
         
         serializer = BuildingSerializer(building)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -10,8 +10,10 @@ import {
 } from "@mui/material";
 import ThermostatIcon from "@mui/icons-material/Thermostat";
 import AddIcon from "@mui/icons-material/Add";
+import SolarPowerIcon from "@mui/icons-material/SolarPower";
 import ThermalInsulationTabContent from "./ThermalInsulationTabContent";
 import RoofThermalInsulationTabContent from "./RoofThermalInsulationTabContent";
+import PhotovoltaicSystemTabContent from "./PhotovoltaicSystemTabContent";
 
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
@@ -49,6 +51,16 @@ const ScenariosTabContent = ({
         "Ανάλυση και βελτιστοποίηση θερμομόνωσης της οροφής",
       icon: <ThermostatIcon className="w-8 h-8" />,
       color: "from-green-500 to-green-600",
+      disabled: false,
+    },
+    {
+      id: "photovoltaic-systems",
+      title: translations.photovoltaicSystems || "Φωτοβολταϊκά Συστήματα",
+      description:
+        translations.photovoltaicSystemsDesc ||
+        "Ανάλυση και σχεδιασμός φωτοβολταϊκών συστημάτων για ενεργειακή αυτονομία",
+      icon: <SolarPowerIcon className="w-8 h-8" />,
+      color: "from-yellow-500 to-orange-600",
       disabled: false,
     },
     // Μπορούμε να προσθέσουμε άλλα σενάρια στο μέλλον
@@ -112,6 +124,36 @@ const ScenariosTabContent = ({
             </Button>
           </div>
           <RoofThermalInsulationTabContent
+            buildingUuid={buildingUuid}
+            projectUuid={projectUuid}
+            buildingData={buildingData}
+            params={params}
+          />
+        </div>
+      );
+    }
+
+    if (selectedScenario === "photovoltaic-systems") {
+      return (
+        <div>
+          <div className="mb-4">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleBackToScenarios}
+              sx={{
+                mb: 2,
+                backgroundColor: "var(--color-primary)",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "var(--color-primary)",
+                  opacity: 0.8,
+                },
+              }}>
+              {translations.backToScenarios || "← Επιστροφή στα Σενάρια"}
+            </Button>
+          </div>
+          <PhotovoltaicSystemTabContent
             buildingUuid={buildingUuid}
             projectUuid={projectUuid}
             buildingData={buildingData}
