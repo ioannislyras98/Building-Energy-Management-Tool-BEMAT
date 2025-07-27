@@ -339,9 +339,9 @@ const PhotovoltaicSystemTabContent = ({
         setPhotovoltaicSystem(data);
         setSuccess(
           isUpdate
-            ? translations.updateSuccess ||
+            ? translations.successSave ||
                 "Το φωτοβολταϊκό σύστημα ενημερώθηκε επιτυχώς!"
-            : translations.createSuccess ||
+            : translations.successSave ||
                 "Το φωτοβολταϊκό σύστημα δημιουργήθηκε επιτυχώς!"
         );
         setLoading(false);
@@ -448,8 +448,8 @@ const PhotovoltaicSystemTabContent = ({
                 {translations.title || "Φωτοβολταϊκά Συστήματα"}
               </h2>
               <p className="text-gray-600 mt-1">
-                {translations.description ||
-                  "Διαχείριση εγκατάστασης και διαμόρφωσης φωτοβολταϊκού συστήματος"}
+                {translations.subtitle ||
+                  "Ανάλυση και υπολογισμός οφελών από την εγκατάσταση φωτοβολταϊκού συστήματος"}
               </p>
             </div>
           </div>
@@ -910,7 +910,7 @@ const PhotovoltaicSystemTabContent = ({
                   },
                 }}
                 helperText={
-                  translations.unexpectedExpensesHelp ||
+                  translations.autoCalculatedUnexpected ||
                   "9% του συνολικού κόστους"
                 }
               />
@@ -1138,13 +1138,13 @@ const PhotovoltaicSystemTabContent = ({
                   },
                 }}>
                 <option value="electricity">
-                  {translations.pvUsage?.electricity || "Ηλεκτρική Ενέργεια"}
+                  {translations.pvUsageOptions?.electricity || "Ηλεκτρική Ενέργεια"}
                 </option>
                 <option value="hot_water">
-                  {translations.pvUsage?.hotWater || "Ζεστό Νερό"}
+                  {translations.pvUsageOptions?.hotWater || "Ζεστό Νερό"}
                 </option>
                 <option value="both">
-                  {translations.pvUsage?.both || "Και τα δύο"}
+                  {translations.pvUsageOptions?.both || "Και τα δύο"}
                 </option>
               </TextField>
             </Grid>
@@ -1174,13 +1174,13 @@ const PhotovoltaicSystemTabContent = ({
                   },
                 }}>
                 <option value="grid_connected">
-                  {translations.pvSystemType?.gridConnected || "Διασυνδεδεμένο"}
+                  {translations.pvSystemTypeOptions?.gridConnected || "Διασυνδεδεμένο"}
                 </option>
                 <option value="standalone">
-                  {translations.pvSystemType?.standalone || "Αυτόνομο"}
+                  {translations.pvSystemTypeOptions?.standalone || "Αυτόνομο"}
                 </option>
                 <option value="hybrid">
-                  {translations.pvSystemType?.hybrid || "Υβριδικό"}
+                  {translations.pvSystemTypeOptions?.hybrid || "Υβριδικό"}
                 </option>
               </TextField>
             </Grid>

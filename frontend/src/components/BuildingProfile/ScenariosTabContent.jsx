@@ -11,9 +11,11 @@ import {
 import ThermostatIcon from "@mui/icons-material/Thermostat";
 import AddIcon from "@mui/icons-material/Add";
 import SolarPowerIcon from "@mui/icons-material/SolarPower";
+import WindowIcon from "@mui/icons-material/Window";
 import ThermalInsulationTabContent from "./ThermalInsulationTabContent";
 import RoofThermalInsulationTabContent from "./RoofThermalInsulationTabContent";
 import PhotovoltaicSystemTabContent from "./PhotovoltaicSystemTabContent";
+import WindowReplacementTabContent from "./WindowReplacementTabContent";
 
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
@@ -61,6 +63,16 @@ const ScenariosTabContent = ({
         "Ανάλυση και σχεδιασμός φωτοβολταϊκών συστημάτων για ενεργειακή αυτονομία",
       icon: <SolarPowerIcon className="w-8 h-8" />,
       color: "from-yellow-500 to-orange-600",
+      disabled: false,
+    },
+    {
+      id: "window-replacement",
+      title: translations.windowReplacement || "Αντικατάσταση παλαιών υαλοπινάκων",
+      description:
+        translations.windowReplacementDesc ||
+        "Ανάλυση και υπολογισμός οφελών από την αντικατάσταση παλαιών υαλοπινάκων",
+      icon: <WindowIcon className="w-8 h-8" />,
+      color: "from-indigo-500 to-purple-600",
       disabled: false,
     },
     // Μπορούμε να προσθέσουμε άλλα σενάρια στο μέλλον
@@ -154,6 +166,36 @@ const ScenariosTabContent = ({
             </Button>
           </div>
           <PhotovoltaicSystemTabContent
+            buildingUuid={buildingUuid}
+            projectUuid={projectUuid}
+            buildingData={buildingData}
+            params={params}
+          />
+        </div>
+      );
+    }
+
+    if (selectedScenario === "window-replacement") {
+      return (
+        <div>
+          <div className="mb-4">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleBackToScenarios}
+              sx={{
+                mb: 2,
+                backgroundColor: "var(--color-primary)",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "var(--color-primary)",
+                  opacity: 0.8,
+                },
+              }}>
+              {translations.backToScenarios || "← Επιστροφή στα Σενάρια"}
+            </Button>
+          </div>
+          <WindowReplacementTabContent
             buildingUuid={buildingUuid}
             projectUuid={projectUuid}
             buildingData={buildingData}

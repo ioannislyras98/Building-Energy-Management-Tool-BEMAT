@@ -20,4 +20,5 @@ urlpatterns = [
     path('thermal_insulations/', include('thermalInsulation.urls')),
     path('roof_thermal_insulations/', include('roofThermalInsulation.urls')),
     path('photovoltaic_systems/', include('photovoltaicSystem.urls')),
+    path('window_replacements/', include('windowReplacement.urls')),
 ]
