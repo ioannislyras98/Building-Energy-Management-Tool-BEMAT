@@ -12,10 +12,16 @@ import ThermostatIcon from "@mui/icons-material/Thermostat";
 import AddIcon from "@mui/icons-material/Add";
 import SolarPowerIcon from "@mui/icons-material/SolarPower";
 import WindowIcon from "@mui/icons-material/Window";
+import LightbulbIcon from "@mui/icons-material/Lightbulb";
+import AcUnitIcon from "@mui/icons-material/AcUnit";
+import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import ThermalInsulationTabContent from "./ThermalInsulationTabContent";
 import RoofThermalInsulationTabContent from "./RoofThermalInsulationTabContent";
 import PhotovoltaicSystemTabContent from "./PhotovoltaicSystemTabContent";
 import WindowReplacementTabContent from "./WindowReplacementTabContent";
+import BulbReplacementTabContent from "./BulbReplacementTabContent";
+import AirConditioningReplacementTabContent from "./AirConditioningReplacementTabContent";
+import HotWaterUpgradeTabContent from "./HotWaterUpgradeTabContent";
 
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
@@ -67,12 +73,48 @@ const ScenariosTabContent = ({
     },
     {
       id: "window-replacement",
-      title: translations.windowReplacement || "Αντικατάσταση παλαιών υαλοπινάκων",
+      title:
+        translations.windowReplacement || "Αντικατάσταση παλαιών υαλοπινάκων",
       description:
         translations.windowReplacementDesc ||
         "Ανάλυση και υπολογισμός οφελών από την αντικατάσταση παλαιών υαλοπινάκων",
       icon: <WindowIcon className="w-8 h-8" />,
       color: "from-indigo-500 to-purple-600",
+      disabled: false,
+    },
+    {
+      id: "bulb-replacement",
+      title:
+        translations.bulbReplacement || "Αντικατάσταση λαμπτήρων πυράκτωσης",
+      description:
+        translations.bulbReplacementDesc ||
+        "Ανάλυση και υπολογισμός οφελών από την αντικατάσταση λαμπτήρων πυράκτωσης με LED",
+      icon: <LightbulbIcon className="w-8 h-8" />,
+      color: "from-amber-500 to-yellow-600",
+      disabled: false,
+    },
+    {
+      id: "air-conditioning-replacement",
+      title:
+        translations.airConditioningReplacement ||
+        "Αντικατάσταση κλιματιστικών",
+      description:
+        translations.airConditioningReplacementDesc ||
+        "Ανάλυση και υπολογισμός οφελών από την αντικατάσταση παλαιών κλιματιστικών",
+      icon: <AcUnitIcon className="w-8 h-8" />,
+      color: "from-cyan-500 to-blue-600",
+      disabled: false,
+    },
+    {
+      id: "hot-water-upgrade",
+      title:
+        translations.hotWaterUpgrade ||
+        "Αναβάθμιση συστήματος παραγωγής Ζ.Ν.Χ.",
+      description:
+        translations.hotWaterUpgradeDesc ||
+        "Ανάλυση και υπολογισμός οφελών από την αναβάθμιση του συστήματος ζεστού νερού χρήσης",
+      icon: <WaterDropIcon className="w-8 h-8" />,
+      color: "from-orange-500 to-red-600",
       disabled: false,
     },
     // Μπορούμε να προσθέσουμε άλλα σενάρια στο μέλλον
@@ -196,6 +238,96 @@ const ScenariosTabContent = ({
             </Button>
           </div>
           <WindowReplacementTabContent
+            buildingUuid={buildingUuid}
+            projectUuid={projectUuid}
+            buildingData={buildingData}
+            params={params}
+          />
+        </div>
+      );
+    }
+
+    if (selectedScenario === "bulb-replacement") {
+      return (
+        <div>
+          <div className="mb-4">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleBackToScenarios}
+              sx={{
+                mb: 2,
+                backgroundColor: "var(--color-primary)",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "var(--color-primary)",
+                  opacity: 0.8,
+                },
+              }}>
+              {translations.backToScenarios || "← Επιστροφή στα Σενάρια"}
+            </Button>
+          </div>
+          <BulbReplacementTabContent
+            buildingUuid={buildingUuid}
+            projectUuid={projectUuid}
+            buildingData={buildingData}
+            params={params}
+          />
+        </div>
+      );
+    }
+
+    if (selectedScenario === "air-conditioning-replacement") {
+      return (
+        <div>
+          <div className="mb-4">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleBackToScenarios}
+              sx={{
+                mb: 2,
+                backgroundColor: "var(--color-primary)",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "var(--color-primary)",
+                  opacity: 0.8,
+                },
+              }}>
+              {translations.backToScenarios || "← Επιστροφή στα Σενάρια"}
+            </Button>
+          </div>
+          <AirConditioningReplacementTabContent
+            buildingUuid={buildingUuid}
+            projectUuid={projectUuid}
+            buildingData={buildingData}
+            params={params}
+          />
+        </div>
+      );
+    }
+
+    if (selectedScenario === "hot-water-upgrade") {
+      return (
+        <div>
+          <div className="mb-4">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleBackToScenarios}
+              sx={{
+                mb: 2,
+                backgroundColor: "var(--color-primary)",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "var(--color-primary)",
+                  opacity: 0.8,
+                },
+              }}>
+              {translations.backToScenarios || "← Επιστροφή στα Σενάρια"}
+            </Button>
+          </div>
+          <HotWaterUpgradeTabContent
             buildingUuid={buildingUuid}
             projectUuid={projectUuid}
             buildingData={buildingData}

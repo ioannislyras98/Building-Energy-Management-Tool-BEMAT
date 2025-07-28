@@ -69,6 +69,9 @@ INSTALLED_APPS = [
     "roofThermalInsulation",
     "photovoltaicSystem",
     "windowReplacement",
+    "bulbReplacement",
+    "airConditioningReplacement",
+    "hotWaterUpgrade",
 ]
 
 MIDDLEWARE = [

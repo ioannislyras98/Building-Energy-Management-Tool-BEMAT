@@ -504,7 +504,7 @@ const ThermalInsulationTabContent = ({
                 backgroundColor: "var(--color-primary-dark)",
               },
             }}>
-            {translations.saveButton || "Αποθήκευση"}
+            {translations.save || "Αποθήκευση"}
           </Button>
         </div>
       </div>

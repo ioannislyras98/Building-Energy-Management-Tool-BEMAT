@@ -118,6 +118,45 @@ const WindowReplacementTabContent = ({
     internal_rate_of_return: 0,
   });
 
+  // Auto-save with debouncing
+  const [debounceTimeout, setDebounceTimeout] = useState(null);
+
+  const autoSave = useCallback(() => {
+    if (!buildingUuid || !token || !formData.old_thermal_conductivity || !formData.new_thermal_conductivity || !formData.window_area) {
+      return;
+    }
+
+    const submitData = {
+      building: buildingUuid,
+      project: projectUuid,
+      ...formData,
+      ...calculatedResults,
+    };
+
+    $.ajax({
+      url: "http://127.0.0.1:8000/window_replacements/create/",
+      method: "POST",
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+      data: JSON.stringify(submitData),
+      success: (response) => {
+        console.log("Window replacement data auto-saved:", response);
+        setSuccess(translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς");
+        setTimeout(() => setSuccess(null), 3000);
+      },
+      error: (jqXHR) => {
+        console.error("Error auto-saving window replacement data:", jqXHR);
+        setError(
+          jqXHR.responseJSON?.detail ||
+            translations.errorSave ||
+            "Σφάλμα κατά την αποθήκευση"
+        );
+      },
+    });
+  }, [buildingUuid, projectUuid, token, formData, calculatedResults, translations]);
+
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -130,6 +169,17 @@ const WindowReplacementTabContent = ({
                      field === "new_thermal_conductivity" ? value : formData.new_thermal_conductivity,
                      field === "window_area" ? value : formData.window_area);
     }
+
+    // Auto-save with 1 second debouncing
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+    
+    const newTimeout = setTimeout(() => {
+      autoSave();
+    }, 1000);
+    
+    setDebounceTimeout(newTimeout);
   };
 
   const calculateLosses = (oldK, newK, area) => {
@@ -226,6 +276,15 @@ const WindowReplacementTabContent = ({
   useEffect(() => {
     calculateResults();
   }, [calculateResults]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+      }
+    };
+  }, [debounceTimeout]);
 
   const handleSubmit = () => {
     if (!buildingUuid || !token) {
@@ -852,7 +911,7 @@ const WindowReplacementTabContent = ({
                 backgroundColor: "var(--color-primary-dark)",
               },
             }}>
-            {translations.saveButton || "Αποθήκευση"}
+            {loading ? (translations.saving || "Αποθήκευση...") : (translations.save || "Αποθήκευση")}
           </Button>
         </div>
       </div>
