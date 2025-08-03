@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from .models import PhotovoltaicSystem
 from .serializer import PhotovoltaicSystemSerializer, PhotovoltaicSystemCreateSerializer
+from common.utils import is_admin_user, has_access_permission
 
 class PhotovoltaicSystemListCreateView(generics.ListCreateAPIView):
     """
@@ -16,9 +17,17 @@ class PhotovoltaicSystemListCreateView(generics.ListCreateAPIView):
     
     def get_queryset(self):
         user = self.request.user
-        queryset = PhotovoltaicSystem.objects.filter(user=user).select_related(
-            'building', 'project', 'user'
-        ).order_by('-created_at')
+        
+        if is_admin_user(user):
+            # Admin can see all photovoltaic systems
+            queryset = PhotovoltaicSystem.objects.all().select_related(
+                'building', 'project', 'user'
+            ).order_by('-created_at')
+        else:
+            # Regular users can only see their own systems
+            queryset = PhotovoltaicSystem.objects.filter(user=user).select_related(
+                'building', 'project', 'user'
+            ).order_by('-created_at')
         
         # Φιλτράρισμα ανά κτίριο
         building_id = self.request.query_params.get('building', None)
@@ -60,9 +69,42 @@ class PhotovoltaicSystemDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'uuid'
     
     def get_queryset(self):
-        return PhotovoltaicSystem.objects.filter(user=self.request.user).select_related(
-            'building', 'project', 'user'
-        )
+        if is_admin_user(self.request.user):
+            # Admin can access all photovoltaic systems
+            return PhotovoltaicSystem.objects.all().select_related(
+                'building', 'project', 'user'
+            )
+        else:
+            # Regular users can only access their own systems
+            return PhotovoltaicSystem.objects.filter(user=self.request.user).select_related(
+                'building', 'project', 'user'
+            )
+    
+    def update(self, request, *args, **kwargs):
+        """Override update to check permissions"""
+        instance = self.get_object()
+        
+        # Check if user can update this system (admin or owner)
+        if not is_admin_user(request.user) and instance.user != request.user:
+            return Response(
+                {"error": "Access denied - you can only update your own systems"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        """Override destroy to check permissions"""
+        instance = self.get_object()
+        
+        # Check if user can delete this system (admin or owner)
+        if not is_admin_user(request.user) and instance.user != request.user:
+            return Response(
+                {"error": "Access denied - you can only delete your own systems"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().destroy(request, *args, **kwargs)
     
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:

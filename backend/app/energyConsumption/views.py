@@ -19,11 +19,17 @@ class CreateEnergyConsumption(generics.CreateAPIView):
 
 # Update an existing EnergyProfile identified by uuid
 class UpdateEnergyConsumption(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def put(self, request, uuid):
         try:
             energy_profile = EnergyConsumption.objects.get(uuid=uuid)
         except EnergyConsumption.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check permission - admin can update any, users can update only their own
+        if not is_admin_user(request.user) and energy_profile.user != request.user:
+            return Response({"detail": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
         
         serializer = EnergyConsumptionSerializer(energy_profile, data=request.data, partial=True)
         if serializer.is_valid():
@@ -33,11 +39,18 @@ class UpdateEnergyConsumption(APIView):
         
 # Delete an EnergyProfile identified by uuid
 class DeleteEnergyConsumption(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def delete(self, request, uuid):
         try:
             energy_profile = EnergyConsumption.objects.get(uuid=uuid)
         except EnergyConsumption.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check permission - admin can delete any, users can delete only their own
+        if not is_admin_user(request.user) and energy_profile.user != request.user:
+            return Response({"detail": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
+        
         energy_profile.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
         

@@ -48,6 +48,45 @@ class BuildingImageViewSet(viewsets.ModelViewSet):
             return BuildingImageCreateUpdateSerializer
         return BuildingImageSerializer
     
+    def update(self, request, *args, **kwargs):
+        """Override update to check permissions"""
+        instance = self.get_object()
+        
+        # Check if user can update this image (admin or owner)
+        if not is_admin_user(request.user) and instance.user != request.user:
+            return Response(
+                {"error": "Access denied - you can only update your own images"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().update(request, *args, **kwargs)
+    
+    def partial_update(self, request, *args, **kwargs):
+        """Override partial_update to check permissions"""
+        instance = self.get_object()
+        
+        # Check if user can update this image (admin or owner)
+        if not is_admin_user(request.user) and instance.user != request.user:
+            return Response(
+                {"error": "Access denied - you can only update your own images"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().partial_update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        """Override destroy to check permissions"""
+        instance = self.get_object()
+        
+        # Check if user can delete this image (admin or owner)
+        if not is_admin_user(request.user) and instance.user != request.user:
+            return Response(
+                {"error": "Access denied - you can only delete your own images"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().destroy(request, *args, **kwargs)
+    
     @action(detail=False, methods=['get'], url_path='building/(?P<building_uuid>[^/.]+)')
     def by_building(self, request, building_uuid=None):
         """Get all images for a specific building"""

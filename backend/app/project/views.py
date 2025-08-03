@@ -140,7 +140,7 @@ def update_project(request, uuid):
         project = Project.objects.get(uuid=uuid)
         
         # Ελέγχουμε αν ο χρήστης έχει δικαίωμα να ενημερώσει αυτό το project
-        if project.user != request.user:
+        if not has_access_permission(request.user, project):
             return Response(
                 {"error": "You don't have permission to update this project"},
                 status=status.HTTP_403_FORBIDDEN

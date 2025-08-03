@@ -17,6 +17,7 @@ from building.models import Building
 from project.models import Project
 from materials.models import Material
 from materials.serializers import MaterialListSerializer
+from common.utils import is_admin_user, has_access_permission
 
 
 # Get available materials for thermal insulation
@@ -46,7 +47,12 @@ class ExternalWallThermalInsulationListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return ExternalWallThermalInsulation.objects.filter(user=self.request.user)
+        if is_admin_user(self.request.user):
+            # Admin can see all thermal insulation records
+            return ExternalWallThermalInsulation.objects.all()
+        else:
+            # Regular users can only see their own records
+            return ExternalWallThermalInsulation.objects.filter(user=self.request.user)
 
 
 class ExternalWallThermalInsulationCreateView(generics.CreateAPIView):

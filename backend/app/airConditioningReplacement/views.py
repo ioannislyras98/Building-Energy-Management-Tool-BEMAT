@@ -78,6 +78,21 @@ def update_old_air_conditioning(request, ac_uuid):
     """Ενημέρωση παλαιού κλιματιστικού"""
     try:
         old_ac = get_object_or_404(OldAirConditioning, id=ac_uuid)
+        
+        # Check permission - admin can update any, users can update only their own
+        if not has_access_permission(request.user, old_ac.building):
+            return Response({
+                'success': False,
+                'message': 'Access denied'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # If not admin, check if user owns this record
+        if not is_admin_user(request.user) and old_ac.user != request.user:
+            return Response({
+                'success': False,
+                'message': 'Access denied - you can only update your own records'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
         serializer = OldAirConditioningCreateSerializer(old_ac, data=request.data, partial=True)
         if serializer.is_valid():
             updated_ac = serializer.save()
@@ -182,6 +197,21 @@ def update_new_air_conditioning(request, ac_uuid):
     """Ενημέρωση νέου κλιματιστικού"""
     try:
         new_ac = get_object_or_404(NewAirConditioning, id=ac_uuid)
+        
+        # Check permission - admin can update any, users can update only their own
+        if not has_access_permission(request.user, new_ac.building):
+            return Response({
+                'success': False,
+                'message': 'Access denied'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # If not admin, check if user owns this record
+        if not is_admin_user(request.user) and new_ac.user != request.user:
+            return Response({
+                'success': False,
+                'message': 'Access denied - you can only update your own records'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
         serializer = NewAirConditioningCreateSerializer(new_ac, data=request.data, partial=True)
         if serializer.is_valid():
             updated_ac = serializer.save()
@@ -292,6 +322,21 @@ def update_air_conditioning_analysis(request, analysis_uuid):
     """Ενημέρωση ανάλυσης κλιματιστικών"""
     try:
         analysis = get_object_or_404(AirConditioningAnalysis, id=analysis_uuid)
+        
+        # Check permission - admin can update any, users can update only their own
+        if not has_access_permission(request.user, analysis.building):
+            return Response({
+                'success': False,
+                'message': 'Access denied'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # If not admin, check if user owns this record
+        if not is_admin_user(request.user) and analysis.user != request.user:
+            return Response({
+                'success': False,
+                'message': 'Access denied - you can only update your own records'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
         serializer = AirConditioningAnalysisCreateSerializer(analysis, data=request.data, partial=True)
         if serializer.is_valid():
             updated_analysis = serializer.save()

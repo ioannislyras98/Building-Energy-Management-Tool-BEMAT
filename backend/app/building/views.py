@@ -254,7 +254,7 @@ def update_building(request, uuid):
         
         building = Building.objects.get(uuid=uuid)
         
-        if building.project.user != request.user:
+        if not has_access_permission(request.user, building):
             return Response(
                 {"error": "You don't have permission to update this building"},
                 status=status.HTTP_403_FORBIDDEN

@@ -86,13 +86,23 @@ class ContactDeleteView(APIView):
     """
     View for deleting a contact associated with a building.
     """
+    permission_classes = [IsAuthenticated]
+    
     def delete(self, request, building_uuid, contact_uuid, *args, **kwargs):
         try:
             # Verify the building exists
             building = Building.objects.get(uuid=building_uuid)
             
+            # Check building access permission
+            if not has_access_permission(request.user, building):
+                return Response({"error": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
+            
             # Find the contact that belongs to this building
             contact = Contact.objects.get(uuid=contact_uuid, building=building)
+            
+            # Check if user can delete this contact (admin or owner)
+            if not is_admin_user(request.user) and contact.user != request.user:
+                return Response({"error": "Access denied - you can only delete your own contacts."}, status=status.HTTP_403_FORBIDDEN)
             
             # Perform deletion
             contact.delete()
@@ -110,8 +120,16 @@ class ContactUpdateView(APIView):
             # Verify building exists
             building = Building.objects.get(uuid=building_uuid)
             
+            # Check building access permission
+            if not has_access_permission(request.user, building):
+                return Response({"error": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
+            
             # Get the contact that belongs to this building
             contact = Contact.objects.get(uuid=contact_uuid, building=building)
+            
+            # Check if user can update this contact (admin or owner)
+            if not is_admin_user(request.user) and contact.user != request.user:
+                return Response({"error": "Access denied - you can only update your own contacts."}, status=status.HTTP_403_FORBIDDEN)
             
             # Get the data from request
             serializer = ContactSerializer(contact, data=request.data)
