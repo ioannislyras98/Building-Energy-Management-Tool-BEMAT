@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import Cookies from "universal-cookie";
 import "./../assets/styles/main.css";
 import "./../assets/styles/my_projects.css";
 import { useLanguage } from "../context/LanguageContext";
@@ -11,6 +12,8 @@ import { useBuildings } from "../hooks/useBuildings";
 import { useModalBlur } from "../hooks/useModals";
 import english_text from "../languages/english.json";
 import greek_text from "../languages/greek.json";
+
+const cookies = new Cookies(null, { path: "/" });
 
 export default function ProjectView() {
   const [selectedProject, setSelectedProject] = useState(null);
@@ -36,6 +39,7 @@ export default function ProjectView() {
     handleProjectUpdated,
     handleDeleteProject,
     updateBuildingCount,
+    refreshProjects,
   } = useProjects();
   const {
     buildings,
@@ -113,6 +117,48 @@ export default function ProjectView() {
     if (selectedProject) {
       updateBuildingCount(selectedProject.uuid, true);
     }
+    // Refresh projects to update completion status
+    refreshProjects();
+  };
+
+  const handleSubmitProject = async () => {
+    if (!selectedProject) return;
+    
+    try {
+      const token = cookies.get("token");
+      const response = await fetch(`http://127.0.0.1:8000/projects/submit/${selectedProject.uuid}/`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Project submitted successfully:", data);
+        
+        // Update the selected project in state
+        const updatedProject = { ...selectedProject, is_submitted: true };
+        setSelectedProject(updatedProject);
+        
+        // Also update in the projects list
+        handleProjectUpdated(updatedProject);
+        
+        // Refresh projects to get updated data
+        refreshProjects();
+        
+        // Show success message
+        alert(paramsText?.projectSubmittedSuccess || "Project submitted successfully!");
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to submit project:", errorData);
+        alert(errorData.error || "Failed to submit project");
+      }
+    } catch (error) {
+      console.error("Error submitting project:", error);
+      alert("An error occurred while submitting the project");
+    }
   };
 
   if (!selectedProject && !projectsLoading) {
@@ -136,9 +182,12 @@ export default function ProjectView() {
           buildings={buildings}
           selectedProject={selectedProject}
           params={paramsText}
-          onBackClick={backToProjects}          onUpdateProject={() => openUpdateProjectModal(selectedProject)}
+          onBackClick={backToProjects}
+          onUpdateProject={() => openUpdateProjectModal(selectedProject)}
           onDeleteProject={handleProjectDeleteClick}
           onAddBuilding={() => openBuildingModal()}
+          onSubmitProject={handleSubmitProject}
+          refreshProjects={refreshProjects}
         />
       </div>
 

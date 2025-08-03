@@ -29,6 +29,8 @@ const ProjectsView = ({ projects, params, onProjectClick, onAddProject }) => {
                 name={project.name}
                 buildings_count={project.buildings_count}
                 date_created={project.date_created}
+                is_submitted={project.is_submitted}
+                completion_status={project.completion_status}
               />
             </div>
           ))

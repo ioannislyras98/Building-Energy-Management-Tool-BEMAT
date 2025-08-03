@@ -3,6 +3,7 @@ import "./../../assets/styles/topbar.css";
 import { useState, useRef, useEffect } from "react";
 import Cookies from "universal-cookie";
 import { useLanguage } from "../../context/LanguageContext";
+import { useProgress } from "../../context/ProgressContext";
 import { useNavigate } from "react-router-dom";
 
 import { FaBell, FaCircleUser } from "react-icons/fa6";
@@ -18,8 +19,10 @@ const cookies = new Cookies(null, { path: "/" });
 export default function TopBar() {
   const [open, setOpen] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [pendingProjectsData, setPendingProjectsData] = useState(null);
   const drop = useRef(null);
   const { language, toggleLanguage } = useLanguage();
+  const { refreshTrigger } = useProgress();
   const params = language === "en" ? english_text.TopBar : greek_text.TopBar;
   const navigate = useNavigate();
   const token = cookies.get("token") || "";
@@ -43,8 +46,36 @@ export default function TopBar() {
         .fail(function (error) {
           console.error("Failed to fetch user data:", error);
         });
+
+      // Fetch pending projects data
+      const fetchPendingProjects = () => {
+        const pendingSettings = {
+          url: "http://127.0.0.1:8000/projects/pending-percentage/",
+          method: "GET",
+          timeout: 0,
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        };
+
+        $.ajax(pendingSettings)
+          .done(function (response) {
+            console.log("Pending projects data:", response);
+            setPendingProjectsData(response);
+          })
+          .fail(function (error) {
+            console.error("Failed to fetch pending projects data:", error);
+          });
+      };
+
+      fetchPendingProjects();
+
+      // Refresh pending projects data every 30 seconds
+      const interval = setInterval(fetchPendingProjects, 30000);
+      
+      return () => clearInterval(interval);
     }
-  }, [token]);
+  }, [token, refreshTrigger]); // Re-fetch when refreshTrigger changes
 
   const handleOutsideClicks = (ev) => {
     if (open && drop.current && !drop.current.contains(ev.target)) {
@@ -53,11 +84,11 @@ export default function TopBar() {
   };
 
   useEffect(() => {
-    document.addEventListener("click", handleOutsideClicks);
+    document.addEventListener("mousedown", handleOutsideClicks);
     return () => {
-      document.removeEventListener("click", handleOutsideClicks);
+      document.removeEventListener("mousedown", handleOutsideClicks);
     };
-  });
+  }, [open]);
 
   const handleLogout = () => {
     cookies.remove("token", { path: "/" });
@@ -77,9 +108,14 @@ export default function TopBar() {
             <li className="hover:text-primary-bold">
               <a
                 href="#"
-                className="block py-2 px-3 rounded-sm md:bg-transparent md:p-0 topbar-item topbar-right-item"
+                className="block py-2 px-3 rounded-sm md:bg-transparent md:p-0 topbar-item topbar-right-item relative"
                 aria-current="page">
                 <FaBell className="size-6" />
+                {pendingProjectsData && pendingProjectsData.pending_count > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {pendingProjectsData.pending_percentage.toFixed(0)}%
+                  </span>
+                )}
               </a>
             </li>
             <li
@@ -109,26 +145,36 @@ export default function TopBar() {
                 </svg>
               </button>
               {open && (
-                <div id="user-dropdown">
+                <div id="user-dropdown" className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
                   <ul aria-labelledby="dropdownLargeButton">
                     <li>
-                      <a href="#" className="px-4 py-2 flex gap-2 self-start">
+                      <a 
+                        href="#" 
+                        className="px-4 py-2 flex gap-2 items-center text-primary hover:bg-primary hover:text-white transition-colors"
+                        onClick={(e) => e.stopPropagation()}>
                         <HiCog6Tooth className="size-[20px]" />
                         {params.settings}
                       </a>
                     </li>
                     <li>
                       <a
-                        onClick={toggleLanguage}
-                        className="px-4 py-2 flex gap-2 self-start cursor-pointer">
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleLanguage();
+                          setOpen(false);
+                        }}
+                        className="px-4 py-2 flex gap-2 items-center cursor-pointer text-primary hover:bg-primary hover:text-white transition-colors">
                         <MdTranslate className="size-[20px]" />
                         {params.changeLanguage}
                       </a>
                     </li>
                     <li>
                       <a
-                        onClick={handleLogout}
-                        className="px-4 py-2 flex gap-2 self-start cursor-pointer">
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleLogout();
+                        }}
+                        className="px-4 py-2 flex gap-2 items-center cursor-pointer text-primary hover:bg-primary hover:text-white transition-colors">
                         <MdLogout className="size-[20px]" />
                         {params.logout}
                       </a>

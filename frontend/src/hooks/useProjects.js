@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import $ from "jquery";
 import Cookies from "universal-cookie";
+import { useProgress } from "../context/ProgressContext";
 
 export const useProjects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { refreshTrigger } = useProgress();
 
   const cookies = new Cookies();
   const token = cookies.get("token") || "";
@@ -96,13 +98,14 @@ export const useProjects = () => {
     if (token) {
       fetchProjects();
     }
-  }, [token]);
+  }, [token, refreshTrigger]); // Re-fetch when refreshTrigger changes
 
   return {
     projects,
     loading,
     error,
     fetchProjects,
+    refreshProjects: fetchProjects, // Alias for refetching projects
     handleProjectCreated,
     handleProjectUpdated,
     handleDeleteProject,

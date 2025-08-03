@@ -4,6 +4,7 @@ import {
   MdDelete,
   MdEdit,
   MdArrowBack,
+  MdSend,
 } from "react-icons/md";
 import BuildingBtn from "./BuildingBtn";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +20,8 @@ const BuildingsView = ({
   onUpdateProject,
   onDeleteProject,
   onAddBuilding,
+  onSubmitProject,
+  refreshProjects,
 }) => {
   const navigate = useNavigate();
 
@@ -70,6 +73,22 @@ const BuildingsView = ({
                 <MdEdit size={18} className="mr-2" />
                 {params.update}
               </button>
+              
+              <button
+                onClick={onSubmitProject}
+                disabled={selectedProject?.is_submitted || !selectedProject?.completion_status?.can_submit}
+                className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
+                  selectedProject?.is_submitted 
+                    ? 'bg-gray-400 text-white cursor-not-allowed' 
+                    : selectedProject?.completion_status?.can_submit
+                      ? 'bg-primary hover:bg-primary-dark text-white'
+                      : 'bg-gray-400 text-white cursor-not-allowed'
+                }`}
+                aria-label={selectedProject?.is_submitted ? "Submitted" : "Submit Project"}>
+                <MdSend size={18} className="mr-2" />
+                {selectedProject?.is_submitted ? "Submitted" : "Submit"}
+              </button>
+              
               <button
                 onClick={onDeleteProject}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-red-700 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
@@ -81,6 +100,7 @@ const BuildingsView = ({
           </div>
         </div>
       </div>{" "}
+      
       <div className="px-4 md:px-6">
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-800 bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
@@ -109,9 +129,11 @@ const BuildingsView = ({
                 onClick={() => handleBuildingClick(building.uuid)}
                 style={{ cursor: "pointer" }}>
                 <BuildingBtn
+                  uuid={building.uuid}
                   name={building.name}
                   usage={building.usage}
                   date_created={building.date_created}
+                  refreshProjects={refreshProjects}
                 />
               </div>
             ))

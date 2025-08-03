@@ -228,7 +228,8 @@
     "confirmDelete": "Are you sure you want to delete this project? This action cannot be undone.",
     "deleteError": "An error occurred while trying to delete the project.",
     "deleteButton": "Delete",
-    "cancelButton": "Cancel"
+    "cancelButton": "Cancel",
+    "projectSubmittedSuccess": "Project submitted successfully!"
   },
   "BuildingProfile": {
     "backToBuildings": "Back to Buildings List",
@@ -433,6 +434,17 @@
   "ProjectBtn": {
     "buildings": "Buildings",
     "created": "Created"
+  },
+  "ProjectProgress": {
+    "projectProgress": "Project Progress",
+    "systems": "Systems",
+    "scenarios": "Scenarios",
+    "buildingsProgress": "Buildings Progress",
+    "complete": "Complete",
+    "incomplete": "Incomplete",
+    "submitProject": "Submit Project",
+    "projectSubmitted": "Project has been submitted",
+    "submitRequirement": "All buildings must be completed to submit project"
   },
   "BuildingBtn": {
     "usage": "Usage",

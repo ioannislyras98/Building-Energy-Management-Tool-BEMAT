@@ -232,7 +232,8 @@
     "confirmDelete": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό το έργο; Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
     "deleteError": "Παρουσιάστηκε σφάλμα κατά την προσπάθεια διαγραφής του έργου.",
     "deleteButton": "Διαγραφή",
-    "cancelButton": "Άκύρωση"
+    "cancelButton": "Άκύρωση",
+    "projectSubmittedSuccess": "Το έργο υποβλήθηκε επιτυχώς!"
   },
   "BuildingProfile": {
     "loading": "Φόρτωση προφίλ κτιρίου...",
@@ -437,6 +438,17 @@
   "ProjectBtn": {
     "buildings": "Κτίρια",
     "created": "Δημιουργήθηκε"
+  },
+  "ProjectProgress": {
+    "projectProgress": "Πρόοδος Έργου",
+    "systems": "Συστήματα",
+    "scenarios": "Σενάρια",
+    "buildingsProgress": "Πρόοδος Κτιρίων",
+    "complete": "Ολοκληρωμένο",
+    "incomplete": "Ημιτελές",
+    "submitProject": "Υποβολή Έργου",
+    "projectSubmitted": "Το έργο έχει υποβληθεί",
+    "submitRequirement": "Όλα τα κτίρια πρέπει να είναι ολοκληρωμένα για υποβολή"
   },
   "BuildingBtn": {
     "usage": "Χρήση",

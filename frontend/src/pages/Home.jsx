@@ -16,7 +16,7 @@ export default function Home() {
 
   const navigate = useNavigate();
 
-  const { projects, handleProjectCreated } = useProjects();
+  const { projects, handleProjectCreated, refreshProjects } = useProjects();
 
   // Individual modal state management
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
@@ -29,6 +29,11 @@ export default function Home() {
 
   const handleProjectClick = (project) => {
     navigate(`/projects/${project.uuid}`);
+  };
+
+  const handleProjectCreatedWithRefresh = (newProject) => {
+    handleProjectCreated(newProject);
+    refreshProjects(); // Refresh to get updated completion status
   };
 
   return (
@@ -49,7 +54,7 @@ export default function Home() {
         closeProjectModal={closeProjectModal}
         closeBuildingModal={() => {}}
         closeUpdateProjectModal={() => {}}
-        handleProjectCreated={handleProjectCreated}
+        handleProjectCreated={handleProjectCreatedWithRefresh}
         handleBuildingCreated={() => {}}
         handleProjectUpdated={() => {}}
         selectedProject={null}

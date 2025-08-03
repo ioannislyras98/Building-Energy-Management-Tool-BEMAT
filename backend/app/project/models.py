@@ -30,9 +30,121 @@ class Project(models.Model):
         verbose_name="Αριθμός Κτιρίων",
         editable=False  # Managed by signals, not direct user input
     )
+    is_submitted = models.BooleanField(
+        default=False,
+        verbose_name="Έχει Υποβληθεί"
+    )
 
     class Meta:
         unique_together = (("user", "name"),)
+
+    def get_completion_status(self):
+        """
+        Calculate completion status for the project.
+        Returns:
+        - total_buildings: total number of buildings in project
+        - buildings_progress: list of building progress data
+        - overall_systems_progress: overall systems completion percentage
+        - overall_scenarios_progress: overall scenarios completion percentage
+        - can_submit: whether project can be submitted
+        """
+        buildings = self.buildings.all()
+        total_buildings = buildings.count()
+        
+        if total_buildings == 0:
+            return {
+                'total_buildings': 0,
+                'buildings_progress': [],
+                'overall_systems_progress': 0,
+                'overall_scenarios_progress': 0,
+                'can_submit': False
+            }
+        
+        buildings_progress = []
+        total_systems_completed = 0
+        total_scenarios_completed = 0
+        total_systems_required = total_buildings * 5  # 5 systems per building
+        total_scenarios_required = total_buildings * 11  # 11 scenarios per building
+        
+        for building in buildings:
+            # Count completed systems (5 systems)
+            systems_completed = 0
+            if hasattr(building, 'heating_systems') and building.heating_systems.exists():
+                systems_completed += 1
+            if hasattr(building, 'cooling_systems') and building.cooling_systems.exists():
+                systems_completed += 1
+            if hasattr(building, 'domestic_hot_water_systems') and building.domestic_hot_water_systems.exists():
+                systems_completed += 1
+            if hasattr(building, 'electrical_consumptions') and building.electrical_consumptions.exists():
+                systems_completed += 1
+            if hasattr(building, 'energy_profiles') and building.energy_profiles.exists():
+                systems_completed += 1
+            
+            # Count completed scenarios (11 scenarios)
+            scenarios_completed = 0
+            # windowReplacement uses default related name
+            if hasattr(building, 'windowreplacement_set') and building.windowreplacement_set.exists():
+                scenarios_completed += 1
+            # bulbReplacement uses default related name  
+            if hasattr(building, 'bulbreplacement_set') and building.bulbreplacement_set.exists():
+                scenarios_completed += 1
+            if hasattr(building, 'boiler_replacements') and building.boiler_replacements.exists():
+                scenarios_completed += 1
+            # Air conditioning has multiple related names, check any of them
+            if (hasattr(building, 'old_air_conditionings') and building.old_air_conditionings.exists()) or \
+               (hasattr(building, 'new_air_conditionings') and building.new_air_conditionings.exists()) or \
+               (hasattr(building, 'ac_analyses') and building.ac_analyses.exists()):
+                scenarios_completed += 1
+            if hasattr(building, 'roof_thermal_insulations') and building.roof_thermal_insulations.exists():
+                scenarios_completed += 1
+            # thermalInsulation uses default related name
+            if hasattr(building, 'thermalinsulation_set') and building.thermalinsulation_set.exists():
+                scenarios_completed += 1
+            if hasattr(building, 'exterior_blinds') and building.exterior_blinds.exists():
+                scenarios_completed += 1
+            if hasattr(building, 'photovoltaic_systems') and building.photovoltaic_systems.exists():
+                scenarios_completed += 1
+            if hasattr(building, 'solar_collectors') and building.solar_collectors.exists():
+                scenarios_completed += 1
+            # hotWaterUpgrade uses default related name
+            if hasattr(building, 'hotwaterupgrade_set') and building.hotwaterupgrade_set.exists():
+                scenarios_completed += 1
+            if hasattr(building, 'automatic_lighting_controls') and building.automatic_lighting_controls.exists():
+                scenarios_completed += 1
+            
+            building_progress = {
+                'building_uuid': str(building.uuid),
+                'building_name': building.name,
+                'systems_completed': systems_completed,
+                'systems_total': 5,
+                'systems_percentage': round((systems_completed / 5) * 100, 1),
+                'scenarios_completed': scenarios_completed,
+                'scenarios_total': 11,
+                'scenarios_percentage': round((scenarios_completed / 11) * 100, 1),
+                'is_complete': systems_completed == 5 and scenarios_completed == 11
+            }
+            
+            buildings_progress.append(building_progress)
+            total_systems_completed += systems_completed
+            total_scenarios_completed += scenarios_completed
+        
+        overall_systems_progress = round((total_systems_completed / total_systems_required) * 100, 1) if total_systems_required > 0 else 0
+        overall_scenarios_progress = round((total_scenarios_completed / total_scenarios_required) * 100, 1) if total_scenarios_required > 0 else 0
+        
+        # Project can be submitted if all buildings are complete
+        can_submit = all(building['is_complete'] for building in buildings_progress)
+        
+        return {
+            'total_buildings': total_buildings,
+            'buildings_progress': buildings_progress,
+            'overall_systems_progress': overall_systems_progress,
+            'overall_scenarios_progress': overall_scenarios_progress,
+            'can_submit': can_submit,
+            'systems_completed': total_systems_completed,
+            'systems_total': total_systems_required,
+            'scenarios_completed': total_scenarios_completed,
+            'scenarios_total': total_scenarios_required
+        }
 
     def __str__(self):
         return self.name
