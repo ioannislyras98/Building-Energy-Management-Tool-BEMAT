@@ -15,7 +15,9 @@ from common.utils import (
     standard_error_response, 
     standard_success_response,
     validate_uuid,
-    check_user_ownership
+    check_user_ownership,
+    is_admin_user,
+    has_access_permission
 )
 
 
@@ -39,7 +41,7 @@ def create_thermal_zone(request):
         except Building.DoesNotExist:
             return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, building):
+        if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
         
         # Check project exists and user has permission (if provided)
@@ -50,7 +52,7 @@ def create_thermal_zone(request):
             
             try:
                 project = Project.objects.get(uuid=data.get("project"))
-                if not check_user_ownership(request.user, project):
+                if not has_access_permission(request.user, project):
                     return standard_error_response("Access denied: You do not own this project", status.HTTP_403_FORBIDDEN)
             except Project.DoesNotExist:
                 return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
@@ -88,14 +90,19 @@ def get_building_thermal_zones(request, building_uuid):
         except Building.DoesNotExist:
             return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, building):
+        if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not have permission to view thermal zones for this building", status.HTTP_403_FORBIDDEN)
         
         # Get thermal zones for building
-        thermal_zones = ThermalZone.objects.filter(
-            building=building, 
-            user=request.user
-        )
+        if is_admin_user(request.user):
+            # Admin can see all thermal zones for the building
+            thermal_zones = ThermalZone.objects.filter(building=building)
+        else:
+            # Regular users can only see their own thermal zones
+            thermal_zones = ThermalZone.objects.filter(
+                building=building, 
+                user=request.user
+            )
         
         serializer = ThermalZoneSerializer(thermal_zones, many=True)
         return standard_success_response(serializer.data)
@@ -118,7 +125,7 @@ def update_thermal_zone(request, zone_uuid):
         except ThermalZone.DoesNotExist:
             return standard_error_response("Thermal zone not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, thermal_zone):
+        if not has_access_permission(request.user, thermal_zone):
             return standard_error_response("Access denied: You do not own this thermal zone", status.HTTP_403_FORBIDDEN)
         
         data = request.data
@@ -158,7 +165,7 @@ def delete_thermal_zone(request, zone_uuid):
         except ThermalZone.DoesNotExist:
             return standard_error_response("Thermal zone not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, thermal_zone):
+        if not has_access_permission(request.user, thermal_zone):
             return standard_error_response("Access denied: You do not own this thermal zone", status.HTTP_403_FORBIDDEN)
         
         thermal_zone.delete()

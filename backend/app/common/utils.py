@@ -71,3 +71,19 @@ def check_user_ownership(user, obj):
         return False
     
     return True
+
+
+def is_admin_user(user):
+    """
+    Check if user is admin (superuser or staff).
+    Returns True if user is admin, False otherwise.
+    """
+    return user.is_superuser or user.is_staff
+
+
+def has_access_permission(user, obj):
+    """
+    Check if user has permission to access object.
+    Admin users can access everything, regular users only their own objects.
+    """
+    return is_admin_user(user) or check_user_ownership(user, obj)

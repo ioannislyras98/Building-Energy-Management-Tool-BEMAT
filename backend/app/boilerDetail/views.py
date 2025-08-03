@@ -15,7 +15,9 @@ from common.utils import (
     standard_error_response, 
     standard_success_response,
     validate_uuid,
-    check_user_ownership
+    check_user_ownership,
+    is_admin_user,
+    has_access_permission
 )
 
 @api_view(['POST'])
@@ -38,7 +40,7 @@ def create_boiler_detail(request):
         except Building.DoesNotExist:
             return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, building):
+        if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
         
         # Check project exists and user has permission (if provided)
@@ -49,7 +51,7 @@ def create_boiler_detail(request):
             
             try:
                 project = Project.objects.get(uuid=data.get("project"))
-                if not check_user_ownership(request.user, project):
+                if not has_access_permission(request.user, project):
                     return standard_error_response("Access denied: You do not own this project", status.HTTP_403_FORBIDDEN)
             except Project.DoesNotExist:
                 return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
@@ -90,14 +92,14 @@ def get_building_boiler_details(request, building_uuid):
         except Building.DoesNotExist:
             return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, building):
+        if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not have permission to view boiler details for this building", status.HTTP_403_FORBIDDEN)
         
-        # Get boiler details for building
-        boiler_details = BoilerDetail.objects.filter(
-            building=building, 
-            user=request.user
-        )
+        # Get boiler details for building - Admin users see all, regular users see only their own
+        if is_admin_user(request.user):
+            boiler_details = BoilerDetail.objects.filter(building=building)
+        else:
+            boiler_details = BoilerDetail.objects.filter(building=building, user=request.user)
         
         serializer = BoilerDetailSerializer(boiler_details, many=True)
         return standard_success_response(serializer.data)
@@ -120,7 +122,7 @@ def update_boiler_detail(request, boiler_uuid):
             return standard_error_response("Boiler detail not found", status.HTTP_404_NOT_FOUND)
         
         # Check user permission
-        if not check_user_ownership(request.user, boiler_detail):
+        if not has_access_permission(request.user, boiler_detail):
             return standard_error_response("Access denied: You do not have permission to update this boiler detail", status.HTTP_403_FORBIDDEN)
         
         # Update boiler detail
@@ -154,7 +156,7 @@ def delete_boiler_detail(request, boiler_uuid):
             return standard_error_response("Boiler detail not found", status.HTTP_404_NOT_FOUND)
         
         # Check user permission
-        if not check_user_ownership(request.user, boiler_detail):
+        if not has_access_permission(request.user, boiler_detail):
             return standard_error_response("Access denied: You do not have permission to delete this boiler detail", status.HTTP_403_FORBIDDEN)
         
         # Delete boiler detail

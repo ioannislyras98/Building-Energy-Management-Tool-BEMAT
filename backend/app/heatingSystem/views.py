@@ -12,7 +12,9 @@ from common.utils import (
     standard_error_response, 
     standard_success_response,
     validate_uuid,
-    check_user_ownership
+    check_user_ownership,
+    is_admin_user,
+    has_access_permission
 )
 
 
@@ -47,13 +49,13 @@ def create_heating_system(request):
             print(f"Building with UUID {data.get('building')} not found")  # Debug log
             return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, building):
+        if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
         
         # Check project exists and user has permission
         try:
             project = Project.objects.get(uuid=data.get("project"))
-            if not check_user_ownership(request.user, project):
+            if not has_access_permission(request.user, project):
                 return standard_error_response("Access denied: You do not own this project", status.HTTP_403_FORBIDDEN)
         except Project.DoesNotExist:
             return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
@@ -94,14 +96,14 @@ def get_building_heating_systems(request, building_uuid):
         except Building.DoesNotExist:
             return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, building):
+        if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not have permission to view systems for this building", status.HTTP_403_FORBIDDEN)
         
-        # Get heating systems for building
-        heating_systems = HeatingSystem.objects.filter(
-            building=building, 
-            user=request.user
-        )
+        # Get heating systems for building - Admin users see all, regular users see only their own
+        if is_admin_user(request.user):
+            heating_systems = HeatingSystem.objects.filter(building=building)
+        else:
+            heating_systems = HeatingSystem.objects.filter(building=building, user=request.user)
         
         serializer = HeatingSystemSerializer(heating_systems, many=True)
         return standard_success_response(serializer.data)
@@ -124,7 +126,7 @@ def update_heating_system(request, system_uuid):
             return standard_error_response("Heating system not found", status.HTTP_404_NOT_FOUND)
         
         # Check user permission
-        if not check_user_ownership(request.user, heating_system):
+        if not has_access_permission(request.user, heating_system):
             return standard_error_response("Access denied: You do not have permission to update this system", status.HTTP_403_FORBIDDEN)
         
         # Update system
@@ -158,7 +160,7 @@ def delete_heating_system(request, system_uuid):
             return standard_error_response("Heating system not found", status.HTTP_404_NOT_FOUND)
         
         # Check user permission
-        if not check_user_ownership(request.user, heating_system):
+        if not has_access_permission(request.user, heating_system):
             return standard_error_response("Access denied: You do not have permission to delete this system", status.HTTP_403_FORBIDDEN)
         
         # Delete system

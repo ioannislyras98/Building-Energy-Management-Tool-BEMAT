@@ -8,6 +8,7 @@ from .models import Contact
 from .serializers import ContactSerializer, ContactCreateSerializer
 from building.models import Building
 from django.shortcuts import get_object_or_404
+from common.utils import is_admin_user, has_access_permission
 
 # Create your views here.
 
@@ -22,27 +23,28 @@ class ContactListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         building_uuid = self.kwargs.get('building_uuid')
         building = get_object_or_404(Building, uuid=building_uuid)
-        # Έλεγχos αν ο χρήστης έχει δικαίωμα στο κτίριο
-        if building.project.user != self.request.user:
-            return Contact.objects.none() # Επιστρέφει κενό queryset αν δεν έχει δικαίωμα
-        return Contact.objects.filter(building=building)
+        
+        # Check if user has access permission to the building
+        if not has_access_permission(self.request.user, building):
+            return Contact.objects.none() # Return empty queryset if no permission
+            
+        if is_admin_user(self.request.user):
+            # Admin can see all contacts for the building
+            return Contact.objects.filter(building=building)
+        else:
+            # Regular users can only see contacts they created
+            return Contact.objects.filter(building=building, user=self.request.user)
 
     def perform_create(self, serializer):
         building_uuid = self.kwargs.get('building_uuid')
         building = get_object_or_404(Building, uuid=building_uuid)
         
-        # Έλεγχος αν ο χρήστης έχει δικαίωμα να προσθέσει επαφή σε αυτό το κτίριο
-        if building.project.user != self.request.user:
-            # Αυτό κανονικά δεν θα έπρεπε να συμβεί αν ο έλεγχος στο get_queryset είναι σωστός για GET,
-            # αλλά είναι καλή πρακτική να υπάρχει και εδώ για POST.
-            # Ωστόσο, η απάντηση εδώ πρέπει να είναι διαφορετική, π.χ. PermissionDenied.
-            # Για λόγους απλότητας, θα βασιστούμε ότι το get_object_or_404 θα αποτύχει αν δεν βρεθεί
-            # ή ο παρακάτω έλεγχος θα πιάσει την περίπτωση.
-            # Στην πράξη, θα μπορούσατε να ρίξετε ένα exceptions.PermissionDenied()
+        # Check if user has access permission to create contact for this building
+        if not has_access_permission(self.request.user, building):
             return Response({"error": "You do not have permission to add a contact to this building."},
                             status=status.HTTP_403_FORBIDDEN)
                             
-        serializer.save(building=building)
+        serializer.save(building=building, user=self.request.user)
 
 # Προς το παρόν, το frontend καλεί ένα συγκεκριμένο /create/ endpoint.
 # Θα μπορούσαμε να το ενσωματώσουμε στο παραπάνω view ή να έχουμε ένα ξεχωριστό.

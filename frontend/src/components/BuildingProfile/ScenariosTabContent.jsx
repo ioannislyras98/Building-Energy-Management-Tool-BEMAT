@@ -15,6 +15,10 @@ import WindowIcon from "@mui/icons-material/Window";
 import LightbulbIcon from "@mui/icons-material/Lightbulb";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
+import LocalGasStationIcon from "@mui/icons-material/LocalGasStation";
+import ViewComfyIcon from "@mui/icons-material/ViewComfy";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import FireplaceIcon from "@mui/icons-material/Fireplace";
 import ThermalInsulationTabContent from "./ThermalInsulationTabContent";
 import RoofThermalInsulationTabContent from "./RoofThermalInsulationTabContent";
 import PhotovoltaicSystemTabContent from "./PhotovoltaicSystemTabContent";
@@ -22,6 +26,10 @@ import WindowReplacementTabContent from "./WindowReplacementTabContent";
 import BulbReplacementTabContent from "./BulbReplacementTabContent";
 import AirConditioningReplacementTabContent from "./AirConditioningReplacementTabContent";
 import HotWaterUpgradeTabContent from "./HotWaterUpgradeTabContent";
+import NaturalGasNetworkTabContent from "./NaturalGasNetworkTabContent";
+import ExteriorBlindsTabContent from "./ExteriorBlindsTabContent";
+import AutomaticLightingControlTabContent from "./AutomaticLightingControlTabContent";
+import BoilerReplacementTabContent from "./BoilerReplacementTabContent";
 
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
@@ -115,6 +123,54 @@ const ScenariosTabContent = ({
         "Ανάλυση και υπολογισμός οφελών από την αναβάθμιση του συστήματος ζεστού νερού χρήσης",
       icon: <WaterDropIcon className="w-8 h-8" />,
       color: "from-orange-500 to-red-600",
+      disabled: false,
+    },
+    {
+      id: "natural-gas-network",
+      title:
+        translations.naturalGasNetwork ||
+        "Εγκατάσταση δικτύου φυσικού αερίου",
+      description:
+        translations.naturalGasNetworkDesc ||
+        "Ανάλυση και υπολογισμός οφελών από την εγκατάσταση δικτύου φυσικού αερίου",
+      icon: <LocalGasStationIcon className="w-8 h-8" />,
+      color: "from-emerald-500 to-teal-600",
+      disabled: false,
+    },
+    {
+      id: "exterior-blinds",
+      title:
+        translations.exteriorBlinds ||
+        "Εγκατάσταση εξωτερικών περσίδων",
+      description:
+        translations.exteriorBlindsDesc ||
+        "Ανάλυση και υπολογισμός οφελών από την εγκατάσταση εξωτερικών περσίδων",
+      icon: <ViewComfyIcon className="w-8 h-8" />,
+      color: "from-purple-500 to-indigo-600",
+      disabled: false,
+    },
+    {
+      id: "automatic-lighting-control",
+      title:
+        translations.automaticLightingControl ||
+        "Εγκατάσταση συστήματος αυτόματου ελέγχου τεχνητού φωτισμού",
+      description:
+        translations.automaticLightingControlDesc ||
+        "Ανάλυση και υπολογισμός οφελών από την εγκατάσταση συστήματος αυτόματου ελέγχου φωτισμού",
+      icon: <LightModeIcon className="w-8 h-8" />,
+      color: "from-pink-500 to-rose-600",
+      disabled: false,
+    },
+    {
+      id: "boiler-replacement",
+      title:
+        translations.boilerReplacement ||
+        "Αντικατάσταση λέβητα",
+      description:
+        translations.boilerReplacementDesc ||
+        "Ανάλυση και υπολογισμός οφελών από την αντικατάσταση λέβητα",
+      icon: <FireplaceIcon className="w-8 h-8" />,
+      color: "from-red-500 to-orange-600",
       disabled: false,
     },
     // Μπορούμε να προσθέσουμε άλλα σενάρια στο μέλλον
@@ -328,6 +384,126 @@ const ScenariosTabContent = ({
             </Button>
           </div>
           <HotWaterUpgradeTabContent
+            buildingUuid={buildingUuid}
+            projectUuid={projectUuid}
+            buildingData={buildingData}
+            params={params}
+          />
+        </div>
+      );
+    }
+
+    if (selectedScenario === "natural-gas-network") {
+      return (
+        <div>
+          <div className="mb-4">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleBackToScenarios}
+              sx={{
+                mb: 2,
+                backgroundColor: "var(--color-primary)",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "var(--color-primary)",
+                  opacity: 0.8,
+                },
+              }}>
+              {translations.backToScenarios || "← Επιστροφή στα Σενάρια"}
+            </Button>
+          </div>
+          <NaturalGasNetworkTabContent
+            buildingUuid={buildingUuid}
+            projectUuid={projectUuid}
+            buildingData={buildingData}
+            params={params}
+          />
+        </div>
+      );
+    }
+
+    if (selectedScenario === "exterior-blinds") {
+      return (
+        <div>
+          <div className="mb-4">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleBackToScenarios}
+              sx={{
+                mb: 2,
+                backgroundColor: "var(--color-primary)",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "var(--color-primary)",
+                  opacity: 0.8,
+                },
+              }}>
+              {translations.backToScenarios || "← Επιστροφή στα Σενάρια"}
+            </Button>
+          </div>
+          <ExteriorBlindsTabContent
+            buildingUuid={buildingUuid}
+            projectUuid={projectUuid}
+            buildingData={buildingData}
+            params={params}
+          />
+        </div>
+      );
+    }
+
+    if (selectedScenario === "automatic-lighting-control") {
+      return (
+        <div>
+          <div className="mb-4">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleBackToScenarios}
+              sx={{
+                mb: 2,
+                backgroundColor: "var(--color-primary)",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "var(--color-primary)",
+                  opacity: 0.8,
+                },
+              }}>
+              {translations.backToScenarios || "← Επιστροφή στα Σενάρια"}
+            </Button>
+          </div>
+          <AutomaticLightingControlTabContent
+            buildingUuid={buildingUuid}
+            projectUuid={projectUuid}
+            buildingData={buildingData}
+            params={params}
+          />
+        </div>
+      );
+    }
+
+    if (selectedScenario === "boiler-replacement") {
+      return (
+        <div>
+          <div className="mb-4">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleBackToScenarios}
+              sx={{
+                mb: 2,
+                backgroundColor: "var(--color-primary)",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "var(--color-primary)",
+                  opacity: 0.8,
+                },
+              }}>
+              {translations.backToScenarios || "← Επιστροφή στα Σενάρια"}
+            </Button>
+          </div>
+          <BoilerReplacementTabContent
             buildingUuid={buildingUuid}
             projectUuid={projectUuid}
             buildingData={buildingData}

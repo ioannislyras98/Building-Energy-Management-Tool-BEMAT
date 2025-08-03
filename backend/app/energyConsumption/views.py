@@ -5,6 +5,9 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import EnergyConsumption
 from .serializers import EnergyConsumptionSerializer
+from common.utils import is_admin_user, has_access_permission
+from building.models import Building
+from project.models import Project
 
 class CreateEnergyConsumption(generics.CreateAPIView):
     queryset = EnergyConsumption.objects.all()
@@ -40,21 +43,59 @@ class DeleteEnergyConsumption(APIView):
         
 # Retrieve all EnergyProfiles for a given building (by building uuid)
 class GetEnergyConsumptionByBuilding(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, building_id):
-        profiles = EnergyConsumption.objects.filter(building_id=building_id)
+        try:
+            building = Building.objects.get(uuid=building_id)
+        except Building.DoesNotExist:
+            return Response({"detail": "Building not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        if not has_access_permission(request.user, building):
+            return Response({"detail": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
+            
+        if is_admin_user(request.user):
+            # Admin can see all energy consumption profiles for the building
+            profiles = EnergyConsumption.objects.filter(building_id=building_id)
+        else:
+            # Regular users can only see their own energy consumption profiles
+            profiles = EnergyConsumption.objects.filter(building_id=building_id, user=request.user)
+            
         serializer = EnergyConsumptionSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
         
 # Retrieve EnergyProfiles by project (by project uuid)
 class GetEnergyConsumptionByProject(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, project_id):
-        profiles = EnergyConsumption.objects.filter(project_id=project_id)
+        try:
+            project = Project.objects.get(uuid=project_id)
+        except Project.DoesNotExist:
+            return Response({"detail": "Project not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        if not has_access_permission(request.user, project):
+            return Response({"detail": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
+            
+        if is_admin_user(request.user):
+            # Admin can see all energy consumption profiles for the project
+            profiles = EnergyConsumption.objects.filter(project_id=project_id)
+        else:
+            # Regular users can only see their own energy consumption profiles
+            profiles = EnergyConsumption.objects.filter(project_id=project_id, user=request.user)
+            
         serializer = EnergyConsumptionSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
         
 # Retrieve EnergyProfiles by user (by user uuid)
 class GetEnergyConsumptionByUser(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, user_id):
+        # Only admin users can view other users' energy consumption profiles
+        if str(request.user.uuid) != user_id and not is_admin_user(request.user):
+            return Response({"detail": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
+            
         profiles = EnergyConsumption.objects.filter(user_id=user_id)
         serializer = EnergyConsumptionSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

@@ -1,5 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+import admin_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -24,4 +27,19 @@ urlpatterns = [
     path('bulb_replacements/', include('bulbReplacement.urls')),
     path('air_conditioning_replacements/', include('airConditioningReplacement.urls')),
     path('hot_water_upgrades/', include('hotWaterUpgrade.urls')),
+    path('natural_gas_networks/', include('naturalGasNetwork.urls')),
+    path('exterior_blinds/', include('exteriorBlinds.urls')),
+    path('automatic_lighting_control/', include('automaticLightingControl.urls')),
+    path('boiler_replacement/', include('boilerReplacement.urls')),
+    path('', include('buildingImages.urls')),
+    path('', include('buildingActivity.urls')),
+    
+    # Admin endpoints
+    path('admin-api/dashboard-stats/', admin_views.admin_dashboard_stats, name='admin_dashboard_stats'),
+    path('admin-api/users/', admin_views.admin_users_list, name='admin_users_list'),
+    path('admin-api/users/<uuid:user_uuid>/', admin_views.admin_user_detail, name='admin_user_detail'),
 ]
+
+# Serve media files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

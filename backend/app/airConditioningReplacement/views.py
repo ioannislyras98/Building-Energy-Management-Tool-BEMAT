@@ -10,6 +10,7 @@ from .serializer import (
 )
 from building.models import Building
 from project.models import Project
+from common.utils import is_admin_user, has_access_permission
 
 
 # Old Air Conditioning Views
@@ -45,7 +46,20 @@ def get_old_air_conditionings_by_building(request, building_uuid):
     """Λήψη όλων των παλαιών κλιματιστικών για συγκεκριμένο κτίριο"""
     try:
         building = get_object_or_404(Building, uuid=building_uuid)
-        old_acs = OldAirConditioning.objects.filter(building=building).order_by('-created_at')
+        
+        if not has_access_permission(request.user, building):
+            return Response({
+                'success': False,
+                'message': 'Access denied'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        if is_admin_user(request.user):
+            # Admin can see all old air conditionings for the building
+            old_acs = OldAirConditioning.objects.filter(building=building).order_by('-created_at')
+        else:
+            # Regular users can only see their own old air conditionings
+            old_acs = OldAirConditioning.objects.filter(building=building, user=request.user).order_by('-created_at')
+            
         serializer = OldAirConditioningSerializer(old_acs, many=True)
         return Response({
             'success': True,
@@ -136,7 +150,20 @@ def get_new_air_conditionings_by_building(request, building_uuid):
     """Λήψη όλων των νέων κλιματιστικών για συγκεκριμένο κτίριο"""
     try:
         building = get_object_or_404(Building, uuid=building_uuid)
-        new_acs = NewAirConditioning.objects.filter(building=building).order_by('-created_at')
+        
+        if not has_access_permission(request.user, building):
+            return Response({
+                'success': False,
+                'message': 'Access denied'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        if is_admin_user(request.user):
+            # Admin can see all new air conditionings for the building
+            new_acs = NewAirConditioning.objects.filter(building=building).order_by('-created_at')
+        else:
+            # Regular users can only see their own new air conditionings
+            new_acs = NewAirConditioning.objects.filter(building=building, user=request.user).order_by('-created_at')
+            
         serializer = NewAirConditioningSerializer(new_acs, many=True)
         return Response({
             'success': True,
@@ -227,7 +254,20 @@ def get_air_conditioning_analysis_by_building(request, building_uuid):
     """Λήψη ανάλυσης κλιματιστικών για συγκεκριμένο κτίριο"""
     try:
         building = get_object_or_404(Building, uuid=building_uuid)
-        analysis = AirConditioningAnalysis.objects.filter(building=building).order_by('-created_at').first()
+        
+        if not has_access_permission(request.user, building):
+            return Response({
+                'success': False,
+                'message': 'Access denied'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        if is_admin_user(request.user):
+            # Admin can see any analysis for the building
+            analysis = AirConditioningAnalysis.objects.filter(building=building).order_by('-created_at').first()
+        else:
+            # Regular users can only see their own analysis
+            analysis = AirConditioningAnalysis.objects.filter(building=building, user=request.user).order_by('-created_at').first()
+            
         if analysis:
             serializer = AirConditioningAnalysisSerializer(analysis)
             return Response({

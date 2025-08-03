@@ -15,6 +15,8 @@ import {
   TableHead,
   TableRow,
   Box,
+  Tabs,
+  Tab,
   Divider,
 } from "@mui/material";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
@@ -24,7 +26,21 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 
-// TabPanel component δεν χρειάζεται πια
+// TabPanel component για τα tabs
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`hot-water-tabpanel-${index}`}
+      aria-labelledby={`hot-water-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
 
 const HotWaterUpgradeTabContent = ({
   buildingUuid,
@@ -32,6 +48,7 @@ const HotWaterUpgradeTabContent = ({
   buildingData,
   params,
 }) => {
+  const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -323,17 +340,17 @@ const HotWaterUpgradeTabContent = ({
       <TableContainer component={Paper} elevation={2}>
         <Table>
           <TableHead>
-            <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-              <TableCell sx={{ fontWeight: "bold" }}>
+            <TableRow sx={{ backgroundColor: "var(--color-primary)" }}>
+              <TableCell sx={{ fontWeight: "bold", color: "white" }}>
                 {translations.itemType || "Είδος"}
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold" }} align="center">
+              <TableCell sx={{ fontWeight: "bold", color: "white" }} align="center">
                 {translations.quantity || "Ποσότητα"}
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold" }} align="center">
+              <TableCell sx={{ fontWeight: "bold", color: "white" }} align="center">
                 {translations.unitPrice || "Τιμή Μονάδας (€)"}
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold" }} align="center">
+              <TableCell sx={{ fontWeight: "bold", color: "white" }} align="center">
                 {translations.subtotal || "Υποσύνολο (€)"}
               </TableCell>
             </TableRow>
@@ -598,18 +615,6 @@ const HotWaterUpgradeTabContent = ({
                 {calculatedResults.central_heater_installation_subtotal.toFixed(2)}
               </TableCell>
             </TableRow>
-
-            {/* Total Row */}
-            <TableRow sx={{ backgroundColor: "#e3f2fd" }}>
-              <TableCell sx={{ fontWeight: "bold", fontSize: "1.1rem" }}>
-                {translations.total || "Σύνολο"}
-              </TableCell>
-              <TableCell align="center">-</TableCell>
-              <TableCell align="center">-</TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold", fontSize: "1.1rem", color: "var(--color-primary)" }}>
-                {calculatedResults.total_investment_cost.toFixed(2)}
-              </TableCell>
-            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
@@ -783,155 +788,198 @@ const HotWaterUpgradeTabContent = ({
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Card sx={{ 
-            backgroundColor: "#f3e5f5",
-            border: "1px solid var(--color-primary)",
-            borderRadius: "12px",
-            transition: "all 0.2s ease-in-out",
-            "&:hover": {
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              transform: "translateY(-2px)"
-            }
-          }}>
-            <CardContent>
-              <Typography variant="subtitle1" gutterBottom>
-                {translations.totalCost || "Συνολικό κόστος"}
-              </Typography>
-              <Typography variant="h5" sx={{ fontWeight: "bold", color: "var(--color-primary)" }}>
-                €{calculatedResults.total_investment_cost.toFixed(2)}
-              </Typography>
-            </CardContent>
-          </Card>
+        {/* Total Investment Cost */}
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={translations.totalCost || "Συνολικό κόστος επένδυσης (€)"}
+            value={calculatedResults.total_investment_cost.toFixed(2)}
+            InputProps={{ readOnly: true }}
+            sx={{
+              "& .MuiInputBase-input": {
+                color: "var(--color-primary)",
+                fontWeight: "bold",
+              },
+              "& .MuiInputLabel-root": {
+                color: "var(--color-primary)",
+              },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
+            }}
+          />
         </Grid>
 
-        <Grid item xs={12} md={6}>
-          <Card sx={{ 
-            backgroundColor: "#e8f5e8",
-            border: "1px solid #4caf50",
-            borderRadius: "12px",
-            transition: "all 0.2s ease-in-out",
-            "&:hover": {
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              transform: "translateY(-2px)"
-            }
-          }}>
-            <CardContent>
-              <Typography variant="subtitle1" gutterBottom>
-                {translations.annualBenefit || "Ετήσιο όφελος"}
-              </Typography>
-              <Typography variant="h5" color="success.main" sx={{ fontWeight: "bold" }}>
-                €{calculatedResults.annual_economic_benefit.toFixed(2)}
-              </Typography>
-            </CardContent>
-          </Card>
+        {/* Annual Economic Benefit */}
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={translations.annualBenefit || "Ετήσιο οικονομικό όφελος (€)"}
+            value={calculatedResults.annual_economic_benefit.toFixed(2)}
+            InputProps={{ readOnly: true }}
+            sx={{
+              "& .MuiInputBase-input": {
+                color: "var(--color-primary)",
+                fontWeight: "bold",
+              },
+              "& .MuiInputLabel-root": {
+                color: "var(--color-primary)",
+              },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
+            }}
+          />
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Card sx={{ 
-            borderRadius: "12px",
-            transition: "all 0.2s ease-in-out",
-            "&:hover": {
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              transform: "translateY(-2px)"
-            }
-          }}>
-            <CardContent>
-              <Typography variant="subtitle1" gutterBottom>
-                {translations.paybackPeriod || "Περίοδος Αποπληρωμής"}
-              </Typography>
-              <Typography variant="h6" sx={{ color: "var(--color-primary)", fontWeight: "bold" }}>
-                {calculatedResults.payback_period.toFixed(1)} έτη
-              </Typography>
-            </CardContent>
-          </Card>
+        {/* Payback Period */}
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={translations.paybackPeriod || "Περίοδος αποπληρωμής (έτη)"}
+            value={calculatedResults.payback_period.toFixed(1)}
+            InputProps={{ readOnly: true }}
+            sx={{
+              "& .MuiInputBase-input": {
+                color: "var(--color-primary)",
+                fontWeight: "bold",
+              },
+              "& .MuiInputLabel-root": {
+                color: "var(--color-primary)",
+              },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
+            }}
+          />
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Card sx={{ 
-            borderRadius: "12px",
-            transition: "all 0.2s ease-in-out",
-            "&:hover": {
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              transform: "translateY(-2px)"
-            }
-          }}>
-            <CardContent>
-              <Typography variant="subtitle1" gutterBottom>
-                {translations.npv || "Καθαρή Παρούσα Αξία"}
-              </Typography>
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  color: calculatedResults.net_present_value >= 0 ? "#4caf50" : "#f44336",
-                  fontWeight: "bold"
-                }}
-              >
-                €{calculatedResults.net_present_value.toFixed(2)}
-              </Typography>
-            </CardContent>
-          </Card>
+        {/* Net Present Value */}
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={translations.npv || "Καθαρή παρούσα αξία (€)"}
+            value={calculatedResults.net_present_value.toFixed(2)}
+            InputProps={{ readOnly: true }}
+            sx={{
+              "& .MuiInputBase-input": {
+                color: "var(--color-primary)",
+                fontWeight: "bold",
+              },
+              "& .MuiInputLabel-root": {
+                color: "var(--color-primary)",
+              },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
+            }}
+          />
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Card sx={{ 
-            borderRadius: "12px",
-            transition: "all 0.2s ease-in-out",
-            "&:hover": {
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              transform: "translateY(-2px)"
-            }
-          }}>
-            <CardContent>
-              <Typography variant="subtitle1" gutterBottom>
-                {translations.irr || "Εσωτερικός Βαθμός Απόδοσης"}
-              </Typography>
-              <Typography variant="h6" sx={{ color: "#4caf50", fontWeight: "bold" }}>
-                {calculatedResults.internal_rate_of_return.toFixed(2)}%
-              </Typography>
-            </CardContent>
-          </Card>
+        {/* Internal Rate of Return */}
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={translations.irr || "Εσωτερικός βαθμός απόδοσης (%)"}
+            value={calculatedResults.internal_rate_of_return.toFixed(2)}
+            InputProps={{ readOnly: true }}
+            sx={{
+              "& .MuiInputBase-input": {
+                color: "var(--color-primary)",
+                fontWeight: "bold",
+              },
+              "& .MuiInputLabel-root": {
+                color: "var(--color-primary)",
+              },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
+            }}
+          />
+        </Grid>
+
+        {/* Annual Energy Consumption */}
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={translations.annualEnergyConsumption || "Ετήσια κατανάλωση ενέργειας (kWh)"}
+            value={calculatedResults.annual_energy_consumption_kwh.toFixed(2)}
+            InputProps={{ readOnly: true }}
+            sx={{
+              "& .MuiInputBase-input": {
+                color: "var(--color-primary)",
+                fontWeight: "bold",
+              },
+              "& .MuiInputLabel-root": {
+                color: "var(--color-primary)",
+              },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
+            }}
+          />
+        </Grid>
+
+        {/* Annual Solar Savings */}
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={translations.annualSolarSavings || "Ετήσια ηλιακή εξοικονόμηση (kWh)"}
+            value={calculatedResults.annual_solar_savings_kwh.toFixed(2)}
+            InputProps={{ readOnly: true }}
+            sx={{
+              "& .MuiInputBase-input": {
+                color: "var(--color-primary)",
+                fontWeight: "bold",
+              },
+              "& .MuiInputLabel-root": {
+                color: "var(--color-primary)",
+              },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
+            }}
+          />
+        </Grid>
+
+        {/* Energy Savings Percentage */}
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={translations.energySavingsPercentage || "Ποσοστό ενεργειακής εξοικονόμησης (%)"}
+            value={formData.solar_utilization_percentage}
+            InputProps={{ readOnly: true }}
+            sx={{
+              "& .MuiInputBase-input": {
+                color: "var(--color-primary)",
+                fontWeight: "bold",
+              },
+              "& .MuiInputLabel-root": {
+                color: "var(--color-primary)",
+              },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
+            }}
+          />
         </Grid>
       </Grid>
-
-      {/* Energy Analysis */}
-      <Paper sx={{ 
-        p: 3, 
-        mt: 3,
-        borderRadius: "12px",
-        border: "1px solid var(--color-primary)",
-        backgroundColor: "#f8f9fa"
-      }}>
-        <Typography variant="h6" gutterBottom sx={{ color: "var(--color-primary)", fontWeight: "bold" }}>
-          {translations.energyAnalysis || "Ενεργειακή Ανάλυση"}
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={4}>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              {translations.annualEnergyConsumption || "Ετήσια κατανάλωση ενέργειας"}
-            </Typography>
-            <Typography variant="h6" sx={{ color: "var(--color-primary)", fontWeight: "bold" }}>
-              {calculatedResults.annual_energy_consumption_kwh.toFixed(2)} kWh
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              {translations.annualSolarSavings || "Ετήσια ηλιακή εξοικονόμηση"}
-            </Typography>
-            <Typography variant="h6" sx={{ color: "#4caf50", fontWeight: "bold" }}>
-              {calculatedResults.annual_solar_savings_kwh.toFixed(2)} kWh
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              {translations.energySavingsPercentage || "Ποσοστό ενεργειακής εξοικονόμησης"}
-            </Typography>
-            <Typography variant="h6" sx={{ color: "#4caf50", fontWeight: "bold" }}>
-              {formData.solar_utilization_percentage}%
-            </Typography>
-          </Grid>
-        </Grid>
-      </Paper>
     </div>
   );
 
@@ -984,20 +1032,46 @@ const HotWaterUpgradeTabContent = ({
         </Alert>
       )}
 
-      {/* Main Content */}
-      <div className="bg-white rounded-xl shadow-md p-6 space-y-8">
-        {/* System Components Section */}
-        {renderSystemComponents()}
-        
-        <Divider />
-        
-        {/* Economic Data Section */}
-        {renderEconomicData()}
-        
-        <Divider />
-        
-        {/* Economic Analysis Section */}
-        {renderEconomicAnalysis()}
+      {/* Tabs */}
+      <div className="bg-white rounded-xl shadow-md">
+        <Tabs
+          value={tabValue}
+          onChange={(event, newValue) => setTabValue(newValue)}
+          sx={{
+            borderBottom: 1,
+            borderColor: "divider",
+            px: 3,
+            pt: 2,
+            "& .MuiTab-root": {
+              textTransform: "none",
+              fontSize: "1rem",
+              fontWeight: 600,
+            },
+            "& .Mui-selected": {
+              color: "var(--color-primary) !important",
+            },
+            "& .MuiTabs-indicator": {
+              backgroundColor: "var(--color-primary)",
+            },
+          }}
+        >
+          <Tab label={translations.systemComponents || "Στοιχεία Συστήματος"} />
+          <Tab label={translations.economicData || "Οικονομικά Στοιχεία"} />
+          <Tab label={translations.economicAnalysis || "Οικονομική Ανάλυση"} />
+        </Tabs>
+
+        {/* Tab Panels */}
+        <TabPanel value={tabValue} index={0}>
+          {renderSystemComponents()}
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={1}>
+          {renderEconomicData()}
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={2}>
+          {renderEconomicAnalysis()}
+        </TabPanel>
       </div>
     </div>
   );

@@ -4,6 +4,9 @@ import SystemsTabContent from "./SystemsTabContent";
 import ThermalZoneTabContent from "./ThermalZoneTabContent";
 import ElectricalConsumptionTabContent from "./ElectricalConsumptionTabContent";
 import ScenariosTabContent from "./ScenariosTabContent";
+import ResultsTabContent from "./ResultsTabContent";
+import ImagesTabContent from "./ImagesTabContent";
+import ActivityTabContent from "./ActivityTabContent";
 import { AdminContext, ResourceContextProvider, Resource } from "react-admin";
 import { defaultTheme } from "../../utils/theme";
 const dataProvider = {
@@ -33,6 +36,7 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData }) => {
     params.scenarios,
     params.results,
     params.images,
+    params.activity,
   ];
   const energyProfileParams = {
     content: params?.energyProfileContent,
@@ -122,48 +126,31 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData }) => {
           )}
           {activeTab === 5 && (
             <div className="animate-fadeIn">
-              <div className="flex items-center justify-center h-32 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                <div className="text-center">
-                  <svg
-                    className="mx-auto h-8 w-8 text-gray-400 mb-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <p className="text-sm font-medium">
-                    {params?.resultsContent || "Results content not available."}
-                  </p>
-                </div>
-              </div>
+              <ResultsTabContent
+                buildingUuid={buildingUuid}
+                projectUuid={projectUuid}
+                buildingData={buildingData}
+                params={params}
+              />
             </div>
           )}
           {activeTab === 6 && (
             <div className="animate-fadeIn">
-              <div className="flex items-center justify-center h-32 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                <div className="text-center">
-                  <svg
-                    className="mx-auto h-8 w-8 text-gray-400 mb-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <p className="text-sm font-medium">
-                    {params?.imagesContent || "Images content not available."}
-                  </p>
-                </div>
-              </div>
+              <ImagesTabContent
+                buildingUuid={buildingUuid}
+                projectUuid={projectUuid}
+                buildingData={buildingData}
+                params={params}
+              />
+            </div>
+          )}
+          {activeTab === 7 && (
+            <div className="animate-fadeIn">
+              <ActivityTabContent
+                building={buildingData}
+                project={{ uuid: projectUuid }}
+                params={params}
+              />
             </div>
           )}
         </div>

@@ -17,7 +17,9 @@ from common.utils import (
     standard_error_response, 
     standard_success_response,
     validate_uuid,
-    check_user_ownership
+    check_user_ownership,
+    is_admin_user,
+    has_access_permission
 )
 
 
@@ -47,7 +49,7 @@ def create_electrical_consumption(request):
         except Building.DoesNotExist:
             return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, building):
+        if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
         
         # Check thermal zone exists and belongs to the building
@@ -66,7 +68,7 @@ def create_electrical_consumption(request):
             
             try:
                 project = Project.objects.get(uuid=data.get("project"))
-                if not check_user_ownership(request.user, project):
+                if not has_access_permission(request.user, project):
                     return standard_error_response("Access denied: You do not own this project", status.HTTP_403_FORBIDDEN)
             except Project.DoesNotExist:
                 return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
@@ -120,14 +122,21 @@ def get_building_electrical_consumptions(request, building_uuid):
         except Building.DoesNotExist:
             return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, building):
+        if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not have permission to view electrical consumptions for this building", status.HTTP_403_FORBIDDEN)
         
         # Get electrical consumptions for building
-        electrical_consumptions = ElectricalConsumption.objects.filter(
-            building=building, 
-            user=request.user
-        ).select_related('thermal_zone', 'energy_consumption')
+        if is_admin_user(request.user):
+            # Admin can see all electrical consumptions for the building
+            electrical_consumptions = ElectricalConsumption.objects.filter(
+                building=building
+            ).select_related('thermal_zone', 'energy_consumption')
+        else:
+            # Regular users can only see their own electrical consumptions
+            electrical_consumptions = ElectricalConsumption.objects.filter(
+                building=building, 
+                user=request.user
+            ).select_related('thermal_zone', 'energy_consumption')
         
         serializer = ElectricalConsumptionSerializer(electrical_consumptions, many=True)
         return standard_success_response(serializer.data)
@@ -150,7 +159,7 @@ def update_electrical_consumption(request, consumption_uuid):
         except ElectricalConsumption.DoesNotExist:
             return standard_error_response("Electrical consumption not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, electrical_consumption):
+        if not has_access_permission(request.user, electrical_consumption):
             return standard_error_response("Access denied: You do not own this electrical consumption", status.HTTP_403_FORBIDDEN)
         
         data = request.data
@@ -212,7 +221,7 @@ def delete_electrical_consumption(request, consumption_uuid):
         except ElectricalConsumption.DoesNotExist:
             return standard_error_response("Electrical consumption not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, electrical_consumption):
+        if not has_access_permission(request.user, electrical_consumption):
             return standard_error_response("Access denied: You do not own this electrical consumption", status.HTTP_403_FORBIDDEN)
         
         electrical_consumption.delete()

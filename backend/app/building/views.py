@@ -17,7 +17,9 @@ from common.utils import (
     standard_error_response, 
     standard_success_response,
     validate_uuid,
-    check_user_ownership
+    check_user_ownership,
+    is_admin_user,
+    has_access_permission
 )
 
 logger = logging.getLogger(__name__)
@@ -104,9 +106,18 @@ def get_buildings(request):
         if project_uuid:
             if not validate_uuid(project_uuid):
                 return standard_error_response("Invalid project UUID", status.HTTP_400_BAD_REQUEST)
-            buildings = Building.objects.filter(user=request.user, project__uuid=project_uuid)
+            
+            # Admin users can see all buildings, regular users only their own
+            if is_admin_user(request.user):
+                buildings = Building.objects.filter(project__uuid=project_uuid)
+            else:
+                buildings = Building.objects.filter(user=request.user, project__uuid=project_uuid)
         else:
-            buildings = Building.objects.filter(user=request.user)
+            # Admin users can see all buildings, regular users only their own
+            if is_admin_user(request.user):
+                buildings = Building.objects.all()
+            else:
+                buildings = Building.objects.filter(user=request.user)
         
         serializer = BuildingSerializer(buildings, many=True)
         return standard_success_response(serializer.data)
@@ -126,8 +137,8 @@ def get_building_detail(request, uuid):
             
         building = Building.objects.get(uuid=uuid)
         
-        # Έλεγχος αν ο authenticated χρήστης έχει δικαίωμα πρόσβασης στο κτίριο
-        if not check_user_ownership(request.user, building):
+        # Admin users can access any building, regular users only their own
+        if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
         
         # Ανάκτηση των επαφών για το κτίριο

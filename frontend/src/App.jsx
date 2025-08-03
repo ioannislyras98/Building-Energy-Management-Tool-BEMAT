@@ -11,6 +11,7 @@ import Layout from "./tools/Layout";
 import PageNotFound from "./pages/PageNotFound";
 import BuildingProfilePage from "./pages/BuildingProfilePage";
 import UnauthorizedAccess from "./pages/UnauthorizedAccess";
+import AdminDashboard from "./pages/AdminDashboard";
 import "./App.css";
 import { AuthProvider, RequireAuth } from "./tools/Auth";
 
@@ -37,6 +38,7 @@ function App() {
                 path="/projects/:projectUuid/buildings/:buildingUuid"
                 element={<BuildingProfilePage />}
               />
+              <Route path="/admin" element={<AdminDashboard />} />
             </Route>
           </Route>
 

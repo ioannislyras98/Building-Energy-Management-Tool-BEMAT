@@ -10,7 +10,9 @@ from common.utils import (
     standard_error_response, 
     standard_success_response,
     validate_uuid,
-    check_user_ownership
+    check_user_ownership,
+    is_admin_user,
+    has_access_permission
 )
 
 logger = logging.getLogger(__name__)
@@ -72,14 +74,20 @@ def delete_project(request, uuid):
 @permission_classes([IsAuthenticated])
 def get_projects(request):
     try:
-        projects = Project.objects.filter(user=request.user)
+        # If user is admin, show all projects, otherwise only their own
+        if is_admin_user(request.user):
+            projects = Project.objects.all()
+        else:
+            projects = Project.objects.filter(user=request.user)
+            
         projects_list = [{
             "uuid": project.uuid,
             "name": project.name,
             "date_created": project.date_created.strftime("%d-%m-%Y"),
             "buildings_count": project.buildings_count,
             "cost_per_kwh_fuel": str(project.cost_per_kwh_fuel),
-            "cost_per_kwh_electricity": str(project.cost_per_kwh_electricity)
+            "cost_per_kwh_electricity": str(project.cost_per_kwh_electricity),
+            "user_email": project.user.email  # Add user email for admin view
         } for project in projects]
         
         return standard_success_response({"projects": projects_list})
@@ -99,8 +107,8 @@ def get_project_detail(request, project_uuid):
             
         project = Project.objects.get(uuid=project_uuid)
         
-        # Έλεγχος αν ο authenticated χρήστης έχει δικαίωμα πρόσβασης στο έργο
-        if not check_user_ownership(request.user, project):
+        # Admin users can access any project, regular users only their own
+        if not has_access_permission(request.user, project):
             return standard_error_response("Access denied: You do not own this project", status.HTTP_403_FORBIDDEN)
         
         # Επιστρέφουμε αναλυτικά όλα τα πεδία του έργου

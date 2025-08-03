@@ -13,7 +13,9 @@ from common.utils import (
     standard_error_response, 
     standard_success_response,
     validate_uuid,
-    check_user_ownership
+    check_user_ownership,
+    is_admin_user,
+    has_access_permission
 )
 
 
@@ -44,7 +46,7 @@ def create_solar_collector(request):
         return standard_error_response("Building not found", 404)
     
     # Check ownership
-    if not check_user_ownership(user, building):
+    if not has_access_permission(user, building):
         return standard_error_response("You don't have permission to add solar collectors to this building", 403)
     
     # Validate project if provided
@@ -55,7 +57,7 @@ def create_solar_collector(request):
         
         try:
             project = Project.objects.get(uuid=data.get("project"))
-            if not check_user_ownership(user, project):
+            if not has_access_permission(user, project):
                 return standard_error_response("You don't have permission to use this project", 403)
         except Project.DoesNotExist:
             return standard_error_response("Project not found", 404)
@@ -94,14 +96,14 @@ def get_building_solar_collectors(request, building_uuid):
         except Building.DoesNotExist:
             return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, building):
+        if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not have permission to view systems for this building", status.HTTP_403_FORBIDDEN)
         
-        # Get solar collectors for building
-        solar_collectors = SolarCollector.objects.filter(
-            building=building, 
-            user=request.user
-        )
+        # Get solar collectors for building - Admin users see all, regular users see only their own
+        if is_admin_user(request.user):
+            solar_collectors = SolarCollector.objects.filter(building=building)
+        else:
+            solar_collectors = SolarCollector.objects.filter(building=building, user=request.user)
         
         serializer = SolarCollectorSerializer(solar_collectors, many=True)
         return standard_success_response(serializer.data)
@@ -124,7 +126,7 @@ def update_solar_collector(request, system_uuid):
             return standard_error_response("Solar collector not found", status.HTTP_404_NOT_FOUND)
         
         # Check user permission
-        if not check_user_ownership(request.user, solar_collector):
+        if not has_access_permission(request.user, solar_collector):
             return standard_error_response("Access denied: You do not have permission to update this system", status.HTTP_403_FORBIDDEN)
         
         # Update system
@@ -158,7 +160,7 @@ def delete_solar_collector(request, system_uuid):
             return standard_error_response("Solar collector not found", status.HTTP_404_NOT_FOUND)
         
         # Check user permission
-        if not check_user_ownership(request.user, solar_collector):
+        if not has_access_permission(request.user, solar_collector):
             return standard_error_response("Access denied: You do not have permission to delete this system", status.HTTP_403_FORBIDDEN)
         
         # Delete system

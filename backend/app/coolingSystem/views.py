@@ -15,7 +15,9 @@ from common.utils import (
     standard_error_response, 
     standard_success_response,
     validate_uuid,
-    check_user_ownership
+    check_user_ownership,
+    is_admin_user,
+    has_access_permission
 )
 
 @api_view(['POST'])
@@ -38,7 +40,7 @@ def create_cooling_system(request):
         except Building.DoesNotExist:
             return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, building):
+        if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
         
         # Check project exists and user has permission (if provided)
@@ -49,7 +51,7 @@ def create_cooling_system(request):
             
             try:
                 project = Project.objects.get(uuid=data.get("project"))
-                if not check_user_ownership(request.user, project):
+                if not has_access_permission(request.user, project):
                     return standard_error_response("Access denied: You do not own this project", status.HTTP_403_FORBIDDEN)
             except Project.DoesNotExist:
                 return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
@@ -89,14 +91,14 @@ def get_building_cooling_systems(request, building_uuid):
         except Building.DoesNotExist:
             return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, building):
+        if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not have permission to view systems for this building", status.HTTP_403_FORBIDDEN)
         
-        # Get cooling systems for building
-        cooling_systems = CoolingSystem.objects.filter(
-            building=building, 
-            user=request.user
-        )
+        # Get cooling systems for building - Admin users see all, regular users see only their own
+        if is_admin_user(request.user):
+            cooling_systems = CoolingSystem.objects.filter(building=building)
+        else:
+            cooling_systems = CoolingSystem.objects.filter(building=building, user=request.user)
         
         serializer = CoolingSystemSerializer(cooling_systems, many=True)
         return standard_success_response(serializer.data)
@@ -119,7 +121,7 @@ def update_cooling_system(request, system_uuid):
             return standard_error_response("Cooling system not found", status.HTTP_404_NOT_FOUND)
         
         # Check user permission
-        if not check_user_ownership(request.user, cooling_system):
+        if not has_access_permission(request.user, cooling_system):
             return standard_error_response("Access denied: You do not have permission to update this system", status.HTTP_403_FORBIDDEN)
         
         # Update system
@@ -153,7 +155,7 @@ def delete_cooling_system(request, system_uuid):
             return standard_error_response("Cooling system not found", status.HTTP_404_NOT_FOUND)
         
         # Check user permission
-        if not check_user_ownership(request.user, cooling_system):
+        if not has_access_permission(request.user, cooling_system):
             return standard_error_response("Access denied: You do not have permission to delete this system", status.HTTP_403_FORBIDDEN)
         
         # Delete system
