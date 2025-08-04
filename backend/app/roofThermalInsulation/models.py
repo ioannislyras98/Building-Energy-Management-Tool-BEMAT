@@ -87,6 +87,181 @@ class RoofThermalInsulation(models.Model):
     def __str__(self):
         return f"Θερμομόνωση Οροφής - {self.building.name} (U={self.u_coefficient:.4f})"
 
+    def calculate_u_coefficient(self):
+        """
+        Calculate the U coefficient for the roof thermal insulation
+        Based on the new materials layers
+        """
+        try:
+            new_materials = self.material_layers.filter(material_type='new')
+            if not new_materials.exists():
+                return 0
+            
+            # Roof-specific surface resistances
+            R_si = 0.10  # Internal surface resistance for roofs
+            R_se = 0.04  # External surface resistance
+            
+            # Calculate total material resistance
+            materials_r_sum = 0
+            for material_layer in new_materials:
+                try:
+                    thickness = float(material_layer.thickness or 0)
+                    thermal_conductivity = float(material_layer.material_thermal_conductivity or 1)
+                    
+                    if thermal_conductivity > 0 and thickness > 0:
+                        r_material = thickness / thermal_conductivity
+                        materials_r_sum += r_material
+                except (AttributeError, TypeError, ValueError):
+                    continue
+            
+            r_total = R_si + R_se + materials_r_sum
+            u_coefficient = 1 / r_total if r_total > 0 else 0
+            
+            return round(u_coefficient, 4)
+        except Exception as e:
+            print(f"Error calculating U coefficient: {e}")
+            return 0
+
+    def calculate_npv(self):
+        """
+        Calculate Net Present Value
+        Formula: NPV = -Initial_Investment + Σ(Annual_Net_Benefit / (1 + discount_rate)^year)
+        """
+        try:
+            # Get required values with safe defaults
+            initial_investment = float(self.total_cost or 0)
+            annual_benefit = float(self.annual_benefit or 0)
+            annual_operating_costs = float(self.annual_operating_costs or 0)
+            time_period_years = int(self.time_period_years or 20)
+            discount_rate_percent = float(self.discount_rate or 5.0)
+            
+            # Calculate annual net benefit
+            annual_net_benefit = annual_benefit - annual_operating_costs
+            
+            # Convert discount rate to decimal
+            discount_rate_decimal = discount_rate_percent / 100.0
+            
+            # Calculate NPV
+            npv = -initial_investment
+            for year in range(1, time_period_years + 1):
+                npv += annual_net_benefit / ((1 + discount_rate_decimal) ** year)
+            return round(npv, 2)  # Round to 2 decimal places
+        except (TypeError, ValueError, ZeroDivisionError) as e:
+            print(f"Error calculating NPV: {e}")
+            return 0
+
+    def calculate_annual_benefit(self):
+        """
+        Calculate annual benefit from energy savings
+        Formula: (difference in winter hourly losses × heating hours per year + 
+                  difference in summer hourly losses × cooling hours per year) × electricity cost per kWh
+        """
+        try:
+            # Check for required values with safe defaults
+            heating_hours = float(self.heating_hours_per_year or 0)
+            cooling_hours = float(self.cooling_hours_per_year or 0)
+            
+            if heating_hours <= 0 and cooling_hours <= 0:
+                return 0
+            
+            # Check project and electricity cost
+            if not self.project:
+                print("No project found for roof thermal insulation")
+                return 0
+                
+            electricity_cost = 0
+            if hasattr(self.project, 'cost_per_kwh_electricity') and self.project.cost_per_kwh_electricity:
+                electricity_cost = float(self.project.cost_per_kwh_electricity)
+                print(f"Found electricity cost: {electricity_cost}")
+            else:
+                print("No electricity cost found in project")
+                return 0
+        
+            # Calculate hourly losses for old and new materials
+            old_materials = self.material_layers.filter(material_type='old')
+            new_materials = self.material_layers.filter(material_type='new')
+        
+            # Calculate winter hourly losses (kW) for both old and new materials
+            winter_losses_old = self._calculate_hourly_losses(old_materials, 17)  # 17K difference for winter
+            winter_losses_new = self._calculate_hourly_losses(new_materials, 17)
+        
+            # Calculate summer hourly losses (kW) for both old and new materials  
+            summer_losses_old = self._calculate_hourly_losses(old_materials, 13)  # 13K difference for summer
+            summer_losses_new = self._calculate_hourly_losses(new_materials, 13)
+        
+            # Calculate differences (savings)
+            winter_losses_difference = winter_losses_old - winter_losses_new
+            summer_losses_difference = summer_losses_old - summer_losses_new
+            
+            # Calculate annual energy savings (kWh/year)
+            annual_energy_savings = (
+                winter_losses_difference * heating_hours +
+                summer_losses_difference * cooling_hours
+            )
+            
+            # Calculate annual benefit (€/year)
+            annual_benefit = annual_energy_savings * electricity_cost
+        
+            return annual_benefit  # Allow negative values to show actual calculations
+        except Exception as e:
+            print(f"Error calculating annual benefit: {e}")
+            return 0
+
+    def _calculate_hourly_losses(self, materials, temperature_difference):
+        """
+        Helper method to calculate hourly losses for a set of materials
+        Formula: U × A × ΔT / 1000 (kW)
+        """
+        if not materials.exists():
+            return 0
+        
+        # Calculate U coefficient for these materials
+        R_si = 0.10  # Internal surface resistance for roofs (different from walls)
+        R_se = 0.04  # External surface resistance
+        
+        materials_r_sum = 0
+        total_area = 0
+        
+        for material_layer in materials:
+            try:
+                # Safe access to attributes with None checks
+                thickness = float(material_layer.thickness or 0)
+                thermal_conductivity = float(material_layer.material_thermal_conductivity or 1)
+                surface_area = float(material_layer.surface_area or 0)
+                
+                if thermal_conductivity > 0 and thickness > 0:
+                    r_material = thickness / thermal_conductivity
+                    materials_r_sum += r_material
+                
+                total_area += surface_area
+            except (AttributeError, TypeError, ValueError):
+                # Skip this material if there are any issues
+                continue
+        
+        r_total = R_si + R_se + materials_r_sum
+        u_coefficient = 1 / r_total if r_total > 0 else 0
+        
+        # Calculate hourly losses: U × A × ΔT / 1000 (kW)
+        hourly_losses = (u_coefficient * total_area * temperature_difference) / 1000
+        return hourly_losses
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Recalculate U coefficient, annual benefit, and NPV after saving
+        try:
+            self.u_coefficient = self.calculate_u_coefficient()
+            self.annual_benefit = self.calculate_annual_benefit()
+            self.net_present_value = self.calculate_npv()
+            
+            # Update without triggering save again to avoid recursion
+            RoofThermalInsulation.objects.filter(uuid=self.uuid).update(
+                u_coefficient=self.u_coefficient,
+                annual_benefit=self.annual_benefit,
+                net_present_value=self.net_present_value
+            )
+        except Exception as e:
+            print(f"Error in auto-calculation during save: {e}")
+
 
 class RoofThermalInsulationMaterialLayer(models.Model):
     """

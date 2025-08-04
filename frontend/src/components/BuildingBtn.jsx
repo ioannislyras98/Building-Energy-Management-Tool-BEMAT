@@ -29,8 +29,13 @@ export default function BuildingBtn({ uuid, name, usage, date_created, refreshPr
       })
         .then((response) => response.json())
         .then((data) => {
-          if (data && !data.error) {
-            setProgressData(data);
+          // Check if data is wrapped in a success response
+          const actualData = data?.data || data;
+          
+          if (actualData && typeof actualData === 'object' && !actualData.error) {
+            setProgressData(actualData);
+          } else {
+            setProgressData(null);
           }
         })
         .catch((error) => {
@@ -39,35 +44,51 @@ export default function BuildingBtn({ uuid, name, usage, date_created, refreshPr
     }
   };
 
+  // Expose refresh function for manual calls when systems are added/updated
+  const refreshProgress = () => {
+    fetchProgressData();
+    if (refreshProjects) {
+      refreshProjects();
+    }
+  };
+
   useEffect(() => {
     fetchProgressData();
   }, [uuid, refreshTrigger]); // Re-fetch when refreshTrigger changes
 
-  // Refetch data every 30 seconds to keep it updated
+  // Refetch data every 2 minutes to keep it updated (increased frequency for better UX)
   useEffect(() => {
     const interval = setInterval(() => {
       fetchProgressData();
       if (refreshProjects) {
         refreshProjects();
       }
-    }, 30000);
+    }, 120000); // 2 minutes instead of 5 minutes
 
     return () => clearInterval(interval);
   }, [uuid, refreshProjects]);
 
   const getProgressDisplay = () => {
-    if (!progressData) return null;
+    // Show default progress if no data is available
+    const displayData = progressData || {
+      systems_completed: 0,
+      systems_total: 5,
+      systems_percentage: 0,
+      scenarios_completed: 0,
+      scenarios_total: 11,
+      scenarios_percentage: 0
+    };
     
     return (
       <div className="progress-info text-xs mt-1">
         <div className="flex justify-between">
           <span className="text-primary">
-            Systems: {progressData.systems_completed}/{progressData.systems_total} ({progressData.systems_percentage}%)
+            Systems: {displayData.systems_completed}/{displayData.systems_total} ({displayData.systems_percentage}%)
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-primary">
-            Scenarios: {progressData.scenarios_completed}/{progressData.scenarios_total} ({progressData.scenarios_percentage}%)
+            Scenarios: {displayData.scenarios_completed}/{displayData.scenarios_total} ({displayData.scenarios_percentage}%)
           </span>
         </div>
       </div>

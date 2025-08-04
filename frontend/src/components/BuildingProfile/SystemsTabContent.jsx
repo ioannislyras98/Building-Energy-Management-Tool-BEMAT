@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import $ from "jquery";
 import Cookies from "universal-cookie";
+import { useProgress } from "../../context/ProgressContext";
 import BoilerDetailModal from "../../modals/systems/BoilerDetailModal";
 import CoolingSystemModal from "../../modals/systems/CoolingSystemModal";
 import HeatingSystemModal from "../../modals/systems/HeatingSystemModal";
@@ -16,6 +17,8 @@ const SystemsTabContent = ({
   buildingData,
   params,
 }) => {
+  const { triggerProgressRefresh } = useProgress();
+  
   const [systems, setSystems] = useState({
     boiler: null,
     cooling: null,
@@ -183,6 +186,7 @@ const SystemsTabContent = ({
   const handleModalSuccess = (systemType) => {
     handleCloseModal(systemType);
     fetchSystemsData(); // Refresh data after successful operation
+    triggerProgressRefresh(); // Trigger progress refresh in all components
   };
 
   const handleDeleteSystem = (systemType, systemData) => {
@@ -212,6 +216,7 @@ const SystemsTabContent = ({
       success: () => {
         setSystems((prev) => ({ ...prev, [systemType]: null }));
         setDeleteDialog({ open: false, systemType: null, systemData: null });
+        triggerProgressRefresh(); // Trigger progress refresh when system is deleted
         console.log(`${systemType} system deleted successfully`);
       },
       error: (jqXHR) => {

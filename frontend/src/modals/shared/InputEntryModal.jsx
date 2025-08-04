@@ -28,7 +28,6 @@ export default function InputEntryModal({
           value={value || ""}
           onChange={onChange}
           className={inputClasses}
-          required={required}
           {...props}>
           {example && <option value="">{example}</option>}
           {options.map((option, index) => (
@@ -49,7 +48,6 @@ export default function InputEntryModal({
           onChange={onChange}
           placeholder={example}
           className={inputClasses}
-          required={required}
           rows={3}
           {...props}
         />
@@ -65,7 +63,6 @@ export default function InputEntryModal({
         onChange={onChange}
         placeholder={example}
         className={inputClasses}
-        required={required}
         {...props}
       />
     );

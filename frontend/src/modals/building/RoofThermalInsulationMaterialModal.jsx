@@ -274,7 +274,6 @@ const RoofThermalInsulationMaterialModal = ({
                 value={formData.material}
                 onChange={handleMaterialChange}
                 className={`input-field ${validationErrors.material ? "error-input" : ""}`}
-                required
               >
                 <option value="">
                   {translations.selectMaterial || "Επιλέξτε υλικό"}
@@ -299,7 +298,6 @@ const RoofThermalInsulationMaterialModal = ({
                 value={formData.surface_type}
                 onChange={(e) => handleInputChange("surface_type", e.target.value)}
                 className="input-field"
-                required
               >
                 {surfaceTypeOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -320,7 +318,6 @@ const RoofThermalInsulationMaterialModal = ({
 
               onChange={(e) => handleInputChange("thickness", e.target.value)}
               error={validationErrors.thickness}
-              required
             />
 
             {/* Surface Area */}
@@ -333,7 +330,6 @@ const RoofThermalInsulationMaterialModal = ({
               value={formData.surface_area}
               onChange={(e) => handleInputChange("surface_area", e.target.value)}
               error={validationErrors.surface_area}
-              required
             />
 
             {/* Cost (only for new materials) */}

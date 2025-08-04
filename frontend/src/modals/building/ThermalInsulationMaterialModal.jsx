@@ -259,8 +259,7 @@ const ThermalInsulationMaterialModal = ({
                 onChange={(e) => handleInputChange("material", e.target.value)}
                 className={`input-field ${
                   validationErrors.material ? "error-input" : ""
-                }`}
-                required>
+                }`}>
                 <option value="">{translations.selectMaterial || "Επιλέξτε υλικό"}</option>
                 {availableMaterials.map((material) => (
                   <option key={material.uuid} value={material.uuid}>
@@ -284,8 +283,7 @@ const ThermalInsulationMaterialModal = ({
                 onChange={(e) =>
                   handleInputChange("surface_type", e.target.value)
                 }
-                className="input-field"
-                required>
+                className="input-field">
                 {surfaceTypeOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -303,7 +301,6 @@ const ThermalInsulationMaterialModal = ({
               onChange={(e) => handleInputChange("thickness", e.target.value)}
               example={translations.thicknessPlaceholder || "π.χ. 0.050"}
               error={validationErrors.thickness}
-              required
             />            {/* Surface Area */}
             <InputEntryModal
               entry={`${translations.surfaceArea || "Επιφάνεια"} (m²)`}
@@ -315,7 +312,6 @@ const ThermalInsulationMaterialModal = ({
               onChange={(e) => handleInputChange("surface_area", e.target.value)}
               example={translations.surfaceAreaPlaceholder || "π.χ. 25.50"}
               error={validationErrors.surface_area}
-              required
             />            {/* Cost - Only for new materials */}
             {materialType === "new" && (
               <InputEntryModal
@@ -328,7 +324,6 @@ const ThermalInsulationMaterialModal = ({
                 onChange={(e) => handleInputChange("cost", e.target.value)}
                 example={translations.costPlaceholder || "π.χ. 1250.00"}
                 error={validationErrors.cost}
-                required
               />
             )}
           </div>          <div className="flex justify-between mt-6">

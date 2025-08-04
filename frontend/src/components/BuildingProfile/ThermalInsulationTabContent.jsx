@@ -193,6 +193,7 @@ const ThermalInsulationTabContent = ({
       },
       data: JSON.stringify(updatedThermalInsulation),
       success: (data) => {
+        // After successful save, trigger recalculation if available
         setThermalInsulation(data);
         setSuccess(
           translations.saveSuccess || "Η θερμομόνωση αποθηκεύτηκε επιτυχώς!"
@@ -330,40 +331,8 @@ const ThermalInsulationTabContent = ({
   };
 
   const calculateAnnualBenefit = () => {
-    if (
-      !thermalInsulation.heating_hours_per_year ||
-      !thermalInsulation.cooling_hours_per_year ||
-      !thermalInsulation.project_electricity_cost
-    ) {
-      return 0;
-    }
-
-    // Calculate winter hourly losses (kW) for both old and new materials
-    const winterLossesOld = calculateWinterHourlyLosses(oldMaterials);
-    const winterLossesNew = calculateWinterHourlyLosses(newMaterials);
-
-    // Calculate summer hourly losses (kW) for both old and new materials
-    const summerLossesOld = calculateSummerHourlyLosses(oldMaterials);
-    const summerLossesNew = calculateSummerHourlyLosses(newMaterials);
-
-    // Calculate differences (savings)
-    const winterLossesDifference = winterLossesOld - winterLossesNew;
-    const summerLossesDifference = summerLossesOld - summerLossesNew;
-
-    // Calculate annual energy savings (kWh/year)
-    const annualEnergySavings =
-      winterLossesDifference *
-        parseFloat(thermalInsulation.cooling_hours_per_year) +
-      summerLossesDifference *
-        parseFloat(thermalInsulation.heating_hours_per_year);
-
-    // Calculate annual benefit (€/year)
-    const electricityCost = parseFloat(
-      thermalInsulation.project_electricity_cost
-    );
-    const annualBenefit = annualEnergySavings * electricityCost;
-
-    return Math.max(0, annualBenefit); // Ensure non-negative value
+    // Return the calculated annual benefit from backend
+    return parseFloat(thermalInsulation.annual_benefit || 0);
   };
   // Base columns for all materials
   const baseColumns = [
@@ -749,6 +718,18 @@ const ThermalInsulationTabContent = ({
                   )
                 }
                 inputProps={{ step: 1, min: 0, max: 8760 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary) !important",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary) !important",
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -767,6 +748,18 @@ const ThermalInsulationTabContent = ({
                   )
                 }
                 inputProps={{ step: 1, min: 0, max: 8760 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary) !important",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary) !important",
+                    },
+                  },
+                }}
               />
             </Grid>
           </Grid>
@@ -801,6 +794,17 @@ const ThermalInsulationTabContent = ({
                   },
                   "& .MuiInputLabel-root": {
                     color: "var(--color-primary)",
+                    "&.Mui-focused": {
+                      color: "var(--color-primary) !important",
+                    },
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary) !important",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "var(--color-primary) !important",
+                    },
                   },
                 }}
                 helperText={
@@ -823,11 +827,22 @@ const ThermalInsulationTabContent = ({
                 InputProps={{ readOnly: true }}
                 sx={{
                   "& .MuiInputBase-input": {
-                    color: "var(--color-success)",
+                    color: calculateAnnualBenefit() >= 0 ? "var(--color-success)" : "red",
                     fontWeight: "bold",
                   },
                   "& .MuiInputLabel-root": {
-                    color: "var(--color-success)",
+                    color: calculateAnnualBenefit() >= 0 ? "var(--color-success)" : "red",
+                    "&.Mui-focused": {
+                      color: calculateAnnualBenefit() >= 0 ? "var(--color-success) !important" : "red !important",
+                    },
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: calculateAnnualBenefit() >= 0 ? "var(--color-success) !important" : "red !important",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: calculateAnnualBenefit() >= 0 ? "var(--color-success) !important" : "red !important",
+                    },
                   },
                 }}
                 helperText={
@@ -852,6 +867,26 @@ const ThermalInsulationTabContent = ({
                   )
                 }
                 inputProps={{ step: 1, min: 1, max: 50 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary) !important",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "var(--color-primary) !important",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary) !important",
+                    },
+                  },
+                  "& .MuiInputLabel-outlined": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary) !important",
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -867,6 +902,26 @@ const ThermalInsulationTabContent = ({
                   handleInputChange("annual_operating_costs", e.target.value)
                 }
                 inputProps={{ step: 0.01, min: 0 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary) !important",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "var(--color-primary) !important",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary) !important",
+                    },
+                  },
+                  "& .MuiInputLabel-outlined": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary) !important",
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -881,6 +936,26 @@ const ThermalInsulationTabContent = ({
                   handleInputChange("discount_rate", e.target.value)
                 }
                 inputProps={{ step: 0.1, min: 0, max: 100 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary) !important",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "var(--color-primary) !important",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary) !important",
+                    },
+                  },
+                  "& .MuiInputLabel-outlined": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary) !important",
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -900,6 +975,19 @@ const ThermalInsulationTabContent = ({
                         ? "green"
                         : "red",
                     fontWeight: "bold",
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary) !important",
+                    },
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary) !important",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "var(--color-primary) !important",
+                    },
                   },
                 }}
               />

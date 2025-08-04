@@ -70,8 +70,8 @@ export default function TopBar() {
 
       fetchPendingProjects();
 
-      // Refresh pending projects data every 30 seconds
-      const interval = setInterval(fetchPendingProjects, 30000);
+      // Refresh pending projects data every 5 minutes
+      const interval = setInterval(fetchPendingProjects, 300000);
       
       return () => clearInterval(interval);
     }

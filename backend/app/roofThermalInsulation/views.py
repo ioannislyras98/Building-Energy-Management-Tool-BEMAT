@@ -220,3 +220,31 @@ class RoofThermalInsulationMaterialLayerDetailView(generics.RetrieveUpdateDestro
         return RoofThermalInsulationMaterialLayer.objects.filter(
             roof_thermal_insulation__created_by=self.request.user
         )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def recalculate_roof_thermal_insulation(request, roof_thermal_insulation_uuid):
+    """Manually trigger recalculation of U coefficient, annual benefit, and NPV"""
+    try:
+        roof_thermal_insulation = get_object_or_404(
+            RoofThermalInsulation,
+            uuid=roof_thermal_insulation_uuid,
+            created_by=request.user
+        )
+        
+        # Trigger recalculation by saving
+        roof_thermal_insulation.save()
+        
+        serializer = RoofThermalInsulationSerializer(roof_thermal_insulation)
+        return Response({
+            "success": True,
+            "data": serializer.data,
+            "message": "Roof thermal insulation recalculated successfully"
+        })
+        
+    except Exception as e:
+        return Response(
+            {"detail": str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

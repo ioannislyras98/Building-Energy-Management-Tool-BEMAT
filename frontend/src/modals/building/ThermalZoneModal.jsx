@@ -31,6 +31,7 @@ function ThermalZoneModalForm({
   });
 
   const [errors, setErrors] = useState({});
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
   const token = cookies.get("token") || "";
 
   useEffect(() => {
@@ -45,7 +46,9 @@ function ThermalZoneModalForm({
     } else {
       resetForm();
     }
-  }, [editItem]);
+    setErrors({});
+    setShowValidationErrors(false);
+  }, [editItem, open]);
 
   const isEditMode = !!editItem;
 
@@ -73,16 +76,17 @@ function ThermalZoneModalForm({
       hasErrors = true;
     }
 
-    if (
-      formData.total_thermal_zone_area &&
-      parseFloat(formData.total_thermal_zone_area) <= 0
-    ) {
-      newErrors.total_thermal_zone_area =
-        params.errorPositiveNumber || "Must be a positive number";
+    // Required field: Total thermal zone area
+    if (!formData.total_thermal_zone_area || formData.total_thermal_zone_area === "") {
+      newErrors.total_thermal_zone_area = params.errorRequired || "Field is required";
+      hasErrors = true;
+    } else if (isNaN(formData.total_thermal_zone_area) || parseFloat(formData.total_thermal_zone_area) <= 0) {
+      newErrors.total_thermal_zone_area = params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
 
     setErrors(newErrors);
+    setShowValidationErrors(true);
     return !hasErrors;
   };
 
@@ -162,6 +166,7 @@ function ThermalZoneModalForm({
       total_thermal_zone_area: "",
     });
     setErrors({});
+    setShowValidationErrors(false);
   };
 
   if (!open) return null;
@@ -193,7 +198,7 @@ function ThermalZoneModalForm({
               type="text"
               value={formData.thermal_zone_usage}
               onChange={handleChange}
-              error={errors.thermal_zone_usage}
+              error={showValidationErrors ? errors.thermal_zone_usage : ""}
               required
             />
 
@@ -203,7 +208,7 @@ function ThermalZoneModalForm({
               type="text"
               value={formData.space_condition}
               onChange={handleChange}
-              error={errors.space_condition}
+              error={showValidationErrors ? errors.space_condition : ""}
             />
 
             <InputEntryModal
@@ -212,7 +217,7 @@ function ThermalZoneModalForm({
               type="text"
               value={formData.floor}
               onChange={handleChange}
-              error={errors.floor}
+              error={showValidationErrors ? errors.floor : ""}
             />
 
             <InputEntryModal
@@ -224,9 +229,10 @@ function ThermalZoneModalForm({
               type="number"
               value={formData.total_thermal_zone_area}
               onChange={handleChange}
-              error={errors.total_thermal_zone_area}
+              error={showValidationErrors ? errors.total_thermal_zone_area : ""}
               step="0.01"
               min="0"
+              required
             />
 
             <div className="md:col-span-2">
@@ -236,7 +242,7 @@ function ThermalZoneModalForm({
                 type="textarea"
                 value={formData.description}
                 onChange={handleChange}
-                error={errors.description}
+                error={showValidationErrors ? errors.description : ""}
               />
             </div>
           </div>

@@ -31,6 +31,7 @@ function SolarCollectorsModalForm({
     storage_tank_condition: "",
   });
   const [errors, setErrors] = useState({});
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
   const token = cookies.get("token") || "";
 
   // Apply blur effect using hook
@@ -49,8 +50,22 @@ function SolarCollectorsModalForm({
         collector_accessibility: editItem.collector_accessibility || "",
         storage_tank_condition: editItem.storage_tank_condition || "",
       });
+    } else {
+      setFormData({
+        solar_collector_usage: "",
+        solar_collector_type: "",
+        collector_surface_area: "",
+        hot_water_storage_capacity: "",
+        heating_storage_capacity: "",
+        distribution_network_state: "",
+        terminal_units_position: "",
+        collector_accessibility: "",
+        storage_tank_condition: "",
+      });
     }
-  }, [editItem]);
+    setErrors({});
+    setShowValidationErrors(false);
+  }, [editItem, open]);
 
   const isEditMode = !!editItem;
 
@@ -71,37 +86,47 @@ function SolarCollectorsModalForm({
     const newErrors = {};
     let hasErrors = false;
 
+    // Required fields
+    if (!formData.solar_collector_usage) {
+      newErrors.solar_collector_usage = params.errorRequired || "Field is required";
+      hasErrors = true;
+    }
+
+    if (!formData.solar_collector_type) {
+      newErrors.solar_collector_type = params.errorRequired || "Field is required";
+      hasErrors = true;
+    }
+
+    // Optional field validations
     if (
       formData.collector_surface_area &&
-      parseFloat(formData.collector_surface_area) <= 0
+      formData.collector_surface_area !== "" &&
+      (isNaN(formData.collector_surface_area) || parseFloat(formData.collector_surface_area) <= 0)
     ) {
-      newErrors.collector_surface_area =
-        params.errorPositiveNumber ||
-        "Η επιφάνεια συλλεκτών πρέπει να είναι θετικός αριθμός";
+      newErrors.collector_surface_area = params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
 
     if (
       formData.hot_water_storage_capacity &&
-      parseFloat(formData.hot_water_storage_capacity) <= 0
+      formData.hot_water_storage_capacity !== "" &&
+      (isNaN(formData.hot_water_storage_capacity) || parseFloat(formData.hot_water_storage_capacity) <= 0)
     ) {
-      newErrors.hot_water_storage_capacity =
-        params.errorPositiveNumber ||
-        "Η χωρητικότητα δοχείου Ζ.Ν.Χ. πρέπει να είναι θετικός αριθμός";
+      newErrors.hot_water_storage_capacity = params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
 
     if (
       formData.heating_storage_capacity &&
-      parseFloat(formData.heating_storage_capacity) <= 0
+      formData.heating_storage_capacity !== "" &&
+      (isNaN(formData.heating_storage_capacity) || parseFloat(formData.heating_storage_capacity) <= 0)
     ) {
-      newErrors.heating_storage_capacity =
-        params.errorPositiveNumber ||
-        "Η χωρητικότητα δοχείου θέρμανσης πρέπει να είναι θετικός αριθμός";
+      newErrors.heating_storage_capacity = params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
 
     setErrors(newErrors);
+    setShowValidationErrors(true);
     return !hasErrors;
   };
 
@@ -190,6 +215,7 @@ function SolarCollectorsModalForm({
       storage_tank_condition: "",
     });
     setErrors({});
+    setShowValidationErrors(false);
   };
   const submitButtonText = isEditMode
     ? params.update || "Ενημέρωση"
@@ -218,7 +244,8 @@ function SolarCollectorsModalForm({
               type="text"
               value={formData.solar_collector_usage}
               onChange={handleChange}
-              error={errors.solar_collector_usage}
+              error={showValidationErrors ? errors.solar_collector_usage : ""}
+              required
             />
 
             <InputEntryModal
@@ -227,7 +254,8 @@ function SolarCollectorsModalForm({
               type="text"
               value={formData.solar_collector_type}
               onChange={handleChange}
-              error={errors.solar_collector_type}
+              error={showValidationErrors ? errors.solar_collector_type : ""}
+              required
             />
 
             <InputEntryModal
@@ -239,7 +267,7 @@ function SolarCollectorsModalForm({
               type="number"
               value={formData.collector_surface_area}
               onChange={handleChange}
-              error={errors.collector_surface_area}
+              error={showValidationErrors ? errors.collector_surface_area : ""}
               step="0.01"
               min="0"
             />
@@ -253,7 +281,7 @@ function SolarCollectorsModalForm({
               type="number"
               value={formData.hot_water_storage_capacity}
               onChange={handleChange}
-              error={errors.hot_water_storage_capacity}
+              error={showValidationErrors ? errors.hot_water_storage_capacity : ""}
               step="0.01"
               min="0"
             />
@@ -267,7 +295,7 @@ function SolarCollectorsModalForm({
               type="number"
               value={formData.heating_storage_capacity}
               onChange={handleChange}
-              error={errors.heating_storage_capacity}
+              error={showValidationErrors ? errors.heating_storage_capacity : ""}
               step="0.01"
               min="0"
             />
@@ -280,7 +308,7 @@ function SolarCollectorsModalForm({
               type="text"
               value={formData.distribution_network_state}
               onChange={handleChange}
-              error={errors.distribution_network_state}
+              error={showValidationErrors ? errors.distribution_network_state : ""}
             />
 
             <InputEntryModal
@@ -289,7 +317,7 @@ function SolarCollectorsModalForm({
               type="text"
               value={formData.terminal_units_position}
               onChange={handleChange}
-              error={errors.terminal_units_position}
+              error={showValidationErrors ? errors.terminal_units_position : ""}
             />
 
             <InputEntryModal
@@ -301,7 +329,7 @@ function SolarCollectorsModalForm({
               type="text"
               value={formData.collector_accessibility}
               onChange={handleChange}
-              error={errors.collector_accessibility}
+              error={showValidationErrors ? errors.collector_accessibility : ""}
             />
 
             <div className="md:col-span-2">
@@ -313,7 +341,7 @@ function SolarCollectorsModalForm({
                 type="text"
                 value={formData.storage_tank_condition}
                 onChange={handleChange}
-                error={errors.storage_tank_condition}
+                error={showValidationErrors ? errors.storage_tank_condition : ""}
               />
             </div>
           </div>

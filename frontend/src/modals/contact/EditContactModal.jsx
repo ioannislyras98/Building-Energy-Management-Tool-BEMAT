@@ -25,6 +25,7 @@ function EditContactModalForm({
     phone_number: "",
   });
   const [errors, setErrors] = useState({});
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
   const token = cookies.get("token") || "";
 
   // Apply blur effect when modal is open
@@ -39,7 +40,10 @@ function EditContactModalForm({
         phone_number: contact.phone_number || "",
       });
     }
-  }, [contact]);
+    // Reset validation state when modal opens/closes
+    setErrors({});
+    setShowValidationErrors(false);
+  }, [contact, isOpen]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -53,11 +57,11 @@ function EditContactModalForm({
     const newErrors = {};
     let isValid = true;
     if (!formData.name.trim()) {
-      newErrors.name = params.errorRequired || "Name is required";
+      newErrors.name = params.errorRequired || "Field is required";
       isValid = false;
     }
     if (!formData.email.trim()) {
-      newErrors.email = params.errorRequired || "Email is required";
+      newErrors.email = params.errorRequired || "Field is required";
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = params.errorEmail || "Invalid email format";
@@ -68,6 +72,7 @@ function EditContactModalForm({
       isValid = false;
     }
     setErrors(newErrors);
+    setShowValidationErrors(true);
     return isValid;
   };
 
@@ -86,6 +91,8 @@ function EditContactModalForm({
       success: function (response) {
         onContactUpdated(response);
         onClose();
+        setErrors({});
+        setShowValidationErrors(false);
       },
       error: function (error) {
         if (error.responseJSON && error.responseJSON.error) {
@@ -124,7 +131,7 @@ function EditContactModalForm({
             value={formData.name}
             onChange={handleChange}
             example={params.contactName_example}
-            error={errors.name}
+            error={showValidationErrors ? errors.name : ""}
             required
           />
           <InputEntryModal
@@ -133,7 +140,7 @@ function EditContactModalForm({
             value={formData.role}
             onChange={handleChange}
             example={params.contactRole_example}
-            error={errors.role}
+            error={showValidationErrors ? errors.role : ""}
           />
           <InputEntryModal
             entry={params.contactEmail}
@@ -142,7 +149,7 @@ function EditContactModalForm({
             value={formData.email}
             onChange={handleChange}
             example={params.contactEmail_example}
-            error={errors.email}
+            error={showValidationErrors ? errors.email : ""}
             required
           />
           <InputEntryModal
@@ -152,7 +159,7 @@ function EditContactModalForm({
             value={formData.phone_number}
             onChange={handleChange}
             example={params.contactPhone_example}
-            error={errors.phone_number}
+            error={showValidationErrors ? errors.phone_number : ""}
           />
           <div className="flex justify-between mt-6">
             <button type="button" onClick={onClose} className="close-modal">

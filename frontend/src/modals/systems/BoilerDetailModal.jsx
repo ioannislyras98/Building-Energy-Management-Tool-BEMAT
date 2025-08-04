@@ -34,6 +34,7 @@ function BoilerDetailModalForm({
   });
 
   const [errors, setErrors] = useState({});
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
   const token = cookies.get("token") || "";
 
   useEffect(() => {
@@ -49,8 +50,12 @@ function BoilerDetailModalForm({
         smoke_scale: editItem.smoke_scale || "",
         room_temperature: editItem.room_temperature || "",
       });
+    } else {
+      resetForm();
     }
-  }, [editItem]);
+    setErrors({});
+    setShowValidationErrors(false);
+  }, [editItem, open]);
 
   const isEditMode = !!editItem;
 
@@ -72,34 +77,44 @@ function BoilerDetailModalForm({
     const newErrors = {};
     let hasErrors = false;
 
-    if (!formData.fuel_type) {
-      newErrors.fuel_type =
-        params.errorRequired || "Το είδος καυσίμου είναι υποχρεωτικό";
+    // Required fields
+    if (!formData.nominal_power || formData.nominal_power.trim() === "") {
+      newErrors.nominal_power = params.errorRequired || "Field is required";
+      hasErrors = true;
+    } else if (isNaN(formData.nominal_power) || parseFloat(formData.nominal_power) <= 0) {
+      newErrors.nominal_power = params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
-    if (
-      formData.internal_efficiency &&
-      (parseFloat(formData.internal_efficiency) < 0 ||
-        parseFloat(formData.internal_efficiency) > 100)
-    ) {
-      newErrors.internal_efficiency =
-        params.errorEfficiencyRange ||
-        "Ο βαθμός απόδοσης πρέπει να είναι μεταξύ 0-100%";
+
+    if (!formData.internal_efficiency || formData.internal_efficiency.trim() === "") {
+      newErrors.internal_efficiency = params.errorRequired || "Field is required";
+      hasErrors = true;
+    } else if (isNaN(formData.internal_efficiency)) {
+      newErrors.internal_efficiency = params.errorNumber || "Must be a number";
+      hasErrors = true;
+    } else if (parseFloat(formData.internal_efficiency) < 0 || parseFloat(formData.internal_efficiency) > 100) {
+      newErrors.internal_efficiency = params.errorEfficiencyRange || "Must be between 0-100%";
+      hasErrors = true;
+    }
+
+    // Optional field validations
+    if (!formData.fuel_type) {
+      newErrors.fuel_type = params.errorRequired || "Field is required";
       hasErrors = true;
     }
 
     if (
       formData.smoke_scale &&
+      formData.smoke_scale.trim() !== "" &&
       (parseFloat(formData.smoke_scale) < 0 ||
         parseFloat(formData.smoke_scale) > 9)
     ) {
-      newErrors.smoke_scale =
-        params.errorSmokeScaleRange ||
-        "Η κλίμακα καπνού πρέπει να είναι μεταξύ 0-9";
+      newErrors.smoke_scale = params.errorSmokeScaleRange || "Must be between 0-9";
       hasErrors = true;
     }
 
     setErrors(newErrors);
+    setShowValidationErrors(true);
     return !hasErrors;
   };
 
@@ -155,7 +170,8 @@ function BoilerDetailModalForm({
       },
       data: JSON.stringify(apiData),
       success: (response) => {
-        console.log("Boiler detail saved:", response);        onSubmitSuccess(response);
+        console.log("Boiler detail saved:", response);        
+        onSubmitSuccess(response);
         resetForm();
         onClose();
       },
@@ -197,6 +213,7 @@ function BoilerDetailModalForm({
       room_temperature: "",
     });
     setErrors({});
+    setShowValidationErrors(false);
   };
 
   if (!open) {
@@ -231,9 +248,10 @@ function BoilerDetailModalForm({
               type="number"
               value={formData.nominal_power}
               onChange={handleChange}
-              error={errors.nominal_power}
+              error={showValidationErrors ? errors.nominal_power : ""}
               step="0.01"
               min="0"
+              required
             />
             <InputEntryModal
               entry={params.internalEfficiency || "Βαθμός Απόδοσης (%)"}
@@ -241,10 +259,11 @@ function BoilerDetailModalForm({
               type="number"
               value={formData.internal_efficiency}
               onChange={handleChange}
-              error={errors.internal_efficiency}
+              error={showValidationErrors ? errors.internal_efficiency : ""}
               step="0.01"
               min="0"
               max="100"
+              required
             />
             <InputEntryModal
               entry={params.manufacturingYear || "Έτος Κατασκευής"}
@@ -252,10 +271,10 @@ function BoilerDetailModalForm({
               type="number"
               value={formData.manufacturing_year}
               onChange={handleChange}
-              error={errors.manufacturing_year}
+              error={showValidationErrors ? errors.manufacturing_year : ""}
               min="1900"
               max={new Date().getFullYear()}
-            />{" "}
+            />
             <div className="mb-4">
               <label htmlFor="fuel_type" className="label-name">
                 {params.fuelType || "Είδος Καυσίμου"}{" "}
@@ -267,26 +286,25 @@ function BoilerDetailModalForm({
                 value={formData.fuel_type}
                 onChange={handleChange}
                 className={`input-field ${
-                  errors.fuel_type ? "error-input" : ""
+                  errors.fuel_type && showValidationErrors ? "error-input" : ""
                 }`}
                 placeholder={
                   params.fuelTypePlaceholder || "Εισάγετε το είδος καυσίμου"
                 }
-                required
               />
-              {errors.fuel_type && (
+              {showValidationErrors && errors.fuel_type && (
                 <div className="text-red-500 text-xs mt-1">
                   {errors.fuel_type}
                 </div>
               )}
-            </div>{" "}
+            </div>
             <InputEntryModal
               entry={params.nitrogenMonoxide || "Μονοξείδιο Αζώτου (ppm)"}
               id="nitrogen_monoxide"
               type="number"
               value={formData.nitrogen_monoxide}
               onChange={handleChange}
-              error={errors.nitrogen_monoxide}
+              error={showValidationErrors ? errors.nitrogen_monoxide : ""}
               step="0.01"
               min="0"
               max="65"
@@ -297,7 +315,7 @@ function BoilerDetailModalForm({
               type="number"
               value={formData.nitrogen_oxides}
               onChange={handleChange}
-              error={errors.nitrogen_oxides}
+              error={showValidationErrors ? errors.nitrogen_oxides : ""}
               step="0.01"
               min="0"
               max="65"
@@ -308,7 +326,7 @@ function BoilerDetailModalForm({
               type="number"
               value={formData.exhaust_temperature}
               onChange={handleChange}
-              error={errors.exhaust_temperature}
+              error={showValidationErrors ? errors.exhaust_temperature : ""}
               step="0.01"
               min="0"
             />
@@ -318,7 +336,7 @@ function BoilerDetailModalForm({
               type="number"
               value={formData.smoke_scale}
               onChange={handleChange}
-              error={errors.smoke_scale}
+              error={showValidationErrors ? errors.smoke_scale : ""}
               step="0.1"
               min="0"
               max="9"
@@ -329,7 +347,7 @@ function BoilerDetailModalForm({
               type="number"
               value={formData.room_temperature}
               onChange={handleChange}
-              error={errors.room_temperature}
+              error={showValidationErrors ? errors.room_temperature : ""}
               step="0.01"
             />
           </div>          <div className="flex justify-between mt-6">

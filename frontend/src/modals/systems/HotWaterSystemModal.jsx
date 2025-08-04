@@ -29,6 +29,7 @@ function HotWaterSystemModalForm({
     energy_metering_system: "",
   });
   const [errors, setErrors] = useState({});
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
   const token = cookies.get("token") || "";
 
   // Apply blur effect using hook
@@ -45,8 +46,20 @@ function HotWaterSystemModalForm({
         storage_tank_state: editItem.storage_tank_state || "",
         energy_metering_system: editItem.energy_metering_system || "",
       });
+    } else {
+      setFormData({
+        heating_system_type: "",
+        boiler_type: "",
+        power_kw: "",
+        thermal_efficiency: "",
+        distribution_network_state: "",
+        storage_tank_state: "",
+        energy_metering_system: "",
+      });
     }
-  }, [editItem]);
+    setErrors({});
+    setShowValidationErrors(false);
+  }, [editItem, open]);
 
   const isEditMode = !!editItem;
 
@@ -67,24 +80,40 @@ function HotWaterSystemModalForm({
   const validateForm = () => {
     const newErrors = {};
     let hasErrors = false;
-    if (
-      formData.thermal_efficiency &&
-      (parseFloat(formData.thermal_efficiency) < 0 ||
-        parseFloat(formData.thermal_efficiency) > 100)
-    ) {
-      newErrors.thermal_efficiency =
-        params.errorEfficiencyRange ||
-        "Ο θερμικός βαθμός απόδοσης πρέπει να είναι μεταξύ 0-100%";
+
+    // Required fields
+    if (!formData.heating_system_type) {
+      newErrors.heating_system_type = params.errorRequired || "Field is required";
       hasErrors = true;
     }
 
-    if (formData.power_kw && parseFloat(formData.power_kw) <= 0) {
-      newErrors.power_kw =
-        params.errorPositiveNumber || "Η ισχύς πρέπει να είναι θετικός αριθμός";
+    if (!formData.boiler_type) {
+      newErrors.boiler_type = params.errorRequired || "Field is required";
+      hasErrors = true;
+    }
+
+    if (!formData.power_kw || formData.power_kw === "") {
+      newErrors.power_kw = params.errorRequired || "Field is required";
+      hasErrors = true;
+    } else if (isNaN(formData.power_kw) || parseFloat(formData.power_kw) <= 0) {
+      newErrors.power_kw = params.errorPositiveNumber || "Must be a positive number";
+      hasErrors = true;
+    }
+
+    // Optional field validations
+    if (
+      formData.thermal_efficiency &&
+      formData.thermal_efficiency !== "" &&
+      (isNaN(formData.thermal_efficiency) || 
+       parseFloat(formData.thermal_efficiency) < 0 ||
+       parseFloat(formData.thermal_efficiency) > 100)
+    ) {
+      newErrors.thermal_efficiency = params.errorEfficiencyRange || "Must be between 0-100%";
       hasErrors = true;
     }
 
     setErrors(newErrors);
+    setShowValidationErrors(true);
     return !hasErrors;
   };
 
@@ -166,6 +195,7 @@ function HotWaterSystemModalForm({
       energy_metering_system: "",
     });
     setErrors({});
+    setShowValidationErrors(false);
   };
 
   const submitButtonText = isEditMode
@@ -197,7 +227,8 @@ function HotWaterSystemModalForm({
               type="text"
               value={formData.heating_system_type}
               onChange={handleChange}
-              error={errors.heating_system_type}
+              error={showValidationErrors ? errors.heating_system_type : ""}
+              required
             />
 
             <InputEntryModal
@@ -206,7 +237,8 @@ function HotWaterSystemModalForm({
               type="text"
               value={formData.boiler_type}
               onChange={handleChange}
-              error={errors.boiler_type}
+              error={showValidationErrors ? errors.boiler_type : ""}
+              required
             />
 
             <InputEntryModal
@@ -215,9 +247,10 @@ function HotWaterSystemModalForm({
               type="number"
               value={formData.power_kw}
               onChange={handleChange}
-              error={errors.power_kw}
+              error={showValidationErrors ? errors.power_kw : ""}
               step="0.01"
               min="0"
+              required
             />
 
             <InputEntryModal
@@ -226,7 +259,7 @@ function HotWaterSystemModalForm({
               type="number"
               value={formData.thermal_efficiency}
               onChange={handleChange}
-              error={errors.thermal_efficiency}
+              error={showValidationErrors ? errors.thermal_efficiency : ""}
               step="0.01"
               min="0"
               max="100"
@@ -240,7 +273,7 @@ function HotWaterSystemModalForm({
               type="text"
               value={formData.distribution_network_state}
               onChange={handleChange}
-              error={errors.distribution_network_state}
+              error={showValidationErrors ? errors.distribution_network_state : ""}
             />
 
             <InputEntryModal
@@ -251,7 +284,7 @@ function HotWaterSystemModalForm({
               type="text"
               value={formData.storage_tank_state}
               onChange={handleChange}
-              error={errors.storage_tank_state}
+              error={showValidationErrors ? errors.storage_tank_state : ""}
             />
 
             <div className="md:col-span-2">
@@ -263,7 +296,7 @@ function HotWaterSystemModalForm({
                 type="text"
                 value={formData.energy_metering_system}
                 onChange={handleChange}
-                error={errors.energy_metering_system}
+                error={showValidationErrors ? errors.energy_metering_system : ""}
               />
             </div>
           </div>

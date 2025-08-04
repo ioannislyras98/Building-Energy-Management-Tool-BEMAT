@@ -29,6 +29,7 @@ function CoolingSystemModalForm({
     maintenance_period: "",
     operating_hours: "",
   });  const [errors, setErrors] = useState({});
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
   const token = cookies.get("token") || "";
 
   // Apply blur effect using hook
@@ -46,8 +47,12 @@ function CoolingSystemModalForm({
         maintenance_period: editItem.maintenance_period || "",
         operating_hours: editItem.operating_hours || "",
       });
+    } else {
+      resetForm();
     }
-  }, [editItem]);
+    setErrors({});
+    setShowValidationErrors(false);
+  }, [editItem, open]);
 
   const isEditMode = !!editItem;
 
@@ -69,28 +74,32 @@ function CoolingSystemModalForm({
     const newErrors = {};
     let hasErrors = false;
 
+    // Required fields
     if (!formData.cooling_system_type) {
-      newErrors.cooling_system_type =
-        params.errorRequired || "Ο τύπος συστήματος ψύξης είναι υποχρεωτικός";
-      hasErrors = true;
-    }
-    if (
-      formData.energy_efficiency_ratio &&
-      parseFloat(formData.energy_efficiency_ratio) <= 0
-    ) {
-      newErrors.energy_efficiency_ratio =
-        params.errorPositiveNumber ||
-        "Ο συντελεστής ενεργειακής απόδοσης πρέπει να είναι θετικός αριθμός";
+      newErrors.cooling_system_type = params.errorRequired || "Field is required";
       hasErrors = true;
     }
 
-    if (formData.power_kw && parseFloat(formData.power_kw) <= 0) {
-      newErrors.power_kw =
-        params.errorPositiveNumber || "Η ισχύς πρέπει να είναι θετικός αριθμός";
+    if (!formData.power_kw || formData.power_kw === "") {
+      newErrors.power_kw = params.errorRequired || "Field is required";
+      hasErrors = true;
+    } else if (isNaN(formData.power_kw) || parseFloat(formData.power_kw) <= 0) {
+      newErrors.power_kw = params.errorPositiveNumber || "Must be a positive number";
+      hasErrors = true;
+    }
+
+    // Optional field validations
+    if (
+      formData.energy_efficiency_ratio &&
+      formData.energy_efficiency_ratio !== "" &&
+      (isNaN(formData.energy_efficiency_ratio) || parseFloat(formData.energy_efficiency_ratio) <= 0)
+    ) {
+      newErrors.energy_efficiency_ratio = params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
 
     setErrors(newErrors);
+    setShowValidationErrors(true);
     return !hasErrors;
   };
 
@@ -176,6 +185,7 @@ function CoolingSystemModalForm({
       operating_hours: "",
     });
     setErrors({});
+    setShowValidationErrors(false);
   };
 
   const submitButtonText = isEditMode
@@ -212,15 +222,14 @@ function CoolingSystemModalForm({
                 value={formData.cooling_system_type}
                 onChange={handleChange}
                 className={`input-field ${
-                  errors.cooling_system_type ? "error-input" : ""
+                  errors.cooling_system_type && showValidationErrors ? "error-input" : ""
                 }`}
                 placeholder={
                   params.coolingSystemTypePlaceholder ||
                   "Εισάγετε τον τύπο του συστήματος ψύξης"
                 }
-                required
               />
-              {errors.cooling_system_type && (
+              {showValidationErrors && errors.cooling_system_type && (
                 <div className="text-red-500 text-xs mt-1">
                   {errors.cooling_system_type}
                 </div>
@@ -239,14 +248,14 @@ function CoolingSystemModalForm({
                 value={formData.cooling_unit_accessibility}
                 onChange={handleChange}
                 className={`input-field ${
-                  errors.cooling_unit_accessibility ? "error-input" : ""
+                  errors.cooling_unit_accessibility && showValidationErrors ? "error-input" : ""
                 }`}
                 placeholder={
                   params.coolingUnitAccessibilityPlaceholder ||
                   "Εισάγετε τη δυνατότητα πρόσβασης στη μονάδα ψύξης"
                 }
               />
-              {errors.cooling_unit_accessibility && (
+              {showValidationErrors && errors.cooling_unit_accessibility && (
                 <div className="text-red-500 text-xs mt-1">
                   {errors.cooling_unit_accessibility}
                 </div>
@@ -258,7 +267,7 @@ function CoolingSystemModalForm({
               type="text"
               value={formData.heat_pump_type}
               onChange={handleChange}
-              error={errors.heat_pump_type}
+              error={showValidationErrors ? errors.heat_pump_type : ""}
             />
             <InputEntryModal
               entry={params.powerKW || "Ισχύς (kW)"}
@@ -266,9 +275,10 @@ function CoolingSystemModalForm({
               type="number"
               value={formData.power_kw}
               onChange={handleChange}
-              error={errors.power_kw}
+              error={showValidationErrors ? errors.power_kw : ""}
               step="0.01"
               min="0"
+              required
             />
             <InputEntryModal
               entry={params.constructionYear || "Έτος Κατασκευής"}
@@ -276,7 +286,7 @@ function CoolingSystemModalForm({
               type="number"
               value={formData.construction_year}
               onChange={handleChange}
-              error={errors.construction_year}
+              error={showValidationErrors ? errors.construction_year : ""}
               min="1900"
               max={new Date().getFullYear()}
             />
@@ -289,7 +299,7 @@ function CoolingSystemModalForm({
               type="number"
               value={formData.energy_efficiency_ratio}
               onChange={handleChange}
-              error={errors.energy_efficiency_ratio}
+              error={showValidationErrors ? errors.energy_efficiency_ratio : ""}
               step="0.01"
               min="0"
             />
@@ -299,7 +309,7 @@ function CoolingSystemModalForm({
               type="text"
               value={formData.maintenance_period}
               onChange={handleChange}
-              error={errors.maintenance_period}
+              error={showValidationErrors ? errors.maintenance_period : ""}
             />
             <InputEntryModal
               entry={params.operatingHours || "Ώρες Λειτουργίας"}
@@ -307,7 +317,7 @@ function CoolingSystemModalForm({
               type="text"
               value={formData.operating_hours}
               onChange={handleChange}
-              error={errors.operating_hours}
+              error={showValidationErrors ? errors.operating_hours : ""}
             />
           </div>
 

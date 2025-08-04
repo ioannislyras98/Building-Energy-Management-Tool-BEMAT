@@ -29,7 +29,17 @@ function AddContactModalForm({
     phone_number: "",
   });
   const [errors, setErrors] = useState({});
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
   const token = cookies.get("token") || "";
+
+  // Reset validation state when modal opens/closes
+  React.useEffect(() => {
+    if (isOpen) {
+      setFormData({ name: "", role: "", email: "", phone_number: "" });
+      setErrors({});
+      setShowValidationErrors(false);
+    }
+  }, [isOpen]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -43,11 +53,11 @@ function AddContactModalForm({
     const newErrors = {};
     let isValid = true;
     if (!formData.name.trim()) {
-      newErrors.name = params.errorRequired || "Name is required";
+      newErrors.name = params.errorRequired || "Field is required";
       isValid = false;
     }
     if (!formData.email.trim()) {
-      newErrors.email = params.errorRequired || "Email is required";
+      newErrors.email = params.errorRequired || "Field is required";
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = params.errorEmail || "Invalid email format";
@@ -58,6 +68,7 @@ function AddContactModalForm({
       isValid = false;
     }
     setErrors(newErrors);
+    setShowValidationErrors(true);
     return isValid;
   };
 
@@ -84,6 +95,8 @@ function AddContactModalForm({
         onContactAdded(response);
         onClose();
         setFormData({ name: "", role: "", email: "", phone_number: "" });
+        setErrors({});
+        setShowValidationErrors(false);
       },
       error: function (error) {
         if (error.responseJSON && error.responseJSON.error) {
@@ -124,7 +137,7 @@ function AddContactModalForm({
             value={formData.name}
             onChange={handleChange}
             example={params.contactName_example}
-            error={errors.name}
+            error={showValidationErrors ? errors.name : ""}
             required
           />
           <InputEntryModal
@@ -133,7 +146,7 @@ function AddContactModalForm({
             value={formData.role}
             onChange={handleChange}
             example={params.contactRole_example}
-            error={errors.role}
+            error={showValidationErrors ? errors.role : ""}
           />
           <InputEntryModal
             entry={params.contactEmail}
@@ -142,7 +155,7 @@ function AddContactModalForm({
             value={formData.email}
             onChange={handleChange}
             example={params.contactEmail_example}
-            error={errors.email}
+            error={showValidationErrors ? errors.email : ""}
             required
           />
           <InputEntryModal
@@ -152,7 +165,7 @@ function AddContactModalForm({
             value={formData.phone_number}
             onChange={handleChange}
             example={params.contactPhone_example}
-            error={errors.phone_number}
+            error={showValidationErrors ? errors.phone_number : ""}
           />
           <div className="flex justify-between mt-6">
             <button type="button" onClick={onClose} className="close-modal">

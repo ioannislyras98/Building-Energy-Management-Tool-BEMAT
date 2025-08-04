@@ -195,12 +195,32 @@ const RoofThermalInsulationTabContent = ({
       },
       data: JSON.stringify(updatedRoofThermalInsulation),
       success: (data) => {
-        setRoofThermalInsulation(data);
-        setSuccess(
-          translations.saveSuccess ||
-            "Η θερμομόνωση οροφής αποθηκεύτηκε επιτυχώς!"
-        );
-        setLoading(false);
+        // After successful save, trigger recalculation
+        $.ajax({
+          url: `http://127.0.0.1:8000/roof_thermal_insulations/${currentRoofThermalInsulation.uuid}/recalculate/`,
+          method: "POST",
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+          success: (recalculatedData) => {
+            setRoofThermalInsulation(recalculatedData.data);
+            setSuccess(
+              translations.saveSuccess ||
+                "Η θερμομόνωση οροφής αποθηκεύτηκε επιτυχώς!"
+            );
+            setLoading(false);
+          },
+          error: (jqXHR) => {
+            console.error("Error recalculating roof thermal insulation:", jqXHR);
+            // Still show success for the save, even if recalculation failed
+            setRoofThermalInsulation(data);
+            setSuccess(
+              translations.saveSuccess ||
+                "Η θερμομόνωση οροφής αποθηκεύτηκε επιτυχώς!"
+            );
+            setLoading(false);
+          }
+        });
       },
       error: (jqXHR) => {
         console.error("Error saving roof thermal insulation:", jqXHR);
@@ -280,6 +300,21 @@ const RoofThermalInsulationTabContent = ({
           setRoofThermalInsulation(data);
           setOldMaterials(data.old_materials || []);
           setNewMaterials(data.new_materials || []);
+          
+          // Trigger recalculation after material changes
+          $.ajax({
+            url: `http://127.0.0.1:8000/roof_thermal_insulations/${currentRoofThermalInsulation.uuid}/recalculate/`,
+            method: "POST",
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+            success: (recalculatedData) => {
+              setRoofThermalInsulation(recalculatedData.data);
+            },
+            error: (jqXHR) => {
+              console.error("Error recalculating after material save:", jqXHR);
+            }
+          });
         },
       });
     }
@@ -336,40 +371,8 @@ const RoofThermalInsulationTabContent = ({
   };
 
   const calculateAnnualBenefit = () => {
-    if (
-      !roofThermalInsulation.heating_hours_per_year ||
-      !roofThermalInsulation.cooling_hours_per_year ||
-      !roofThermalInsulation.project_electricity_cost
-    ) {
-      return 0;
-    }
-
-    // Calculate winter hourly losses (kW) for both old and new materials
-    const winterLossesOld = calculateWinterHourlyLosses(oldMaterials);
-    const winterLossesNew = calculateWinterHourlyLosses(newMaterials);
-
-    // Calculate summer hourly losses (kW) for both old and new materials
-    const summerLossesOld = calculateSummerHourlyLosses(oldMaterials);
-    const summerLossesNew = calculateSummerHourlyLosses(newMaterials);
-
-    // Calculate differences (savings)
-    const winterLossesDifference = winterLossesOld - winterLossesNew;
-    const summerLossesDifference = summerLossesOld - summerLossesNew;
-
-    // Calculate annual energy savings (kWh/year)
-    const annualEnergySavings =
-      winterLossesDifference *
-        parseFloat(roofThermalInsulation.cooling_hours_per_year) +
-      summerLossesDifference *
-        parseFloat(roofThermalInsulation.heating_hours_per_year);
-
-    // Calculate annual benefit (€/year)
-    const electricityCost = parseFloat(
-      roofThermalInsulation.project_electricity_cost
-    );
-    const annualBenefit = annualEnergySavings * electricityCost;
-
-    return Math.max(0, annualBenefit); // Ensure non-negative value
+    // Return the calculated annual benefit from backend
+    return parseFloat(roofThermalInsulation.annual_benefit || 0);
   };
 
   // Base columns for all materials
@@ -758,6 +761,18 @@ const RoofThermalInsulationTabContent = ({
                   )
                 }
                 inputProps={{ step: 1, min: 0, max: 8760 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -776,6 +791,18 @@ const RoofThermalInsulationTabContent = ({
                   )
                 }
                 inputProps={{ step: 1, min: 0, max: 8760 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
               />
             </Grid>
           </Grid>
@@ -810,6 +837,17 @@ const RoofThermalInsulationTabContent = ({
                   },
                   "& .MuiInputLabel-root": {
                     color: "var(--color-primary)",
+                    "&.Mui-focused": {
+                      color: "var(--color-primary) !important",
+                    },
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary) !important",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "var(--color-primary) !important",
+                    },
                   },
                 }}
                 helperText={
@@ -832,11 +870,22 @@ const RoofThermalInsulationTabContent = ({
                 InputProps={{ readOnly: true }}
                 sx={{
                   "& .MuiInputBase-input": {
-                    color: "var(--color-success)",
+                    color: calculateAnnualBenefit() >= 0 ? "var(--color-success)" : "red",
                     fontWeight: "bold",
                   },
                   "& .MuiInputLabel-root": {
-                    color: "var(--color-success)",
+                    color: calculateAnnualBenefit() >= 0 ? "var(--color-success)" : "red",
+                    "&.Mui-focused": {
+                      color: calculateAnnualBenefit() >= 0 ? "var(--color-success) !important" : "red !important",
+                    },
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: calculateAnnualBenefit() >= 0 ? "var(--color-success) !important" : "red !important",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: calculateAnnualBenefit() >= 0 ? "var(--color-success) !important" : "red !important",
+                    },
                   },
                 }}
                 helperText={
@@ -861,6 +910,18 @@ const RoofThermalInsulationTabContent = ({
                   )
                 }
                 inputProps={{ step: 1, min: 1, max: 50 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -876,6 +937,18 @@ const RoofThermalInsulationTabContent = ({
                   handleInputChange("annual_operating_costs", e.target.value)
                 }
                 inputProps={{ step: 0.01, min: 0 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -890,6 +963,18 @@ const RoofThermalInsulationTabContent = ({
                   handleInputChange("discount_rate", e.target.value)
                 }
                 inputProps={{ step: 0.1, min: 0, max: 100 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -909,6 +994,19 @@ const RoofThermalInsulationTabContent = ({
                         ? "green"
                         : "red",
                     fontWeight: "bold",
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary) !important",
+                    },
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary) !important",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "var(--color-primary) !important",
+                    },
                   },
                 }}
               />

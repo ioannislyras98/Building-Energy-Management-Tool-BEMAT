@@ -31,6 +31,7 @@ function HeatingSystemModalForm({
     distribution_network_state: "",
   });
   const [errors, setErrors] = useState({});
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
   const token = cookies.get("token") || "";
 
   // Apply blur effect using hook
@@ -49,8 +50,22 @@ function HeatingSystemModalForm({
         cop: editItem.cop || "",
         distribution_network_state: editItem.distribution_network_state || "",
       });
+    } else {
+      setFormData({
+        heating_system_type: "",
+        exchanger_type: "",
+        central_boiler_system: "",
+        central_heat_pump_system: "",
+        local_heating_system: "",
+        power_kw: "",
+        construction_year: "",
+        cop: "",
+        distribution_network_state: "",
+      });
     }
-  }, [editItem]);
+    setErrors({});
+    setShowValidationErrors(false);
+  }, [editItem, open]);
 
   const isEditMode = !!editItem;
 
@@ -71,20 +86,29 @@ function HeatingSystemModalForm({
   const validateForm = () => {
     const newErrors = {};
     let hasErrors = false;
-    if (formData.cop && parseFloat(formData.cop) <= 0) {
-      newErrors.cop =
-        params.errorPositiveNumber ||
-        "Ο συντελεστής ενεργειακής επίδοσης (COP) πρέπει να είναι θετικός αριθμός";
+
+    // Required fields
+    if (!formData.heating_system_type) {
+      newErrors.heating_system_type = params.errorRequired || "Field is required";
       hasErrors = true;
     }
 
-    if (formData.power_kw && parseFloat(formData.power_kw) <= 0) {
-      newErrors.power_kw =
-        params.errorPositiveNumber || "Η ισχύς πρέπει να είναι θετικός αριθμός";
+    if (!formData.power_kw || formData.power_kw === "") {
+      newErrors.power_kw = params.errorRequired || "Field is required";
+      hasErrors = true;
+    } else if (isNaN(formData.power_kw) || parseFloat(formData.power_kw) <= 0) {
+      newErrors.power_kw = params.errorPositiveNumber || "Must be a positive number";
+      hasErrors = true;
+    }
+
+    // Optional field validations
+    if (formData.cop && formData.cop !== "" && (isNaN(formData.cop) || parseFloat(formData.cop) <= 0)) {
+      newErrors.cop = params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
 
     setErrors(newErrors);
+    setShowValidationErrors(true);
     return !hasErrors;
   };
 
@@ -170,6 +194,7 @@ function HeatingSystemModalForm({
       distribution_network_state: "",
     });
     setErrors({});
+    setShowValidationErrors(false);
   };
 
   const submitButtonText = isEditMode
@@ -201,7 +226,8 @@ function HeatingSystemModalForm({
               type="text"
               value={formData.heating_system_type}
               onChange={handleChange}
-              error={errors.heating_system_type}
+              error={showValidationErrors ? errors.heating_system_type : ""}
+              required
             />
             <InputEntryModal
               entry={params.exchangerType || "Τύπος Εναλλάκτη"}
@@ -209,7 +235,7 @@ function HeatingSystemModalForm({
               type="text"
               value={formData.exchanger_type}
               onChange={handleChange}
-              error={errors.exchanger_type}
+              error={showValidationErrors ? errors.exchanger_type : ""}
             />
             <InputEntryModal
               entry={params.centralBoilerSystem || "Κεντρικό Σύστημα Λέβητα"}
@@ -217,7 +243,7 @@ function HeatingSystemModalForm({
               type="text"
               value={formData.central_boiler_system}
               onChange={handleChange}
-              error={errors.central_boiler_system}
+              error={showValidationErrors ? errors.central_boiler_system : ""}
             />
             <InputEntryModal
               entry={
@@ -228,7 +254,7 @@ function HeatingSystemModalForm({
               type="text"
               value={formData.central_heat_pump_system}
               onChange={handleChange}
-              error={errors.central_heat_pump_system}
+              error={showValidationErrors ? errors.central_heat_pump_system : ""}
             />
             <InputEntryModal
               entry={params.localHeatingSystem || "Τοπικό Σύστημα Θέρμανσης"}
@@ -236,7 +262,7 @@ function HeatingSystemModalForm({
               type="text"
               value={formData.local_heating_system}
               onChange={handleChange}
-              error={errors.local_heating_system}
+              error={showValidationErrors ? errors.local_heating_system : ""}
             />
             <InputEntryModal
               entry={params.powerKW || "Ισχύς (kW)"}
@@ -244,9 +270,10 @@ function HeatingSystemModalForm({
               type="number"
               value={formData.power_kw}
               onChange={handleChange}
-              error={errors.power_kw}
+              error={showValidationErrors ? errors.power_kw : ""}
               step="0.01"
               min="0"
+              required
             />
             <InputEntryModal
               entry={params.constructionYear || "Έτος Κατασκευής"}
@@ -254,7 +281,7 @@ function HeatingSystemModalForm({
               type="number"
               value={formData.construction_year}
               onChange={handleChange}
-              error={errors.construction_year}
+              error={showValidationErrors ? errors.construction_year : ""}
               min="1900"
               max={new Date().getFullYear()}
             />
@@ -267,7 +294,7 @@ function HeatingSystemModalForm({
               type="number"
               value={formData.cop}
               onChange={handleChange}
-              error={errors.cop}
+              error={showValidationErrors ? errors.cop : ""}
               step="0.01"
               min="0"
             />
@@ -281,7 +308,7 @@ function HeatingSystemModalForm({
                 type="text"
                 value={formData.distribution_network_state}
                 onChange={handleChange}
-                error={errors.distribution_network_state}
+                error={showValidationErrors ? errors.distribution_network_state : ""}
               />
             </div>
           </div>

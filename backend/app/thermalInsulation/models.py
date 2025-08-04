@@ -201,7 +201,7 @@ class ExternalWallThermalInsulation(models.Model):
             # Calculate annual benefit (€/year)
             annual_benefit = annual_energy_savings * electricity_cost
         
-            return max(0, annual_benefit)  # Ensure non-negative value
+            return annual_benefit  # Allow negative values to show actual calculations
         except Exception as e:
             print(f"Error calculating annual benefit: {e}")
             return 0

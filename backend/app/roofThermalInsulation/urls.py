@@ -16,8 +16,9 @@ urlpatterns = [
     path('building/<uuid:building_uuid>/', views.get_roof_thermal_insulations_by_building, 
          name='roof-thermal-insulations-by-building'),
     path('project/<uuid:project_uuid>/', views.get_roof_thermal_insulations_by_project, 
-         name='roof-thermal-insulations-by-project'),    path('<uuid:thermal_insulation_uuid>/recalculate/', views.recalculate_u_coefficient, 
-         name='roof-recalculate-u-coefficient'),
+         name='roof-thermal-insulations-by-project'),
+    path('<uuid:roof_thermal_insulation_uuid>/recalculate/', views.recalculate_roof_thermal_insulation, 
+         name='roof-recalculate-thermal-insulation'),
     
     # Material Layer URLs
     path('<uuid:thermal_insulation_uuid>/materials/add/', 

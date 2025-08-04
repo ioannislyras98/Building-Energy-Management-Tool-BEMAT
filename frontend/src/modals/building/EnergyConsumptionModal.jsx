@@ -32,6 +32,7 @@ function EnergyConsumptionModalForm({
   });
 
   const [errors, setErrors] = useState({});
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
   const token = cookies.get("token") || "";
 
   const ENERGY_UNITS = {
@@ -71,7 +72,9 @@ function EnergyConsumptionModalForm({
     } else {
       resetForm();
     }
-  }, [editItem]);
+    setErrors({});
+    setShowValidationErrors(false);
+  }, [editItem, open]);
   const isEditMode = !!editItem;
 
   const handleChange = (e) => {
@@ -94,19 +97,19 @@ function EnergyConsumptionModalForm({
 
     if (!formData.energy_source) {
       newErrors.energy_source =
-        params.errorRequired || "This field is required";
+        params.errorRequired || "Field is required";
       hasErrors = true;
     }
     if (!formData.start_date) {
-      newErrors.start_date = params.errorRequired || "This field is required";
+      newErrors.start_date = params.errorRequired || "Field is required";
       hasErrors = true;
     }
     if (!formData.end_date) {
-      newErrors.end_date = params.errorRequired || "This field is required";
+      newErrors.end_date = params.errorRequired || "Field is required";
       hasErrors = true;
     }
     if (!formData.quantity) {
-      newErrors.quantity = params.errorRequired || "This field is required";
+      newErrors.quantity = params.errorRequired || "Field is required";
       hasErrors = true;
     } else if (isNaN(formData.quantity)) {
       newErrors.quantity = params.errorNumber || "Must be a number";
@@ -114,6 +117,7 @@ function EnergyConsumptionModalForm({
     }
 
     setErrors(newErrors);
+    setShowValidationErrors(true);
     return !hasErrors;
   };
 
@@ -203,6 +207,7 @@ function EnergyConsumptionModalForm({
       quantity: "",
     });
     setErrors({});
+    setShowValidationErrors(false);
   };
 
   const energySources = [
@@ -251,16 +256,15 @@ function EnergyConsumptionModalForm({
               value={formData.energy_source}
               onChange={handleChange}
               className={`input-field ${
-                errors.energy_source ? "error-input" : ""
-              }`}
-              required>
+                errors.energy_source && showValidationErrors ? "error-input" : ""
+              }`}>
               {energySources.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}
             </select>
-            {errors.energy_source && (
+            {showValidationErrors && errors.energy_source && (
               <div className="text-red-500 text-xs mt-1">
                 {errors.energy_source}
               </div>
@@ -273,7 +277,7 @@ function EnergyConsumptionModalForm({
             type="date"
             value={formData.start_date}
             onChange={handleChange}
-            error={errors.start_date}
+            error={showValidationErrors ? errors.start_date : ""}
             required
           />
           <InputEntryModal
@@ -282,7 +286,7 @@ function EnergyConsumptionModalForm({
             type="date"
             value={formData.end_date}
             onChange={handleChange}
-            error={errors.end_date}
+            error={showValidationErrors ? errors.end_date : ""}
             required
           />
 
@@ -299,12 +303,11 @@ function EnergyConsumptionModalForm({
               type="number"
               value={formData.quantity}
               onChange={handleChange}
-              className={`input-field ${errors.quantity ? "error-input" : ""}`}
+              className={`input-field ${errors.quantity && showValidationErrors ? "error-input" : ""}`}
               placeholder={params.quantity_example || "e.g., 1000"}
-              required
               step="0.01"
             />
-            {errors.quantity && (
+            {showValidationErrors && errors.quantity && (
               <div className="text-red-500 text-xs mt-1">{errors.quantity}</div>
             )}
             {formData.energy_source && (

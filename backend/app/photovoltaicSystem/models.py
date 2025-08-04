@@ -256,6 +256,14 @@ class PhotovoltaicSystem(models.Model):
         verbose_name='Απόδοση επένδυσης (%)',
         validators=[MinValueValidator(0)]
     )
+    net_present_value = models.DecimalField(
+        max_digits=12, 
+        decimal_places=2, 
+        blank=True, 
+        null=True,
+        verbose_name='Καθαρή παρούσα αξία - NPV (€)',
+        help_text='Αυτόματος υπολογισμός NPV με προεξοφλητικό συντελεστή'
+    )
     
     # Ενεργειακοί Δείκτες
     power_per_panel = models.DecimalField(
