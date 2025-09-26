@@ -88,12 +88,14 @@ function SolarCollectorsModalForm({
 
     // Required fields
     if (!formData.solar_collector_usage) {
-      newErrors.solar_collector_usage = params.errorRequired || "Field is required";
+      newErrors.solar_collector_usage =
+        params.errorRequired || "Field is required";
       hasErrors = true;
     }
 
     if (!formData.solar_collector_type) {
-      newErrors.solar_collector_type = params.errorRequired || "Field is required";
+      newErrors.solar_collector_type =
+        params.errorRequired || "Field is required";
       hasErrors = true;
     }
 
@@ -101,27 +103,33 @@ function SolarCollectorsModalForm({
     if (
       formData.collector_surface_area &&
       formData.collector_surface_area !== "" &&
-      (isNaN(formData.collector_surface_area) || parseFloat(formData.collector_surface_area) <= 0)
+      (isNaN(formData.collector_surface_area) ||
+        parseFloat(formData.collector_surface_area) <= 0)
     ) {
-      newErrors.collector_surface_area = params.errorPositiveNumber || "Must be a positive number";
+      newErrors.collector_surface_area =
+        params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
 
     if (
       formData.hot_water_storage_capacity &&
       formData.hot_water_storage_capacity !== "" &&
-      (isNaN(formData.hot_water_storage_capacity) || parseFloat(formData.hot_water_storage_capacity) <= 0)
+      (isNaN(formData.hot_water_storage_capacity) ||
+        parseFloat(formData.hot_water_storage_capacity) <= 0)
     ) {
-      newErrors.hot_water_storage_capacity = params.errorPositiveNumber || "Must be a positive number";
+      newErrors.hot_water_storage_capacity =
+        params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
 
     if (
       formData.heating_storage_capacity &&
       formData.heating_storage_capacity !== "" &&
-      (isNaN(formData.heating_storage_capacity) || parseFloat(formData.heating_storage_capacity) <= 0)
+      (isNaN(formData.heating_storage_capacity) ||
+        parseFloat(formData.heating_storage_capacity) <= 0)
     ) {
-      newErrors.heating_storage_capacity = params.errorPositiveNumber || "Must be a positive number";
+      newErrors.heating_storage_capacity =
+        params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
 
@@ -281,7 +289,9 @@ function SolarCollectorsModalForm({
               type="number"
               value={formData.hot_water_storage_capacity}
               onChange={handleChange}
-              error={showValidationErrors ? errors.hot_water_storage_capacity : ""}
+              error={
+                showValidationErrors ? errors.hot_water_storage_capacity : ""
+              }
               step="0.01"
               min="0"
             />
@@ -295,7 +305,9 @@ function SolarCollectorsModalForm({
               type="number"
               value={formData.heating_storage_capacity}
               onChange={handleChange}
-              error={showValidationErrors ? errors.heating_storage_capacity : ""}
+              error={
+                showValidationErrors ? errors.heating_storage_capacity : ""
+              }
               step="0.01"
               min="0"
             />
@@ -308,7 +320,9 @@ function SolarCollectorsModalForm({
               type="text"
               value={formData.distribution_network_state}
               onChange={handleChange}
-              error={showValidationErrors ? errors.distribution_network_state : ""}
+              error={
+                showValidationErrors ? errors.distribution_network_state : ""
+              }
             />
 
             <InputEntryModal
@@ -341,7 +355,9 @@ function SolarCollectorsModalForm({
                 type="text"
                 value={formData.storage_tank_condition}
                 onChange={handleChange}
-                error={showValidationErrors ? errors.storage_tank_condition : ""}
+                error={
+                  showValidationErrors ? errors.storage_tank_condition : ""
+                }
               />
             </div>
           </div>

@@ -252,7 +252,8 @@ function ElectricalConsumptionModalForm({
       hasErrors = true;
     }
     if (!formData.energy_consumption) {
-      newErrors.energy_consumption = params.errorRequired || "This field is required";
+      newErrors.energy_consumption =
+        params.errorRequired || "This field is required";
       hasErrors = true;
     }
     if (!formData.load_type) {
@@ -288,10 +289,20 @@ function ElectricalConsumptionModalForm({
       building: buildingUuid,
       project: projectUuid,
       // Convert empty strings to null for decimal fields
-      load_power: formData.load_power && formData.load_power !== "" ? parseFloat(formData.load_power) : null,
-      operating_hours_per_year: formData.operating_hours_per_year && formData.operating_hours_per_year !== "" ? parseFloat(formData.operating_hours_per_year) : null,
+      load_power:
+        formData.load_power && formData.load_power !== ""
+          ? parseFloat(formData.load_power)
+          : null,
+      operating_hours_per_year:
+        formData.operating_hours_per_year &&
+        formData.operating_hours_per_year !== ""
+          ? parseFloat(formData.operating_hours_per_year)
+          : null,
       // Convert empty strings to null for integer fields
-      quantity: formData.quantity && formData.quantity !== "" ? parseInt(formData.quantity) : null,
+      quantity:
+        formData.quantity && formData.quantity !== ""
+          ? parseInt(formData.quantity)
+          : null,
     };
 
     const url = editItem
@@ -363,7 +374,9 @@ function ElectricalConsumptionModalForm({
                 value={formData.consumption_type}
                 onChange={handleChange}
                 className={`input-field ${
-                  errors.consumption_type && showValidationErrors ? "error-input" : ""
+                  errors.consumption_type && showValidationErrors
+                    ? "error-input"
+                    : ""
                 }`}>
                 {consumptionTypes.map((type) => (
                   <option key={type.value} value={type.value}>
@@ -388,7 +401,9 @@ function ElectricalConsumptionModalForm({
                 value={formData.thermal_zone}
                 onChange={handleChange}
                 className={`input-field ${
-                  errors.thermal_zone && showValidationErrors ? "error-input" : ""
+                  errors.thermal_zone && showValidationErrors
+                    ? "error-input"
+                    : ""
                 }`}>
                 <option value="">
                   {params.selectOption || "Select an option"}
@@ -418,7 +433,9 @@ function ElectricalConsumptionModalForm({
                 value={formData.energy_consumption}
                 onChange={handleChange}
                 className={`input-field ${
-                  errors.energy_consumption && showValidationErrors ? "error-input" : ""
+                  errors.energy_consumption && showValidationErrors
+                    ? "error-input"
+                    : ""
                 }`}>
                 <option value="">{params.none || "Κανένα"}</option>
                 {energyConsumptions.map((consumption) => {
@@ -519,7 +536,9 @@ function ElectricalConsumptionModalForm({
                 type="number"
                 value={formData.operating_hours_per_year}
                 onChange={handleChange}
-                error={showValidationErrors ? errors.operating_hours_per_year : ""}
+                error={
+                  showValidationErrors ? errors.operating_hours_per_year : ""
+                }
                 step="0.01"
                 min="0"
                 max="8760"

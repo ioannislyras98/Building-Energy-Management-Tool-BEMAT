@@ -51,7 +51,8 @@ const ThermalInsulationMaterialModal = ({
   const translations =
     language === "en"
       ? english_text.ThermalInsulationMaterialModal || {}
-      : greek_text.ThermalInsulationMaterialModal || {};  const surfaceTypeOptions = [
+      : greek_text.ThermalInsulationMaterialModal || {};
+  const surfaceTypeOptions = [
     {
       value: "external_walls_outdoor",
       label:
@@ -107,9 +108,12 @@ const ThermalInsulationMaterialModal = ({
       },
       success: (response) => {
         setAvailableMaterials(response.data || []);
-      },      error: (jqXHR) => {
+      },
+      error: (jqXHR) => {
         console.error("Error fetching materials:", jqXHR);
-        setError(translations.errorLoadMaterials || "Σφάλμα κατά τη φόρτωση υλικών");
+        setError(
+          translations.errorLoadMaterials || "Σφάλμα κατά τη φόρτωση υλικών"
+        );
       },
     });
   };
@@ -144,18 +148,22 @@ const ThermalInsulationMaterialModal = ({
       return 1 / thermalResistance; // U = 1/R
     }
     return 0;
-  };  const validateForm = () => {
+  };
+  const validateForm = () => {
     const errors = {};
 
     if (!formData.material) {
-      errors.material = translations.materialRequired || "Παρακαλώ επιλέξτε υλικό";
+      errors.material =
+        translations.materialRequired || "Παρακαλώ επιλέξτε υλικό";
     }
 
     if (!formData.thickness) {
-      errors.thickness = translations.thicknessRequired || "Παρακαλώ εισάγετε το πάχος";
+      errors.thickness =
+        translations.thicknessRequired || "Παρακαλώ εισάγετε το πάχος";
     }
     if (!formData.surface_area) {
-      errors.surface_area = translations.surfaceAreaRequired || "Παρακαλώ εισάγετε την επιφάνεια";
+      errors.surface_area =
+        translations.surfaceAreaRequired || "Παρακαλώ εισάγετε την επιφάνεια";
     }
 
     // Only validate cost for new materials
@@ -168,9 +176,12 @@ const ThermalInsulationMaterialModal = ({
   };
 
   const handleSubmit = () => {
-    if (!token || !thermalInsulationUuid) return;    // Validate form
+    if (!token || !thermalInsulationUuid) return; // Validate form
     if (!validateForm()) {
-      setError(translations.errorValidation || "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία");
+      setError(
+        translations.errorValidation ||
+          "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία"
+      );
       return;
     }
 
@@ -198,10 +209,13 @@ const ThermalInsulationMaterialModal = ({
           onSubmitSuccess(data);
         }
         handleClose();
-      },      error: (jqXHR) => {
+      },
+      error: (jqXHR) => {
         console.error("Error saving material:", jqXHR);
         setError(
-          jqXHR.responseJSON?.detail || translations.errorSave || "Σφάλμα κατά την αποθήκευση του υλικού"
+          jqXHR.responseJSON?.detail ||
+            translations.errorSave ||
+            "Σφάλμα κατά την αποθήκευση του υλικού"
         );
         setLoading(false);
       },
@@ -230,12 +244,13 @@ const ThermalInsulationMaterialModal = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="rounded-lg p-6 w-full max-w-4xl border-primary-light border-2 bg-white shadow-lg max-h-[90vh] overflow-y-auto">
-        {" "}        <h2 className="text-lg font-bold mb-4 text-center">
-          {editItem 
-            ? translations.editMaterial || "Επεξεργασία" 
-            : materialType === "old" 
-              ? translations.addOldMaterial || "Προσθήκη Παλιού Υλικού"
-              : translations.addNewMaterial || "Προσθήκη Νέου Υλικού"}
+        {" "}
+        <h2 className="text-lg font-bold mb-4 text-center">
+          {editItem
+            ? translations.editMaterial || "Επεξεργασία"
+            : materialType === "old"
+            ? translations.addOldMaterial || "Προσθήκη Παλιού Υλικού"
+            : translations.addNewMaterial || "Προσθήκη Νέου Υλικού"}
         </h2>
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-4">
@@ -248,10 +263,12 @@ const ThermalInsulationMaterialModal = ({
             handleSubmit();
           }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {" "}            {/* Material Selection */}
+            {" "}
+            {/* Material Selection */}
             <div className="md:col-span-2">
               <label htmlFor="material" className="label-name text-red-600">
-                {translations.material || "Υλικό"} <span className="text-red-600">*</span>
+                {translations.material || "Υλικό"}{" "}
+                <span className="text-red-600">*</span>
               </label>
               <select
                 id="material"
@@ -260,22 +277,27 @@ const ThermalInsulationMaterialModal = ({
                 className={`input-field ${
                   validationErrors.material ? "error-input" : ""
                 }`}>
-                <option value="">{translations.selectMaterial || "Επιλέξτε υλικό"}</option>
+                <option value="">
+                  {translations.selectMaterial || "Επιλέξτε υλικό"}
+                </option>
                 {availableMaterials.map((material) => (
                   <option key={material.uuid} value={material.uuid}>
                     {material.name} - λ = {material.thermal_conductivity} W/mK |{" "}
                     {material.category_display}
                   </option>
                 ))}
-              </select>{validationErrors.material && (
+              </select>
+              {validationErrors.material && (
                 <div className="text-red-500 text-xs mt-1">
                   {validationErrors.material}
                 </div>
               )}
-            </div>            {/* Surface Type - Fixed to External Walls */}
+            </div>{" "}
+            {/* Surface Type - Fixed to External Walls */}
             <div className="md:col-span-2">
               <label htmlFor="surface_type" className="label-name text-red-600">
-                {translations.surfaceType || "Τύπος Επιφάνειας"} <span className="text-red-600">*</span>
+                {translations.surfaceType || "Τύπος Επιφάνειας"}{" "}
+                <span className="text-red-600">*</span>
               </label>
               <select
                 id="surface_type"
@@ -290,7 +312,8 @@ const ThermalInsulationMaterialModal = ({
                   </option>
                 ))}
               </select>
-            </div>{" "}            {/* Thickness */}
+            </div>{" "}
+            {/* Thickness */}
             <InputEntryModal
               entry={`${translations.thickness || "Πάχος"} (m)`}
               id="thickness"
@@ -301,7 +324,9 @@ const ThermalInsulationMaterialModal = ({
               onChange={(e) => handleInputChange("thickness", e.target.value)}
               example={translations.thicknessPlaceholder || "π.χ. 0.050"}
               error={validationErrors.thickness}
-            />            {/* Surface Area */}
+              required={true}
+            />{" "}
+            {/* Surface Area */}
             <InputEntryModal
               entry={`${translations.surfaceArea || "Επιφάνεια"} (m²)`}
               id="surface_area"
@@ -309,10 +334,14 @@ const ThermalInsulationMaterialModal = ({
               step="0.01"
               min="0.01"
               value={formData.surface_area}
-              onChange={(e) => handleInputChange("surface_area", e.target.value)}
+              onChange={(e) =>
+                handleInputChange("surface_area", e.target.value)
+              }
               example={translations.surfaceAreaPlaceholder || "π.χ. 25.50"}
               error={validationErrors.surface_area}
-            />            {/* Cost - Only for new materials */}
+              required={true}
+            />{" "}
+            {/* Cost - Only for new materials */}
             {materialType === "new" && (
               <InputEntryModal
                 entry={`${translations.cost || "Κόστος"} (€)`}
@@ -324,9 +353,11 @@ const ThermalInsulationMaterialModal = ({
                 onChange={(e) => handleInputChange("cost", e.target.value)}
                 example={translations.costPlaceholder || "π.χ. 1250.00"}
                 error={validationErrors.cost}
+                required={true}
               />
             )}
-          </div>          <div className="flex justify-between mt-6">
+          </div>{" "}
+          <div className="flex justify-between mt-6">
             <button
               type="button"
               onClick={handleCancel}
@@ -335,11 +366,11 @@ const ThermalInsulationMaterialModal = ({
               {translations.cancel || "Ακύρωση"}
             </button>
             <button type="submit" disabled={loading} className="confirm-button">
-              {loading 
-                ? translations.saving || "Αποθήκευση..." 
-                : editItem 
-                  ? translations.save || "Ενημέρωση" 
-                  : translations.save || "Προσθήκη"}
+              {loading
+                ? translations.saving || "Αποθήκευση..."
+                : editItem
+                ? translations.save || "Ενημέρωση"
+                : translations.save || "Προσθήκη"}
             </button>
           </div>
         </form>

@@ -211,7 +211,10 @@ const RoofThermalInsulationTabContent = ({
             setLoading(false);
           },
           error: (jqXHR) => {
-            console.error("Error recalculating roof thermal insulation:", jqXHR);
+            console.error(
+              "Error recalculating roof thermal insulation:",
+              jqXHR
+            );
             // Still show success for the save, even if recalculation failed
             setRoofThermalInsulation(data);
             setSuccess(
@@ -219,7 +222,7 @@ const RoofThermalInsulationTabContent = ({
                 "Η θερμομόνωση οροφής αποθηκεύτηκε επιτυχώς!"
             );
             setLoading(false);
-          }
+          },
         });
       },
       error: (jqXHR) => {
@@ -300,7 +303,7 @@ const RoofThermalInsulationTabContent = ({
           setRoofThermalInsulation(data);
           setOldMaterials(data.old_materials || []);
           setNewMaterials(data.new_materials || []);
-          
+
           // Trigger recalculation after material changes
           $.ajax({
             url: `http://127.0.0.1:8000/roof_thermal_insulations/${currentRoofThermalInsulation.uuid}/recalculate/`,
@@ -313,7 +316,7 @@ const RoofThermalInsulationTabContent = ({
             },
             error: (jqXHR) => {
               console.error("Error recalculating after material save:", jqXHR);
-            }
+            },
           });
         },
       });
@@ -870,21 +873,36 @@ const RoofThermalInsulationTabContent = ({
                 InputProps={{ readOnly: true }}
                 sx={{
                   "& .MuiInputBase-input": {
-                    color: calculateAnnualBenefit() >= 0 ? "var(--color-success)" : "red",
+                    color:
+                      calculateAnnualBenefit() >= 0
+                        ? "var(--color-success)"
+                        : "red",
                     fontWeight: "bold",
                   },
                   "& .MuiInputLabel-root": {
-                    color: calculateAnnualBenefit() >= 0 ? "var(--color-success)" : "red",
+                    color:
+                      calculateAnnualBenefit() >= 0
+                        ? "var(--color-success)"
+                        : "red",
                     "&.Mui-focused": {
-                      color: calculateAnnualBenefit() >= 0 ? "var(--color-success) !important" : "red !important",
+                      color:
+                        calculateAnnualBenefit() >= 0
+                          ? "var(--color-success) !important"
+                          : "red !important",
                     },
                   },
                   "& .MuiOutlinedInput-root": {
                     "&.Mui-focused fieldset": {
-                      borderColor: calculateAnnualBenefit() >= 0 ? "var(--color-success) !important" : "red !important",
+                      borderColor:
+                        calculateAnnualBenefit() >= 0
+                          ? "var(--color-success) !important"
+                          : "red !important",
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: calculateAnnualBenefit() >= 0 ? "var(--color-success) !important" : "red !important",
+                      borderColor:
+                        calculateAnnualBenefit() >= 0
+                          ? "var(--color-success) !important"
+                          : "red !important",
                     },
                   },
                 }}

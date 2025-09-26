@@ -75,14 +75,37 @@ class AutomaticLightingControlSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        """Επιπλέον validations"""
-        if data.get('lighting_area', 0) <= 0:
-            raise serializers.ValidationError("Η επιφάνεια φωτισμού πρέπει να είναι μεγαλύτερη από 0")
+        """Δυναμικά multilingual validations"""
+        # Λήψη γλώσσας από το request context
+        request = self.context.get('request')
+        language = 'el'  # Default Greek
+        if request and hasattr(request, 'META'):
+            accept_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
+            if 'en' in accept_language.lower():
+                language = 'en'
         
-        if data.get('cost_per_m2', 0) <= 0:
-            raise serializers.ValidationError("Το κόστος ανά m² πρέπει να είναι μεγαλύτερο από 0")
-            
-        if data.get('lighting_energy_savings', 0) <= 0:
-            raise serializers.ValidationError("Η εξοικονόμηση ενέργειας πρέπει να είναι μεγαλύτερη από 0")
+        # Δυναμικά error messages - συγχρονισμένα με frontend translations
+        error_messages = {
+            'en': {
+                'lighting_area': "The field 'Lighting area' is required and must be greater than 0",
+                'cost_per_m2': "The field 'Cost per m²' is required and must be greater than 0", 
+                'lighting_energy_savings': "The field 'Lighting energy savings' is required and must be greater than 0"
+            },
+            'el': {
+                'lighting_area': "Το πεδίο 'Επιφάνεια φωτισμού' είναι υποχρεωτικό και πρέπει να είναι μεγαλύτερο από 0",
+                'cost_per_m2': "Το πεδίο 'Κόστος ανά m²' είναι υποχρεωτικό και πρέπει να είναι μεγαλύτερο από 0",
+                'lighting_energy_savings': "Το πεδίο 'Εξοικονόμηση ενέργειας φωτισμού' είναι υποχρεωτικό και πρέπει να είναι μεγαλύτερο από 0"
+            }
+        }
+        
+        messages = error_messages.get(language, error_messages['el'])
+        
+        # Validation logic με δυναμικά messages
+        required_fields = ['lighting_area', 'cost_per_m2', 'lighting_energy_savings']
+        
+        for field in required_fields:
+            value = data.get(field)
+            if value is None or value == '' or (isinstance(value, (int, float)) and value <= 0):
+                raise serializers.ValidationError(messages[field])
         
         return data

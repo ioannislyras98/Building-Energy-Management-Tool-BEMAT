@@ -96,8 +96,7 @@ function EnergyConsumptionModalForm({
     let hasErrors = false;
 
     if (!formData.energy_source) {
-      newErrors.energy_source =
-        params.errorRequired || "Field is required";
+      newErrors.energy_source = params.errorRequired || "Field is required";
       hasErrors = true;
     }
     if (!formData.start_date) {
@@ -256,7 +255,9 @@ function EnergyConsumptionModalForm({
               value={formData.energy_source}
               onChange={handleChange}
               className={`input-field ${
-                errors.energy_source && showValidationErrors ? "error-input" : ""
+                errors.energy_source && showValidationErrors
+                  ? "error-input"
+                  : ""
               }`}>
               {energySources.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -303,7 +304,9 @@ function EnergyConsumptionModalForm({
               type="number"
               value={formData.quantity}
               onChange={handleChange}
-              className={`input-field ${errors.quantity && showValidationErrors ? "error-input" : ""}`}
+              className={`input-field ${
+                errors.quantity && showValidationErrors ? "error-input" : ""
+              }`}
               placeholder={params.quantity_example || "e.g., 1000"}
               step="0.01"
             />

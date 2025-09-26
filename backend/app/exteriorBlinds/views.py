@@ -69,28 +69,37 @@ def exterior_blinds_detail(request, uuid):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def exterior_blinds_create(request):
-    """Δημιουργία νέας εγγραφής εξωτερικών περσίδων"""
-    serializer = ExteriorBlindsSerializer(data=request.data)
+    """Δημιουργία νέας εγγραφής εξωτερικών περσίδων ή ενημέρωση υπάρχουσας"""
+    # Λήψη building και project από τα δεδομένα
+    building_uuid = request.data.get('building')
+    project_uuid = request.data.get('project')
     
-    if serializer.is_valid():
-        # Λήψη building και project από τα δεδομένα
-        building_uuid = request.data.get('building')
-        project_uuid = request.data.get('project')
-        
-        building = get_object_or_404(Building, pk=building_uuid)
-        project = get_object_or_404(Project, pk=project_uuid)
-        
-        # Έλεγχος για υπάρχουσα εγγραφή
-        existing = ExteriorBlinds.objects.filter(building=building, project=project).first()
-        if existing:
-            # Ενημέρωση υπάρχουσας εγγραφής
-            serializer = ExteriorBlindsSerializer(existing, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
+    if not building_uuid or not project_uuid:
+        return Response(
+            {"error": "Τα πεδία building και project είναι υποχρεωτικά"}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    building = get_object_or_404(Building, pk=building_uuid)
+    project = get_object_or_404(Project, pk=project_uuid)
+    
+    # Έλεγχος για υπάρχουσα εγγραφή
+    existing = ExteriorBlinds.objects.filter(building=building, project=project).first()
+    
+    if existing:
+        # Ενημέρωση υπάρχουσας εγγραφής
+        serializer = ExteriorBlindsSerializer(existing, data=request.data, partial=True)
+        if serializer.is_valid():
+            # Διατηρούμε τις σχέσεις building και project
+            serializer.save(building=building, project=project)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            # Δημιουργία νέας εγγραφής
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        # Δημιουργία νέας εγγραφής
+        serializer = ExteriorBlindsSerializer(data=request.data)
+        if serializer.is_valid():
             serializer.save(building=building, project=project)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

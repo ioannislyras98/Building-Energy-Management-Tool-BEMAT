@@ -83,7 +83,8 @@ function HotWaterSystemModalForm({
 
     // Required fields
     if (!formData.heating_system_type) {
-      newErrors.heating_system_type = params.errorRequired || "Field is required";
+      newErrors.heating_system_type =
+        params.errorRequired || "Field is required";
       hasErrors = true;
     }
 
@@ -96,7 +97,8 @@ function HotWaterSystemModalForm({
       newErrors.power_kw = params.errorRequired || "Field is required";
       hasErrors = true;
     } else if (isNaN(formData.power_kw) || parseFloat(formData.power_kw) <= 0) {
-      newErrors.power_kw = params.errorPositiveNumber || "Must be a positive number";
+      newErrors.power_kw =
+        params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
 
@@ -104,11 +106,12 @@ function HotWaterSystemModalForm({
     if (
       formData.thermal_efficiency &&
       formData.thermal_efficiency !== "" &&
-      (isNaN(formData.thermal_efficiency) || 
-       parseFloat(formData.thermal_efficiency) < 0 ||
-       parseFloat(formData.thermal_efficiency) > 100)
+      (isNaN(formData.thermal_efficiency) ||
+        parseFloat(formData.thermal_efficiency) < 0 ||
+        parseFloat(formData.thermal_efficiency) > 100)
     ) {
-      newErrors.thermal_efficiency = params.errorEfficiencyRange || "Must be between 0-100%";
+      newErrors.thermal_efficiency =
+        params.errorEfficiencyRange || "Must be between 0-100%";
       hasErrors = true;
     }
 
@@ -273,7 +276,9 @@ function HotWaterSystemModalForm({
               type="text"
               value={formData.distribution_network_state}
               onChange={handleChange}
-              error={showValidationErrors ? errors.distribution_network_state : ""}
+              error={
+                showValidationErrors ? errors.distribution_network_state : ""
+              }
             />
 
             <InputEntryModal
@@ -296,7 +301,9 @@ function HotWaterSystemModalForm({
                 type="text"
                 value={formData.energy_metering_system}
                 onChange={handleChange}
-                error={showValidationErrors ? errors.energy_metering_system : ""}
+                error={
+                  showValidationErrors ? errors.energy_metering_system : ""
+                }
               />
             </div>
           </div>

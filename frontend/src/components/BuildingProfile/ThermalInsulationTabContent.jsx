@@ -827,21 +827,36 @@ const ThermalInsulationTabContent = ({
                 InputProps={{ readOnly: true }}
                 sx={{
                   "& .MuiInputBase-input": {
-                    color: calculateAnnualBenefit() >= 0 ? "var(--color-success)" : "red",
+                    color:
+                      calculateAnnualBenefit() >= 0
+                        ? "var(--color-success)"
+                        : "red",
                     fontWeight: "bold",
                   },
                   "& .MuiInputLabel-root": {
-                    color: calculateAnnualBenefit() >= 0 ? "var(--color-success)" : "red",
+                    color:
+                      calculateAnnualBenefit() >= 0
+                        ? "var(--color-success)"
+                        : "red",
                     "&.Mui-focused": {
-                      color: calculateAnnualBenefit() >= 0 ? "var(--color-success) !important" : "red !important",
+                      color:
+                        calculateAnnualBenefit() >= 0
+                          ? "var(--color-success) !important"
+                          : "red !important",
                     },
                   },
                   "& .MuiOutlinedInput-root": {
                     "&.Mui-focused fieldset": {
-                      borderColor: calculateAnnualBenefit() >= 0 ? "var(--color-success) !important" : "red !important",
+                      borderColor:
+                        calculateAnnualBenefit() >= 0
+                          ? "var(--color-success) !important"
+                          : "red !important",
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: calculateAnnualBenefit() >= 0 ? "var(--color-success) !important" : "red !important",
+                      borderColor:
+                        calculateAnnualBenefit() >= 0
+                          ? "var(--color-success) !important"
+                          : "red !important",
                     },
                   },
                 }}

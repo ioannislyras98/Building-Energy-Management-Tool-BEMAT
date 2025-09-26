@@ -18,7 +18,7 @@ const SystemsTabContent = ({
   params,
 }) => {
   const { triggerProgressRefresh } = useProgress();
-  
+
   const [systems, setSystems] = useState({
     boiler: null,
     cooling: null,

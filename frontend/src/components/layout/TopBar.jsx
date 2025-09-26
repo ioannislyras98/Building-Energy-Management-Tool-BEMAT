@@ -72,7 +72,7 @@ export default function TopBar() {
 
       // Refresh pending projects data every 5 minutes
       const interval = setInterval(fetchPendingProjects, 300000);
-      
+
       return () => clearInterval(interval);
     }
   }, [token, refreshTrigger]); // Re-fetch when refreshTrigger changes
@@ -111,11 +111,12 @@ export default function TopBar() {
                 className="block py-2 px-3 rounded-sm md:bg-transparent md:p-0 topbar-item topbar-right-item relative"
                 aria-current="page">
                 <FaBell className="size-6" />
-                {pendingProjectsData && pendingProjectsData.pending_count > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {pendingProjectsData.pending_percentage.toFixed(0)}%
-                  </span>
-                )}
+                {pendingProjectsData &&
+                  pendingProjectsData.pending_count > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {pendingProjectsData.pending_percentage.toFixed(0)}%
+                    </span>
+                  )}
               </a>
             </li>
             <li
@@ -145,11 +146,13 @@ export default function TopBar() {
                 </svg>
               </button>
               {open && (
-                <div id="user-dropdown" className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                <div
+                  id="user-dropdown"
+                  className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
                   <ul aria-labelledby="dropdownLargeButton">
                     <li>
-                      <a 
-                        href="#" 
+                      <a
+                        href="#"
                         className="px-4 py-2 flex gap-2 items-center text-primary hover:bg-primary hover:text-white transition-colors"
                         onClick={(e) => e.stopPropagation()}>
                         <HiCog6Tooth className="size-[20px]" />

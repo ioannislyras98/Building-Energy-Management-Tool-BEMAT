@@ -35,6 +35,11 @@ export default function BuildingContactInfo({
       ? english_text.BuildingContactInfo
       : greek_text.BuildingContactInfo;
 
+  const profileText =
+    language === "en"
+      ? english_text.BuildingProfile
+      : greek_text.BuildingProfile;
+
   const handleEditClick = (contact) => {
     onEditContact(contact);
   };
@@ -88,10 +93,15 @@ export default function BuildingContactInfo({
             </div>
             <div>
               <h3 className="text-xl font-bold text-white">
-                {params?.title || "Contact Information"}
+                {params?.title ||
+                  profileText?.contactInfo?.title ||
+                  "Contact Information"}
               </h3>
               <p className="text-blue-100 text-sm">
-                {contacts.length} contact{contacts.length !== 1 ? "s" : ""}
+                {contacts.length}{" "}
+                {language === "en"
+                  ? `contact${contacts.length !== 1 ? "s" : ""}`
+                  : `επαφ${contacts.length === 1 ? "ή" : "ές"}`}
               </p>
             </div>
           </div>
@@ -180,18 +190,20 @@ export default function BuildingContactInfo({
               {params?.noContacts || "No contact persons added yet."}
             </p>
             <p className="text-gray-400 text-sm mt-2">
-              Add your first contact to get started
+              {profileText?.contactInfo?.addFirstContact ||
+                "Add your first contact to get started"}
             </p>
           </div>
         )}
       </div>
-      
       <ConfirmationDialog
         open={deleteDialogOpen}
         title={dialogText?.deleteConfirmTitle || "Delete Contact"}
         message={
           dialogText?.deleteConfirmMessage ||
-          `Are you sure you want to delete ${currentContact?.name || "this contact"}? This action cannot be undone.`
+          `Are you sure you want to delete ${
+            currentContact?.name || "this contact"
+          }? This action cannot be undone.`
         }
         confirmText={dialogText?.deleteConfirmButton || "Delete"}
         cancelText={dialogText?.cancelButton || "Cancel"}

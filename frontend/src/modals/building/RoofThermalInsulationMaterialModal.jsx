@@ -273,17 +273,23 @@ const RoofThermalInsulationMaterialModal = ({
                 id="material"
                 value={formData.material}
                 onChange={handleMaterialChange}
-                className={`input-field ${validationErrors.material ? "error-input" : ""}`}
-              >
+                className={`input-field ${
+                  validationErrors.material ? "error-input" : ""
+                }`}>
                 <option value="">
                   {translations.selectMaterial || "Επιλέξτε υλικό"}
-                </option>                {availableMaterials.map((material) => (
+                </option>{" "}
+                {availableMaterials.map((material) => (
                   <option key={material.uuid} value={material.uuid}>
-                    {material.name} - λ = {material.thermal_conductivity} W/mK | {material.category_display}
+                    {material.name} - λ = {material.thermal_conductivity} W/mK |{" "}
+                    {material.category_display}
                   </option>
                 ))}
-              </select>              {validationErrors.material && (
-                <div className="text-red-500 text-xs mt-1">{validationErrors.material}</div>
+              </select>{" "}
+              {validationErrors.material && (
+                <div className="text-red-500 text-xs mt-1">
+                  {validationErrors.material}
+                </div>
               )}
             </div>
 
@@ -296,9 +302,10 @@ const RoofThermalInsulationMaterialModal = ({
               <select
                 id="surface_type"
                 value={formData.surface_type}
-                onChange={(e) => handleInputChange("surface_type", e.target.value)}
-                className="input-field"
-              >
+                onChange={(e) =>
+                  handleInputChange("surface_type", e.target.value)
+                }
+                className="input-field">
                 {surfaceTypeOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -315,9 +322,9 @@ const RoofThermalInsulationMaterialModal = ({
               step="0.001"
               min="0"
               value={formData.thickness}
-
               onChange={(e) => handleInputChange("thickness", e.target.value)}
               error={validationErrors.thickness}
+              required
             />
 
             {/* Surface Area */}
@@ -328,8 +335,11 @@ const RoofThermalInsulationMaterialModal = ({
               step="0.01"
               min="0"
               value={formData.surface_area}
-              onChange={(e) => handleInputChange("surface_area", e.target.value)}
+              onChange={(e) =>
+                handleInputChange("surface_area", e.target.value)
+              }
               error={validationErrors.surface_area}
+              required
             />
 
             {/* Cost (only for new materials) */}
@@ -353,10 +363,12 @@ const RoofThermalInsulationMaterialModal = ({
                   {translations.thermalResistance || "Θερμική Αντίσταση"}
                 </h4>
                 <p className="text-sm text-green-700">
-                  R = {formData.thickness} / {selectedMaterial.thermal_conductivity} ={" "}
+                  R = {formData.thickness} /{" "}
+                  {selectedMaterial.thermal_conductivity} ={" "}
                   <strong>
                     {(
-                      parseFloat(formData.thickness) / selectedMaterial.thermal_conductivity
+                      parseFloat(formData.thickness) /
+                      selectedMaterial.thermal_conductivity
                     ).toFixed(4)}{" "}
                     m²·K/W
                   </strong>
@@ -370,8 +382,7 @@ const RoofThermalInsulationMaterialModal = ({
               type="button"
               className="close-modal"
               onClick={handleClose}
-              disabled={loading}
-            >
+              disabled={loading}>
               {translations.cancel || "Ακύρωση"}
             </button>
             <button type="submit" className="confirm-button" disabled={loading}>

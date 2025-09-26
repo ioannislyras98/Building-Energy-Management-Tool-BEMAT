@@ -27,8 +27,7 @@ function TabPanel(props) {
       hidden={value !== index}
       id={`exterior-blinds-tabpanel-${index}`}
       aria-labelledby={`exterior-blinds-tab-${index}`}
-      {...other}
-    >
+      {...other}>
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
@@ -43,6 +42,7 @@ const ExteriorBlindsTabContent = ({
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [errorField, setErrorField] = useState(null); // Αποθήκευση του πεδίου που έχει error
   const [success, setSuccess] = useState(null);
   const [formData, setFormData] = useState({
     window_area: "",
@@ -64,27 +64,43 @@ const ExteriorBlindsTabContent = ({
   const cookies = new Cookies();
   const token = cookies.get("token");
 
-  // Auto-save functionality
-  const [autoSave, setAutoSave] = useState(null);
-
-  useEffect(() => {
-    if (autoSave) {
-      clearTimeout(autoSave);
-    }
-    const newAutoSave = setTimeout(() => {
-      // Auto-save μόνο αν έχουν συμπληρωθεί τα βασικά πεδία
-      if (formData.window_area && formData.cost_per_m2 && formData.cooling_energy_savings) {
-        handleSave(false); // Auto-save χωρίς success message
-      }
-    }, 2000);
-    setAutoSave(newAutoSave);
-
-    return () => {
-      if (newAutoSave) {
-        clearTimeout(newAutoSave);
-      }
+  // Validation για υποχρεωτικά πεδία
+  const validateRequiredFields = () => {
+    const requiredFields = {
+      window_area: {
+        label: translations.windowArea || "Επιφάνεια παραθύρων",
+        errorKey: "windowAreaRequired",
+      },
+      cost_per_m2: {
+        label: translations.costPerM2 || "Κόστος ανά m²",
+        errorKey: "costPerM2Required",
+      },
+      cooling_energy_savings: {
+        label:
+          translations.coolingEnergySavings || "Εξοικονόμηση ενέργειας ψύξης",
+        errorKey: "coolingEnergySavingsRequired",
+      },
     };
-  }, [formData]);
+
+    for (const [field, config] of Object.entries(requiredFields)) {
+      const value = formData[field];
+      if (!value || value === "" || parseFloat(value) <= 0) {
+        // Αποθήκευση του πεδίου που έχει error για δυναμική ανανέωση
+        setErrorField(config.errorKey);
+        const errorMessage = translations[config.errorKey];
+        setError(errorMessage);
+        return false;
+      }
+    }
+    return true;
+  };
+
+  // Δυναμική ανανέωση error message όταν αλλάζει η γλώσσα
+  useEffect(() => {
+    if (errorField && translations[errorField]) {
+      setError(translations[errorField]);
+    }
+  }, [language, errorField, translations]);
 
   // Φόρτωση δεδομένων κατά την αρχικοποίηση
   useEffect(() => {
@@ -97,13 +113,16 @@ const ExteriorBlindsTabContent = ({
     setLoading(true);
     try {
       // Χρήση fetch αντί για jQuery για καλύτερο έλεγχο του error handling
-      const response = await fetch(`http://127.0.0.1:8000/exterior_blinds/building/${buildingUuid}/`, {
-        method: "GET",
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `http://127.0.0.1:8000/exterior_blinds/building/${buildingUuid}/`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -131,7 +150,7 @@ const ExteriorBlindsTabContent = ({
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
-      if (error.message && !error.message.includes('404')) {
+      if (error.message && !error.message.includes("404")) {
         console.error("Error fetching exterior blinds data:", error);
         setError("Σφάλμα κατά την φόρτωση των δεδομένων");
       }
@@ -153,6 +172,11 @@ const ExteriorBlindsTabContent = ({
       return;
     }
 
+    // Έλεγχος υποχρεωτικών πεδίων
+    if (!validateRequiredFields()) {
+      return;
+    }
+
     setLoading(true);
     try {
       const dataToSend = {
@@ -161,39 +185,54 @@ const ExteriorBlindsTabContent = ({
         ...formData,
       };
 
-      const response = await $.ajax({
-        url: "http://127.0.0.1:8000/exterior_blinds/create/",
-        type: "POST",
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-        data: JSON.stringify(dataToSend),
-      });
+      const response = await fetch(
+        "http://127.0.0.1:8000/exterior_blinds/create/",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataToSend),
+        }
+      );
 
-      if (response) {
+      if (response.ok) {
+        const responseData = await response.json();
+
         // Ενημέρωση των υπολογιζόμενων πεδίων
         setFormData((prev) => ({
           ...prev,
-          total_investment_cost: response.total_investment_cost,
-          annual_energy_savings: response.annual_energy_savings,
-          annual_economic_benefit: response.annual_economic_benefit,
-          payback_period: response.payback_period,
-          net_present_value: response.net_present_value,
-          internal_rate_of_return: response.internal_rate_of_return,
+          total_investment_cost: responseData.total_investment_cost,
+          annual_energy_savings: responseData.annual_energy_savings,
+          annual_economic_benefit: responseData.annual_economic_benefit,
+          payback_period: responseData.payback_period,
+          net_present_value: responseData.net_present_value,
+          internal_rate_of_return: responseData.internal_rate_of_return,
         }));
 
         if (showMessage) {
-          setSuccess("Τα δεδομένα αποθηκεύτηκαν επιτυχώς!");
+          // Διαφορετικό μήνυμα ανάλογα με το status code
+          const message =
+            response.status === 201
+              ? "Τα δεδομένα δημιουργήθηκαν επιτυχώς!"
+              : "Τα δεδομένα ενημερώθηκαν επιτυχώς!";
+          setSuccess(message);
           setTimeout(() => setSuccess(null), 3000);
         }
         setError(null);
+        setErrorField(null);
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
       console.error("Error saving exterior blinds data:", error);
       if (showMessage) {
         setError("Σφάλμα κατά την αποθήκευση των δεδομένων");
-        setTimeout(() => setError(null), 5000);
+        setTimeout(() => {
+          setError(null);
+          setErrorField(null);
+        }, 5000);
       }
     } finally {
       setLoading(false);
@@ -212,12 +251,16 @@ const ExteriorBlindsTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={(translations.windowArea || "Επιφάνεια παραθύρων") + " (m²) *"}
+            label={
+              <span>
+                {translations.windowArea || "Επιφάνεια παραθύρων"} (m²){" "}
+                <span style={{ color: "red" }}>*</span>
+              </span>
+            }
             type="number"
             value={formData.window_area}
             onChange={(e) => handleInputChange("window_area", e.target.value)}
             variant="outlined"
-            required
             inputProps={{ step: 0.1, min: 0.1 }}
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -240,12 +283,16 @@ const ExteriorBlindsTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={(translations.costPerM2 || "Κόστος ανά m²") + " (€) *"}
+            label={
+              <span>
+                {translations.costPerM2 || "Κόστος ανά m²"} (€){" "}
+                <span style={{ color: "red" }}>*</span>
+              </span>
+            }
             type="number"
             value={formData.cost_per_m2}
             onChange={(e) => handleInputChange("cost_per_m2", e.target.value)}
             variant="outlined"
-            required
             inputProps={{ step: 0.01, min: 0 }}
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -268,10 +315,14 @@ const ExteriorBlindsTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={(translations.installationCost || "Κόστος εγκατάστασης") + " (€)"}
+            label={
+              (translations.installationCost || "Κόστος εγκατάστασης") + " (€)"
+            }
             type="number"
             value={formData.installation_cost}
-            onChange={(e) => handleInputChange("installation_cost", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("installation_cost", e.target.value)
+            }
             variant="outlined"
             inputProps={{ step: 0.01, min: 0 }}
             sx={{
@@ -295,10 +346,15 @@ const ExteriorBlindsTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={(translations.maintenanceCost || "Ετήσιο κόστος συντήρησης") + " (€)"}
+            label={
+              (translations.maintenanceCost || "Ετήσιο κόστος συντήρησης") +
+              " (€)"
+            }
             type="number"
             value={formData.maintenance_cost}
-            onChange={(e) => handleInputChange("maintenance_cost", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("maintenance_cost", e.target.value)
+            }
             variant="outlined"
             inputProps={{ step: 0.01, min: 0 }}
             sx={{
@@ -326,7 +382,9 @@ const ExteriorBlindsTabContent = ({
     return (
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Typography variant="h6" className="font-semibold text-green-700 mb-4">
+          <Typography
+            variant="h6"
+            className="font-semibold text-green-700 mb-4">
             {translations.energyData || "Ενεργειακά Στοιχεία"}
           </Typography>
         </Grid>
@@ -334,12 +392,19 @@ const ExteriorBlindsTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={(translations.coolingEnergySavings || "Εξοικονόμηση ενέργειας ψύξης") + " (kWh/έτος) *"}
+            label={
+              <span>
+                {translations.coolingEnergySavings ||
+                  "Εξοικονόμηση ενέργειας ψύξης"}{" "}
+                (kWh/έτος) <span style={{ color: "red" }}>*</span>
+              </span>
+            }
             type="number"
             value={formData.cooling_energy_savings}
-            onChange={(e) => handleInputChange("cooling_energy_savings", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("cooling_energy_savings", e.target.value)
+            }
             variant="outlined"
-            required
             inputProps={{ step: 0.1, min: 0 }}
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -362,10 +427,14 @@ const ExteriorBlindsTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={(translations.energyCostKwh || "Κόστος ενέργειας") + " (€/kWh)"}
+            label={
+              (translations.energyCostKwh || "Κόστος ενέργειας") + " (€/kWh)"
+            }
             type="number"
             value={formData.energy_cost_kwh}
-            onChange={(e) => handleInputChange("energy_cost_kwh", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("energy_cost_kwh", e.target.value)
+            }
             variant="outlined"
             inputProps={{ step: 0.01, min: 0 }}
             sx={{
@@ -428,13 +497,19 @@ const ExteriorBlindsTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={(translations.discountRate || "Προεξοφλητικός συντελεστής") + " (%)"}
+            label={
+              (translations.discountRate || "Προεξοφλητικός συντελεστής") +
+              " (%)"
+            }
             type="number"
             value={formData.discount_rate}
             onChange={(e) => handleInputChange("discount_rate", e.target.value)}
             variant="outlined"
             inputProps={{ step: 0.1, min: 0, max: 30 }}
-            helperText={translations.discountRateHelper || "Σταθερή τιμή 5% για τους υπολογισμούς NPV"}
+            helperText={
+              translations.discountRateHelper ||
+              "Σταθερή τιμή 5% για τους υπολογισμούς NPV"
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -460,7 +535,9 @@ const ExteriorBlindsTabContent = ({
     return (
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Typography variant="h6" className="font-semibold text-green-700 mb-4">
+          <Typography
+            variant="h6"
+            className="font-semibold text-green-700 mb-4">
             {translations.economicAnalysis || "Οικονομική Ανάλυση"}
           </Typography>
         </Grid>
@@ -469,15 +546,22 @@ const ExteriorBlindsTabContent = ({
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
-            label={translations.totalInvestmentCost || "Συνολικό κόστος επένδυσης (€)"}
+            label={
+              translations.totalInvestmentCost ||
+              "Συνολικό κόστος επένδυσης (€)"
+            }
             type="text"
-            value={formData.total_investment_cost ? 
-              parseFloat(formData.total_investment_cost).toLocaleString() : 
-              ""
+            value={
+              formData.total_investment_cost
+                ? parseFloat(formData.total_investment_cost).toLocaleString()
+                : ""
             }
             variant="outlined"
             InputProps={{ readOnly: true }}
-            helperText={translations.totalInvestmentCostHelper || "Αυτόματος υπολογισμός: (Επιφάνεια × Κόστος/m²) + Κόστος εγκατάστασης"}
+            helperText={
+              translations.totalInvestmentCostHelper ||
+              "Αυτόματος υπολογισμός: (Επιφάνεια × Κόστος/m²) + Κόστος εγκατάστασης"
+            }
             sx={{
               "& .MuiInputBase-input": {
                 color: "red",
@@ -504,15 +588,22 @@ const ExteriorBlindsTabContent = ({
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
-            label={translations.annualEnergySavings || "Ετήσια ενεργειακή εξοικονόμηση (€)"}
+            label={
+              translations.annualEnergySavings ||
+              "Ετήσια ενεργειακή εξοικονόμηση (€)"
+            }
             type="text"
-            value={formData.annual_energy_savings ? 
-              parseFloat(formData.annual_energy_savings).toLocaleString() : 
-              ""
+            value={
+              formData.annual_energy_savings
+                ? parseFloat(formData.annual_energy_savings).toLocaleString()
+                : ""
             }
             variant="outlined"
             InputProps={{ readOnly: true }}
-            helperText={translations.annualEnergySavingsHelper || "Αυτόματος υπολογισμός: Εξοικονόμηση kWh × Κόστος ενέργειας"}
+            helperText={
+              translations.annualEnergySavingsHelper ||
+              "Αυτόματος υπολογισμός: Εξοικονόμηση kWh × Κόστος ενέργειας"
+            }
             sx={{
               "& .MuiInputBase-input": {
                 color: "green",
@@ -539,15 +630,22 @@ const ExteriorBlindsTabContent = ({
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
-            label={translations.annualEconomicBenefit || "Ετήσιο οικονομικό όφελος (€)"}
+            label={
+              translations.annualEconomicBenefit ||
+              "Ετήσιο οικονομικό όφελος (€)"
+            }
             type="text"
-            value={formData.annual_economic_benefit ? 
-              parseFloat(formData.annual_economic_benefit).toLocaleString() : 
-              ""
+            value={
+              formData.annual_economic_benefit
+                ? parseFloat(formData.annual_economic_benefit).toLocaleString()
+                : ""
             }
             variant="outlined"
             InputProps={{ readOnly: true }}
-            helperText={translations.annualEconomicBenefitHelper || "Αυτόματος υπολογισμός: Εξοικονόμηση - Κόστος συντήρησης"}
+            helperText={
+              translations.annualEconomicBenefitHelper ||
+              "Αυτόματος υπολογισμός: Εξοικονόμηση - Κόστος συντήρησης"
+            }
             sx={{
               "& .MuiInputBase-input": {
                 color: "green",
@@ -576,13 +674,17 @@ const ExteriorBlindsTabContent = ({
             fullWidth
             label={translations.paybackPeriod || "Περίοδος αποπληρωμής (έτη)"}
             type="text"
-            value={formData.payback_period ? 
-              parseFloat(formData.payback_period).toFixed(1) : 
-              ""
+            value={
+              formData.payback_period
+                ? parseFloat(formData.payback_period).toFixed(1)
+                : ""
             }
             variant="outlined"
             InputProps={{ readOnly: true }}
-            helperText={translations.paybackPeriodHelper || "Αυτόματος υπολογισμός: Κόστος επένδυσης ÷ Ετήσιο όφελος"}
+            helperText={
+              translations.paybackPeriodHelper ||
+              "Αυτόματος υπολογισμός: Κόστος επένδυσης ÷ Ετήσιο όφελος"
+            }
             sx={{
               "& .MuiInputBase-input": {
                 color: "var(--color-primary)",
@@ -609,15 +711,21 @@ const ExteriorBlindsTabContent = ({
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
-            label={translations.netPresentValue || "Καθαρή παρούσα αξία - NPV (€)"}
+            label={
+              translations.netPresentValue || "Καθαρή παρούσα αξία - NPV (€)"
+            }
             type="text"
-            value={formData.net_present_value ? 
-              parseFloat(formData.net_present_value).toLocaleString() : 
-              ""
+            value={
+              formData.net_present_value
+                ? parseFloat(formData.net_present_value).toLocaleString()
+                : ""
             }
             variant="outlined"
             InputProps={{ readOnly: true }}
-            helperText={translations.npvHelper || "Αυτόματος υπολογισμός NPV με προεξοφλητικό συντελεστή"}
+            helperText={
+              translations.npvHelper ||
+              "Αυτόματος υπολογισμός NPV με προεξοφλητικό συντελεστή"
+            }
             sx={{
               "& .MuiInputBase-input": {
                 color: formData.net_present_value >= 0 ? "green" : "red",
@@ -644,15 +752,22 @@ const ExteriorBlindsTabContent = ({
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
-            label={translations.internalRateOfReturn || "Εσωτερικός βαθμός απόδοσης - IRR (%)"}
+            label={
+              translations.internalRateOfReturn ||
+              "Εσωτερικός βαθμός απόδοσης - IRR (%)"
+            }
             type="text"
-            value={formData.internal_rate_of_return ? 
-              parseFloat(formData.internal_rate_of_return).toFixed(2) : 
-              ""
+            value={
+              formData.internal_rate_of_return
+                ? parseFloat(formData.internal_rate_of_return).toFixed(2)
+                : ""
             }
             variant="outlined"
             InputProps={{ readOnly: true }}
-            helperText={translations.irrHelper || "Αυτόματος υπολογισμός IRR (απλοποιημένος)"}
+            helperText={
+              translations.irrHelper ||
+              "Αυτόματος υπολογισμός IRR (απλοποιημένος)"
+            }
             sx={{
               "& .MuiInputBase-input": {
                 color: "var(--color-primary)",
@@ -683,7 +798,9 @@ const ExteriorBlindsTabContent = ({
       <div className="flex items-center justify-center h-32">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-gray-600">{translations.loading || "Φόρτωση..."}</p>
+          <p className="text-gray-600">
+            {translations.loading || "Φόρτωση..."}
+          </p>
         </div>
       </div>
     );
@@ -714,7 +831,8 @@ const ExteriorBlindsTabContent = ({
                 {translations.title || "Εγκατάσταση Εξωτερικών Περσίδων"}
               </h2>
               <p className="text-gray-600 mt-1">
-                {translations.subtitle || "Οικονομική ανάλυση εγκατάστασης εξωτερικών περσίδων"}
+                {translations.subtitle ||
+                  "Οικονομική ανάλυση εγκατάστασης εξωτερικών περσίδων"}
               </p>
             </div>
           </div>
@@ -729,14 +847,22 @@ const ExteriorBlindsTabContent = ({
                 backgroundColor: "var(--color-primary-dark)",
               },
             }}>
-            {loading ? (translations.saving || "Αποθήκευση...") : (translations.save || "Αποθήκευση")}
+            {loading
+              ? translations.saving || "Αποθήκευση..."
+              : translations.save || "Αποθήκευση"}
           </Button>
         </div>
       </div>
 
       {/* Alerts */}
       {error && (
-        <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
+        <Alert
+          severity="error"
+          onClose={() => {
+            setError(null);
+            setErrorField(null);
+          }}
+          sx={{ mb: 2 }}>
           {error}
         </Alert>
       )}
@@ -771,10 +897,18 @@ const ExteriorBlindsTabContent = ({
               backgroundColor: "var(--color-primary)",
             },
           }}>
-          <Tab label={translations.blindsDataTab || "Στοιχεία Εξωτερικών Περσίδων"} />
+          <Tab
+            label={translations.blindsDataTab || "Στοιχεία Εξωτερικών Περσίδων"}
+          />
           <Tab label={translations.energyDataTab || "Ενεργειακά Στοιχεία"} />
-          <Tab label={translations.evaluationParametersTab || "Παράμετροι Αξιολόγησης"} />
-          <Tab label={translations.economicAnalysisTab || "Οικονομική Ανάλυση"} />
+          <Tab
+            label={
+              translations.evaluationParametersTab || "Παράμετροι Αξιολόγησης"
+            }
+          />
+          <Tab
+            label={translations.economicAnalysisTab || "Οικονομική Ανάλυση"}
+          />
         </Tabs>
 
         {/* Tab 1: Στοιχεία Εξωτερικών Περσίδων */}

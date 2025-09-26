@@ -67,6 +67,7 @@ const PhotovoltaicSystemTabContent = ({
   // State management
   const [currentPhotovoltaicSystem, setCurrentPhotovoltaicSystem] =
     useState(null);
+  const [hasBackendData, setHasBackendData] = useState(false);
   const [photovoltaicSystem, setPhotovoltaicSystem] = useState({
     building: buildingUuid,
     project: projectUuid,
@@ -84,13 +85,15 @@ const PhotovoltaicSystemTabContent = ({
     installation_quantity: "",
     installation_unit_price: "",
     // Economic fields
+    estimated_cost: "",
     total_cost: "",
     unexpected_expenses: "",
     value_after_unexpected: "",
-    tax_24: "",
+    tax_burden: "",
     total_project_cost: "",
     subsidy_amount: "",
     net_cost: "",
+    net_present_value: "",
     payback_period: "",
     annual_savings: "",
     investment_return: "",
@@ -137,11 +140,18 @@ const PhotovoltaicSystemTabContent = ({
         installation_quantity: "",
         installation_unit_price: "",
         // Economic fields
+        estimated_cost: "",
         total_cost: "",
         unexpected_expenses: "",
         value_after_unexpected: "",
-        tax_24: "",
+        tax_burden: "",
         total_project_cost: "",
+        subsidy_amount: "",
+        net_cost: "",
+        net_present_value: "",
+        payback_period: "",
+        annual_savings: "",
+        investment_return: "",
         // Energy fields
         power_per_panel: "",
         collector_efficiency: "",
@@ -172,85 +182,102 @@ const PhotovoltaicSystemTabContent = ({
         Authorization: `Token ${token}`,
       },
       success: (data) => {
-        if (data.data && data.data.length > 0) {
-          const existing = data.data[0];
+        console.log("Fetched photovoltaic systems data:", data);
+        if (data && data.length > 0) {
+          const existing = data[0];
+          console.log("Found existing photovoltaic system:", existing);
           setCurrentPhotovoltaicSystem(existing);
           setPhotovoltaicSystem(existing);
+          setHasBackendData(true); // Mark that we have backend data
         } else {
-          createNewPhotovoltaicSystem();
+          console.log("No existing photovoltaic system found, setting up for new one");
+          // No existing system found - set up for creating a new one
+          setCurrentPhotovoltaicSystem(null);
+          setHasBackendData(false); // No backend data for new system
+          setPhotovoltaicSystem({
+            building: buildingUuid,
+            project: projectUuid,
+            // Installation fields
+            pv_panels_quantity: "",
+            pv_panels_unit_price: "",
+            metal_bases_quantity: "",
+            metal_bases_unit_price: "",
+            piping_quantity: "",
+            piping_unit_price: "",
+            wiring_quantity: "",
+            wiring_unit_price: "",
+            inverter_quantity: "",
+            inverter_unit_price: "",
+            installation_quantity: "",
+            installation_unit_price: "",
+            // Economic fields
+            estimated_cost: "",
+            total_cost: "",
+            unexpected_expenses: "",
+            value_after_unexpected: "",
+            tax_burden: "",
+            total_project_cost: "",
+            subsidy_amount: "",
+            net_cost: "",
+            net_present_value: "",
+            payback_period: "",
+            annual_savings: "",
+            investment_return: "",
+            // Energy fields
+            power_per_panel: "",
+            collector_efficiency: "",
+            installation_angle: "",
+            pv_usage: "electricity",
+            pv_system_type: "grid_connected",
+            annual_energy_production: "",
+            carbon_footprint_reduction: "",
+          });
         }
         setLoading(false);
       },
       error: (jqXHR) => {
         console.error("Error fetching photovoltaic system:", jqXHR);
-        createNewPhotovoltaicSystem();
-      },
-    });
-  };
-
-  const createNewPhotovoltaicSystem = () => {
-    if (!buildingUuid || !projectUuid || !token) {
-      console.log("Missing required data for creating photovoltaic system:", {
-        buildingUuid,
-        projectUuid,
-        token: !!token,
-      });
-      setLoading(false);
-      return;
-    }
-
-    const newData = {
-      building: buildingUuid,
-      project: projectUuid,
-      pv_panels_quantity: 0,
-      pv_panels_unit_price: 0,
-      metal_bases_quantity: 0,
-      metal_bases_unit_price: 0,
-      piping_quantity: 0,
-      piping_unit_price: 0,
-      wiring_quantity: 0,
-      wiring_unit_price: 0,
-      inverter_quantity: 0,
-      inverter_unit_price: 0,
-      installation_quantity: 0,
-      installation_unit_price: 0,
-      total_cost: 0,
-      unexpected_expenses: 0,
-      value_after_unexpected: 0,
-      tax_24: 0,
-      total_project_cost: 0,
-      subsidy_amount: 0,
-      net_cost: 0,
-      payback_period: 0,
-      annual_savings: 0,
-      investment_return: 0,
-      power_per_panel: 0,
-      collector_efficiency: 0,
-      installation_angle: 0,
-      pv_usage: "electricity",
-      pv_system_type: "grid_connected",
-      annual_energy_production: 0,
-      carbon_footprint_reduction: 0,
-    };
-    $.ajax({
-      url: "http://127.0.0.1:8000/photovoltaic_systems/",
-      method: "POST",
-      headers: {
-        Authorization: `Token ${token}`,
-        "Content-Type": "application/json",
-      },
-      data: JSON.stringify(newData),
-      success: (data) => {
-        setCurrentPhotovoltaicSystem(data);
-        setPhotovoltaicSystem(data);
-        setLoading(false);
-      },
-      error: (jqXHR) => {
-        console.error("Error creating photovoltaic system:", jqXHR);
-        setError(
-          translations.errorLoad ||
-            "Σφάλμα κατά τη δημιουργία νέου φωτοβολταϊκού συστήματος"
-        );
+        // On error, set up for creating a new system
+        setCurrentPhotovoltaicSystem(null);
+        setHasBackendData(false); // No backend data on error
+        setPhotovoltaicSystem({
+          building: buildingUuid,
+          project: projectUuid,
+          // Installation fields
+          pv_panels_quantity: "",
+          pv_panels_unit_price: "",
+          metal_bases_quantity: "",
+          metal_bases_unit_price: "",
+          piping_quantity: "",
+          piping_unit_price: "",
+          wiring_quantity: "",
+          wiring_unit_price: "",
+          inverter_quantity: "",
+          inverter_unit_price: "",
+          installation_quantity: "",
+          installation_unit_price: "",
+          // Economic fields
+          estimated_cost: "",
+          total_cost: "",
+          unexpected_expenses: "",
+          value_after_unexpected: "",
+          tax_burden: "",
+          total_project_cost: "",
+          subsidy_amount: "",
+          net_cost: "",
+          net_present_value: "",
+          payback_period: "",
+          annual_savings: "",
+          investment_return: "",
+          // Energy fields
+          power_per_panel: "",
+          collector_efficiency: "",
+          installation_angle: "",
+          pv_usage: "electricity",
+          pv_system_type: "grid_connected",
+          annual_energy_production: "",
+          carbon_footprint_reduction: "",
+        });
         setLoading(false);
       },
     });
@@ -282,6 +309,12 @@ const PhotovoltaicSystemTabContent = ({
         ...prev,
         [field]: value,
       }));
+    }
+    
+    // Reset backend data flag when user manually changes input
+    // This allows frontend calculations to take effect again
+    if (hasBackendData) {
+      setHasBackendData(false);
     }
   };
 
@@ -335,8 +368,13 @@ const PhotovoltaicSystemTabContent = ({
           } successfully:`,
           data
         );
-        setCurrentPhotovoltaicSystem(data);
+        
+        // Backend now returns full data with calculated fields, no need for additional GET request
+        console.log("Using backend response data with calculated fields:", data);
         setPhotovoltaicSystem(data);
+        setCurrentPhotovoltaicSystem(data);
+        setHasBackendData(true); // Mark that we have backend data
+        
         setSuccess(
           isUpdate
             ? translations.successSave ||
@@ -363,20 +401,22 @@ const PhotovoltaicSystemTabContent = ({
 
   // Calculate economic indicators automatically
   const calculateEconomicIndicators = () => {
+    // Calculate individual costs
+    const pvPanelsCost = (parseFloat(photovoltaicSystem.pv_panels_quantity) || 0) *
+      (parseFloat(photovoltaicSystem.pv_panels_unit_price) || 0);
+    const metalBasesCost = (parseFloat(photovoltaicSystem.metal_bases_quantity) || 0) *
+      (parseFloat(photovoltaicSystem.metal_bases_unit_price) || 0);
+    const pipingCost = (parseFloat(photovoltaicSystem.piping_quantity) || 0) *
+      (parseFloat(photovoltaicSystem.piping_unit_price) || 0);
+    const wiringCost = (parseFloat(photovoltaicSystem.wiring_quantity) || 0) *
+      (parseFloat(photovoltaicSystem.wiring_unit_price) || 0);
+    const inverterCost = (parseFloat(photovoltaicSystem.inverter_quantity) || 0) *
+      (parseFloat(photovoltaicSystem.inverter_unit_price) || 0);
+    const installationCost = (parseFloat(photovoltaicSystem.installation_quantity) || 0) *
+      (parseFloat(photovoltaicSystem.installation_unit_price) || 0);
+
     // Calculate total cost from installation data
-    const totalCost =
-      (parseFloat(photovoltaicSystem.pv_panels_quantity) || 0) *
-        (parseFloat(photovoltaicSystem.pv_panels_unit_price) || 0) +
-      (parseFloat(photovoltaicSystem.metal_bases_quantity) || 0) *
-        (parseFloat(photovoltaicSystem.metal_bases_unit_price) || 0) +
-      (parseFloat(photovoltaicSystem.piping_quantity) || 0) *
-        (parseFloat(photovoltaicSystem.piping_unit_price) || 0) +
-      (parseFloat(photovoltaicSystem.wiring_quantity) || 0) *
-        (parseFloat(photovoltaicSystem.wiring_unit_price) || 0) +
-      (parseFloat(photovoltaicSystem.inverter_quantity) || 0) *
-        (parseFloat(photovoltaicSystem.inverter_unit_price) || 0) +
-      (parseFloat(photovoltaicSystem.installation_quantity) || 0) *
-        (parseFloat(photovoltaicSystem.installation_unit_price) || 0);
+    const totalCost = pvPanelsCost + metalBasesCost + pipingCost + wiringCost + inverterCost + installationCost;
 
     // Calculate unexpected expenses (9% of total cost)
     const unexpectedExpenses = totalCost * 0.09;
@@ -385,27 +425,38 @@ const PhotovoltaicSystemTabContent = ({
     const valueAfterUnexpected = totalCost + unexpectedExpenses;
 
     // Calculate tax (24% of value after unexpected expenses)
-    const tax24 = valueAfterUnexpected * 0.24;
+    const taxBurden = valueAfterUnexpected * 0.24;
 
     // Calculate total project cost
-    const totalProjectCost = valueAfterUnexpected + tax24;
+    const totalProjectCost = valueAfterUnexpected + taxBurden;
 
     return {
-      total_cost: totalCost,
+      // Individual equipment costs
+      pv_panels_cost: pvPanelsCost,
+      metal_bases_cost: metalBasesCost,
+      piping_cost: pipingCost,
+      wiring_cost: wiringCost,
+      inverter_cost: inverterCost,
+      installation_cost: installationCost,
+      // Economic indicators
+      estimated_cost: totalCost,  // Αυτό είναι το αρχικό κόστος εξοπλισμού
       unexpected_expenses: unexpectedExpenses,
       value_after_unexpected: valueAfterUnexpected,
-      tax_24: tax24,
-      total_project_cost: totalProjectCost,
+      tax_burden: taxBurden,
+      total_cost: totalProjectCost,  // Αυτό είναι το συνολικό κόστος με ΦΠΑ
     };
   };
 
   // Update economic indicators when installation data changes
   useEffect(() => {
-    const economicData = calculateEconomicIndicators();
-    setPhotovoltaicSystem((prev) => ({
-      ...prev,
-      ...economicData,
-    }));
+    // Only recalculate if we don't have backend-calculated data
+    if (!hasBackendData) {
+      const economicData = calculateEconomicIndicators();
+      setPhotovoltaicSystem((prev) => ({
+        ...prev,
+        ...economicData,
+      }));
+    }
   }, [
     photovoltaicSystem.pv_panels_quantity,
     photovoltaicSystem.pv_panels_unit_price,
@@ -419,6 +470,7 @@ const PhotovoltaicSystemTabContent = ({
     photovoltaicSystem.inverter_unit_price,
     photovoltaicSystem.installation_quantity,
     photovoltaicSystem.installation_unit_price,
+    hasBackendData, // Include hasBackendData to re-evaluate when it changes
   ]);
 
   if (loading) {
@@ -510,10 +562,10 @@ const PhotovoltaicSystemTabContent = ({
             label={translations.installationTab || "Εγκατάσταση Φ/Β Συστήματος"}
           />
           <Tab
-            label={translations.economicIndicatorsTab || "Οικονομικοί Δείκτες"}
+            label={translations.energyIndicatorsTab || "Ενεργειακοί Δείκτες"}
           />
           <Tab
-            label={translations.energyIndicatorsTab || "Ενεργειακοί Δείκτες"}
+            label={translations.economicIndicatorsTab || "Οικονομικοί Δείκτες"}
           />
         </Tabs>
 
@@ -830,8 +882,8 @@ const PhotovoltaicSystemTabContent = ({
           </div>
         </TabPanel>
 
-        {/* Tab 2: Economic Indicators */}
-        <TabPanel value={tabValue} index={1}>
+        {/* Tab 3: Economic Indicators */}
+        <TabPanel value={tabValue} index={2}>
           <Typography variant="h6" gutterBottom>
             {translations.sections?.economicIndicators || "Οικονομικοί Δείκτες"}
           </Typography>
@@ -840,11 +892,11 @@ const PhotovoltaicSystemTabContent = ({
               <TextField
                 fullWidth
                 label={`${
-                  translations.fields?.totalCost || "Συνολικό κόστος (€)"
+                  translations.fields?.estimatedCost || "Κόστος εξοπλισμού (€)"
                 } - ${translations.autoCalculated || "Αυτόματος Υπολογισμός"}`}
                 type="text"
                 value={
-                  photovoltaicSystem.total_cost?.toLocaleString("el-GR", {
+                  photovoltaicSystem.estimated_cost?.toLocaleString("el-GR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   }) || "0.00"
@@ -957,12 +1009,12 @@ const PhotovoltaicSystemTabContent = ({
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label={`${translations.fields?.tax24 || "ΦΠΑ 24% (€)"} - ${
+                label={`${translations.fields?.taxBurden || "ΦΠΑ 24% (€)"} - ${
                   translations.autoCalculated || "Αυτόματος Υπολογισμός"
                 }`}
                 type="text"
                 value={
-                  photovoltaicSystem.tax_24?.toLocaleString("el-GR", {
+                  photovoltaicSystem.tax_burden?.toLocaleString("el-GR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   }) || "0.00"
@@ -992,12 +1044,12 @@ const PhotovoltaicSystemTabContent = ({
               <TextField
                 fullWidth
                 label={`${
-                  translations.fields?.totalProjectCost ||
+                  translations.fields?.totalCost ||
                   "Συνολικό κόστος έργου (€)"
                 } - ${translations.autoCalculated || "Αυτόματος Υπολογισμός"}`}
                 type="text"
                 value={
-                  photovoltaicSystem.total_project_cost?.toLocaleString(
+                  photovoltaicSystem.total_cost?.toLocaleString(
                     "el-GR",
                     {
                       minimumFractionDigits: 2,
@@ -1025,11 +1077,185 @@ const PhotovoltaicSystemTabContent = ({
                 }}
               />
             </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={`${
+                  translations.fields?.subsidyAmount || "Ποσό επιδότησης (€)"
+                }`}
+                type="number"
+                value={photovoltaicSystem.subsidy_amount || ""}
+                onChange={(e) =>
+                  handleInputChange("subsidy_amount", e.target.value)
+                }
+                inputProps={{ step: 0.01, min: 0 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.fields?.netCost || "Καθαρό κόστος (€)"
+                }
+                type="number"
+                value={photovoltaicSystem.net_cost || 0}
+                InputProps={{ readOnly: true }}
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "var(--color-primary)",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.fields?.netPresentValue ||
+                  "Καθαρή παρούσα αξία (€)"
+                }
+                type="number"
+                value={photovoltaicSystem.net_present_value || 0}
+                InputProps={{ readOnly: true }}
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color:
+                      photovoltaicSystem.net_present_value >= 0
+                        ? "green"
+                        : "red",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary) !important",
+                    },
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary) !important",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "var(--color-primary) !important",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.fields?.paybackPeriod || "Περίοδος απόσβεσης (έτη)"
+                }
+                type="number"
+                value={photovoltaicSystem.payback_period || 0}
+                InputProps={{ readOnly: true }}
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "var(--color-primary)",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.fields?.annualSavings || "Ετήσια εξοικονόμηση (€)"
+                }
+                type="number"
+                value={photovoltaicSystem.annual_savings || 0}
+                InputProps={{ readOnly: true }}
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "var(--color-primary)",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.fields?.investmentReturn || "Απόδοση επένδυσης (%)"
+                }
+                type="number"
+                value={photovoltaicSystem.investment_return || 0}
+                InputProps={{ readOnly: true }}
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "var(--color-primary)",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                }}
+              />
+            </Grid>
           </Grid>
         </TabPanel>
 
-        {/* Tab 3: Energy Indicators */}
-        <TabPanel value={tabValue} index={2}>
+        {/* Tab 2: Energy Indicators */}
+        <TabPanel value={tabValue} index={1}>
           <Typography variant="h6" gutterBottom>
             {translations.sections?.energyIndicators || "Ενεργειακοί Δείκτες"}
           </Typography>

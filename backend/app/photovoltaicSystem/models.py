@@ -365,6 +365,46 @@ class PhotovoltaicSystem(models.Model):
         tax_burden = self.calculate_tax_burden()
         return value_after_unexpected + tax_burden
     
+    def calculate_annual_savings(self):
+        """Υπολογισμός ετήσιων εξοικονομήσεων βάσει της ετήσιας παραγωγής ενέργειας"""
+        try:
+            # Default electricity cost per kWh in Greece (approx €0.15/kWh)
+            electricity_cost_per_kwh = Decimal('0.15')
+            
+            # Annual energy production in kWh
+            annual_energy_kwh = float(self.annual_energy_production or 0)
+            
+            if annual_energy_kwh <= 0:
+                return Decimal('0')
+            
+            # Calculate annual savings: energy production × electricity cost
+            annual_savings = Decimal(str(annual_energy_kwh)) * electricity_cost_per_kwh
+            
+            return round(annual_savings, 2)
+        except (TypeError, ValueError, ZeroDivisionError):
+            return Decimal('0')
+    
+    def calculate_net_present_value(self):
+        """Υπολογισμός της Καθαρής Παρούσας Αξίας (NPV)"""
+        try:
+            # Required values for NPV calculation
+            initial_investment = float(self.net_cost or self.total_cost or 0)
+            annual_savings = float(self.annual_savings or 0)
+            payback_period_years = int(self.payback_period or 20)
+            discount_rate = 0.05  # 5% default discount rate
+            
+            if initial_investment <= 0 or annual_savings <= 0:
+                return 0
+            
+            # Calculate NPV: NPV = -Initial_Investment + Σ(Annual_Savings / (1 + discount_rate)^year)
+            npv = -initial_investment
+            for year in range(1, payback_period_years + 1):
+                npv += annual_savings / ((1 + discount_rate) ** year)
+            
+            return round(npv, 2)
+        except (TypeError, ValueError, ZeroDivisionError):
+            return 0
+    
     def save(self, *args, **kwargs):
         """Αυτόματος υπολογισμός οικονομικών δεικτών κατά την αποθήκευση"""
         # Υπολογισμός κόστους για κάθε κατηγορία εξοπλισμού
@@ -392,5 +432,17 @@ class PhotovoltaicSystem(models.Model):
         self.value_after_unexpected = self.calculate_value_after_unexpected()
         self.tax_burden = self.calculate_tax_burden()
         self.total_cost = self.calculate_total_cost()
+        
+        # Υπολογισμός καθαρού κόστους (συνολικό κόστος - επιδότηση)
+        if self.total_cost and self.subsidy_amount:
+            self.net_cost = self.total_cost - self.subsidy_amount
+        elif self.total_cost:
+            self.net_cost = self.total_cost
+        
+        # Υπολογισμός ετήσιων εξοικονομήσεων
+        self.annual_savings = self.calculate_annual_savings()
+        
+        # Υπολογισμός NPV
+        self.net_present_value = self.calculate_net_present_value()
         
         super().save(*args, **kwargs)

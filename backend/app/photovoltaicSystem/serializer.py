@@ -8,6 +8,8 @@ class PhotovoltaicSystemSerializer(serializers.ModelSerializer):
     calculated_value_after_unexpected = serializers.SerializerMethodField()
     calculated_tax_burden = serializers.SerializerMethodField()
     calculated_total_cost = serializers.SerializerMethodField()
+    calculated_annual_savings = serializers.SerializerMethodField()
+    calculated_net_present_value = serializers.SerializerMethodField()
     
     # Related fields
     building_name = serializers.CharField(source='building.name', read_only=True)
@@ -61,6 +63,12 @@ class PhotovoltaicSystemSerializer(serializers.ModelSerializer):
             'value_after_unexpected',
             'tax_burden',
             'total_cost',
+            'subsidy_amount',
+            'net_cost',
+            'net_present_value',
+            'payback_period',
+            'annual_savings',
+            'investment_return',
             
             # Ενεργειακοί Δείκτες
             'power_per_panel',
@@ -68,6 +76,8 @@ class PhotovoltaicSystemSerializer(serializers.ModelSerializer):
             'installation_angle',
             'pv_usage',
             'pv_system_type',
+            'annual_energy_production',
+            'carbon_footprint_reduction',
             
             # Calculated fields
             'total_equipment_cost',
@@ -75,6 +85,8 @@ class PhotovoltaicSystemSerializer(serializers.ModelSerializer):
             'calculated_value_after_unexpected',
             'calculated_tax_burden',
             'calculated_total_cost',
+            'calculated_annual_savings',
+            'calculated_net_present_value',
             
             'created_at',
             'updated_at',
@@ -100,6 +112,14 @@ class PhotovoltaicSystemSerializer(serializers.ModelSerializer):
     def get_calculated_total_cost(self, obj):
         """Υπολογισμός συνολικού κόστους"""
         return obj.calculate_total_cost()
+    
+    def get_calculated_annual_savings(self, obj):
+        """Υπολογισμός ετήσιων εξοικονομήσεων"""
+        return obj.calculate_annual_savings()
+    
+    def get_calculated_net_present_value(self, obj):
+        """Υπολογισμός καθαρής παρούσας αξίας"""
+        return obj.calculate_net_present_value()
 
 class PhotovoltaicSystemCreateSerializer(serializers.ModelSerializer):
     """Serializer για δημιουργία νέου φωτοβολταϊκού συστήματος"""
@@ -135,12 +155,17 @@ class PhotovoltaicSystemCreateSerializer(serializers.ModelSerializer):
             'installation_quantity',
             'installation_unit_price',
             
+            # Οικονομικοί Δείκτες (αυτά που μπορεί να εισάγει ο χρήστης)
+            'subsidy_amount',
+            
             # Ενεργειακοί Δείκτες
             'power_per_panel',
             'collector_efficiency',
             'installation_angle',
             'pv_usage',
             'pv_system_type',
+            'annual_energy_production',
+            'carbon_footprint_reduction',
         ]
     
     def validate(self, data):

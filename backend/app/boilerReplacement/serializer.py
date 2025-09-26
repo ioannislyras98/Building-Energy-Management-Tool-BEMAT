@@ -1,4 +1,4 @@
-from rest_framework import serializers
+﻿from rest_framework import serializers
 from .models import BoilerReplacement
 
 
@@ -75,14 +75,37 @@ class BoilerReplacementSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        """Επιπλέον validations"""
-        if data.get('boiler_power', 0) <= 0:
-            raise serializers.ValidationError("Η ισχύς λέβητα πρέπει να είναι μεγαλύτερη από 0")
+        """Δυναμικά multilingual validations"""
+        # Λήψη γλώσσας από το request context
+        request = self.context.get('request')
+        language = 'el'  # Default Greek
+        if request and hasattr(request, 'META'):
+            accept_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
+            if 'en' in accept_language.lower():
+                language = 'en'
         
-        if data.get('boiler_cost', 0) <= 0:
-            raise serializers.ValidationError("Το κόστος λέβητα πρέπει να είναι μεγαλύτερο από 0")
-            
-        if data.get('heating_energy_savings', 0) <= 0:
-            raise serializers.ValidationError("Η εξοικονόμηση ενέργειας πρέπει να είναι μεγαλύτερη από 0")
+        # Δυναμικά error messages - συγχρονισμένα με frontend translations
+        error_messages = {
+            'en': {
+                'boiler_power': "The field 'Boiler power' is required and must be greater than 0",
+                'boiler_cost': "The field 'Boiler cost' is required and must be greater than 0", 
+                'heating_energy_savings': "The field 'Heating energy savings' is required and must be greater than 0"
+            },
+            'el': {
+                'boiler_power': "Το πεδίο 'Ισχύς λέβητα' είναι υποχρεωτικό και πρέπει να είναι μεγαλύτερο από 0",
+                'boiler_cost': "Το πεδίο 'Κόστος λέβητα' είναι υποχρεωτικό και πρέπει να είναι μεγαλύτερο από 0",
+                'heating_energy_savings': "Το πεδίο 'Εξοικονόμηση ενέργειας θέρμανσης' είναι υποχρεωτικό και πρέπει να είναι μεγαλύτερο από 0"
+            }
+        }
+        
+        messages = error_messages.get(language, error_messages['el'])
+        
+        # Validation logic με δυναμικά messages
+        required_fields = ['boiler_power', 'boiler_cost', 'heating_energy_savings']
+        
+        for field in required_fields:
+            value = data.get(field)
+            if value is None or value == '' or (isinstance(value, (int, float)) and value <= 0):
+                raise serializers.ValidationError(messages[field])
         
         return data

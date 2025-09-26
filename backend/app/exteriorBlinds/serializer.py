@@ -45,6 +45,42 @@ class ExteriorBlindsSerializer(serializers.ModelSerializer):
         
         return super().to_internal_value(data)
     
+    def validate(self, data):
+        """Δυναμικά multilingual validations"""
+        # Λήψη γλώσσας από το request context
+        request = self.context.get('request')
+        language = 'el'  # Default Greek
+        if request and hasattr(request, 'META'):
+            accept_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
+            if 'en' in accept_language.lower():
+                language = 'en'
+        
+        # Δυναμικά error messages - συγχρονισμένα με frontend translations
+        error_messages = {
+            'en': {
+                'window_area': "The field 'Window area' is required and must be greater than 0",
+                'cost_per_m2': "The field 'Cost per m²' is required and must be greater than 0", 
+                'cooling_energy_savings': "The field 'Cooling energy savings' is required and must be greater than 0"
+            },
+            'el': {
+                'window_area': "Το πεδίο 'Επιφάνεια παραθύρων' είναι υποχρεωτικό και πρέπει να είναι μεγαλύτερο από 0",
+                'cost_per_m2': "Το πεδίο 'Κόστος ανά m²' είναι υποχρεωτικό και πρέπει να είναι μεγαλύτερο από 0",
+                'cooling_energy_savings': "Το πεδίο 'Εξοικονόμηση ενέργειας ψύξης' είναι υποχρεωτικό και πρέπει να είναι μεγαλύτερο από 0"
+            }
+        }
+        
+        messages = error_messages.get(language, error_messages['el'])
+        
+        # Validation logic με δυναμικά messages
+        required_fields = ['window_area', 'cost_per_m2', 'cooling_energy_savings']
+        
+        for field in required_fields:
+            value = data.get(field)
+            if value is None or value == '' or (isinstance(value, (int, float)) and value <= 0):
+                raise serializers.ValidationError(messages[field])
+        
+        return data
+    
     def validate_window_area(self, value):
         """Επικύρωση επιφάνειας παραθύρων"""
         if value is not None and value <= 0:

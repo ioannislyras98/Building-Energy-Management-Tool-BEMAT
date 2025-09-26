@@ -258,6 +258,7 @@
       "title": "Contact Information",
       "addContactButoon": "Add Contact Person",
       "noContacts": "No contact persons available.",
+      "addFirstContact": "Add your first contact to get started",
       "name": "Name",
       "role": "Role",
       "email": "Email",
@@ -1235,7 +1236,10 @@
     "irrHelper": "Auto IRR calculation (simplified)",
     "save": "Save",
     "saving": "Saving...",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "windowAreaRequired": "The field 'Window area' is required and must be greater than 0",
+    "costPerM2Required": "The field 'Cost per m²' is required and must be greater than 0",
+    "coolingEnergySavingsRequired": "The field 'Cooling energy savings' is required and must be greater than 0"
   },
   "AutomaticLightingControlTabContent": {
     "title": "Automatic Lighting Control System Installation",
@@ -1271,7 +1275,10 @@
     "irrHelper": "Auto IRR calculation (simplified)",
     "save": "Save",
     "saving": "Saving...",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "lightingAreaRequired": "The field 'Lighting area' is required and must be greater than 0",
+    "costPerM2Required": "The field 'Cost per m²' is required and must be greater than 0",
+    "lightingEnergySavingsRequired": "The field 'Lighting energy savings' is required and must be greater than 0"
   },
   "BoilerReplacementTabContent": {
     "title": "Boiler Replacement",
@@ -1307,7 +1314,10 @@
     "irrHelper": "Auto IRR calculation (simplified)",
     "save": "Save",
     "saving": "Saving...",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "boilerPowerRequired": "The field 'Boiler power' is required and must be greater than 0",
+    "boilerCostRequired": "The field 'Boiler cost' is required and must be greater than 0",
+    "heatingEnergySavingsRequired": "The field 'Heating energy savings' is required and must be greater than 0"
   },
   "ResultsTabContent": {
     "title": "Scenario Results",

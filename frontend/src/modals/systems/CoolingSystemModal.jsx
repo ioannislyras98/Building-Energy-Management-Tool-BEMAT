@@ -28,7 +28,8 @@ function CoolingSystemModalForm({
     energy_efficiency_ratio: "",
     maintenance_period: "",
     operating_hours: "",
-  });  const [errors, setErrors] = useState({});
+  });
+  const [errors, setErrors] = useState({});
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const token = cookies.get("token") || "";
 
@@ -76,7 +77,8 @@ function CoolingSystemModalForm({
 
     // Required fields
     if (!formData.cooling_system_type) {
-      newErrors.cooling_system_type = params.errorRequired || "Field is required";
+      newErrors.cooling_system_type =
+        params.errorRequired || "Field is required";
       hasErrors = true;
     }
 
@@ -84,7 +86,8 @@ function CoolingSystemModalForm({
       newErrors.power_kw = params.errorRequired || "Field is required";
       hasErrors = true;
     } else if (isNaN(formData.power_kw) || parseFloat(formData.power_kw) <= 0) {
-      newErrors.power_kw = params.errorPositiveNumber || "Must be a positive number";
+      newErrors.power_kw =
+        params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
 
@@ -92,9 +95,11 @@ function CoolingSystemModalForm({
     if (
       formData.energy_efficiency_ratio &&
       formData.energy_efficiency_ratio !== "" &&
-      (isNaN(formData.energy_efficiency_ratio) || parseFloat(formData.energy_efficiency_ratio) <= 0)
+      (isNaN(formData.energy_efficiency_ratio) ||
+        parseFloat(formData.energy_efficiency_ratio) <= 0)
     ) {
-      newErrors.energy_efficiency_ratio = params.errorPositiveNumber || "Must be a positive number";
+      newErrors.energy_efficiency_ratio =
+        params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
 
@@ -222,7 +227,9 @@ function CoolingSystemModalForm({
                 value={formData.cooling_system_type}
                 onChange={handleChange}
                 className={`input-field ${
-                  errors.cooling_system_type && showValidationErrors ? "error-input" : ""
+                  errors.cooling_system_type && showValidationErrors
+                    ? "error-input"
+                    : ""
                 }`}
                 placeholder={
                   params.coolingSystemTypePlaceholder ||
@@ -248,7 +255,9 @@ function CoolingSystemModalForm({
                 value={formData.cooling_unit_accessibility}
                 onChange={handleChange}
                 className={`input-field ${
-                  errors.cooling_unit_accessibility && showValidationErrors ? "error-input" : ""
+                  errors.cooling_unit_accessibility && showValidationErrors
+                    ? "error-input"
+                    : ""
                 }`}
                 placeholder={
                   params.coolingUnitAccessibilityPlaceholder ||

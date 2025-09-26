@@ -56,6 +56,19 @@ class PhotovoltaicSystemListCreateView(generics.ListCreateAPIView):
             return PhotovoltaicSystemCreateSerializer
         return PhotovoltaicSystemSerializer
     
+    def create(self, request, *args, **kwargs):
+        """Override create to return full data with calculated fields"""
+        serializer = PhotovoltaicSystemCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            # Save the instance with the user
+            instance = serializer.save(user=request.user)
+            
+            # Return the full data using the main serializer with calculated fields
+            response_serializer = PhotovoltaicSystemSerializer(instance)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
@@ -81,7 +94,7 @@ class PhotovoltaicSystemDetailView(generics.RetrieveUpdateDestroyAPIView):
             )
     
     def update(self, request, *args, **kwargs):
-        """Override update to check permissions"""
+        """Override update to check permissions and return full data"""
         instance = self.get_object()
         
         # Check if user can update this system (admin or owner)
@@ -91,7 +104,16 @@ class PhotovoltaicSystemDetailView(generics.RetrieveUpdateDestroyAPIView):
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        return super().update(request, *args, **kwargs)
+        # Use the create serializer for input validation
+        serializer = PhotovoltaicSystemCreateSerializer(instance, data=request.data, partial=kwargs.get('partial', False))
+        if serializer.is_valid():
+            updated_instance = serializer.save()
+            
+            # Return the full data using the main serializer with calculated fields
+            response_serializer = PhotovoltaicSystemSerializer(updated_instance)
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def destroy(self, request, *args, **kwargs):
         """Override destroy to check permissions"""
@@ -107,8 +129,7 @@ class PhotovoltaicSystemDetailView(generics.RetrieveUpdateDestroyAPIView):
         return super().destroy(request, *args, **kwargs)
     
     def get_serializer_class(self):
-        if self.request.method in ['PUT', 'PATCH']:
-            return PhotovoltaicSystemCreateSerializer
+        # Always use the main serializer for detail view (GET)
         return PhotovoltaicSystemSerializer
 
 @api_view(['GET'])

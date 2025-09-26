@@ -18,7 +18,8 @@ function BoilerDetailModalForm({
   onSubmitSuccess,
   editItem,
   params,
-}) {  // Apply blur effect when modal is open
+}) {
+  // Apply blur effect when modal is open
   useModalBlur(open);
 
   const [formData, setFormData] = useState({
@@ -81,19 +82,31 @@ function BoilerDetailModalForm({
     if (!formData.nominal_power || formData.nominal_power.trim() === "") {
       newErrors.nominal_power = params.errorRequired || "Field is required";
       hasErrors = true;
-    } else if (isNaN(formData.nominal_power) || parseFloat(formData.nominal_power) <= 0) {
-      newErrors.nominal_power = params.errorPositiveNumber || "Must be a positive number";
+    } else if (
+      isNaN(formData.nominal_power) ||
+      parseFloat(formData.nominal_power) <= 0
+    ) {
+      newErrors.nominal_power =
+        params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
 
-    if (!formData.internal_efficiency || formData.internal_efficiency.trim() === "") {
-      newErrors.internal_efficiency = params.errorRequired || "Field is required";
+    if (
+      !formData.internal_efficiency ||
+      formData.internal_efficiency.trim() === ""
+    ) {
+      newErrors.internal_efficiency =
+        params.errorRequired || "Field is required";
       hasErrors = true;
     } else if (isNaN(formData.internal_efficiency)) {
       newErrors.internal_efficiency = params.errorNumber || "Must be a number";
       hasErrors = true;
-    } else if (parseFloat(formData.internal_efficiency) < 0 || parseFloat(formData.internal_efficiency) > 100) {
-      newErrors.internal_efficiency = params.errorEfficiencyRange || "Must be between 0-100%";
+    } else if (
+      parseFloat(formData.internal_efficiency) < 0 ||
+      parseFloat(formData.internal_efficiency) > 100
+    ) {
+      newErrors.internal_efficiency =
+        params.errorEfficiencyRange || "Must be between 0-100%";
       hasErrors = true;
     }
 
@@ -109,7 +122,8 @@ function BoilerDetailModalForm({
       (parseFloat(formData.smoke_scale) < 0 ||
         parseFloat(formData.smoke_scale) > 9)
     ) {
-      newErrors.smoke_scale = params.errorSmokeScaleRange || "Must be between 0-9";
+      newErrors.smoke_scale =
+        params.errorSmokeScaleRange || "Must be between 0-9";
       hasErrors = true;
     }
 
@@ -170,7 +184,7 @@ function BoilerDetailModalForm({
       },
       data: JSON.stringify(apiData),
       success: (response) => {
-        console.log("Boiler detail saved:", response);        
+        console.log("Boiler detail saved:", response);
         onSubmitSuccess(response);
         resetForm();
         onClose();
@@ -233,13 +247,11 @@ function BoilerDetailModalForm({
       <div className="rounded-lg p-6 w-full max-w-2xl border-primary-light border-2 bg-white shadow-lg max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
           <h2 className="text-lg font-bold mb-4 text-center">{modalTitle}</h2>
-
           {errors.general && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-4">
               {errors.general}
             </div>
           )}
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {" "}
             <InputEntryModal
@@ -350,7 +362,8 @@ function BoilerDetailModalForm({
               error={showValidationErrors ? errors.room_temperature : ""}
               step="0.01"
             />
-          </div>          <div className="flex justify-between mt-6">
+          </div>{" "}
+          <div className="flex justify-between mt-6">
             <button type="button" onClick={onClose} className="close-modal">
               {params.cancel || "Ακύρωση"}
             </button>

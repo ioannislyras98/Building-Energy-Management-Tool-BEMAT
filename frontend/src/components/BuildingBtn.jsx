@@ -10,7 +10,13 @@ import greek_text from "../languages/greek.json";
 
 const cookies = new Cookies(null, { path: "/" });
 
-export default function BuildingBtn({ uuid, name, usage, date_created, refreshProjects }) {
+export default function BuildingBtn({
+  uuid,
+  name,
+  usage,
+  date_created,
+  refreshProjects,
+}) {
   const { language } = useLanguage();
   const { refreshTrigger } = useProgress();
   const params =
@@ -23,7 +29,7 @@ export default function BuildingBtn({ uuid, name, usage, date_created, refreshPr
       fetch(`http://127.0.0.1:8000/projects/building-progress/${uuid}/`, {
         method: "GET",
         headers: {
-          "Authorization": `Token ${token}`,
+          Authorization: `Token ${token}`,
           "Content-Type": "application/json",
         },
       })
@@ -31,8 +37,12 @@ export default function BuildingBtn({ uuid, name, usage, date_created, refreshPr
         .then((data) => {
           // Check if data is wrapped in a success response
           const actualData = data?.data || data;
-          
-          if (actualData && typeof actualData === 'object' && !actualData.error) {
+
+          if (
+            actualData &&
+            typeof actualData === "object" &&
+            !actualData.error
+          ) {
             setProgressData(actualData);
           } else {
             setProgressData(null);
@@ -68,6 +78,12 @@ export default function BuildingBtn({ uuid, name, usage, date_created, refreshPr
     return () => clearInterval(interval);
   }, [uuid, refreshProjects]);
 
+  // Get translations
+  const translations =
+    language === "en"
+      ? english_text.ProjectProgress
+      : greek_text.ProjectProgress;
+
   const getProgressDisplay = () => {
     // Show default progress if no data is available
     const displayData = progressData || {
@@ -76,19 +92,23 @@ export default function BuildingBtn({ uuid, name, usage, date_created, refreshPr
       systems_percentage: 0,
       scenarios_completed: 0,
       scenarios_total: 11,
-      scenarios_percentage: 0
+      scenarios_percentage: 0,
     };
-    
+
     return (
       <div className="progress-info text-xs mt-1">
         <div className="flex justify-between">
           <span className="text-primary">
-            Systems: {displayData.systems_completed}/{displayData.systems_total} ({displayData.systems_percentage}%)
+            {translations?.systems || "Systems"}:{" "}
+            {displayData.systems_completed}/{displayData.systems_total} (
+            {displayData.systems_percentage}%)
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-primary">
-            Scenarios: {displayData.scenarios_completed}/{displayData.scenarios_total} ({displayData.scenarios_percentage}%)
+            {translations?.scenarios || "Scenarios"}:{" "}
+            {displayData.scenarios_completed}/{displayData.scenarios_total} (
+            {displayData.scenarios_percentage}%)
           </span>
         </div>
       </div>

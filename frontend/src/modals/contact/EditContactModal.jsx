@@ -67,8 +67,12 @@ function EditContactModalForm({
       newErrors.email = params.errorEmail || "Invalid email format";
       isValid = false;
     }
-    if (formData.phone_number.trim() && !/^[\d\s+()-]+$/.test(formData.phone_number)) {
-      newErrors.phone_number = params.errorPhone || "Μόνο αριθμοί και σύμβολα τηλεφώνου επιτρέπονται";
+    if (
+      formData.phone_number.trim() &&
+      !/^[\d\s+()-]+$/.test(formData.phone_number)
+    ) {
+      newErrors.phone_number =
+        params.errorPhone || "Μόνο αριθμοί και σύμβολα τηλεφώνου επιτρέπονται";
       isValid = false;
     }
     setErrors(newErrors);

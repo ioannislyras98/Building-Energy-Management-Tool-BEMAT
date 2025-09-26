@@ -51,7 +51,9 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
                 <h2 className="text-xl font-bold text-white">
                   {building.data?.name || params.loading}
                 </h2>
-                <p className="text-blue-100 text-sm">Basic Information</p>
+                <p className="text-blue-100 text-sm">
+                  {dialogText?.basicInfo?.title || "Basic Information"}
+                </p>
               </div>
             </div>
             <div className="flex gap-2">

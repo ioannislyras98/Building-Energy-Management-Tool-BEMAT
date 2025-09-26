@@ -77,11 +77,19 @@ function ThermalZoneModalForm({
     }
 
     // Required field: Total thermal zone area
-    if (!formData.total_thermal_zone_area || formData.total_thermal_zone_area === "") {
-      newErrors.total_thermal_zone_area = params.errorRequired || "Field is required";
+    if (
+      !formData.total_thermal_zone_area ||
+      formData.total_thermal_zone_area === ""
+    ) {
+      newErrors.total_thermal_zone_area =
+        params.errorRequired || "Field is required";
       hasErrors = true;
-    } else if (isNaN(formData.total_thermal_zone_area) || parseFloat(formData.total_thermal_zone_area) <= 0) {
-      newErrors.total_thermal_zone_area = params.errorPositiveNumber || "Must be a positive number";
+    } else if (
+      isNaN(formData.total_thermal_zone_area) ||
+      parseFloat(formData.total_thermal_zone_area) <= 0
+    ) {
+      newErrors.total_thermal_zone_area =
+        params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
 

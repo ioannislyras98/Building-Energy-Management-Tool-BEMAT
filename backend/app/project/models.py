@@ -105,8 +105,8 @@ class Project(models.Model):
                 scenarios_completed += 1
             if hasattr(building, 'exterior_blinds') and building.exterior_blinds.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
                 scenarios_completed += 1
-            # Photovoltaic systems don't have NPV calculation yet, so check for existence only
-            if hasattr(building, 'photovoltaic_systems') and building.photovoltaic_systems.exists():
+            # Photovoltaic systems - check for NPV != 0
+            if hasattr(building, 'photovoltaic_systems') and building.photovoltaic_systems.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
                 scenarios_completed += 1
             # hotWaterUpgrade uses default related name
             if hasattr(building, 'hotwaterupgrade_set') and building.hotwaterupgrade_set.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():

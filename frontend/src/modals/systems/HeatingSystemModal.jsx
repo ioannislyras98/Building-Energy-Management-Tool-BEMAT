@@ -89,7 +89,8 @@ function HeatingSystemModalForm({
 
     // Required fields
     if (!formData.heating_system_type) {
-      newErrors.heating_system_type = params.errorRequired || "Field is required";
+      newErrors.heating_system_type =
+        params.errorRequired || "Field is required";
       hasErrors = true;
     }
 
@@ -97,12 +98,17 @@ function HeatingSystemModalForm({
       newErrors.power_kw = params.errorRequired || "Field is required";
       hasErrors = true;
     } else if (isNaN(formData.power_kw) || parseFloat(formData.power_kw) <= 0) {
-      newErrors.power_kw = params.errorPositiveNumber || "Must be a positive number";
+      newErrors.power_kw =
+        params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
 
     // Optional field validations
-    if (formData.cop && formData.cop !== "" && (isNaN(formData.cop) || parseFloat(formData.cop) <= 0)) {
+    if (
+      formData.cop &&
+      formData.cop !== "" &&
+      (isNaN(formData.cop) || parseFloat(formData.cop) <= 0)
+    ) {
       newErrors.cop = params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
@@ -254,7 +260,9 @@ function HeatingSystemModalForm({
               type="text"
               value={formData.central_heat_pump_system}
               onChange={handleChange}
-              error={showValidationErrors ? errors.central_heat_pump_system : ""}
+              error={
+                showValidationErrors ? errors.central_heat_pump_system : ""
+              }
             />
             <InputEntryModal
               entry={params.localHeatingSystem || "Τοπικό Σύστημα Θέρμανσης"}
@@ -308,7 +316,9 @@ function HeatingSystemModalForm({
                 type="text"
                 value={formData.distribution_network_state}
                 onChange={handleChange}
-                error={showValidationErrors ? errors.distribution_network_state : ""}
+                error={
+                  showValidationErrors ? errors.distribution_network_state : ""
+                }
               />
             </div>
           </div>
