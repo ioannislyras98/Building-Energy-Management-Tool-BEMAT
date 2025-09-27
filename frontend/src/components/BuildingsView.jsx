@@ -40,6 +40,11 @@ const BuildingsView = ({
       ? english_text.BuildingProfile
       : greek_text.BuildingProfile;
 
+  const progressTranslations =
+    language === "en"
+      ? english_text.ProjectProgress
+      : greek_text.ProjectProgress;
+
   return (
     <div className="buildings-view">
       <div className="bg-white shadow-xl border-b border-gray-200 backdrop-blur-sm mb-6">
@@ -73,22 +78,31 @@ const BuildingsView = ({
                 <MdEdit size={18} className="mr-2" />
                 {params.update}
               </button>
-              
+
               <button
                 onClick={onSubmitProject}
-                disabled={selectedProject?.is_submitted || !selectedProject?.completion_status?.can_submit}
+                disabled={
+                  selectedProject?.is_submitted ||
+                  !selectedProject?.completion_status?.can_submit
+                }
                 className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
-                  selectedProject?.is_submitted 
-                    ? 'bg-gray-400 text-white cursor-not-allowed' 
+                  selectedProject?.is_submitted
+                    ? "bg-gray-400 text-white cursor-not-allowed"
                     : selectedProject?.completion_status?.can_submit
-                      ? 'bg-primary hover:bg-primary-dark text-white'
-                      : 'bg-gray-400 text-white cursor-not-allowed'
+                    ? "bg-primary hover:bg-primary-dark text-white"
+                    : "bg-gray-400 text-white cursor-not-allowed"
                 }`}
-                aria-label={selectedProject?.is_submitted ? "Submitted" : "Submit Project"}>
+                aria-label={
+                  selectedProject?.is_submitted
+                    ? progressTranslations?.projectSubmitted || "Submitted"
+                    : progressTranslations?.submitProject || "Submit Project"
+                }>
                 <MdSend size={18} className="mr-2" />
-                {selectedProject?.is_submitted ? "Submitted" : "Submit"}
+                {selectedProject?.is_submitted
+                  ? progressTranslations?.projectSubmitted || "Submitted"
+                  : progressTranslations?.submitProject || "Submit"}
               </button>
-              
+
               <button
                 onClick={onDeleteProject}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-red-700 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
@@ -100,7 +114,6 @@ const BuildingsView = ({
           </div>
         </div>
       </div>{" "}
-      
       <div className="px-4 md:px-6">
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-800 bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">

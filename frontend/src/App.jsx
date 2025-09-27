@@ -12,6 +12,10 @@ import PageNotFound from "./pages/PageNotFound";
 import BuildingProfilePage from "./pages/BuildingProfilePage";
 import UnauthorizedAccess from "./pages/UnauthorizedAccess";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminPrefectures from "./pages/admin/AdminPrefectures";
+import AdminThermalZones from "./pages/admin/AdminThermalZones";
+import AdminMaterials from "./pages/admin/AdminMaterials";
+
 import "./App.css";
 import { AuthProvider, RequireAuth } from "./tools/Auth";
 
@@ -39,6 +43,12 @@ function App() {
                 element={<BuildingProfilePage />}
               />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/prefectures" element={<AdminPrefectures />} />
+              <Route
+                path="/admin/thermal-zones"
+                element={<AdminThermalZones />}
+              />
+              <Route path="/admin/materials" element={<AdminMaterials />} />
             </Route>
           </Route>
 

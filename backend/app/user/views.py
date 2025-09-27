@@ -85,9 +85,12 @@ class CurrentUserView(APIView):
                 'uuid': str(user.uuid) if hasattr(user, 'uuid') else user.id,
                 'email': user.email,
                 'first_name': user.first_name,
-                'last_name': user.last_name
+                'last_name': user.last_name,
+                'is_superuser': user.is_superuser,
+                'is_staff': user.is_staff,
+                'is_active': user.is_active
             }
-            return Response(data, status=status.HTTP_200_OK)
+            return Response({'data': data}, status=status.HTTP_200_OK)
         except Exception as e:
             print(f"Error in get_current_user: {str(e)}")
             return Response(

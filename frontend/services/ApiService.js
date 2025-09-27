@@ -32,6 +32,23 @@ export function getAllPrefectures() {
     });
 }
 
+export function getAllPrefecturesAdmin() {
+  const token = cookies.get("token") || "";
+  return axios
+    .get("http://127.0.0.1:8000/prefectures/admin/all/", {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log("Error fetching all prefectures for admin:", error);
+      throw error;
+    });
+}
+
 export function getPrefecturesByZone(zone) {
   const token = cookies.get("token") || "";
   return axios
@@ -62,6 +79,60 @@ export function getEnergyZones() {
     })
     .catch((error) => {
       console.log("Error fetching energy zones:", error);
+      throw error;
+    });
+}
+
+// Admin Prefecture CRUD operations
+export function createPrefecture(data) {
+  const token = cookies.get("token") || "";
+  return axios
+    .post("http://127.0.0.1:8000/prefectures/", data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log("Error creating prefecture:", error);
+      throw error;
+    });
+}
+
+export function updatePrefecture(uuid, data) {
+  const token = cookies.get("token") || "";
+  return axios
+    .put(`http://127.0.0.1:8000/prefectures/${uuid}/`, data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log("Error updating prefecture:", error);
+      throw error;
+    });
+}
+
+export function deletePrefecture(uuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .delete(`http://127.0.0.1:8000/prefectures/${uuid}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log("Error deleting prefecture:", error);
       throw error;
     });
 }

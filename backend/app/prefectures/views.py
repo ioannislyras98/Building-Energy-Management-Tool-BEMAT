@@ -54,3 +54,12 @@ def get_energy_zones(request):
     """Get all available energy zones"""
     zones = [{'value': choice[0], 'label': choice[1]} for choice in Prefecture.ENERGY_ZONE_CHOICES]
     return Response(zones)
+
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def get_all_prefectures_admin(request):
+    """Get all prefectures (active and inactive) for admin panel"""
+    prefectures = Prefecture.objects.all()
+    serializer = PrefectureSerializer(prefectures, many=True)
+    return Response(serializer.data)

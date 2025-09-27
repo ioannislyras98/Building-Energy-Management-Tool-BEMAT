@@ -18,3 +18,75 @@
 .nav-link {
   @apply text-primary text-[18px] origin-center hover:text-primary-bold hover:text-primary-bold transition delay-150 duration-300 ease-in-out hover:scale-105 cursor-pointer hover:drop-shadow-basic;
 }
+
+/* Dropdown animations */
+.dropdown-enter {
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(-10px);
+}
+
+.dropdown-enter-active {
+  opacity: 1;
+  max-height: 300px;
+  transform: translateY(0);
+  transition: all 0.3s ease-in-out;
+}
+
+.dropdown-exit {
+  opacity: 1;
+  max-height: 300px;
+  transform: translateY(0);
+}
+
+.dropdown-exit-active {
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Submenu styling */
+.submenu-item {
+  @apply transition-all duration-200 ease-in-out hover:bg-gray-100 rounded-md;
+}
+
+.admin-submenu-item {
+  @apply transition-all duration-200 ease-in-out hover:bg-primary-light/20 rounded-md;
+}
+
+/* Animation for dropdown slide */
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out forwards;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+}
+
+/* Project items styling */
+.project-item {
+  @apply transition-all duration-200 ease-in-out hover:bg-primary-light/20 rounded-md border-l-2 border-transparent hover:border-primary;
+}
+
+.project-item:hover {
+  transform: translateX(2px);
+}
+
+/* Badge styling */
+.project-count-badge {
+  @apply text-xs bg-primary-light text-primary px-2 py-1 rounded-full font-medium;
+}
+
+.submitted-badge {
+  @apply text-xs bg-green-100 text-green-600 px-1 rounded font-medium;
+}

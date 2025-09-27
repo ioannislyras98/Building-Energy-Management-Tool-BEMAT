@@ -3,8 +3,19 @@ import $ from "jquery";
 import "./../../assets/styles/sidebar.css";
 import Cookies from "universal-cookie";
 import { useLanguage } from "../../context/LanguageContext";
-import { FaArrowRight, FaUserShield } from "react-icons/fa6";
-import { IoHome } from "react-icons/io5";
+import { useSidebar } from "../../context/SidebarContext";
+import { useNavigate } from "react-router-dom";
+import {
+  FaArrowRight,
+  FaUserShield,
+  FaChevronDown,
+  FaChevronUp,
+  FaMapMarkerAlt,
+  FaThermometerHalf,
+  FaCubes,
+  FaBuilding,
+} from "react-icons/fa";
+import { IoHome, IoFolderOpen, IoFolder } from "react-icons/io5";
 
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
@@ -14,21 +25,26 @@ const cookies = new Cookies(null, { path: "/" });
 export default function Sidenav() {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [userInfo, setUserInfo] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [projectsExpanded, setProjectsExpanded] = useState(false);
+  const [adminExpanded, setAdminExpanded] = useState(false);
   const { language } = useLanguage();
+  const { refreshTrigger } = useSidebar();
   const params = language === "en" ? english_text.SideBar : greek_text.SideBar;
   const sidebar = useRef(null);
+  const navigate = useNavigate();
 
   const token = cookies.get("token") || "";
 
-  // Check if user is admin
+  // Fetch user info and projects
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/users/me/', {
-          method: 'GET',
+        const response = await fetch("http://127.0.0.1:8000/users/me/", {
+          method: "GET",
           headers: {
-            'Authorization': `Token ${token}`,
-            'Content-Type': 'application/json',
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
           },
         });
 
@@ -37,20 +53,63 @@ export default function Sidenav() {
           setUserInfo(data.data);
         }
       } catch (error) {
-        console.error('Error fetching user info:', error);
+        console.error("Error fetching user info:", error);
+      }
+    };
+
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/projects/get/", {
+          method: "GET",
+          headers: {
+            Authorization: `token ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Projects API response:", data); // Debug log
+          // Handle different response structures based on useProjects hook
+          if (Array.isArray(data)) {
+            setProjects(data);
+          } else if (data.projects && Array.isArray(data.projects)) {
+            setProjects(data.projects);
+          } else if (
+            data.data &&
+            data.data.projects &&
+            Array.isArray(data.data.projects)
+          ) {
+            setProjects(data.data.projects);
+          } else {
+            console.log("Unexpected projects data structure:", data);
+            setProjects([]);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching projects:", error);
       }
     };
 
     if (token) {
       fetchUserInfo();
+      fetchProjects();
     }
-  }, [token]);
+  }, [token, refreshTrigger]);
 
   useEffect(() => {
     if (sidebarExpanded) {
       document.querySelector("body")?.classList.add("sidebar-open");
     } else {
       document.querySelector("body")?.classList.remove("sidebar-open");
+    }
+  }, [sidebarExpanded]);
+
+  // Close dropdowns when sidebar is collapsed
+  useEffect(() => {
+    if (!sidebarExpanded) {
+      setProjectsExpanded(false);
+      setAdminExpanded(false);
     }
   }, [sidebarExpanded]);
 
@@ -63,26 +122,128 @@ export default function Sidenav() {
           sidebarExpanded ? "sidebar-expanded" : "sidebar-shrinked"
         }`}>
         <div className="pt-[80px] pl-1">
-          <a href="/" className="flex nav-link">
+          {/* Home */}
+          <div
+            onClick={() => navigate("/")}
+            className="flex nav-link cursor-pointer hover:bg-gray-100 transition-colors duration-200">
             <IoHome className="sidebar-icon" />
             {sidebarExpanded && (
-              <span className="pl-3 text-md font-medium tracking-tighter focus:outline-none focus:ring whitespace-nowrap cursor-pointer">
-                {" "}
+              <span className="pl-3 text-md font-medium tracking-tighter focus:outline-none focus:ring whitespace-nowrap">
                 {params.home}
               </span>
             )}
-          </a>
+          </div>
 
-          {/* Admin Dashboard Link - only show for admin users */}
-          {userInfo && (userInfo.is_superuser || userInfo.is_staff) && (
-            <a href="/admin" className="flex nav-link mt-4">
-              <FaUserShield className="sidebar-icon text-red-500" />
-              {sidebarExpanded && (
-                <span className="pl-3 text-md font-medium tracking-tighter focus:outline-none focus:ring whitespace-nowrap cursor-pointer text-red-500">
-                  Admin Dashboard
-                </span>
+          {/* Projects Dropdown */}
+          <div className="mt-4">
+            <div
+              onClick={() => setProjectsExpanded(!projectsExpanded)}
+              className="flex nav-link cursor-pointer hover:bg-gray-100 transition-colors duration-200 items-center">
+              {projectsExpanded ? (
+                <IoFolderOpen className="sidebar-icon" />
+              ) : (
+                <IoFolder className="sidebar-icon" />
               )}
-            </a>
+              {sidebarExpanded && (
+                <>
+                  <span className="pl-3 text-md font-medium tracking-tighter focus:outline-none focus:ring whitespace-nowrap flex-1">
+                    {params.projects}
+                    {projects.length > 0 && (
+                      <span className="project-count-badge ml-2">
+                        {projects.length}
+                      </span>
+                    )}
+                  </span>
+                  {projectsExpanded ? (
+                    <FaChevronUp className="text-xs" />
+                  ) : (
+                    <FaChevronDown className="text-xs" />
+                  )}
+                </>
+              )}
+            </div>
+            {/* Projects Submenu */}
+            {projectsExpanded && sidebarExpanded && (
+              <div className="ml-8 mt-2 space-y-2 animate-slide-down">
+                {projects.length > 0 && (
+                  <div className="space-y-1">
+                    {projects.map((project, index) => (
+                      <div
+                        key={project.uuid || project.id || index}
+                        onClick={() => navigate(`/projects/${project.uuid}`)}
+                        className="project-item flex items-center justify-between py-2 px-3 text-sm text-primary hover:text-primary-bold cursor-pointer"
+                        title={project.name}>
+                        <span className="truncate flex-1 max-w-[120px]">
+                          {project.name}
+                        </span>
+                        {project.is_submitted && (
+                          <span className="submitted-badge ml-2">✓</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {projects.length === 0 && (
+                  <div className="ml-4 py-2 text-xs text-gray-400">
+                    {language === "en"
+                      ? "No projects yet"
+                      : "Δεν υπάρχουν έργα"}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Admin Panel - only show for admin users */}
+          {userInfo && (userInfo.is_superuser || userInfo.is_staff) && (
+            <div className="mt-4">
+              <div
+                onClick={() => setAdminExpanded(!adminExpanded)}
+                className="flex nav-link cursor-pointer hover:bg-primary/10 transition-colors duration-200 items-center">
+                <FaUserShield className="sidebar-icon text-primary text-lg" />
+                {sidebarExpanded && (
+                  <>
+                    <span className="pl-3 text-md font-medium tracking-tighter focus:outline-none focus:ring whitespace-nowrap text-primary flex-1">
+                      {params.adminPanel}
+                    </span>
+                    {adminExpanded ? (
+                      <FaChevronUp className="text-xs text-primary" />
+                    ) : (
+                      <FaChevronDown className="text-xs text-primary" />
+                    )}
+                  </>
+                )}
+              </div>
+              {/* Admin Submenu */}
+              {adminExpanded && sidebarExpanded && (
+                <div className="ml-8 mt-2 space-y-2 animate-slide-down">
+                  <div
+                    onClick={() => navigate("/admin")}
+                    className="admin-submenu-item flex items-center py-2 px-3 text-sm text-primary hover:text-primary-bold cursor-pointer">
+                    <FaUserShield className="mr-2 text-xs" />
+                    <span>Admin Dashboard</span>
+                  </div>
+                  <div
+                    onClick={() => navigate("/admin/prefectures")}
+                    className="admin-submenu-item flex items-center py-2 px-3 text-sm text-primary hover:text-primary-bold cursor-pointer">
+                    <FaMapMarkerAlt className="mr-2 text-xs" />
+                    <span>{params.prefectures}</span>
+                  </div>
+                  <div
+                    onClick={() => navigate("/admin/thermal-zones")}
+                    className="admin-submenu-item flex items-center py-2 px-3 text-sm text-primary hover:text-primary-bold cursor-pointer">
+                    <FaThermometerHalf className="mr-2 text-xs" />
+                    <span>{params.thermalZones}</span>
+                  </div>
+                  <div
+                    onClick={() => navigate("/admin/materials")}
+                    className="admin-submenu-item flex items-center py-2 px-3 text-sm text-primary hover:text-primary-bold cursor-pointer">
+                    <FaCubes className="mr-2 text-xs" />
+                    <span>{params.materials}</span>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
