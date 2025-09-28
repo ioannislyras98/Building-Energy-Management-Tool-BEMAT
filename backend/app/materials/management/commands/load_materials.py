@@ -53,8 +53,6 @@ class Command(BaseCommand):
                     category=material_data['category'],
                     defaults={
                         'thermal_conductivity': material_data['thermal_conductivity'],
-                        'density': material_data.get('density'),
-                        'specific_heat': material_data.get('specific_heat'),
                         'description': f'Προκαθορισμένο υλικό με συντελεστή λ = {material_data["thermal_conductivity"]} W/mK',
                         'is_active': True
                     }
@@ -68,8 +66,6 @@ class Command(BaseCommand):
                     if (options['update'] and 
                         material.thermal_conductivity != material_data['thermal_conductivity']):
                         material.thermal_conductivity = material_data['thermal_conductivity']
-                        material.density = material_data.get('density')
-                        material.specific_heat = material_data.get('specific_heat')
                         material.description = f'Προκαθορισμένο υλικό με συντελεστή λ = {material_data["thermal_conductivity"]} W/mK'
                         material.save()
                         updated_count += 1

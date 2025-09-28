@@ -15,6 +15,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminPrefectures from "./pages/admin/AdminPrefectures";
 import AdminThermalZones from "./pages/admin/AdminThermalZones";
 import AdminMaterials from "./pages/admin/AdminMaterials";
+import Settings from "./pages/Settings";
 
 import "./App.css";
 import { AuthProvider, RequireAuth } from "./tools/Auth";
@@ -49,6 +50,7 @@ function App() {
                 element={<AdminThermalZones />}
               />
               <Route path="/admin/materials" element={<AdminMaterials />} />
+              <Route path="/settings" element={<Settings />} />
             </Route>
           </Route>
 

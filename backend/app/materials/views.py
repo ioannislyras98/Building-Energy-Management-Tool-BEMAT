@@ -90,3 +90,19 @@ def get_material_categories(request):
             {"detail": str(e)}, 
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def get_all_materials_admin(request):
+    """Get all materials for admin (including inactive ones)"""
+    try:
+        materials = Material.objects.all().order_by('category', 'name')
+        serializer = MaterialSerializer(materials, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response(
+            {"detail": str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

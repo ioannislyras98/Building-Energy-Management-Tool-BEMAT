@@ -10,6 +10,8 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):  # Use this version
     password = serializers.CharField(write_only=True)
+    first_name = serializers.CharField(required=True, allow_blank=False)
+    last_name = serializers.CharField(required=True, allow_blank=False)
     
     class Meta:
         model = User
@@ -25,20 +27,80 @@ class UserSerializer(serializers.ModelSerializer):  # Use this version
         user.save()
         return user
 
+class UpdateProfileSerializer(serializers.Serializer):
+    first_name = serializers.CharField(required=True, allow_blank=False, max_length=30)
+    last_name = serializers.CharField(required=True, allow_blank=False, max_length=150)
+    email = serializers.EmailField(required=True)
+    current_password = serializers.CharField(required=True, write_only=True)
+    
+    def validate_current_password(self, value):
+        if not self.context['request'].user.check_password(value):
+            language = self.context['request'].headers.get('X-Language', 'en')
+            if language == 'gr':
+                raise serializers.ValidationError("Λάθος κωδικός")
+            else:
+                raise serializers.ValidationError("Invalid password")
+        return value
+    
+    def validate_first_name(self, value):
+        if not value or not value.strip():
+            language = self.context['request'].headers.get('X-Language', 'en')
+            if language == 'gr':
+                raise serializers.ValidationError("Το όνομα είναι υποχρεωτικό")
+            else:
+                raise serializers.ValidationError("First name is required")
+        return value
+    
+    def validate_last_name(self, value):
+        if not value or not value.strip():
+            language = self.context['request'].headers.get('X-Language', 'en')
+            if language == 'gr':
+                raise serializers.ValidationError("Το επώνυμο είναι υποχρεωτικό")
+            else:
+                raise serializers.ValidationError("Last name is required")
+        return value
+
+    def validate_email(self, value):
+        user = self.context['request'].user
+        if User.objects.filter(email=value).exclude(uuid=user.uuid).exists():
+            language = self.context['request'].headers.get('X-Language', 'en')
+            if language == 'gr':
+                raise serializers.ValidationError("Αυτό το email χρησιμοποιείται ήδη")
+            else:
+                raise serializers.ValidationError("This email is already in use")
+        return value
+    
+    def save(self, **kwargs):
+        user = self.context['request'].user
+        user.first_name = self.validated_data['first_name']
+        user.last_name = self.validated_data['last_name']
+        user.email = self.validated_data['email']
+        user.save()
+        return user
+
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
     new_password_confirm = serializers.CharField(required=True)
     
     def validate_old_password(self, value):
-        user = self.context['request'].user
-        if not user.check_password(value):
-            raise serializers.ValidationError("Λάθος παλιό password.")
+        if not self.context['request'].user.check_password(value):
+            language = self.context['request'].headers.get('X-Language', 'en')
+            if language == 'gr':
+                raise serializers.ValidationError("Λάθος κωδικός")
+            else:
+                raise serializers.ValidationError("Invalid password")
         return value
 
     def validate(self, data):
+        request = self.context['request']
+        language = request.headers.get('X-Language', 'en')
+        
         if data['new_password'] != data['new_password_confirm']:
-            raise serializers.ValidationError("Τα νέα passwords δεν ταιριάζουν.")
+            if language == 'gr':
+                raise serializers.ValidationError("Τα νέα passwords δεν ταιριάζουν.")
+            else:
+                raise serializers.ValidationError("New passwords don't match.")
         return data
 
     def save(self, **kwargs):

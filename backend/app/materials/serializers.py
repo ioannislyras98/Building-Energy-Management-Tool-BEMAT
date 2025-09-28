@@ -11,7 +11,7 @@ class MaterialSerializer(serializers.ModelSerializer):
         model = Material
         fields = [
             'uuid', 'name', 'category', 'category_display', 'thermal_conductivity', 
-            'density', 'specific_heat', 'description', 'is_active',
+            'description', 'is_active',
             'created_at', 'updated_at', 'created_by', 'created_by_name'
         ]
         read_only_fields = ['uuid', 'created_at', 'updated_at']

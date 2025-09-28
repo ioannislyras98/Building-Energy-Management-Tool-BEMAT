@@ -7,6 +7,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
 from .serializers import UserSerializer
 from .serializers import ChangePasswordSerializer
+from .serializers import UpdateProfileSerializer
 from .serializers import PasswordResetRequestSerializer
 from .serializers import PasswordResetConfirmSerializer
 from .serializers import CustomAuthTokenSerializer
@@ -49,10 +50,15 @@ class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, *args, **kwargs):
+        language = request.headers.get('X-Language', 'en')
         serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"detail": "Το password άλλαξε επιτυχώς."}, status=status.HTTP_200_OK)
+        
+        if language == 'gr':
+            return Response({"detail": "Το password άλλαξε επιτυχώς."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
 
 class PasswordResetRequestView(APIView):
     permission_classes = []  # Δεν απαιτείται αυθεντικοποίηση
@@ -97,3 +103,32 @@ class CurrentUserView(APIView):
                 {"error": "An unexpected error occurred."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+class UpdateProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, *args, **kwargs):
+        try:
+            language = request.headers.get('X-Language', 'en')
+            serializer = UpdateProfileSerializer(data=request.data, context={'request': request})
+            
+            if serializer.is_valid():
+                serializer.save()
+                if language == 'gr':
+                    return Response({"message": "Το προφίλ ενημερώθηκε επιτυχώς."}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"message": "Profile updated successfully."}, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            language = request.headers.get('X-Language', 'en')
+            if language == 'gr':
+                return Response(
+                    {"error": "Σφάλμα κατά την ενημέρωση του προφίλ."},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+            else:
+                return Response(
+                    {"error": "Error updating profile."},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )

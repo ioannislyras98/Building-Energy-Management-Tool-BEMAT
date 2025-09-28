@@ -41,7 +41,7 @@ export default function TopBar() {
       $.ajax(settings)
         .done(function (response) {
           console.log("User data:", response);
-          setUserData(response);
+          setUserData(response.data);
         })
         .fail(function (error) {
           console.error("Failed to fetch user data:", error);
@@ -131,8 +131,10 @@ export default function TopBar() {
                   onClick={() => {
                     setOpen((open) => !open);
                   }}>
-                  {userData
-                    ? `${userData.first_name} ${userData.last_name}`
+                  {userData && userData.email
+                    ? `${userData.first_name || ""} ${
+                        userData.last_name || ""
+                      }`.trim() || userData.email
                     : params.loading}
                 </div>
                 <FaCircleUser className="size-6" />
@@ -154,7 +156,12 @@ export default function TopBar() {
                       <a
                         href="#"
                         className="px-4 py-2 flex gap-2 items-center text-primary hover:bg-primary hover:text-white transition-colors"
-                        onClick={(e) => e.stopPropagation()}>
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setOpen(false);
+                          navigate("/settings");
+                        }}>
                         <HiCog6Tooth className="size-[20px]" />
                         {params.settings}
                       </a>

@@ -5,7 +5,7 @@ from .models import Material
 @admin.register(Material)
 class MaterialAdmin(admin.ModelAdmin):
     list_display = [
-        'name', 'category', 'thermal_conductivity', 'density', 
+        'name', 'category', 'thermal_conductivity', 
         'is_active', 'created_by', 'created_at'
     ]
     list_filter = ['category', 'is_active', 'created_by', 'created_at']
@@ -18,7 +18,7 @@ class MaterialAdmin(admin.ModelAdmin):
             'fields': ('name', 'category', 'description', 'is_active')
         }),
         ('Θερμικές Ιδιότητες', {
-            'fields': ('thermal_conductivity', 'density', 'specific_heat')
+            'fields': ('thermal_conductivity',)
         }),
         ('Μεταδεδομένα', {
             'fields': ('uuid', 'created_at', 'updated_at', 'created_by'),

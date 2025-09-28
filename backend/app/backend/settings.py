@@ -112,7 +112,7 @@ TEMPLATES = [
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "mediafiles"
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://localhost:8000"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://localhost:8000", "http://127.0.0.1:3000", "http://127.0.0.1:8000"]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
@@ -175,7 +175,8 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ORIGIN_WHITELIST = [
-     'http://localhost:3000'
+     'http://localhost:3000',
+     'http://127.0.0.1:3000'
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -192,6 +193,7 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'x-language',  # Custom header για language detection
 ]
 
 AUTH_USER_MODEL = 'user.User'

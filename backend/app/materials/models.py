@@ -34,18 +34,6 @@ class Material(models.Model):
         verbose_name="Τυπικός συντελεστής λ (W/mK)",
         help_text="Συντελεστής θερμικής αγωγιμότητας σε W/mK"
     )
-    density = models.FloatField(
-        verbose_name="Πυκνότητα (kg/m³)",
-        null=True,
-        blank=True,
-        help_text="Πυκνότητα του υλικού σε kg/m³"
-    )
-    specific_heat = models.FloatField(
-        verbose_name="Ειδική θερμότητα (J/kgK)",
-        null=True,
-        blank=True,
-        help_text="Ειδική θερμότητα σε J/kgK"
-    )
     description = models.TextField(
         verbose_name="Περιγραφή",
         blank=True,

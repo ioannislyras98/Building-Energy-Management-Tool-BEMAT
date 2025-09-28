@@ -15,11 +15,20 @@ function submitData(event, params, setErrorMsg) {
   event.preventDefault();
   setErrorMsg(false);
 
+  const firstName = $(event.currentTarget).find("#name").val().trim();
+  const lastName = $(event.currentTarget).find("#surname").val().trim();
+
+  // Validate required fields
+  if (!firstName || !lastName) {
+    setErrorMsg("Το όνομα και το επώνυμο είναι υποχρεωτικά πεδία");
+    return;
+  }
+
   const payload = {
     email: $(event.currentTarget).find("#email").val(),
     password: btoa($(event.currentTarget).find("#password").val()),
-    first_name: $(event.currentTarget).find("#name").val(),
-    last_name: $(event.currentTarget).find("#surname").val(),
+    first_name: firstName,
+    last_name: lastName,
   };
 
   var settings = {
@@ -139,7 +148,7 @@ function SignUpForm({ params }) {
         </div>
         {errorMsg && (
           <div className="text-red-500 text-[12px] text-center mt-2">
-            {params.errorMessage}
+            {typeof errorMsg === "string" ? errorMsg : params.errorMessage}
           </div>
         )}
         <button id="submit-form" type="submit" className="mt-6">

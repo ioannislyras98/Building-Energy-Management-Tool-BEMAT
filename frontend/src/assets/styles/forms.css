@@ -21,7 +21,7 @@
 }
 
 .logo-img {
-  @apply bg-[url(../images/bemat_alt.avif)] bg-cover size-16 justify-self-center mb-8;
+  @apply bg-[url(../images/bemat-svg.svg)] bg-cover size-16 justify-self-center mb-8;
 }
 
 #submit-form {

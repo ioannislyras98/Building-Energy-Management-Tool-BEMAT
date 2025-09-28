@@ -354,15 +354,6 @@ const AdminDashboard = () => {
                           }
                         )}
                       </div>
-                      <div className="text-xs text-gray-500">
-                        {user.last_login
-                          ? new Date(user.last_login).toLocaleDateString(
-                              language === "en" ? "en-US" : "el-GR"
-                            )
-                          : language === "en"
-                          ? "Never logged in"
-                          : "Δεν έχει συνδεθεί"}
-                      </div>
                     </td>
                   </tr>
                 ))}

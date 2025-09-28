@@ -11,6 +11,7 @@ import {
   FaTrash,
   FaArrowLeft,
   FaMapMarkerAlt,
+  FaSearch,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "../../assets/styles/forms.css";
@@ -36,6 +37,7 @@ const AdminPrefectures = () => {
     key: "name",
     direction: "asc",
   });
+  const [searchTerm, setSearchTerm] = useState("");
 
   const { language } = useLanguage();
   const text =
@@ -234,9 +236,17 @@ const AdminPrefectures = () => {
   };
 
   const sortedPrefectures = useMemo(() => {
-    let sortableItems = [...prefectures];
+    // First filter by search term
+    let filteredItems = prefectures.filter(
+      (prefecture) =>
+        prefecture.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (prefecture.zone &&
+          prefecture.zone.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+
+    // Then sort
     if (sortConfig.key) {
-      sortableItems.sort((a, b) => {
+      filteredItems.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
           return sortConfig.direction === "asc" ? -1 : 1;
         }
@@ -246,8 +256,8 @@ const AdminPrefectures = () => {
         return 0;
       });
     }
-    return sortableItems;
-  }, [prefectures, sortConfig]);
+    return filteredItems;
+  }, [prefectures, sortConfig, searchTerm]);
 
   if (loading) {
     return (
@@ -259,37 +269,6 @@ const AdminPrefectures = () => {
 
   return (
     <div className="admin-container p-6 bg-gray-50 min-h-screen">
-      {/* Breadcrumb */}
-      <nav className="flex mb-4" aria-label="Breadcrumb">
-        <ol className="inline-flex items-center space-x-1 md:space-x-3">
-          <li className="inline-flex items-center">
-            <button
-              onClick={() => navigate("/admin")}
-              className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-primary transition-colors duration-200">
-              Admin
-            </button>
-          </li>
-          <li>
-            <div className="flex items-center">
-              <svg
-                className="w-6 h-6 text-gray-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg">
-                <path
-                  fillRule="evenodd"
-                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                  clipRule="evenodd"></path>
-              </svg>
-              <span className="ml-1 text-sm font-medium text-gray-700 md:ml-2 flex items-center">
-                <FaMapMarkerAlt className="mr-2 text-primary" />
-                {text.prefectures}
-              </span>
-            </div>
-          </li>
-        </ol>
-      </nav>
-
       {/* Header */}
       <div className="bg-white shadow-sm rounded-lg p-6 mb-6">
         <div className="flex items-center justify-between">
@@ -331,8 +310,46 @@ const AdminPrefectures = () => {
         </div>
       )}
 
+      {/* Search */}
+      <div className="bg-white shadow-sm rounded-lg p-4 mb-6">
+        <div className="relative">
+          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder={
+              language === "en"
+                ? "Search prefectures by name or zone..."
+                : "Αναζήτηση νομών βάσει ονόματος ή ζώνης..."
+            }
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+      </div>
+
       {/* Table */}
       <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+        {searchTerm && (
+          <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
+            <p className="text-sm text-gray-600">
+              {language === "en"
+                ? `Found ${sortedPrefectures.length} prefecture${
+                    sortedPrefectures.length !== 1 ? "s" : ""
+                  }`
+                : `Βρέθηκαν ${sortedPrefectures.length} νομ${
+                    sortedPrefectures.length === 1 ? "ός" : "οί"
+                  }`}
+              {searchTerm && (
+                <span className="font-medium">
+                  {language === "en"
+                    ? ` matching "${searchTerm}"`
+                    : ` που ταιριάζουν με "${searchTerm}"`}
+                </span>
+              )}
+            </p>
+          </div>
+        )}
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -394,54 +411,80 @@ const AdminPrefectures = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {sortedPrefectures.map((prefecture) => (
-              <tr
-                key={prefecture.uuid || prefecture.id}
-                className="table-row-hover">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {prefecture.name}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-light text-primary-bold">
-                    {prefecture.zone || "-"}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-700">
-                  {prefecture.temperature_winter
-                    ? `${prefecture.temperature_winter}°C`
-                    : "-"}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-700">
-                  {prefecture.temperature_summer
-                    ? `${prefecture.temperature_summer}°C`
-                    : "-"}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      prefecture.is_active
-                        ? "bg-green-100 text-green-800"
-                        : "bg-primary-light text-primary-bold"
-                    }`}>
-                    {prefecture.is_active ? text.active : text.inactive}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button
-                    onClick={() => handleEdit(prefecture)}
-                    className="text-primary hover:text-primary-bold mr-4 transition-colors duration-200">
-                    <FaEdit />
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleDelete(prefecture.uuid || prefecture.id)
-                    }
-                    className="text-primary hover:text-primary-bold transition-colors duration-200">
-                    <FaTrash />
-                  </button>
+            {sortedPrefectures.length === 0 ? (
+              <tr>
+                <td colSpan="4" className="px-6 py-12 text-center">
+                  <div className="text-gray-500">
+                    <FaMapMarkerAlt className="mx-auto h-8 w-8 text-gray-400 mb-4" />
+                    <p className="text-lg font-medium">
+                      {searchTerm
+                        ? language === "en"
+                          ? "No prefectures found"
+                          : "Δεν βρέθηκαν νομοί"
+                        : language === "en"
+                        ? "No prefectures available"
+                        : "Δεν υπάρχουν διαθέσιμοι νομοί"}
+                    </p>
+                    {searchTerm && (
+                      <p className="mt-1">
+                        {language === "en"
+                          ? `Try adjusting your search term "${searchTerm}"`
+                          : `Δοκιμάστε να τροποποιήσετε την αναζήτηση "${searchTerm}"`}
+                      </p>
+                    )}
+                  </div>
                 </td>
               </tr>
-            ))}
+            ) : (
+              sortedPrefectures.map((prefecture) => (
+                <tr
+                  key={prefecture.uuid || prefecture.id}
+                  className="table-row-hover">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {prefecture.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-light text-primary-bold">
+                      {prefecture.zone || "-"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-700">
+                    {prefecture.temperature_winter
+                      ? `${prefecture.temperature_winter}°C`
+                      : "-"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-700">
+                    {prefecture.temperature_summer
+                      ? `${prefecture.temperature_summer}°C`
+                      : "-"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        prefecture.is_active
+                          ? "bg-green-100 text-green-800"
+                          : "bg-primary-light text-primary-bold"
+                      }`}>
+                      {prefecture.is_active ? text.active : text.inactive}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button
+                      onClick={() => handleEdit(prefecture)}
+                      className="text-primary hover:text-primary-bold mr-4 transition-colors duration-200">
+                      <FaEdit />
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleDelete(prefecture.uuid || prefecture.id)
+                      }
+                      className="text-primary hover:text-primary-bold transition-colors duration-200">
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

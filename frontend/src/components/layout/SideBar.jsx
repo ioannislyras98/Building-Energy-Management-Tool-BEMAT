@@ -229,12 +229,7 @@ export default function Sidenav() {
                     <FaMapMarkerAlt className="mr-2 text-xs" />
                     <span>{params.prefectures}</span>
                   </div>
-                  <div
-                    onClick={() => navigate("/admin/thermal-zones")}
-                    className="admin-submenu-item flex items-center py-2 px-3 text-sm text-primary hover:text-primary-bold cursor-pointer">
-                    <FaThermometerHalf className="mr-2 text-xs" />
-                    <span>{params.thermalZones}</span>
-                  </div>
+
                   <div
                     onClick={() => navigate("/admin/materials")}
                     className="admin-submenu-item flex items-center py-2 px-3 text-sm text-primary hover:text-primary-bold cursor-pointer">

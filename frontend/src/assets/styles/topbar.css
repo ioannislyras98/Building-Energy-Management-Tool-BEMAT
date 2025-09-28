@@ -17,7 +17,7 @@
     }
 
     #logo-image {
-      @apply h-8 bg-[url(../images/svg-test.png)] bg-cover size-10 ml-5;
+      @apply h-8 bg-[url(../images/bemat-svg.svg)] bg-cover size-10 ml-5 bg-no-repeat bg-center;
     }
 
     .topbar-right {
