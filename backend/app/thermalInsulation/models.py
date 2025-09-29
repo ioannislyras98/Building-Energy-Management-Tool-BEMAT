@@ -92,6 +92,18 @@ class ExternalWallThermalInsulation(models.Model):
         blank=True,
         help_text="Καθαρή παρούσα αξία της επένδυσης"
     )
+    payback_period = models.FloatField(
+        verbose_name="Περίοδος αποπληρωμής (έτη)",
+        null=True,
+        blank=True,
+        help_text="Περίοδος αποπληρωμής της επένδυσης σε έτη"
+    )
+    internal_rate_of_return = models.FloatField(
+        verbose_name="Εσωτερικός βαθμός απόδοσης (%)",
+        null=True,
+        blank=True,
+        help_text="Εσωτερικός βαθμός απόδοσης της επένδυσης ως ποσοστό"
+    )
     
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Δημιουργήθηκε")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Ενημερώθηκε")
@@ -100,6 +112,8 @@ class ExternalWallThermalInsulation(models.Model):
         verbose_name = "Θερμομόνωση Εξωτερικής Τοιχοποιίας"
         verbose_name_plural = "Θερμομονώσεις Εξωτερικής Τοιχοποιίας"
         ordering = ['-created_at']
+        # Ensure one thermal insulation per building
+        unique_together = [['building', 'user']]
 
     def __str__(self):
         return f"Θερμομόνωση {self.building.name} - U: {self.u_coefficient}"
@@ -206,6 +220,40 @@ class ExternalWallThermalInsulation(models.Model):
             print(f"Error calculating annual benefit: {e}")
             return 0
 
+    def calculate_payback_period(self):
+        """
+        Calculate payback period in years
+        Formula: Total Investment Cost / Annual Economic Benefit
+        """
+        try:
+            total_cost = float(self.total_cost or 0)
+            annual_benefit = float(self.annual_benefit or 0)
+            
+            if total_cost <= 0 or annual_benefit <= 0:
+                return None
+            
+            payback_years = total_cost / annual_benefit
+            return round(payback_years, 2)
+        except (TypeError, ValueError, ZeroDivisionError):
+            return None
+
+    def calculate_internal_rate_of_return(self):
+        """
+        Calculate internal rate of return as a percentage
+        Formula: (Annual Economic Benefit / Total Investment Cost) × 100
+        """
+        try:
+            total_cost = float(self.total_cost or 0)
+            annual_benefit = float(self.annual_benefit or 0)
+            
+            if total_cost <= 0:
+                return None
+            
+            irr_percentage = (annual_benefit / total_cost) * 100
+            return round(irr_percentage, 2)
+        except (TypeError, ValueError, ZeroDivisionError):
+            return None
+
     def _calculate_hourly_losses(self, materials, temperature_difference):
         """
         Helper method to calculate hourly losses for a set of materials
@@ -246,16 +294,20 @@ class ExternalWallThermalInsulation(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # Recalculate U coefficient, annual benefit, and NPV after saving
+        # Recalculate U coefficient, annual benefit, NPV, payback period, and IRR after saving
         try:
             self.u_coefficient = self.calculate_u_coefficient()
             self.annual_benefit = self.calculate_annual_benefit()
             self.net_present_value = self.calculate_npv()
+            self.payback_period = self.calculate_payback_period()
+            self.internal_rate_of_return = self.calculate_internal_rate_of_return()
             if self.pk:  # Only update if object exists (avoid recursion)
                 ExternalWallThermalInsulation.objects.filter(pk=self.pk).update(
                     u_coefficient=self.u_coefficient,
                     annual_benefit=self.annual_benefit,
-                    net_present_value=self.net_present_value
+                    net_present_value=self.net_present_value,
+                    payback_period=self.payback_period,
+                    internal_rate_of_return=self.internal_rate_of_return
                 )
         except Exception as e:
             # Log the error but don't crash the save operation

@@ -119,49 +119,49 @@ const ResultsTabContent = ({
       name: getScenarioName("thermal_insulation"),
       icon: <Thermostat />,
       color: "#2196F3",
-      endpoint: "thermal_insulation"
+      endpoint: "thermal_insulations"
     },
     roof_thermal_insulation: {
       name: getScenarioName("roof_thermal_insulation"), 
       icon: <Thermostat />,
       color: "#4CAF50",
-      endpoint: "roof_thermal_insulation"
+      endpoint: "roof_thermal_insulations"
     },
     photovoltaic_system: {
       name: getScenarioName("photovoltaic_system"),
       icon: <SolarPower />,
       color: "#FF9800",
-      endpoint: "photovoltaic_system"
+      endpoint: "photovoltaic_systems"
     },
     window_replacement: {
       name: getScenarioName("window_replacement"),
       icon: <Widgets />,
       color: "#9C27B0",
-      endpoint: "window_replacement"
+      endpoint: "window_replacements"
     },
     bulb_replacement: {
       name: getScenarioName("bulb_replacement"),
       icon: <Lightbulb />,
       color: "#FFC107",
-      endpoint: "bulb_replacement"
+      endpoint: "bulb_replacements"
     },
     air_conditioning_replacement: {
       name: getScenarioName("air_conditioning_replacement"),
       icon: <AcUnit />,
       color: "#00BCD4",
-      endpoint: "air_conditioning_replacement"
+      endpoint: "air_conditioning_replacements"
     },
     hot_water_upgrade: {
       name: getScenarioName("hot_water_upgrade"),
       icon: <WaterDrop />,
       color: "#F44336",
-      endpoint: "hot_water_upgrade"
+      endpoint: "hot_water_upgrades"
     },
     natural_gas_network: {
       name: getScenarioName("natural_gas_network"),
       icon: <LocalGasStation />,
       color: "#009688",
-      endpoint: "natural_gas_network"
+      endpoint: "natural_gas_networks"
     },
     exterior_blinds: {
       name: getScenarioName("exterior_blinds"),
@@ -211,21 +211,44 @@ const ResultsTabContent = ({
           });
 
           if (response.ok) {
-            const data = await response.json();
-            console.log(`Data found for ${config.name}:`, data);
-            scenarioData.push({
-              type: key,
-              name: config.name,
-              icon: config.icon,
-              color: config.color,
-              ...data,
-              // Διασφάλιση ότι όλα τα πεδία είναι αριθμοί
-              total_investment_cost: parseFloat(data.total_investment_cost) || 0,
-              annual_energy_savings: parseFloat(data.annual_energy_savings) || 0,
-              annual_economic_benefit: parseFloat(data.annual_economic_benefit) || 0,
-              payback_period: parseFloat(data.payback_period) || 0,
-              net_present_value: parseFloat(data.net_present_value) || 0,
-              internal_rate_of_return: parseFloat(data.internal_rate_of_return) || 0,
+            const responseData = await response.json();
+            console.log(`Response for ${config.name}:`, responseData);
+            
+            // Ελέγχουμε αν το response περιέχει data array ή είναι ήδη το object
+            let scenarioItems = [];
+            if (responseData.data && Array.isArray(responseData.data)) {
+              scenarioItems = responseData.data;
+            } else if (Array.isArray(responseData)) {
+              scenarioItems = responseData;
+            } else if (responseData && typeof responseData === 'object') {
+              scenarioItems = [responseData];
+            }
+            
+            // Προσθέτουμε μόνο τα ολοκληρωμένα σενάρια (με net_present_value)
+            scenarioItems.forEach((item) => {
+              console.log(`Processing item for ${config.name}:`, item);
+              const netPresentValue = parseFloat(item.net_present_value) || parseFloat(item.calculated_net_present_value);
+              console.log(`Net present value for ${config.name}:`, netPresentValue);
+              
+              if (netPresentValue && !isNaN(netPresentValue) && netPresentValue !== 0) {
+                console.log(`Adding completed scenario ${config.name}:`, item);
+                scenarioData.push({
+                  type: key,
+                  name: config.name,
+                  icon: config.icon,
+                  color: config.color,
+                  ...item,
+                  // Διασφάλιση ότι όλα τα πεδία είναι αριθμοί - προσπάθεια με διαφορετικά field names
+                  total_investment_cost: parseFloat(item.total_investment_cost) || parseFloat(item.total_cost) || parseFloat(item.estimated_cost) || parseFloat(item.net_cost) || 0,
+                  annual_energy_savings: parseFloat(item.annual_energy_savings) || parseFloat(item.annual_savings) || 0,
+                  annual_economic_benefit: parseFloat(item.annual_economic_benefit) || parseFloat(item.annual_benefit) || parseFloat(item.annual_savings) || parseFloat(item.calculated_annual_savings) || 0,
+                  payback_period: parseFloat(item.payback_period) || parseFloat(item.calculated_payback_period) || 0,
+                  net_present_value: netPresentValue || parseFloat(item.calculated_net_present_value) || 0,
+                  internal_rate_of_return: parseFloat(item.internal_rate_of_return) || parseFloat(item.investment_return) || parseFloat(item.calculated_investment_return) || 0,
+                });
+              } else {
+                console.log(`Skipping incomplete scenario ${config.name} - no net_present_value:`, item);
+              }
             });
           } else {
             console.log(`No data found for ${config.name} (${response.status})`);
@@ -235,7 +258,8 @@ const ResultsTabContent = ({
         }
       }
 
-      console.log("All scenarios found:", scenarioData);
+      console.log("All completed scenarios found:", scenarioData);
+      console.log(`Total scenarios fetched: ${scenarioData.length}`);
       setScenarios(scenarioData);
     } catch (error) {
       console.error("Error fetching scenarios:", error);

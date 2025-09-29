@@ -4,6 +4,7 @@ import Cookies from "universal-cookie";
 import InputEntry from "../../pages/auth/InputEntry";
 import { useLanguage } from "../../context/LanguageContext";
 import { useModalBlur } from "../../hooks/useModals";
+import { useSidebar } from "../../context/SidebarContext";
 
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
@@ -22,6 +23,7 @@ function ProjectModalForm({
 }) {
   // Apply blur effect when modal is open
   useModalBlur(isOpen);
+  const { refreshSidebar } = useSidebar();
   
   const [formData, setFormData] = useState(
     isEditMode && project
@@ -76,6 +78,7 @@ function ProjectModalForm({
         } else {
           onProjectCreated(response);
         }
+        refreshSidebar(); // Refresh sidebar after project creation/update
         onClose();
       })
       .fail(function (error) {

@@ -48,13 +48,14 @@ class ExternalWallThermalInsulationSerializer(serializers.ModelSerializer):
             'project', 'project_name', 'project_electricity_cost', 'u_coefficient', 'winter_hourly_losses',
             'summer_hourly_losses', 'heating_hours_per_year', 'cooling_hours_per_year',
             'total_cost', 'annual_benefit', 'calculated_annual_benefit', 'time_period_years', 'annual_operating_costs',
-            'discount_rate', 'net_present_value', 'material_layers', 'old_materials',
-            'new_materials', 'total_materials_cost', 'total_surface_area',
+            'discount_rate', 'net_present_value', 'payback_period', 'internal_rate_of_return', 
+            'material_layers', 'old_materials', 'new_materials', 'total_materials_cost', 'total_surface_area',
             'created_at', 'updated_at'
         ]
         read_only_fields = [
             'uuid', 'created_at', 'updated_at', 'u_coefficient', 
-            'net_present_value', 'total_materials_cost', 'total_surface_area', 'annual_benefit'
+            'net_present_value', 'payback_period', 'internal_rate_of_return',
+            'total_materials_cost', 'total_surface_area', 'annual_benefit'
         ]    
     def get_old_materials(self, obj):
         old_materials = obj.material_layers.filter(material_type='old')

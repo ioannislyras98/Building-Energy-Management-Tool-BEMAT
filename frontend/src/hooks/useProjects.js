@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import $ from "jquery";
 import Cookies from "universal-cookie";
 import { useProgress } from "../context/ProgressContext";
+import { useSidebar } from "../context/SidebarContext";
 
 export const useProjects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { refreshTrigger } = useProgress();
+  const { refreshSidebar } = useSidebar();
 
   const cookies = new Cookies();
   const token = cookies.get("token") || "";
@@ -42,6 +44,7 @@ export const useProjects = () => {
 
   const handleProjectCreated = (newProject) => {
     setProjects((prevProjects) => [...prevProjects, newProject]);
+    refreshSidebar(); // Refresh sidebar to show new project
   };
 
   const handleProjectUpdated = (updatedProject) => {
@@ -50,6 +53,7 @@ export const useProjects = () => {
         project.uuid === updatedProject.uuid ? updatedProject : project
       )
     );
+    refreshSidebar(); // Refresh sidebar to show updated project
     return updatedProject;
   };
 
@@ -69,6 +73,7 @@ export const useProjects = () => {
           setProjects((prevProjects) =>
             prevProjects.filter((project) => project.uuid !== projectUuid)
           );
+          refreshSidebar(); // Refresh sidebar to remove deleted project
           resolve(response);
         })
         .fail(function (error) {
@@ -92,6 +97,7 @@ export const useProjects = () => {
           : project
       )
     );
+    refreshSidebar(); // Refresh sidebar to show updated building count
   };
 
   useEffect(() => {

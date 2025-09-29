@@ -143,11 +143,14 @@ class ThermalInsulationMaterialLayerCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
+        print(f"Creating material layer with data: {self.request.data}")
+        print(f"UUID from URL: {self.kwargs['thermal_insulation_uuid']}")
         thermal_insulation = get_object_or_404(
             ExternalWallThermalInsulation,
             uuid=self.kwargs['thermal_insulation_uuid'],
             user=self.request.user
         )
+        print(f"Found thermal insulation: {thermal_insulation}")
         serializer.save(thermal_insulation=thermal_insulation)
 
 

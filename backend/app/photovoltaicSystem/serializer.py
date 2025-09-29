@@ -9,6 +9,8 @@ class PhotovoltaicSystemSerializer(serializers.ModelSerializer):
     calculated_tax_burden = serializers.SerializerMethodField()
     calculated_total_cost = serializers.SerializerMethodField()
     calculated_annual_savings = serializers.SerializerMethodField()
+    calculated_payback_period = serializers.SerializerMethodField()
+    calculated_investment_return = serializers.SerializerMethodField()
     calculated_net_present_value = serializers.SerializerMethodField()
     
     # Related fields
@@ -86,6 +88,8 @@ class PhotovoltaicSystemSerializer(serializers.ModelSerializer):
             'calculated_tax_burden',
             'calculated_total_cost',
             'calculated_annual_savings',
+            'calculated_payback_period',
+            'calculated_investment_return',
             'calculated_net_present_value',
             
             'created_at',
@@ -116,6 +120,14 @@ class PhotovoltaicSystemSerializer(serializers.ModelSerializer):
     def get_calculated_annual_savings(self, obj):
         """Υπολογισμός ετήσιων εξοικονομήσεων"""
         return obj.calculate_annual_savings()
+    
+    def get_calculated_payback_period(self, obj):
+        """Υπολογισμός περιόδου απόσβεσης"""
+        return obj.calculate_payback_period()
+    
+    def get_calculated_investment_return(self, obj):
+        """Υπολογισμός απόδοσης επένδυσης"""
+        return obj.calculate_investment_return()
     
     def get_calculated_net_present_value(self, obj):
         """Υπολογισμός καθαρής παρούσας αξίας"""

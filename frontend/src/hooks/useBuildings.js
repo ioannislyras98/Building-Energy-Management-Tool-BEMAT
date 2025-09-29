@@ -1,11 +1,13 @@
 import { useState, useCallback } from "react";
 import $ from "jquery";
 import Cookies from "universal-cookie";
+import { useSidebar } from "../context/SidebarContext";
 
 export const useBuildings = () => {
   const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { refreshSidebar } = useSidebar();
 
   const cookies = new Cookies(null, { path: "/" });
   const token = cookies.get("token") || "";
@@ -72,7 +74,15 @@ export const useBuildings = () => {
 
   const handleBuildingCreated = useCallback((newBuilding) => {
     setBuildings((prevBuildings) => [...prevBuildings, newBuilding]);
-  }, []);
+    refreshSidebar(); // Refresh sidebar to show updated building count
+  }, [refreshSidebar]);
+
+  const handleBuildingDeleted = useCallback((buildingUuid) => {
+    setBuildings((prevBuildings) => 
+      prevBuildings.filter((building) => building.uuid !== buildingUuid)
+    );
+    refreshSidebar(); // Refresh sidebar to show updated building count
+  }, [refreshSidebar]);
 
   const clearBuildings = useCallback(() => {
     setBuildings([]);
@@ -84,6 +94,7 @@ export const useBuildings = () => {
     error,
     fetchBuildings,
     handleBuildingCreated,
+    handleBuildingDeleted,
     clearBuildings,
   };
 };

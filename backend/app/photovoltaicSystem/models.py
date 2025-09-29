@@ -327,6 +327,8 @@ class PhotovoltaicSystem(models.Model):
     class Meta:
         verbose_name = 'Εγκατάσταση Φωτοβολταϊκών'
         verbose_name_plural = 'Εγκαταστάσεις Φωτοβολταϊκών'
+        # Ensure one photovoltaic system per building
+        unique_together = [['building', 'user']]
         
     def __str__(self):
         return f"Φωτοβολταϊκό σύστημα - {self.building.name if self.building else 'Χωρίς κτίριο'}"
@@ -384,13 +386,53 @@ class PhotovoltaicSystem(models.Model):
         except (TypeError, ValueError, ZeroDivisionError):
             return Decimal('0')
     
+    def calculate_payback_period(self):
+        """Υπολογισμός περιόδου απόσβεσης σε έτη"""
+        try:
+            # Use total_cost if net_cost is negative (subsidy > total cost)
+            initial_investment = float(self.net_cost or 0)
+            if initial_investment <= 0:
+                initial_investment = float(self.total_cost or 0)
+                
+            annual_savings = float(self.annual_savings or 0)
+            
+            if initial_investment <= 0 or annual_savings <= 0:
+                return Decimal('0')
+            
+            # Payback Period = Initial Investment / Annual Savings
+            payback_years = initial_investment / annual_savings
+            
+            return round(Decimal(str(payback_years)), 2)
+        except (TypeError, ValueError, ZeroDivisionError):
+            return Decimal('0')
+    
+    def calculate_investment_return(self):
+        """Υπολογισμός απόδοσης επένδυσης (ROI) ως ποσοστό"""
+        try:
+            # Use total_cost if net_cost is negative (subsidy > total cost)
+            initial_investment = float(self.net_cost or 0)
+            if initial_investment <= 0:
+                initial_investment = float(self.total_cost or 0)
+                
+            annual_savings = float(self.annual_savings or 0)
+            
+            if initial_investment <= 0:
+                return Decimal('0')
+            
+            # Investment Return = (Annual Savings / Initial Investment) × 100
+            roi_percentage = (annual_savings / initial_investment) * 100
+            
+            return round(Decimal(str(roi_percentage)), 2)
+        except (TypeError, ValueError, ZeroDivisionError):
+            return Decimal('0')
+
     def calculate_net_present_value(self):
         """Υπολογισμός της Καθαρής Παρούσας Αξίας (NPV)"""
         try:
             # Required values for NPV calculation
             initial_investment = float(self.net_cost or self.total_cost or 0)
             annual_savings = float(self.annual_savings or 0)
-            payback_period_years = int(self.payback_period or 20)
+            project_lifetime_years = 25  # Typical PV system lifetime
             discount_rate = 0.05  # 5% default discount rate
             
             if initial_investment <= 0 or annual_savings <= 0:
@@ -398,7 +440,7 @@ class PhotovoltaicSystem(models.Model):
             
             # Calculate NPV: NPV = -Initial_Investment + Σ(Annual_Savings / (1 + discount_rate)^year)
             npv = -initial_investment
-            for year in range(1, payback_period_years + 1):
+            for year in range(1, project_lifetime_years + 1):
                 npv += annual_savings / ((1 + discount_rate) ** year)
             
             return round(npv, 2)
@@ -441,6 +483,12 @@ class PhotovoltaicSystem(models.Model):
         
         # Υπολογισμός ετήσιων εξοικονομήσεων
         self.annual_savings = self.calculate_annual_savings()
+        
+        # Υπολογισμός περιόδου απόσβεσης
+        self.payback_period = self.calculate_payback_period()
+        
+        # Υπολογισμός απόδοσης επένδυσης
+        self.investment_return = self.calculate_investment_return()
         
         # Υπολογισμός NPV
         self.net_present_value = self.calculate_net_present_value()
