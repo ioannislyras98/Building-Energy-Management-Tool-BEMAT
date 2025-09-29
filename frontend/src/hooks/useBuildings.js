@@ -72,17 +72,23 @@ export const useBuildings = () => {
     [token]
   );
 
-  const handleBuildingCreated = useCallback((newBuilding) => {
-    setBuildings((prevBuildings) => [...prevBuildings, newBuilding]);
-    refreshSidebar(); // Refresh sidebar to show updated building count
-  }, [refreshSidebar]);
+  const handleBuildingCreated = useCallback(
+    (newBuilding) => {
+      setBuildings((prevBuildings) => [...prevBuildings, newBuilding]);
+      refreshSidebar(); // Refresh sidebar to show updated building count
+    },
+    [refreshSidebar]
+  );
 
-  const handleBuildingDeleted = useCallback((buildingUuid) => {
-    setBuildings((prevBuildings) => 
-      prevBuildings.filter((building) => building.uuid !== buildingUuid)
-    );
-    refreshSidebar(); // Refresh sidebar to show updated building count
-  }, [refreshSidebar]);
+  const handleBuildingDeleted = useCallback(
+    (buildingUuid) => {
+      setBuildings((prevBuildings) =>
+        prevBuildings.filter((building) => building.uuid !== buildingUuid)
+      );
+      refreshSidebar(); // Refresh sidebar to show updated building count
+    },
+    [refreshSidebar]
+  );
 
   const clearBuildings = useCallback(() => {
     setBuildings([]);

@@ -24,7 +24,7 @@ function ProjectModalForm({
   // Apply blur effect when modal is open
   useModalBlur(isOpen);
   const { refreshSidebar } = useSidebar();
-  
+
   const [formData, setFormData] = useState(
     isEditMode && project
       ? {
@@ -172,14 +172,14 @@ export default function ProjectModal({
     language === "en" ? english_text.ProjectModal : greek_text.ProjectModal;
 
   return (
-      <ProjectModalForm
-        isOpen={isOpen}
-        onClose={onClose}
-        onProjectCreated={onProjectCreated}
-        onProjectUpdated={onProjectUpdated}
-        project={project}
-        isEditMode={isEditMode}
-        params={params}
-      />
+    <ProjectModalForm
+      isOpen={isOpen}
+      onClose={onClose}
+      onProjectCreated={onProjectCreated}
+      onProjectUpdated={onProjectUpdated}
+      project={project}
+      isEditMode={isEditMode}
+      params={params}
+    />
   );
 }
