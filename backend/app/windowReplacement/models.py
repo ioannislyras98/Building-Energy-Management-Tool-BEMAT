@@ -151,6 +151,7 @@ class WindowReplacement(models.Model):
         verbose_name = "Αντικατάσταση Υαλοπινάκων"
         verbose_name_plural = "Αντικαταστάσεις Υαλοπινάκων"
         ordering = ['-created_at']
+        unique_together = [['building', 'user']]
 
     def __str__(self):
         return f"Window Replacement - {self.building} ({self.uuid})"

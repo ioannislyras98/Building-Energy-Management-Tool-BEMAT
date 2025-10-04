@@ -31,7 +31,7 @@ export default function BuildingProfilePage() {
   const [isEditBuildingModalOpen, setIsEditBuildingModalOpen] = useState(false);
   const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
   const [isEditContactModalOpen, setIsEditContactModalOpen] = useState(false);
-  
+
   // Apply blur effects for each modal
   useModalBlur(isEditBuildingModalOpen);
   useModalBlur(isAddContactModalOpen);
@@ -137,7 +137,7 @@ export default function BuildingProfilePage() {
       method: "DELETE",
       timeout: 0,
       headers: {
-        Authorization: `token ${token}`,
+        Authorization: `Token ${token}`,
       },
     };
 

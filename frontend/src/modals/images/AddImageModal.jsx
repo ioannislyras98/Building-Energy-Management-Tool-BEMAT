@@ -7,7 +7,6 @@ import { useModalBlur } from "../../hooks/useModals";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import InputEntryModal from "../shared/InputEntryModal";
-import activityLogger from "../../utils/ActivityLogger";
 
 const cookies = new Cookies();
 
@@ -46,27 +45,40 @@ function AddImageModalForm({
     const file = e.target.files[0];
     if (file) {
       // Validate file type
-      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+      ];
       if (!allowedTypes.includes(file.type)) {
-        setErrors({ image: params.errorFileType || "Επιτρέπονται μόνο εικόνες (JPEG, PNG, GIF)" });
+        setErrors({
+          image:
+            params.errorFileType ||
+            "Επιτρέπονται μόνο εικόνες (JPEG, PNG, GIF)",
+        });
         return;
       }
 
       // Validate file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
-        setErrors({ image: params.errorFileSize || "Το αρχείο είναι πολύ μεγάλο (μέγιστο 10MB)" });
+        setErrors({
+          image:
+            params.errorFileSize ||
+            "Το αρχείο είναι πολύ μεγάλο (μέγιστο 10MB)",
+        });
         return;
       }
 
       // Convert file to base64
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         const base64String = e.target.result;
         setSelectedFile({
           name: file.name,
           type: file.type,
           size: file.size,
-          base64: base64String
+          base64: base64String,
         });
         setErrors({ ...errors, image: "" });
       };
@@ -115,7 +127,7 @@ function AddImageModalForm({
       image: selectedFile.base64,
       image_name: selectedFile.name,
       image_type: selectedFile.type,
-      image_size: selectedFile.size
+      image_size: selectedFile.size,
     };
 
     const submitUrl = `http://127.0.0.1:8000/building-images/upload/`;
@@ -130,17 +142,8 @@ function AddImageModalForm({
       },
       data: JSON.stringify(submitData),
       success: function (response) {
-        // Log the image upload activity
-        activityLogger.logImageActivity(
-          buildingUuid,
-          projectUuid,
-          "create",
-          {
-            title: formData.title,
-            category: formData.category
-          }
-        );
-        
+        // Image upload activity logging removed
+
         onImageAdded(response);
         onClose();
         setFormData({ title: "", description: "", category: "", tags: "" });
@@ -168,8 +171,14 @@ function AddImageModalForm({
     { value: "exterior", label: params.categoryExterior || "Εξωτερικές Όψεις" },
     { value: "interior", label: params.categoryInterior || "Εσωτερικές Όψεις" },
     { value: "systems", label: params.categorySystems || "Συστήματα Κτιρίου" },
-    { value: "construction", label: params.categoryConstruction || "Κατασκευαστικά Στοιχεία" },
-    { value: "documentation", label: params.categoryDocumentation || "Τεκμηρίωση" },
+    {
+      value: "construction",
+      label: params.categoryConstruction || "Κατασκευαστικά Στοιχεία",
+    },
+    {
+      value: "documentation",
+      label: params.categoryDocumentation || "Τεκμηρίωση",
+    },
     { value: "other", label: params.categoryOther || "Άλλα" },
   ];
 
@@ -191,7 +200,8 @@ function AddImageModalForm({
           {/* File Upload */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {params.imageFile || "Εικόνα"} <span className="text-red-500">*</span>
+              {params.imageFile || "Εικόνα"}{" "}
+              <span className="text-red-500">*</span>
             </label>
             <input
               type="file"
@@ -271,9 +281,7 @@ export default function AddImageModal({
 }) {
   const { language } = useLanguage();
   const params =
-    language === "en"
-      ? english_text.AddImageModal
-      : greek_text.AddImageModal;
+    language === "en" ? english_text.AddImageModal : greek_text.AddImageModal;
 
   return (
     <AddImageModalForm

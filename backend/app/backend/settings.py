@@ -77,7 +77,6 @@ INSTALLED_APPS = [
     "automaticLightingControl",
     "boilerReplacement",
     "buildingImages",
-    "buildingActivity",
 ]
 
 MIDDLEWARE = [
@@ -96,7 +95,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -231,10 +230,5 @@ LOGGING = {
         'level': 'INFO',
     },
     'loggers': {
-        'buildingActivity': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
     },
 }

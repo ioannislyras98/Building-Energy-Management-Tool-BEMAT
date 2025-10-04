@@ -50,6 +50,9 @@ class HotWaterUpgrade(models.Model):
     class Meta:
         db_table = 'hot_water_upgrade'
         ordering = ['-created_at']
+        verbose_name = "Αναβάθμιση Ζεστού Νερού"
+        verbose_name_plural = "Αναβαθμίσεις Ζεστού Νερού"
+        unique_together = [['building', 'project']]
 
     def save(self, *args, **kwargs):
         # Calculate subtotals

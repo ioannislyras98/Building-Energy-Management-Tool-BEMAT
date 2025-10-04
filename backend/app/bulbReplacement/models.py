@@ -158,6 +158,7 @@ class BulbReplacement(models.Model):
         verbose_name = "Αντικατάσταση Λαμπτήρων"
         verbose_name_plural = "Αντικαταστάσεις Λαμπτήρων"
         ordering = ['-created_at']
+        unique_together = [['building', 'user']]
 
     def __str__(self):
         return f"Bulb Replacement - {self.building} ({self.uuid})"

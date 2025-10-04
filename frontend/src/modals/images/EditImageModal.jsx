@@ -7,7 +7,6 @@ import { useModalBlur } from "../../hooks/useModals";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import InputEntryModal from "../shared/InputEntryModal";
-import activityLogger from "../../utils/ActivityLogger";
 
 const cookies = new Cookies();
 
@@ -56,27 +55,40 @@ function EditImageModalForm({
     const file = e.target.files[0];
     if (file) {
       // Validate file type
-      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+      ];
       if (!allowedTypes.includes(file.type)) {
-        setErrors({ image: params.errorFileType || "Επιτρέπονται μόνο εικόνες (JPEG, PNG, GIF)" });
+        setErrors({
+          image:
+            params.errorFileType ||
+            "Επιτρέπονται μόνο εικόνες (JPEG, PNG, GIF)",
+        });
         return;
       }
 
       // Validate file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
-        setErrors({ image: params.errorFileSize || "Το αρχείο είναι πολύ μεγάλο (μέγιστο 10MB)" });
+        setErrors({
+          image:
+            params.errorFileSize ||
+            "Το αρχείο είναι πολύ μεγάλο (μέγιστο 10MB)",
+        });
         return;
       }
 
       // Convert file to base64
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         const base64String = e.target.result;
         setSelectedFile({
           name: file.name,
           type: file.type,
           size: file.size,
-          base64: base64String
+          base64: base64String,
         });
         setErrors({ ...errors, image: "" });
       };
@@ -118,7 +130,7 @@ function EditImageModalForm({
       building: image.building,
       project: image.project,
     };
-    
+
     // Only add image data if a new file was selected
     if (selectedFile) {
       submitData.image = selectedFile.base64;
@@ -139,17 +151,8 @@ function EditImageModalForm({
       },
       data: JSON.stringify(submitData),
       success: function (response) {
-        // Log the image update activity
-        activityLogger.logImageActivity(
-          image.building,
-          image.project,
-          "update",
-          {
-            title: formData.title,
-            category: formData.category
-          }
-        );
-        
+        // Image update activity logging removed
+
         onImageUpdated(response);
         onClose();
         setSelectedFile(null);
@@ -176,8 +179,14 @@ function EditImageModalForm({
     { value: "exterior", label: params.categoryExterior || "Εξωτερικές Όψεις" },
     { value: "interior", label: params.categoryInterior || "Εσωτερικές Όψεις" },
     { value: "systems", label: params.categorySystems || "Συστήματα Κτιρίου" },
-    { value: "construction", label: params.categoryConstruction || "Κατασκευαστικά Στοιχεία" },
-    { value: "documentation", label: params.categoryDocumentation || "Τεκμηρίωση" },
+    {
+      value: "construction",
+      label: params.categoryConstruction || "Κατασκευαστικά Στοιχεία",
+    },
+    {
+      value: "documentation",
+      label: params.categoryDocumentation || "Τεκμηρίωση",
+    },
     { value: "other", label: params.categoryOther || "Άλλα" },
   ];
 
@@ -211,7 +220,8 @@ function EditImageModalForm({
           {/* File Upload */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {params.newImage || "Νέα Εικόνα"} ({params.optional || "προαιρετικό"})
+              {params.newImage || "Νέα Εικόνα"} (
+              {params.optional || "προαιρετικό"})
             </label>
             <input
               type="file"
@@ -290,9 +300,7 @@ export default function EditImageModal({
 }) {
   const { language } = useLanguage();
   const params =
-    language === "en"
-      ? english_text.EditImageModal
-      : greek_text.EditImageModal;
+    language === "en" ? english_text.EditImageModal : greek_text.EditImageModal;
 
   return (
     <EditImageModalForm

@@ -14,6 +14,7 @@ import {
   FaThermometerHalf,
   FaCubes,
   FaBuilding,
+  FaTools,
 } from "react-icons/fa";
 import { IoHome, IoFolderOpen, IoFolder } from "react-icons/io5";
 
@@ -62,7 +63,7 @@ export default function Sidenav() {
         const response = await fetch("http://127.0.0.1:8000/projects/get/", {
           method: "GET",
           headers: {
-            Authorization: `token ${token}`,
+            Authorization: `Token ${token}`,
             "Content-Type": "application/json",
           },
         });
@@ -221,7 +222,7 @@ export default function Sidenav() {
                     onClick={() => navigate("/admin")}
                     className="admin-submenu-item flex items-center py-2 px-3 text-sm text-primary hover:text-primary-bold cursor-pointer">
                     <FaUserShield className="mr-2 text-xs" />
-                    <span>Admin Dashboard</span>
+                    <span>{params.adminDashboard}</span>
                   </div>
                   <div
                     onClick={() => navigate("/admin/prefectures")}
@@ -229,11 +230,10 @@ export default function Sidenav() {
                     <FaMapMarkerAlt className="mr-2 text-xs" />
                     <span>{params.prefectures}</span>
                   </div>
-
                   <div
                     onClick={() => navigate("/admin/materials")}
                     className="admin-submenu-item flex items-center py-2 px-3 text-sm text-primary hover:text-primary-bold cursor-pointer">
-                    <FaCubes className="mr-2 text-xs" />
+                    <FaTools className="mr-2 text-xs" />
                     <span>{params.materials}</span>
                   </div>
                 </div>

@@ -154,6 +154,7 @@ class AirConditioningAnalysis(models.Model):
         db_table = 'air_conditioning_analysis'
         verbose_name = 'Ανάλυση Κλιματιστικών'
         verbose_name_plural = 'Αναλύσεις Κλιματιστικών'
+        unique_together = [['building', 'project']]
 
     def save(self, *args, **kwargs):
         """Αυτόματος υπολογισμός αποτελεσμάτων"""

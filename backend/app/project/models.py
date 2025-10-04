@@ -133,8 +133,8 @@ class Project(models.Model):
         overall_systems_progress = round((total_systems_completed / total_systems_required) * 100, 1) if total_systems_required > 0 else 0
         overall_scenarios_progress = round((total_scenarios_completed / total_scenarios_required) * 100, 1) if total_scenarios_required > 0 else 0
         
-        # Project can be submitted if all buildings are complete
-        can_submit = all(building['is_complete'] for building in buildings_progress)
+        # Project can be submitted at any time (regardless of completion)
+        can_submit = True
         
         return {
             'total_buildings': total_buildings,

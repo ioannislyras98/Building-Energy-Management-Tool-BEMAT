@@ -44,6 +44,11 @@ class CoolingSystem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    class Meta:
+        verbose_name = "Σύστημα Ψύξης"
+        verbose_name_plural = "Συστήματα Ψύξης"
+        unique_together = [['building', 'user']]
+    
     def __str__(self):
         system_type = self.cooling_system_type if self.cooling_system_type else "Unknown Type"
         return f"Cooling System for {self.building.name} - {system_type}"

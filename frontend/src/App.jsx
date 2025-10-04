@@ -12,9 +12,8 @@ import PageNotFound from "./pages/PageNotFound";
 import BuildingProfilePage from "./pages/BuildingProfilePage";
 import UnauthorizedAccess from "./pages/UnauthorizedAccess";
 import AdminDashboard from "./pages/AdminDashboard";
-import AdminPrefectures from "./pages/admin/AdminPrefectures";
-import AdminThermalZones from "./pages/admin/AdminThermalZones";
 import AdminMaterials from "./pages/admin/AdminMaterials";
+import AdminPrefectures from "./pages/admin/AdminPrefectures";
 import Settings from "./pages/Settings";
 
 import "./App.css";
@@ -44,12 +43,8 @@ function App() {
                 element={<BuildingProfilePage />}
               />
               <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/prefectures" element={<AdminPrefectures />} />
-              <Route
-                path="/admin/thermal-zones"
-                element={<AdminThermalZones />}
-              />
               <Route path="/admin/materials" element={<AdminMaterials />} />
+              <Route path="/admin/prefectures" element={<AdminPrefectures />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
           </Route>

@@ -92,5 +92,10 @@ class SolarCollector(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    class Meta:
+        verbose_name = "Ηλιακός Συλλέκτης"
+        verbose_name_plural = "Ηλιακοί Συλλέκτες"
+        unique_together = [['building', 'user']]
+    
     def __str__(self):
         return f"Solar Collector for {self.building} - {self.uuid}"

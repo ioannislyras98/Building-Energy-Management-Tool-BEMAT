@@ -32,12 +32,17 @@ urlpatterns = [
     path('automatic_lighting_control/', include('automaticLightingControl.urls')),
     path('boiler_replacement/', include('boilerReplacement.urls')),
     path('', include('buildingImages.urls')),
-    path('', include('buildingActivity.urls')),
     
     # Admin endpoints
     path('admin-api/dashboard-stats/', admin_views.admin_dashboard_stats, name='admin_dashboard_stats'),
     path('admin-api/users/', admin_views.admin_users_list, name='admin_users_list'),
     path('admin-api/users/<uuid:user_uuid>/', admin_views.admin_user_detail, name='admin_user_detail'),
+    
+    # Admin table management endpoints
+    path('admin-api/users-table/', admin_views.admin_users_table, name='admin_users_table'),
+    path('admin-api/projects-table/', admin_views.admin_projects_table, name='admin_projects_table'),
+    path('admin-api/users/bulk-delete/', admin_views.admin_bulk_delete_users, name='admin_bulk_delete_users'),
+    path('admin-api/projects/bulk-delete/', admin_views.admin_bulk_delete_projects, name='admin_bulk_delete_projects'),
 ]
 
 # Serve media files during development

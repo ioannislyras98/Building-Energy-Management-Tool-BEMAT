@@ -37,5 +37,10 @@ class DomesticHotWaterSystem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    class Meta:
+        verbose_name = "Σύστημα Ζεστού Νερού Χρήσης"
+        verbose_name_plural = "Συστήματα Ζεστού Νερού Χρήσης"
+        unique_together = [['building', 'user']]
+    
     def __str__(self):
         return f"Domestic Hot Water System for {self.building} - {self.uuid}"

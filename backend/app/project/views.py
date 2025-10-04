@@ -173,14 +173,8 @@ def submit_project(request, uuid):
         if not has_access_permission(request.user, project):
             return standard_error_response("Access denied: You do not own this project", status.HTTP_403_FORBIDDEN)
         
-        # Check if project can be submitted
-        completion_status = project.get_completion_status()
-        
-        if not completion_status['can_submit']:
-            return standard_error_response(
-                "Cannot submit project. All buildings must have completed systems and scenarios.",
-                status.HTTP_400_BAD_REQUEST
-            )
+        # Allow project submission at any time without validation
+        # Removed completion status check to allow flexible submission
         
         # Submit the project
         project.is_submitted = True

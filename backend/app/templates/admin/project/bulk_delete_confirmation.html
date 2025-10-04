@@ -1,0 +1,316 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block title %}{% trans "Bulk Delete Projects" %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    .bulk-delete-container {
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 20px;
+    }
+    
+    .confirmation-header {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .warning-box {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 15px 0;
+        color: #856404;
+    }
+    
+    .error-box {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 15px 0;
+        color: #721c24;
+    }
+    
+    .projects-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .projects-table th {
+        background: #007cba;
+        color: white;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid #005a87;
+    }
+    
+    .projects-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #eee;
+        vertical-align: top;
+    }
+    
+    .projects-table tr:nth-child(even) {
+        background: #f8f9fa;
+    }
+    
+    .projects-table tr:hover {
+        background: #e3f2fd;
+    }
+    
+    .project-uuid {
+        font-family: monospace;
+        font-size: 0.85em;
+        color: #666;
+    }
+    
+    .project-name {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .user-info {
+        font-size: 0.9em;
+        color: #555;
+    }
+    
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        font-weight: 500;
+    }
+    
+    .status-submitted {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-draft {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .action-buttons {
+        margin-top: 20px;
+        text-align: right;
+        border-top: 1px solid #dee2e6;
+        padding-top: 20px;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        margin: 0 5px;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s;
+    }
+    
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #c82333;
+        transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background: #545b62;
+        transform: translateY(-1px);
+    }
+    
+    .summary-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+    }
+    
+    .stat-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 15px;
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 24px;
+        font-weight: bold;
+        color: #007cba;
+    }
+    
+    .stat-label {
+        font-size: 12px;
+        color: #666;
+        text-transform: uppercase;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bulk-delete-container">
+    <div class="confirmation-header">
+        <h1>🗑️ {% trans "Bulk Delete Projects" %}</h1>
+        <p>{% trans "You are about to delete the following projects. This action cannot be undone." %}</p>
+    </div>
+
+    <div class="error-box">
+        <strong>⚠️ {% trans "Warning!" %}</strong><br>
+        {% trans "This will permanently delete all selected projects and their associated data including:" %}
+        <ul>
+            <li>{% trans "All buildings in these projects" %}</li>
+            <li>{% trans "All energy consumption data" %}</li>
+            <li>{% trans "All system configurations" %}</li>
+            <li>{% trans "All scenario calculations" %}</li>
+            <li>{% trans "All uploaded images" %}</li>
+        </ul>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="summary-stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ projects_count }}</div>
+            <div class="stat-label">{% trans "Projects to Delete" %}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">
+                {% for project in queryset %}
+                    {{ project.buildings.count|add:0 }}
+                    {% if not forloop.last %}+{% endif %}
+                {% endfor %}
+            </div>
+            <div class="stat-label">{% trans "Total Buildings" %}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">
+                {{ queryset|length }}
+            </div>
+            <div class="stat-label">{% trans "Users Affected" %}</div>
+        </div>
+    </div>
+
+    <!-- Projects Table -->
+    <table class="projects-table">
+        <thead>
+            <tr>
+                <th>{% trans "UUID" %}</th>
+                <th>{% trans "Project Name" %}</th>
+                <th>{% trans "Owner" %}</th>
+                <th>{% trans "Created" %}</th>
+                <th>{% trans "Status" %}</th>
+                <th>{% trans "Buildings" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in queryset %}
+            <tr>
+                <td>
+                    <code class="project-uuid">{{ project.uuid|truncatechars:13 }}</code>
+                </td>
+                <td>
+                    <div class="project-name">{{ project.name }}</div>
+                </td>
+                <td>
+                    <div class="user-info">
+                        <strong>{{ project.user.username }}</strong><br>
+                        <small>{{ project.user.email }}</small>
+                    </div>
+                </td>
+                <td>
+                    {{ project.date_created|date:"M d, Y" }}<br>
+                    <small>{{ project.date_created|time:"H:i" }}</small>
+                </td>
+                <td>
+                    {% if project.is_submitted %}
+                        <span class="status-badge status-submitted">✅ {% trans "Submitted" %}</span>
+                    {% else %}
+                        <span class="status-badge status-draft">📝 {% trans "Draft" %}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <strong>{{ project.buildings.count }}</strong> {% trans "buildings" %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 40px; color: #666;">
+                    {% trans "No projects selected for deletion." %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Confirmation Form -->
+    <form method="post">
+        {% csrf_token %}
+        {% for project in queryset %}
+            <input type="hidden" name="_selected_action" value="{{ project.pk }}">
+        {% endfor %}
+        <input type="hidden" name="action" value="{{ action }}">
+        
+        <div class="action-buttons">
+            <a href="{% url 'admin:project_project_changelist' %}" class="btn btn-secondary">
+                ← {% trans "Cancel" %}
+            </a>
+            <button type="submit" name="confirm_delete" value="1" class="btn btn-danger" 
+                    onclick="return confirm('{% trans "Are you absolutely sure you want to delete these projects?" %}')">
+                🗑️ {% trans "Yes, delete" %} {{ projects_count }} {% trans "projects" %}
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add confirmation dialog
+    const deleteButton = document.querySelector('button[name="confirm_delete"]');
+    if (deleteButton) {
+        deleteButton.addEventListener('click', function(e) {
+            const confirmed = confirm(
+                `Are you absolutely sure you want to delete {{ projects_count }} projects?\n\n` +
+                `This action cannot be undone and will delete:\n` +
+                `- All project data\n` +
+                `- All buildings\n` +
+                `- All energy consumption records\n` +
+                `- All scenarios and calculations\n` +
+                `- All uploaded images`
+            );
+            
+            if (!confirmed) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}

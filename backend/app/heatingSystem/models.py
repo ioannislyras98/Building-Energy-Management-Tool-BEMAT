@@ -76,5 +76,10 @@ class HeatingSystem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    class Meta:
+        verbose_name = "Σύστημα Θέρμανσης"
+        verbose_name_plural = "Συστήματα Θέρμανσης"
+        unique_together = [['building', 'user']]
+    
     def __str__(self):
         return f"Heating System {self.uuid} - {self.building}"

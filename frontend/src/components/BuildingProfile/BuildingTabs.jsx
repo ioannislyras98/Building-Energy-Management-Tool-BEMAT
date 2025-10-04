@@ -6,7 +6,6 @@ import ElectricalConsumptionTabContent from "./ElectricalConsumptionTabContent";
 import ScenariosTabContent from "./ScenariosTabContent";
 import ResultsTabContent from "./ResultsTabContent";
 import ImagesTabContent from "./ImagesTabContent";
-import ActivityTabContent from "./ActivityTabContent";
 import { AdminContext, ResourceContextProvider, Resource } from "react-admin";
 import { defaultTheme } from "../../utils/theme";
 const dataProvider = {
@@ -36,7 +35,6 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData }) => {
     params.scenarios,
     params.results,
     params.images,
-    params.activity,
   ];
   const energyProfileParams = {
     content: params?.energyProfileContent,
@@ -140,15 +138,6 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData }) => {
                 buildingUuid={buildingUuid}
                 projectUuid={projectUuid}
                 buildingData={buildingData}
-                params={params}
-              />
-            </div>
-          )}
-          {activeTab === 7 && (
-            <div className="animate-fadeIn">
-              <ActivityTabContent
-                building={buildingData}
-                project={{ uuid: projectUuid }}
                 params={params}
               />
             </div>

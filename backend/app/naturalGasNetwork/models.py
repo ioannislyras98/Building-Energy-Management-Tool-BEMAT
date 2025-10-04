@@ -49,6 +49,9 @@ class NaturalGasNetwork(models.Model):
     
     class Meta:
         db_table = 'natural_gas_network'
+        verbose_name = "Δίκτυο Φυσικού Αερίου"
+        verbose_name_plural = "Δίκτυα Φυσικού Αερίου"
+        unique_together = [['building', 'project']]
         verbose_name = 'Natural Gas Network'
         verbose_name_plural = 'Natural Gas Networks'
         ordering = ['-created_at']
