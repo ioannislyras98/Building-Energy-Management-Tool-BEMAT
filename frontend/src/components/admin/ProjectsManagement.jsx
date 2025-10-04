@@ -22,6 +22,8 @@ const ProjectsManagement = () => {
     sort_by: "-date_created",
     is_submitted: "",
     user_id: "",
+    date_from: "",
+    date_to: "",
   });
   const [pagination, setPagination] = useState(null);
 
@@ -126,7 +128,23 @@ const ProjectsManagement = () => {
   const columns = [
     {
       key: "select",
-      title: "",
+      title: (
+        <input
+          type="checkbox"
+          checked={projects && projects.length > 0 && projects.every(project => selectedProjects.includes(project.id))}
+          onChange={(e) => {
+            if (projects && projects.length > 0) {
+              const filteredProjectIds = projects.map(project => project.id);
+              if (e.target.checked) {
+                setSelectedProjects(prev => [...new Set([...prev, ...filteredProjectIds])]);
+              } else {
+                setSelectedProjects(prev => prev.filter(id => !filteredProjectIds.includes(id)));
+              }
+            }
+          }}
+          className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+        />
+      ),
       width: "50px",
       render: (project) => (
         <input
@@ -141,7 +159,7 @@ const ProjectsManagement = () => {
               );
             }
           }}
-          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
         />
       ),
     },
@@ -167,7 +185,7 @@ const ProjectsManagement = () => {
       render: (project) => (
         <div className="flex items-center">
           <div className="flex-shrink-0 h-8 w-8">
-            <div className="h-8 w-8 rounded-full bg-gray-500 flex items-center justify-center">
+            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
               <span className="text-xs font-medium text-white">
                 {project.user?.email?.charAt(0).toUpperCase()}
               </span>
@@ -191,7 +209,7 @@ const ProjectsManagement = () => {
           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
             project.is_submitted
               ? "bg-green-100 text-green-800"
-              : "bg-yellow-100 text-yellow-800"
+              : "bg-primary-light text-primary-bold"
           }`}>
           {project.is_submitted ? "✅" : "📝"}{" "}
           {project.is_submitted
@@ -206,7 +224,7 @@ const ProjectsManagement = () => {
       sortable: true,
       render: (project) => (
         <div className="flex items-center">
-          <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">
+          <span className="inline-flex items-center justify-center w-6 h-6 bg-primary-light text-primary-bold text-xs font-bold rounded-full">
             {project.buildings_count || 0}
           </span>
         </div>
@@ -247,6 +265,23 @@ const ProjectsManagement = () => {
         </div>
       ),
     },
+    {
+      key: "actions",
+      title: language === "en" ? "Actions" : "Ενέργειες",
+      width: "120px",
+      render: (project) => (
+        <div className="flex items-center justify-end">
+          <button
+            onClick={() => handleDeleteProject(project)}
+            className="text-primary hover:text-primary-bold transition-colors duration-200"
+            title={language === "en" ? "Delete Project" : "Διαγραφή Έργου"}>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      ),
+    },
   ];
 
   const filterComponents = (
@@ -256,22 +291,48 @@ const ProjectsManagement = () => {
         placeholder={translations?.searchPlaceholder || "Search projects..."}
         value={filters.search}
         onChange={(e) => handleFilterChange({ search: e.target.value })}
-        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
       />
 
       <select
         value={filters.is_submitted}
         onChange={(e) => handleFilterChange({ is_submitted: e.target.value })}
-        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
         <option value="">{translations?.allStatus || "All Status"}</option>
         <option value="true">{translations?.submitted || "Submitted"}</option>
         <option value="false">{translations?.draft || "Draft"}</option>
       </select>
+
+      <div className="flex items-center gap-2">
+        <label className="text-sm font-medium text-gray-700">
+          {translations?.dateFrom || "From Date"}:
+        </label>
+        <input
+          type="date"
+          value={filters.date_from}
+          onChange={(e) => handleFilterChange({ date_from: e.target.value })}
+          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+      </div>
+
+      <div className="flex items-center gap-2">
+        <label className="text-sm font-medium text-gray-700">
+          {translations?.dateTo || "To Date"}:
+        </label>
+        <input
+          type="date"
+          value={filters.date_to}
+          onChange={(e) => handleFilterChange({ date_to: e.target.value })}
+          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+      </div>
+
+
     </div>
   );
 
   const bulkActions = selectedProjects.length > 0 && (
-    <div className="mb-4 flex items-center justify-between bg-blue-50 p-4 rounded-lg">
+    <div className="mb-4 flex items-center justify-between bg-primary-light p-4 rounded-lg">
       <span className="text-sm text-gray-700">
         {selectedProjects.length}{" "}
         {translations?.selectedProjects || "projects selected"}
@@ -283,6 +344,17 @@ const ProjectsManagement = () => {
       </button>
     </div>
   );
+
+  // Action handlers
+  const handleDeleteProject = async (project) => {
+    if (window.confirm(`${language === "en" ? "Are you sure you want to delete project" : "Είστε σίγουροι ότι θέλετε να διαγράψετε το έργο"} "${project.name}"?`)) {
+      try {
+        await handleBulkDelete([project.id]);
+      } catch (error) {
+        console.error("Error deleting project:", error);
+      }
+    }
+  };
 
   if (error) {
     return (

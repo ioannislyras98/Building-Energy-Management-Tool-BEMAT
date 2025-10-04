@@ -141,7 +141,7 @@ const DataTable = ({
                   onClick={() => onPageChange(page)}
                   className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                     page === current_page
-                      ? "z-10 bg-blue-50 border-blue-500 text-blue-600"
+                      ? "z-10 bg-primary-light border-primary text-primary-bold"
                       : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                   }`}>
                   {page}
@@ -233,7 +233,7 @@ const DataTable = ({
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {data.map((item, index) => (
-              <tr key={item.id || index} className="hover:bg-gray-50">
+              <tr key={item.id || index} className="table-row-hover">
                 {columns.map((column) => (
                   <td
                     key={`${item.id || index}-${column.key}`}

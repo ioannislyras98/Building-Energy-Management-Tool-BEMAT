@@ -89,7 +89,7 @@ const AdminStats = () => {
     <div className={`bg-white rounded-lg shadow p-6 border-l-4 ${color}`}>
       <div className="flex items-center">
         <div className="flex-shrink-0">
-          <span className="text-2xl">{icon}</span>
+          <span className="text-2xl text-primary">{icon}</span>
         </div>
         <div className="ml-5 w-0 flex-1">
           <dl>

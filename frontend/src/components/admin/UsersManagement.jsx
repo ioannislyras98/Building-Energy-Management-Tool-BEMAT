@@ -22,6 +22,8 @@ const UsersManagement = () => {
     sort_by: "-date_joined",
     is_active: "",
     is_staff: "",
+    date_from: "",
+    date_to: "",
   });
   const [pagination, setPagination] = useState(null);
 
@@ -126,7 +128,23 @@ const UsersManagement = () => {
   const columns = [
     {
       key: "select",
-      title: "",
+      title: (
+        <input
+          type="checkbox"
+          checked={users && users.length > 0 && users.every(user => selectedUsers.includes(user.id))}
+          onChange={(e) => {
+            if (users && users.length > 0) {
+              const filteredUserIds = users.map(user => user.id);
+              if (e.target.checked) {
+                setSelectedUsers(prev => [...new Set([...prev, ...filteredUserIds])]);
+              } else {
+                setSelectedUsers(prev => prev.filter(id => !filteredUserIds.includes(id)));
+              }
+            }
+          }}
+          className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+        />
+      ),
       width: "50px",
       render: (user) => (
         <input
@@ -139,7 +157,7 @@ const UsersManagement = () => {
               setSelectedUsers(selectedUsers.filter((id) => id !== user.id));
             }
           }}
-          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
         />
       ),
     },
@@ -150,7 +168,7 @@ const UsersManagement = () => {
       render: (user) => (
         <div className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10">
-            <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
               <span className="text-sm font-medium text-white">
                 {user.email?.charAt(0).toUpperCase()}
               </span>
@@ -180,7 +198,7 @@ const UsersManagement = () => {
           );
         } else if (user.is_staff) {
           return (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-light text-primary-bold">
               👔 {translations?.staff || "Staff"}
             </span>
           );
@@ -212,7 +230,7 @@ const UsersManagement = () => {
           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
             user.is_active
               ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
+              : "bg-primary-light text-primary-bold"
           }`}>
           {user.is_active ? "✅" : "❌"}{" "}
           {user.is_active
@@ -236,6 +254,23 @@ const UsersManagement = () => {
         </div>
       ),
     },
+    {
+      key: "actions",
+      title: language === "en" ? "Actions" : "Ενέργειες",
+      width: "120px",
+      render: (user) => (
+        <div className="flex items-center justify-end">
+          <button
+            onClick={() => handleDeleteUser(user)}
+            className="text-primary hover:text-primary-bold transition-colors duration-200"
+            title={language === "en" ? "Delete User" : "Διαγραφή Χρήστη"}>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      ),
+    },
   ];
 
   const filterComponents = (
@@ -245,13 +280,13 @@ const UsersManagement = () => {
         placeholder={translations?.searchPlaceholder || "Search users..."}
         value={filters.search}
         onChange={(e) => handleFilterChange({ search: e.target.value })}
-        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
       />
 
       <select
         value={filters.is_active}
         onChange={(e) => handleFilterChange({ is_active: e.target.value })}
-        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
         <option value="">
           {translations?.allActive || "All Active Status"}
         </option>
@@ -262,18 +297,44 @@ const UsersManagement = () => {
       <select
         value={filters.is_staff}
         onChange={(e) => handleFilterChange({ is_staff: e.target.value })}
-        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
         <option value="">{translations?.allRoles || "All Roles"}</option>
         <option value="true">{translations?.staff || "Staff"}</option>
         <option value="false">
           {translations?.regularUsers || "Regular Users"}
         </option>
       </select>
+
+      <div className="flex items-center gap-2">
+        <label className="text-sm font-medium text-gray-700">
+          {translations?.dateFrom || "From Date"}:
+        </label>
+        <input
+          type="date"
+          value={filters.date_from}
+          onChange={(e) => handleFilterChange({ date_from: e.target.value })}
+          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+      </div>
+
+      <div className="flex items-center gap-2">
+        <label className="text-sm font-medium text-gray-700">
+          {translations?.dateTo || "To Date"}:
+        </label>
+        <input
+          type="date"
+          value={filters.date_to}
+          onChange={(e) => handleFilterChange({ date_to: e.target.value })}
+          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+      </div>
+
+
     </div>
   );
 
   const bulkActions = selectedUsers.length > 0 && (
-    <div className="mb-4 flex items-center justify-between bg-blue-50 p-4 rounded-lg">
+    <div className="mb-4 flex items-center justify-between bg-primary-light p-4 rounded-lg">
       <span className="text-sm text-gray-700">
         {selectedUsers.length} {translations?.selectedUsers || "users selected"}
       </span>
@@ -284,6 +345,17 @@ const UsersManagement = () => {
       </button>
     </div>
   );
+
+  // Action handlers
+  const handleDeleteUser = async (user) => {
+    if (window.confirm(`${language === "en" ? "Are you sure you want to delete user" : "Είστε σίγουροι ότι θέλετε να διαγράψετε τον χρήστη"} ${user.email}?`)) {
+      try {
+        await handleBulkDelete([user.id]);
+      } catch (error) {
+        console.error("Error deleting user:", error);
+      }
+    }
+  };
 
   if (error) {
     return (

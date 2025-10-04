@@ -182,6 +182,8 @@ def admin_users_table(request):
         sort_by = request.GET.get('sort_by', '-date_joined')
         is_active_filter = request.GET.get('is_active')
         is_staff_filter = request.GET.get('is_staff')
+        date_from = request.GET.get('date_from')
+        date_to = request.GET.get('date_to')
         
         # Build query
         queryset = User.objects.all()
@@ -194,13 +196,22 @@ def admin_users_table(request):
                 Q(last_name__icontains=search)
             )
         
-        # Apply filters
-        # Note: User model doesn't have is_active field, skip this filter
-        # if is_active_filter is not None:
-        #     queryset = queryset.filter(is_active=is_active_filter.lower() == 'true')
+        # Apply filters  
+        # Use last_login to determine if user is "active" (has logged in at least once)
+        if is_active_filter is not None:
+            if is_active_filter.lower() == 'true':
+                queryset = queryset.filter(last_login__isnull=False)
+            else:
+                queryset = queryset.filter(last_login__isnull=True)
         
         if is_staff_filter is not None:
             queryset = queryset.filter(is_staff=is_staff_filter.lower() == 'true')
+        
+        # Apply date filters
+        if date_from:
+            queryset = queryset.filter(date_joined__date__gte=date_from)
+        if date_to:
+            queryset = queryset.filter(date_joined__date__lte=date_to)
         
         # Add annotations
         queryset = queryset.annotate(
@@ -231,7 +242,7 @@ def admin_users_table(request):
                 'username': user.email,  # Use email as username since no username field exists
                 'first_name': user.first_name,
                 'last_name': user.last_name,
-                'is_active': True,  # All users are active by default (no is_active field)
+                'is_active': user.last_login is not None,  # Active if has logged in at least once
                 'is_staff': user.is_staff,
                 'is_superuser': user.is_superuser,
                 'date_joined': user.date_joined.isoformat() if user.date_joined else None,
@@ -277,6 +288,8 @@ def admin_projects_table(request):
         sort_by = request.GET.get('sort_by', '-date_created')
         is_submitted_filter = request.GET.get('is_submitted')
         user_id_filter = request.GET.get('user_id')
+        date_from = request.GET.get('date_from')
+        date_to = request.GET.get('date_to')
         
         # Build query
         queryset = Project.objects.select_related('user')
@@ -295,6 +308,12 @@ def admin_projects_table(request):
         
         if user_id_filter:
             queryset = queryset.filter(user__uuid=user_id_filter)
+        
+        # Apply date filters
+        if date_from:
+            queryset = queryset.filter(date_created__date__gte=date_from)
+        if date_to:
+            queryset = queryset.filter(date_created__date__lte=date_to)
         
         # Note: buildings_count is already a field in the Project model, no annotation needed
         

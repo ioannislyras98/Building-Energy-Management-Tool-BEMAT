@@ -1608,7 +1608,16 @@
     "superuser": "Superuser",
     "staff": "Staff",
     "user": "User",
-    "deleteWarning": "This will permanently delete the selected users and all their associated data including projects, buildings, and calculations."
+    "deleteWarning": "This will permanently delete the selected users and all their associated data including projects, buildings, and calculations.",
+    "dateFrom": "From Date",
+    "dateTo": "To Date",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "allActive": "All Active Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "allRoles": "All Roles",
+    "noName": "No Name"
   },
   "AdminProjectsManagement": {
     "title": "Projects Management",
@@ -1628,7 +1637,11 @@
     "fuelCost": "Fuel Cost",
     "electricityCost": "Electricity Cost",
     "dateCreated": "Date Created",
-    "deleteWarning": "This will permanently delete the selected projects and all their associated data including buildings, energy consumption data, and calculations."
+    "deleteWarning": "This will permanently delete the selected projects and all their associated data including buildings, energy consumption data, and calculations.",
+    "dateFrom": "From Date",
+    "dateTo": "To Date",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All"
   },
   "DataTable": {
     "loading": "Loading...",
