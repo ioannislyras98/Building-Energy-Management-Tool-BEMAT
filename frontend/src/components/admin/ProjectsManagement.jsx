@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import Cookies from "universal-cookie";
-import BulkDeleteConfirmation from "./BulkDeleteConfirmation";
+import ConfirmationDialog from "../dialogs/ConfirmationDialog";
 import DataTable from "./DataTable";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
@@ -14,7 +14,9 @@ const ProjectsManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedProjects, setSelectedProjects] = useState([]);
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
   const [filters, setFilters] = useState({
     search: "",
     page: 1,
@@ -100,7 +102,7 @@ const ProjectsManagement = () => {
         // Refresh the projects list
         await fetchProjects();
         setSelectedProjects([]);
-        setShowDeleteConfirmation(false);
+        setBulkDeleteDialogOpen(false);
 
         // Show success message
         alert(`Successfully deleted ${data.data.deleted_count} projects`);
@@ -280,8 +282,8 @@ const ProjectsManagement = () => {
       render: (project) => (
         <div className="flex items-center justify-end">
           <button
-            onClick={() => handleDeleteProject(project)}
-            className="text-primary hover:text-primary-bold transition-colors duration-200"
+            onClick={() => handleDeleteProjectClick(project)}
+            className="text-red-600 hover:text-red-900 transition-colors duration-200"
             title={language === "en" ? "Delete Project" : "Διαγραφή Έργου"}>
             <svg
               className="w-4 h-4"
@@ -314,7 +316,7 @@ const ProjectsManagement = () => {
       <select
         value={filters.is_submitted}
         onChange={(e) => handleFilterChange({ is_submitted: e.target.value })}
-        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+        className="px py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
         <option value="">{translations?.allStatus || "All Status"}</option>
         <option value="true">{translations?.submitted || "Submitted"}</option>
         <option value="false">{translations?.draft || "Draft"}</option>
@@ -353,7 +355,7 @@ const ProjectsManagement = () => {
         {translations?.selectedProjects || "projects selected"}
       </span>
       <button
-        onClick={() => setShowDeleteConfirmation(true)}
+        onClick={() => setBulkDeleteDialogOpen(true)}
         className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
         🗑️ {translations?.bulkDelete || "Bulk Delete"}
       </button>
@@ -361,22 +363,34 @@ const ProjectsManagement = () => {
   );
 
   // Action handlers
-  const handleDeleteProject = async (project) => {
-    if (
-      window.confirm(
-        `${
-          language === "en"
-            ? "Are you sure you want to delete project"
-            : "Είστε σίγουροι ότι θέλετε να διαγράψετε το έργο"
-        } "${project.name}"?`
-      )
-    ) {
-      try {
-        await handleBulkDelete([project.id]);
-      } catch (error) {
-        console.error("Error deleting project:", error);
-      }
+  const handleDeleteProjectClick = (project) => {
+    setProjectToDelete(project);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteProjectConfirm = async () => {
+    if (!projectToDelete) return;
+
+    try {
+      await handleBulkDelete([projectToDelete.id]);
+      setDeleteDialogOpen(false);
+      setProjectToDelete(null);
+    } catch (error) {
+      console.error("Error deleting project:", error);
     }
+  };
+
+  const handleDeleteDialogClose = () => {
+    setDeleteDialogOpen(false);
+    setProjectToDelete(null);
+  };
+
+  const handleBulkDeleteConfirm = async () => {
+    await handleBulkDelete(selectedProjects);
+  };
+
+  const handleBulkDeleteDialogClose = () => {
+    setBulkDeleteDialogOpen(false);
   };
 
   if (error) {
@@ -414,22 +428,57 @@ const ProjectsManagement = () => {
         emptyMessage={translations?.noProjects || "No projects found"}
       />
 
-      {showDeleteConfirmation && (
-        <BulkDeleteConfirmation
-          isOpen={showDeleteConfirmation}
-          onClose={() => setShowDeleteConfirmation(false)}
-          onConfirm={() => handleBulkDelete(selectedProjects)}
-          items={projects.filter((project) =>
-            selectedProjects.includes(project.id)
-          )}
-          itemType="projects"
-          titleField="name"
-          warningMessage={
-            translations?.deleteWarning ||
-            "This will permanently delete the selected projects and all their associated data including buildings, energy consumption data, and calculations."
-          }
-        />
-      )}
+      {/* Bulk Delete Confirmation */}
+      <ConfirmationDialog
+        open={bulkDeleteDialogOpen}
+        onClose={handleBulkDeleteDialogClose}
+        onConfirm={handleBulkDeleteConfirm}
+        title={
+          language === "en"
+            ? "Delete Selected Projects"
+            : "Διαγραφή Επιλεγμένων Έργων"
+        }
+        message={
+          selectedProjects.length > 0
+            ? `${
+                language === "en"
+                  ? `Are you sure you want to delete ${
+                      selectedProjects.length
+                    } selected project${
+                      selectedProjects.length !== 1 ? "s" : ""
+                    }? This will permanently delete all associated data including buildings, energy consumption data, and calculations.`
+                  : `Είστε βέβαιοι ότι θέλετε να διαγράψετε ${
+                      selectedProjects.length
+                    } επιλεγμέν${
+                      selectedProjects.length === 1 ? "ο έργο" : "α έργα"
+                    }? Αυτό θα διαγράψει μόνιμα όλα τα σχετικά δεδομένα συμπεριλαμβανομένων κτιρίων, δεδομένων κατανάλωσης ενέργειας και υπολογισμών.`
+              }`
+            : ""
+        }
+        confirmText={language === "en" ? "Delete All" : "Διαγραφή Όλων"}
+        cancelText={language === "en" ? "Cancel" : "Άκυρο"}
+        confirmColor="error"
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteDialogClose}
+        onConfirm={handleDeleteProjectConfirm}
+        title={language === "en" ? "Delete Project" : "Διαγραφή Έργου"}
+        message={
+          projectToDelete
+            ? `${
+                language === "en"
+                  ? "Are you sure you want to delete project"
+                  : "Είστε βέβαιοι ότι θέλετε να διαγράψετε το έργο"
+              } "${projectToDelete.name}"?`
+            : ""
+        }
+        confirmText={language === "en" ? "Delete" : "Διαγραφή"}
+        cancelText={language === "en" ? "Cancel" : "Άκυρο"}
+        confirmColor="error"
+      />
     </div>
   );
 };

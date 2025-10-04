@@ -180,7 +180,6 @@ def admin_users_table(request):
         page = int(request.GET.get('page', 1))
         per_page = int(request.GET.get('per_page', 25))
         sort_by = request.GET.get('sort_by', '-date_joined')
-        is_active_filter = request.GET.get('is_active')
         is_staff_filter = request.GET.get('is_staff')
         date_from = request.GET.get('date_from')
         date_to = request.GET.get('date_to')
@@ -196,14 +195,7 @@ def admin_users_table(request):
                 Q(last_name__icontains=search)
             )
         
-        # Apply filters  
-        # Use last_login to determine if user is "active" (has logged in at least once)
-        if is_active_filter is not None:
-            if is_active_filter.lower() == 'true':
-                queryset = queryset.filter(last_login__isnull=False)
-            else:
-                queryset = queryset.filter(last_login__isnull=True)
-        
+        # Apply filters
         if is_staff_filter is not None:
             queryset = queryset.filter(is_staff=is_staff_filter.lower() == 'true')
         
@@ -242,7 +234,7 @@ def admin_users_table(request):
                 'username': user.email,  # Use email as username since no username field exists
                 'first_name': user.first_name,
                 'last_name': user.last_name,
-                'is_active': user.last_login is not None,  # Active if has logged in at least once
+
                 'is_staff': user.is_staff,
                 'is_superuser': user.is_superuser,
                 'date_joined': user.date_joined.isoformat() if user.date_joined else None,
@@ -263,7 +255,6 @@ def admin_users_table(request):
             'filters': {
                 'search': search,
                 'sort_by': sort_by,
-                'is_active': is_active_filter,
                 'is_staff': is_staff_filter,
             }
         })

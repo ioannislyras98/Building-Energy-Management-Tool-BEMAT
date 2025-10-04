@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import Cookies from "universal-cookie";
-import BulkDeleteConfirmation from "./BulkDeleteConfirmation";
+import ConfirmationDialog from "../dialogs/ConfirmationDialog";
 import DataTable from "./DataTable";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
@@ -14,13 +14,14 @@ const UsersManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
   const [filters, setFilters] = useState({
     search: "",
     page: 1,
     per_page: 25,
     sort_by: "-date_joined",
-    is_active: "",
     is_staff: "",
     date_from: "",
     date_to: "",
@@ -100,7 +101,7 @@ const UsersManagement = () => {
         // Refresh the users list
         await fetchUsers();
         setSelectedUsers([]);
-        setShowDeleteConfirmation(false);
+        setBulkDeleteDialogOpen(false);
 
         // Show success message
         alert(`Successfully deleted ${data.data.deleted_count} users`);
@@ -230,24 +231,6 @@ const UsersManagement = () => {
       ),
     },
     {
-      key: "is_active",
-      title: translations?.active || "Active",
-      sortable: true,
-      render: (user) => (
-        <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            user.is_active
-              ? "bg-green-100 text-green-800"
-              : "bg-primary-light text-primary-bold"
-          }`}>
-          {user.is_active ? "✅" : "❌"}{" "}
-          {user.is_active
-            ? translations?.yes || "Yes"
-            : translations?.no || "No"}
-        </span>
-      ),
-    },
-    {
       key: "date_joined",
       title: translations?.dateJoined || "Date Joined",
       sortable: true,
@@ -269,8 +252,8 @@ const UsersManagement = () => {
       render: (user) => (
         <div className="flex items-center justify-end">
           <button
-            onClick={() => handleDeleteUser(user)}
-            className="text-primary hover:text-primary-bold transition-colors duration-200"
+            onClick={() => handleDeleteUserClick(user)}
+            className="text-red-600 hover:text-red-900 transition-colors duration-200"
             title={language === "en" ? "Delete User" : "Διαγραφή Χρήστη"}>
             <svg
               className="w-4 h-4"
@@ -299,17 +282,6 @@ const UsersManagement = () => {
         onChange={(e) => handleFilterChange({ search: e.target.value })}
         className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
       />
-
-      <select
-        value={filters.is_active}
-        onChange={(e) => handleFilterChange({ is_active: e.target.value })}
-        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
-        <option value="">
-          {translations?.allActive || "All Active Status"}
-        </option>
-        <option value="true">{translations?.active || "Active"}</option>
-        <option value="false">{translations?.inactive || "Inactive"}</option>
-      </select>
 
       <select
         value={filters.is_staff}
@@ -354,7 +326,7 @@ const UsersManagement = () => {
         {selectedUsers.length} {translations?.selectedUsers || "users selected"}
       </span>
       <button
-        onClick={() => setShowDeleteConfirmation(true)}
+        onClick={() => setBulkDeleteDialogOpen(true)}
         className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
         🗑️ {translations?.bulkDelete || "Bulk Delete"}
       </button>
@@ -362,22 +334,34 @@ const UsersManagement = () => {
   );
 
   // Action handlers
-  const handleDeleteUser = async (user) => {
-    if (
-      window.confirm(
-        `${
-          language === "en"
-            ? "Are you sure you want to delete user"
-            : "Είστε σίγουροι ότι θέλετε να διαγράψετε τον χρήστη"
-        } ${user.email}?`
-      )
-    ) {
-      try {
-        await handleBulkDelete([user.id]);
-      } catch (error) {
-        console.error("Error deleting user:", error);
-      }
+  const handleDeleteUserClick = (user) => {
+    setUserToDelete(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteUserConfirm = async () => {
+    if (!userToDelete) return;
+
+    try {
+      await handleBulkDelete([userToDelete.id]);
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
+    } catch (error) {
+      console.error("Error deleting user:", error);
     }
+  };
+
+  const handleDeleteDialogClose = () => {
+    setDeleteDialogOpen(false);
+    setUserToDelete(null);
+  };
+
+  const handleBulkDeleteConfirm = async () => {
+    await handleBulkDelete(selectedUsers);
+  };
+
+  const handleBulkDeleteDialogClose = () => {
+    setBulkDeleteDialogOpen(false);
   };
 
   if (error) {
@@ -414,20 +398,57 @@ const UsersManagement = () => {
         emptyMessage={translations?.noUsers || "No users found"}
       />
 
-      {showDeleteConfirmation && (
-        <BulkDeleteConfirmation
-          isOpen={showDeleteConfirmation}
-          onClose={() => setShowDeleteConfirmation(false)}
-          onConfirm={() => handleBulkDelete(selectedUsers)}
-          items={users.filter((user) => selectedUsers.includes(user.id))}
-          itemType="users"
-          titleField="email"
-          warningMessage={
-            translations?.deleteWarning ||
-            "This will permanently delete the selected users and all their associated data including projects and buildings."
-          }
-        />
-      )}
+      {/* Bulk Delete Confirmation */}
+      <ConfirmationDialog
+        open={bulkDeleteDialogOpen}
+        onClose={handleBulkDeleteDialogClose}
+        onConfirm={handleBulkDeleteConfirm}
+        title={
+          language === "en"
+            ? "Delete Selected Users"
+            : "Διαγραφή Επιλεγμένων Χρηστών"
+        }
+        message={
+          selectedUsers.length > 0
+            ? `${
+                language === "en"
+                  ? `Are you sure you want to delete ${
+                      selectedUsers.length
+                    } selected user${
+                      selectedUsers.length !== 1 ? "s" : ""
+                    }? This will permanently delete all their associated data including projects and buildings.`
+                  : `Είστε βέβαιοι ότι θέλετε να διαγράψετε ${
+                      selectedUsers.length
+                    } επιλεγμέν${
+                      selectedUsers.length === 1 ? "ο χρήστη" : "ους χρήστες"
+                    }? Αυτό θα διαγράψει μόνιμα όλα τα σχετικά δεδομένα τους συμπεριλαμβανομένων έργων και κτιρίων.`
+              }`
+            : ""
+        }
+        confirmText={language === "en" ? "Delete All" : "Διαγραφή Όλων"}
+        cancelText={language === "en" ? "Cancel" : "Άκυρο"}
+        confirmColor="error"
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteDialogClose}
+        onConfirm={handleDeleteUserConfirm}
+        title={language === "en" ? "Delete User" : "Διαγραφή Χρήστη"}
+        message={
+          userToDelete
+            ? `${
+                language === "en"
+                  ? "Are you sure you want to delete user"
+                  : "Είστε βέβαιοι ότι θέλετε να διαγράψετε τον χρήστη"
+              } "${userToDelete.email}"?`
+            : ""
+        }
+        confirmText={language === "en" ? "Delete" : "Διαγραφή"}
+        cancelText={language === "en" ? "Cancel" : "Άκυρο"}
+        confirmColor="error"
+      />
     </div>
   );
 };

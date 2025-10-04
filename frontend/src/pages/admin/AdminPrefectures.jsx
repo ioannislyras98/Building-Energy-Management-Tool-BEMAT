@@ -5,6 +5,7 @@ import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import Cookies from "universal-cookie";
 import InputEntryModal from "../../modals/shared/InputEntryModal";
+import ConfirmationDialog from "../../components/dialogs/ConfirmationDialog";
 import {
   FaPlus,
   FaEdit,
@@ -38,6 +39,13 @@ const AdminPrefectures = () => {
     direction: "asc",
   });
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Delete confirmation states
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [prefectureToDelete, setPrefectureToDelete] = useState(null);
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [selectedPrefectures, setSelectedPrefectures] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
 
   const { language } = useLanguage();
   const text =
@@ -202,28 +210,88 @@ const AdminPrefectures = () => {
     setShowAddModal(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm(text.deleteConfirm)) {
-      try {
-        const response = await fetch(
-          `http://127.0.0.1:8000/prefectures/${id}/`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Token ${token}`,
-            },
-          }
-        );
+  const handleDeleteClick = (prefecture) => {
+    setPrefectureToDelete(prefecture);
+    setDeleteDialogOpen(true);
+  };
 
-        if (response.ok) {
-          fetchPrefectures();
-        } else {
-          setError("Failed to delete prefecture");
+  const handleDeleteConfirm = async () => {
+    if (!prefectureToDelete) return;
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/prefectures/${
+          prefectureToDelete.uuid || prefectureToDelete.id
+        }/`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Token ${token}`,
+          },
         }
-      } catch (err) {
-        setError("Error deleting prefecture");
+      );
+
+      if (response.ok) {
+        fetchPrefectures();
+        setDeleteDialogOpen(false);
+        setPrefectureToDelete(null);
+      } else {
+        setError("Failed to delete prefecture");
       }
+    } catch (err) {
+      setError("Error deleting prefecture");
     }
+  };
+
+  const handleDeleteDialogClose = () => {
+    setDeleteDialogOpen(false);
+    setPrefectureToDelete(null);
+  };
+
+  // Bulk selection functions
+  const handleSelectAll = (checked) => {
+    setSelectAll(checked);
+    if (checked) {
+      setSelectedPrefectures(sortedPrefectures.map((p) => p.uuid || p.id));
+    } else {
+      setSelectedPrefectures([]);
+    }
+  };
+
+  const handleSelectPrefecture = (prefectureId, checked) => {
+    if (checked) {
+      setSelectedPrefectures([...selectedPrefectures, prefectureId]);
+    } else {
+      setSelectedPrefectures(
+        selectedPrefectures.filter((id) => id !== prefectureId)
+      );
+      setSelectAll(false);
+    }
+  };
+
+  const handleBulkDeleteConfirm = async () => {
+    try {
+      const deletePromises = selectedPrefectures.map((id) =>
+        fetch(`http://127.0.0.1:8000/prefectures/${id}/`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        })
+      );
+
+      await Promise.all(deletePromises);
+      fetchPrefectures();
+      setSelectedPrefectures([]);
+      setSelectAll(false);
+      setBulkDeleteDialogOpen(false);
+    } catch (err) {
+      setError("Error deleting prefectures");
+    }
+  };
+
+  const handleBulkDeleteDialogClose = () => {
+    setBulkDeleteDialogOpen(false);
   };
 
   // Sorting logic
@@ -328,6 +396,29 @@ const AdminPrefectures = () => {
         </div>
       </div>
 
+      {/* Bulk Actions */}
+      {selectedPrefectures.length > 0 && (
+        <div className="bg-white shadow-sm rounded-lg p-4 mb-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">
+              {language === "en"
+                ? `${selectedPrefectures.length} prefecture${
+                    selectedPrefectures.length !== 1 ? "s" : ""
+                  } selected`
+                : `${selectedPrefectures.length} νομ${
+                    selectedPrefectures.length === 1 ? "ός" : "οί"
+                  } επιλεγμέν${selectedPrefectures.length === 1 ? "ος" : "οι"}`}
+            </span>
+            <button
+              onClick={() => setBulkDeleteDialogOpen(true)}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200">
+              🗑️{" "}
+              {language === "en" ? "Delete Selected" : "Διαγραφή Επιλεγμένων"}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Table */}
       <div className="bg-white shadow-sm rounded-lg overflow-hidden">
         {searchTerm && (
@@ -353,6 +444,14 @@ const AdminPrefectures = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-6 py-3 text-left">
+                <input
+                  type="checkbox"
+                  checked={selectAll && sortedPrefectures.length > 0}
+                  onChange={(e) => handleSelectAll(e.target.checked)}
+                  className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                />
+              </th>
               <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200"
                 onClick={() => handleSort("name")}>
@@ -413,7 +512,7 @@ const AdminPrefectures = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {sortedPrefectures.length === 0 ? (
               <tr>
-                <td colSpan="4" className="px-6 py-12 text-center">
+                <td colSpan="5" className="px-6 py-12 text-center">
                   <div className="text-gray-500">
                     <FaMapMarkerAlt className="mx-auto h-8 w-8 text-gray-400 mb-4" />
                     <p className="text-lg font-medium">
@@ -440,6 +539,21 @@ const AdminPrefectures = () => {
                 <tr
                   key={prefecture.uuid || prefecture.id}
                   className="table-row-hover">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      checked={selectedPrefectures.includes(
+                        prefecture.uuid || prefecture.id
+                      )}
+                      onChange={(e) =>
+                        handleSelectPrefecture(
+                          prefecture.uuid || prefecture.id,
+                          e.target.checked
+                        )
+                      }
+                      className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                    />
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {prefecture.name}
                   </td>
@@ -475,10 +589,8 @@ const AdminPrefectures = () => {
                       <FaEdit />
                     </button>
                     <button
-                      onClick={() =>
-                        handleDelete(prefecture.uuid || prefecture.id)
-                      }
-                      className="text-primary hover:text-primary-bold transition-colors duration-200">
+                      onClick={() => handleDeleteClick(prefecture)}
+                      className="text-red-600 hover:text-red-900 transition-colors duration-200">
                       <FaTrash />
                     </button>
                   </td>
@@ -593,6 +705,58 @@ const AdminPrefectures = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteDialogClose}
+        onConfirm={handleDeleteConfirm}
+        title={language === "en" ? "Delete Prefecture" : "Διαγραφή Νομού"}
+        message={
+          prefectureToDelete
+            ? `${
+                language === "en"
+                  ? "Are you sure you want to delete"
+                  : "Είστε βέβαιοι ότι θέλετε να διαγράψετε τον νομό"
+              } "${prefectureToDelete.name}"?`
+            : ""
+        }
+        confirmText={language === "en" ? "Delete" : "Διαγραφή"}
+        cancelText={language === "en" ? "Cancel" : "Άκυρο"}
+        confirmColor="error"
+      />
+
+      {/* Bulk Delete Confirmation */}
+      <ConfirmationDialog
+        open={bulkDeleteDialogOpen}
+        onClose={handleBulkDeleteDialogClose}
+        onConfirm={handleBulkDeleteConfirm}
+        title={
+          language === "en"
+            ? "Delete Selected Prefectures"
+            : "Διαγραφή Επιλεγμένων Νομών"
+        }
+        message={
+          selectedPrefectures.length > 0
+            ? `${
+                language === "en"
+                  ? `Are you sure you want to delete ${
+                      selectedPrefectures.length
+                    } selected prefecture${
+                      selectedPrefectures.length !== 1 ? "s" : ""
+                    }?`
+                  : `Είστε βέβαιοι ότι θέλετε να διαγράψετε ${
+                      selectedPrefectures.length
+                    } επιλεγμέν${
+                      selectedPrefectures.length === 1 ? "ο νομό" : "ους νομούς"
+                    }?`
+              }`
+            : ""
+        }
+        confirmText={language === "en" ? "Delete All" : "Διαγραφή Όλων"}
+        cancelText={language === "en" ? "Cancel" : "Άκυρο"}
+        confirmColor="error"
+      />
     </div>
   );
 };

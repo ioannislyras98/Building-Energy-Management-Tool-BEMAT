@@ -14,6 +14,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import InputEntryModal from "../../modals/shared/InputEntryModal";
+import ConfirmationDialog from "../../components/dialogs/ConfirmationDialog";
 import "../../assets/styles/forms.css";
 
 const cookies = new Cookies();
@@ -39,6 +40,13 @@ const AdminMaterials = () => {
     description: "",
     is_active: true,
   });
+
+  // Delete confirmation states
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [materialToDelete, setMaterialToDelete] = useState(null);
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [selectedMaterials, setSelectedMaterials] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
 
   const { language } = useLanguage();
   const text = language === "en" ? english_text.SideBar : greek_text.SideBar;
@@ -253,31 +261,88 @@ const AdminMaterials = () => {
     setShowAddModal(true);
   };
 
-  const handleDelete = async (id) => {
-    if (
-      window.confirm(
-        language === "en"
-          ? "Are you sure you want to delete this material?"
-          : "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό το υλικό;"
-      )
-    ) {
-      try {
-        const response = await fetch(`http://127.0.0.1:8000/materials/${id}/`, {
+  const handleDeleteClick = (material) => {
+    setMaterialToDelete(material);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!materialToDelete) return;
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/materials/${
+          materialToDelete.uuid || materialToDelete.id
+        }/`,
+        {
           method: "DELETE",
           headers: {
             Authorization: `Token ${token}`,
           },
-        });
-
-        if (response.ok) {
-          fetchMaterials();
-        } else {
-          setError("Failed to delete material");
         }
-      } catch (err) {
-        setError("Error deleting material");
+      );
+
+      if (response.ok) {
+        fetchMaterials();
+        setDeleteDialogOpen(false);
+        setMaterialToDelete(null);
+      } else {
+        setError("Failed to delete material");
       }
+    } catch (err) {
+      setError("Error deleting material");
     }
+  };
+
+  const handleDeleteDialogClose = () => {
+    setDeleteDialogOpen(false);
+    setMaterialToDelete(null);
+  };
+
+  // Bulk selection functions
+  const handleSelectAll = (checked) => {
+    setSelectAll(checked);
+    if (checked) {
+      setSelectedMaterials(
+        filteredAndSortedMaterials.map((m) => m.uuid || m.id)
+      );
+    } else {
+      setSelectedMaterials([]);
+    }
+  };
+
+  const handleSelectMaterial = (materialId, checked) => {
+    if (checked) {
+      setSelectedMaterials([...selectedMaterials, materialId]);
+    } else {
+      setSelectedMaterials(selectedMaterials.filter((id) => id !== materialId));
+      setSelectAll(false);
+    }
+  };
+
+  const handleBulkDeleteConfirm = async () => {
+    try {
+      const deletePromises = selectedMaterials.map((id) =>
+        fetch(`http://127.0.0.1:8000/materials/${id}/`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        })
+      );
+
+      await Promise.all(deletePromises);
+      fetchMaterials();
+      setSelectedMaterials([]);
+      setSelectAll(false);
+      setBulkDeleteDialogOpen(false);
+    } catch (err) {
+      setError("Error deleting materials");
+    }
+  };
+
+  const handleBulkDeleteDialogClose = () => {
+    setBulkDeleteDialogOpen(false);
   };
 
   if (loading) {
@@ -353,6 +418,29 @@ const AdminMaterials = () => {
         </div>
       </div>
 
+      {/* Bulk Actions */}
+      {selectedMaterials.length > 0 && (
+        <div className="bg-white shadow-sm rounded-lg p-4 mb-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">
+              {language === "en"
+                ? `${selectedMaterials.length} material${
+                    selectedMaterials.length !== 1 ? "s" : ""
+                  } selected`
+                : `${selectedMaterials.length} υλικ${
+                    selectedMaterials.length === 1 ? "ό" : "ά"
+                  } επιλεγμέν${selectedMaterials.length === 1 ? "ο" : "α"}`}
+            </span>
+            <button
+              onClick={() => setBulkDeleteDialogOpen(true)}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200">
+              🗑️{" "}
+              {language === "en" ? "Delete Selected" : "Διαγραφή Επιλεγμένων"}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Materials List */}
       <div className="bg-white shadow-sm rounded-lg overflow-hidden">
         {searchTerm && (
@@ -378,6 +466,14 @@ const AdminMaterials = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-6 py-3 text-left">
+                <input
+                  type="checkbox"
+                  checked={selectAll && filteredAndSortedMaterials.length > 0}
+                  onChange={(e) => handleSelectAll(e.target.checked)}
+                  className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                />
+              </th>
               <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200"
                 onClick={() => handleSort("name")}>
@@ -430,7 +526,7 @@ const AdminMaterials = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredAndSortedMaterials.length === 0 ? (
               <tr>
-                <td colSpan="5" className="px-6 py-12 text-center">
+                <td colSpan="6" className="px-6 py-12 text-center">
                   <div className="text-gray-500">
                     <FaCubes className="mx-auto h-8 w-8 text-gray-400 mb-4" />
                     <p className="text-lg font-medium">
@@ -457,6 +553,21 @@ const AdminMaterials = () => {
                 <tr
                   key={material.uuid || material.id}
                   className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      checked={selectedMaterials.includes(
+                        material.uuid || material.id
+                      )}
+                      onChange={(e) =>
+                        handleSelectMaterial(
+                          material.uuid || material.id,
+                          e.target.checked
+                        )
+                      }
+                      className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                    />
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {material.name}
                   </td>
@@ -493,7 +604,7 @@ const AdminMaterials = () => {
                       <FaEdit />
                     </button>
                     <button
-                      onClick={() => handleDelete(material.uuid || material.id)}
+                      onClick={() => handleDeleteClick(material)}
                       className="text-red-600 hover:text-red-900 transition-colors duration-200">
                       <FaTrash />
                     </button>
@@ -635,6 +746,58 @@ const AdminMaterials = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteDialogClose}
+        onConfirm={handleDeleteConfirm}
+        title={language === "en" ? "Delete Material" : "Διαγραφή Υλικού"}
+        message={
+          materialToDelete
+            ? `${
+                language === "en"
+                  ? "Are you sure you want to delete"
+                  : "Είστε βέβαιοι ότι θέλετε να διαγράψετε το υλικό"
+              } "${materialToDelete.name}"?`
+            : ""
+        }
+        confirmText={language === "en" ? "Delete" : "Διαγραφή"}
+        cancelText={language === "en" ? "Cancel" : "Άκυρο"}
+        confirmColor="error"
+      />
+
+      {/* Bulk Delete Confirmation */}
+      <ConfirmationDialog
+        open={bulkDeleteDialogOpen}
+        onClose={handleBulkDeleteDialogClose}
+        onConfirm={handleBulkDeleteConfirm}
+        title={
+          language === "en"
+            ? "Delete Selected Materials"
+            : "Διαγραφή Επιλεγμένων Υλικών"
+        }
+        message={
+          selectedMaterials.length > 0
+            ? `${
+                language === "en"
+                  ? `Are you sure you want to delete ${
+                      selectedMaterials.length
+                    } selected material${
+                      selectedMaterials.length !== 1 ? "s" : ""
+                    }?`
+                  : `Είστε βέβαιοι ότι θέλετε να διαγράψετε ${
+                      selectedMaterials.length
+                    } επιλεγμέν${
+                      selectedMaterials.length === 1 ? "ο υλικό" : "α υλικά"
+                    }?`
+              }`
+            : ""
+        }
+        confirmText={language === "en" ? "Delete All" : "Διαγραφή Όλων"}
+        cancelText={language === "en" ? "Cancel" : "Άκυρο"}
+        confirmColor="error"
+      />
     </div>
   );
 };
