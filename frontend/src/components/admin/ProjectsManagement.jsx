@@ -131,14 +131,22 @@ const ProjectsManagement = () => {
       title: (
         <input
           type="checkbox"
-          checked={projects && projects.length > 0 && projects.every(project => selectedProjects.includes(project.id))}
+          checked={
+            projects &&
+            projects.length > 0 &&
+            projects.every((project) => selectedProjects.includes(project.id))
+          }
           onChange={(e) => {
             if (projects && projects.length > 0) {
-              const filteredProjectIds = projects.map(project => project.id);
+              const filteredProjectIds = projects.map((project) => project.id);
               if (e.target.checked) {
-                setSelectedProjects(prev => [...new Set([...prev, ...filteredProjectIds])]);
+                setSelectedProjects((prev) => [
+                  ...new Set([...prev, ...filteredProjectIds]),
+                ]);
               } else {
-                setSelectedProjects(prev => prev.filter(id => !filteredProjectIds.includes(id)));
+                setSelectedProjects((prev) =>
+                  prev.filter((id) => !filteredProjectIds.includes(id))
+                );
               }
             }
           }}
@@ -275,8 +283,17 @@ const ProjectsManagement = () => {
             onClick={() => handleDeleteProject(project)}
             className="text-primary hover:text-primary-bold transition-colors duration-200"
             title={language === "en" ? "Delete Project" : "Διαγραφή Έργου"}>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
             </svg>
           </button>
         </div>
@@ -326,8 +343,6 @@ const ProjectsManagement = () => {
           className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
-
-
     </div>
   );
 
@@ -347,7 +362,15 @@ const ProjectsManagement = () => {
 
   // Action handlers
   const handleDeleteProject = async (project) => {
-    if (window.confirm(`${language === "en" ? "Are you sure you want to delete project" : "Είστε σίγουροι ότι θέλετε να διαγράψετε το έργο"} "${project.name}"?`)) {
+    if (
+      window.confirm(
+        `${
+          language === "en"
+            ? "Are you sure you want to delete project"
+            : "Είστε σίγουροι ότι θέλετε να διαγράψετε το έργο"
+        } "${project.name}"?`
+      )
+    ) {
       try {
         await handleBulkDelete([project.id]);
       } catch (error) {

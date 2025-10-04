@@ -131,14 +131,22 @@ const UsersManagement = () => {
       title: (
         <input
           type="checkbox"
-          checked={users && users.length > 0 && users.every(user => selectedUsers.includes(user.id))}
+          checked={
+            users &&
+            users.length > 0 &&
+            users.every((user) => selectedUsers.includes(user.id))
+          }
           onChange={(e) => {
             if (users && users.length > 0) {
-              const filteredUserIds = users.map(user => user.id);
+              const filteredUserIds = users.map((user) => user.id);
               if (e.target.checked) {
-                setSelectedUsers(prev => [...new Set([...prev, ...filteredUserIds])]);
+                setSelectedUsers((prev) => [
+                  ...new Set([...prev, ...filteredUserIds]),
+                ]);
               } else {
-                setSelectedUsers(prev => prev.filter(id => !filteredUserIds.includes(id)));
+                setSelectedUsers((prev) =>
+                  prev.filter((id) => !filteredUserIds.includes(id))
+                );
               }
             }
           }}
@@ -264,8 +272,17 @@ const UsersManagement = () => {
             onClick={() => handleDeleteUser(user)}
             className="text-primary hover:text-primary-bold transition-colors duration-200"
             title={language === "en" ? "Delete User" : "Διαγραφή Χρήστη"}>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
             </svg>
           </button>
         </div>
@@ -328,8 +345,6 @@ const UsersManagement = () => {
           className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
-
-
     </div>
   );
 
@@ -348,7 +363,15 @@ const UsersManagement = () => {
 
   // Action handlers
   const handleDeleteUser = async (user) => {
-    if (window.confirm(`${language === "en" ? "Are you sure you want to delete user" : "Είστε σίγουροι ότι θέλετε να διαγράψετε τον χρήστη"} ${user.email}?`)) {
+    if (
+      window.confirm(
+        `${
+          language === "en"
+            ? "Are you sure you want to delete user"
+            : "Είστε σίγουροι ότι θέλετε να διαγράψετε τον χρήστη"
+        } ${user.email}?`
+      )
+    ) {
       try {
         await handleBulkDelete([user.id]);
       } catch (error) {
