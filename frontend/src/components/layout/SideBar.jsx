@@ -241,7 +241,11 @@ export default function Sidenav() {
                     onClick={() => navigate("/admin/numeric-values")}
                     className="admin-submenu-item flex items-center py-2 px-3 text-sm text-primary hover:text-primary-bold cursor-pointer">
                     <FaCalculator className="mr-2 text-xs" />
-                    <span>{language === "en" ? "Numeric Values" : "Αριθμητικές Τιμές"}</span>
+                    <span>
+                      {language === "en"
+                        ? "Numeric Values"
+                        : "Αριθμητικές Τιμές"}
+                    </span>
                   </div>
                 </div>
               )}

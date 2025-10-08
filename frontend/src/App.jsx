@@ -46,7 +46,10 @@ function App() {
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/materials" element={<AdminMaterials />} />
               <Route path="/admin/prefectures" element={<AdminPrefectures />} />
-              <Route path="/admin/numeric-values" element={<AdminNumericValues />} />
+              <Route
+                path="/admin/numeric-values"
+                element={<AdminNumericValues />}
+              />
               <Route path="/settings" element={<Settings />} />
             </Route>
           </Route>
