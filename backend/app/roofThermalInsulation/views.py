@@ -82,6 +82,9 @@ class RoofThermalInsulationDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'uuid'
 
     def get_queryset(self):
+        # Admin can access all roof thermal insulation records, regular users only their own
+        if is_admin_user(self.request.user):
+            return RoofThermalInsulation.objects.all()
         return RoofThermalInsulation.objects.filter(created_by=self.request.user)
 
 
@@ -90,11 +93,23 @@ class RoofThermalInsulationDetailView(generics.RetrieveUpdateDestroyAPIView):
 def get_roof_thermal_insulations_by_building(request, building_uuid):
     """Get all roof thermal insulations for a specific building"""
     try:
-        building = get_object_or_404(Building, uuid=building_uuid, project__user=request.user)
-        roof_thermal_insulations = RoofThermalInsulation.objects.filter(
-            building=building, 
-            created_by=request.user
-        )
+        building = get_object_or_404(Building, uuid=building_uuid)
+        
+        # Check if user has access to this building (admin can access all, regular users only their own)
+        if not has_access_permission(request.user, building):
+            return Response(
+                {"detail": "You don't have permission to access this building."}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Admin can see all roof thermal insulations for this building, regular users only their own
+        if is_admin_user(request.user):
+            roof_thermal_insulations = RoofThermalInsulation.objects.filter(building=building)
+        else:
+            roof_thermal_insulations = RoofThermalInsulation.objects.filter(
+                building=building, 
+                created_by=request.user
+            )
         serializer = RoofThermalInsulationSerializer(roof_thermal_insulations, many=True)
         return Response({
             "success": True,

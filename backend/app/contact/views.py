@@ -58,7 +58,8 @@ class ContactCreateForBuildingView(generics.CreateAPIView):
         building_uuid = self.kwargs.get('building_uuid')
         building = get_object_or_404(Building, uuid=building_uuid)
 
-        if building.project.user != request.user:
+        # Admin users can add contacts to any building, regular users only their own
+        if not has_access_permission(request.user, building):
             return Response(
                 {"error": "You don't have permission to add contacts to this building."},
                 status=status.HTTP_403_FORBIDDEN
@@ -78,9 +79,10 @@ class ContactDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'uuid' # ή pk αν χρησιμοποιείτε ID
 
     def get_queryset(self):
-        # Διασφάλιση ότι ο χρήστης έχει πρόσβαση μόνο στις δικές του επαφές (μέσω του project του κτιρίου)
-        user = self.request.user
-        return Contact.objects.filter(building__project__user=user)
+        # Admin users can access all contacts, regular users only their own (via building's project)
+        if is_admin_user(self.request.user):
+            return Contact.objects.all()
+        return Contact.objects.filter(building__project__user=self.request.user)
 
 class ContactDeleteView(APIView):
     """

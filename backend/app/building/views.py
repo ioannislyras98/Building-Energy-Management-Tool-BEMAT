@@ -47,8 +47,9 @@ def create_building(request):
         except Project.DoesNotExist:
             return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
         
-        if not check_user_ownership(request.user, project):
-            return standard_error_response("Access denied: You do not own this project", status.HTTP_403_FORBIDDEN)
+        # Admin users can create buildings in any project, regular users only their own
+        if not has_access_permission(request.user, project):
+            return standard_error_response("Access denied: You do not have permission to add buildings to this project", status.HTTP_403_FORBIDDEN)
         
         # Handle prefecture (required)
         prefecture_id = data.get("prefecture")
@@ -198,8 +199,9 @@ def delete_building(request, uuid):
             
         building = Building.objects.get(uuid=uuid)
         
-        if not check_user_ownership(request.user, building):
-            return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
+        # Admin users can delete any building, regular users only their own
+        if not has_access_permission(request.user, building):
+            return standard_error_response("Access denied: You do not have permission to delete this building", status.HTTP_403_FORBIDDEN)
         
         building.delete()
         return standard_success_response({"message": "Building deleted successfully"})

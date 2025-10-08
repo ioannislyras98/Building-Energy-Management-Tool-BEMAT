@@ -56,7 +56,13 @@ def delete_project(request, uuid):
         if not validate_uuid(uuid):
             return standard_error_response("Invalid project UUID", status.HTTP_400_BAD_REQUEST)
             
-        project = Project.objects.get(uuid=uuid, user=request.user)
+        project = Project.objects.get(uuid=uuid)
+        
+        # Admin users can delete any project, regular users only their own
+        if not has_access_permission(request.user, project):
+            logger.warning(f"Project with UUID {uuid} access denied for user {request.user.email}.")
+            return standard_error_response("Access denied: You do not have permission to delete this project", status.HTTP_403_FORBIDDEN)
+        
         project_name_for_log = project.name
         project.delete()
         
@@ -65,7 +71,7 @@ def delete_project(request, uuid):
         
     except Project.DoesNotExist:
         logger.warning(f"Project with UUID {uuid} not found for deletion by user {request.user.email}.")
-        return standard_error_response("Project not found or access denied", status.HTTP_404_NOT_FOUND)
+        return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
     except Exception as e:
         logger.error(f"Error during deletion of project {uuid} by user {request.user.email}. Error: {str(e)}", exc_info=True)
         return standard_error_response(f"An unexpected error occurred during project deletion: {str(e)}", status.HTTP_500_INTERNAL_SERVER_ERROR)
