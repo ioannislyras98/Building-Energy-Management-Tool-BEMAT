@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404
 import json
+from numericValues.models import NumericValue
 from .models import RoofThermalInsulation, RoofThermalInsulationMaterialLayer
 from .serializer import (
     RoofThermalInsulationSerializer,
@@ -148,9 +149,10 @@ def recalculate_u_coefficient(request, thermal_insulation_uuid):
                 "error": "Δεν υπάρχουν νέα υλικά για υπολογισμό"
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        # Calculate thermal resistance for roof (R_si = 0.10 for roofs)
-        R_si = 0.10  # Internal surface resistance for roofs
-        R_se = 0.04  # External surface resistance
+        # Calculate thermal resistance for roof
+        # Φόρτωση θερμικών αντιστάσεων επιφάνειας από τη βάση
+        R_si = NumericValue.get_value('Εσωτερική Οροφής (Rsi)')
+        R_se = NumericValue.get_value('Εξωτερική (Rse)')
         
         # Calculate resistance of materials
         R_materials = sum([

@@ -4,6 +4,7 @@ import uuid
 from building.models import Building
 from project.models import Project
 from materials.models import Material
+from numericValues.models import NumericValue
 
 
 class RoofThermalInsulation(models.Model):
@@ -111,9 +112,9 @@ class RoofThermalInsulation(models.Model):
             if not new_materials.exists():
                 return 0
             
-            # Roof-specific surface resistances
-            R_si = 0.10  # Internal surface resistance for roofs
-            R_se = 0.04  # External surface resistance
+            # Φόρτωση θερμικών αντιστάσεων επιφάνειας από τη βάση
+            R_si = NumericValue.get_value('Εσωτερική Οροφής (Rsi)')
+            R_se = NumericValue.get_value('Εξωτερική (Rse)')
             
             # Calculate total material resistance
             materials_r_sum = 0

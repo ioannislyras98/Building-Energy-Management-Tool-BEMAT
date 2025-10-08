@@ -14,6 +14,7 @@ import UnauthorizedAccess from "./pages/UnauthorizedAccess";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminMaterials from "./pages/admin/AdminMaterials";
 import AdminPrefectures from "./pages/admin/AdminPrefectures";
+import AdminNumericValues from "./pages/AdminNumericValues";
 import Settings from "./pages/Settings";
 
 import "./App.css";
@@ -45,6 +46,7 @@ function App() {
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/materials" element={<AdminMaterials />} />
               <Route path="/admin/prefectures" element={<AdminPrefectures />} />
+              <Route path="/admin/numeric-values" element={<AdminNumericValues />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
           </Route>

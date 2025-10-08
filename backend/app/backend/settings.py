@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     "automaticLightingControl",
     "boilerReplacement",
     "buildingImages",
+    "numericValues",
 ]
 
 MIDDLEWARE = [

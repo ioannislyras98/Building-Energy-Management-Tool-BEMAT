@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.conf import settings
 import uuid
+from numericValues.models import NumericValue
 
 User = get_user_model()
 
@@ -123,11 +124,12 @@ class ExternalWallThermalInsulation(models.Model):
         Calculate U coefficient based on NEW materials only
         U = 1/R_total
         R_total = R_si + R_se + ΣR_materials
-        R_si = 0.13 m²K/W (internal)
+        R_si = 0.13 m²K/W (internal - walls)
         R_se = 0.04 m²K/W (external)
         """
-        R_si = 0.13  # Internal surface resistance
-        R_se = 0.04  # External surface resistance
+        # Φόρτωση θερμικών αντιστάσεων επιφάνειας από τη βάση
+        R_si = NumericValue.get_value('Εσωτερική Τοίχου (Rsi)')
+        R_se = NumericValue.get_value('Εξωτερική (Rse)')
         
         # Calculate sum of all NEW material resistances only
         materials_r_sum = 0
@@ -263,8 +265,9 @@ class ExternalWallThermalInsulation(models.Model):
             return 0
         
         # Calculate U coefficient for these materials
-        R_si = 0.13  # Internal surface resistance
-        R_se = 0.04  # External surface resistance
+        # Φόρτωση θερμικών αντιστάσεων επιφάνειας από τη βάση
+        R_si = NumericValue.get_value('Εσωτερική Τοίχου (Rsi)')
+        R_se = NumericValue.get_value('Εξωτερική (Rse)')
         
         materials_r_sum = 0
         total_area = 0

@@ -1,379 +1,22 @@
-# Τύποι Υπολογισμών στο BEMAT (Building Energy Management Tool)
+# Τύποι Υπολογισμών - Building Energy Management Tool (BEMAT)
 
-Αυτό το έγγραφο περιγράφει όλους τους τύπους υπολογισμών που υποστηρίζονται στο εργαλείο διαχείρισης ενέργειας κτιρίων BEMAT.
+## Περιεχόμενα
 
-## Συστήματα που υποστη## 8. Εγκατάσταση Δικτύου Φυσικού Αερίου
+Το σύστημα BEMAT υποστηρίζει υπολογισμούς για **13 κατηγορίες** ενεργειακών επεμβάσεων:
 
-### Περιγραφή
-
-Υπολογισμός οφελών και κόστους από την εγκατάσταση δικτύου φυσικού αερίου σε κτίριο που χρησιμοποιεί άλλες πηγές ενέργειας για θέρμανση.
-
-### Μαθηματικοί Τύποι
-
-#### Υπολογισμός Τρέχοντος Ετήσιου Κόστους Ενέργειας
-
-**Αυτόματος υπολογισμός από Energy Consumptions:**
-
-```
-Current_annual_cost = Σ(Consumption_i × Cost_rate_i)
-```
-
-Όπου:
-- `Consumption_i`: kWh ισοδύναμο κατανάλωσης για κάθε πηγή ενέργειας
-- `Cost_rate_i`: Κόστος ανά kWh για κάθε πηγή (electricity ή fuel)
-
-#### Υπολογισμός Ετήσιου Κόστους Φυσικού Αερίου
-
-**Φόρμουλα υπολογισμού:**
-
-```
-Natural_gas_annual_cost = (Thermal_requirement ÷ New_system_efficiency) × Natural_gas_price_per_kwh
-```
-
-Όπου:
-- `Thermal_requirement`: Θερμική απαίτηση από Energy Consumptions (μη-ηλεκτρικές πηγές)
-- `New_system_efficiency`: Απόδοση νέου συστήματος φυσικού αερίου (0.1-1.0, default: 0.90)
-- `Natural_gas_price_per_kwh`: Τιμή φυσικού αερίου ανά kWh (€/kWh)
-
-#### Στοιχεία Συστήματος
-
-**Συνολικό κόστος επένδυσης:**
-
-```
-Total_investment_cost = Burner_replacement_cost + Gas_pipes_cost + 
-                       Gas_detection_systems_cost + Boiler_cleaning_cost
-```
-
-Όπου κάθε κόστος υπολογίζεται ως: `Quantity × Unit_price`
-
-#### Οικονομικοί Δείκτες
-
-**Ετήσια ενεργειακή εξοικονόμηση:**
-
-```
-Annual_energy_savings = Current_energy_cost_per_year - Natural_gas_cost_per_year
-```
-
-**Ετήσιο οικονομικό όφελος:**
-
-```
-Annual_economic_benefit = Annual_energy_savings
-```
-
-**Περίοδος αποπληρωμής:**
-
-```
-Payback_period = Total_investment_cost ÷ Annual_economic_benefit
-```
-
-**Καθαρή Παρούσα Αξία (NPV):**
-
-```
-NPV = Σ(Annual_economic_benefit ÷ (1 + discount_rate)^year) - Total_investment_cost
-```
-
-**Εσωτερικός Βαθμός Απόδοσης (IRR) - απλοποιημένος:**
-
-```
-IRR = (Annual_economic_benefit ÷ Total_investment_cost) × 100
-```
-
-### Δεδομένα Εισόδου
-
-#### Στοιχεία Συστήματος
-
-- **Αντικατάσταση καυστήρα**: Ποσότητα και τιμή μονάδας
-- **Γαλβανισμένος σιδηροσωλήνας**: Ποσότητα και τιμή μονάδας  
-- **Συστήματα ανίχνευσης διαρροής**: Ποσότητα και τιμή μονάδας
-- **Καθαρισμός λέβητα**: Ποσότητα και τιμή μονάδας
-
-#### Οικονομικά Στοιχεία
-
-- **Τρέχον ετήσιο κόστος ενέργειας**: Αυτόματος υπολογισμός (read-only)
-- **Ετήσιο κόστος φυσικού αερίου**: Αυτόματος υπολογισμός (read-only)
-- **Ετήσια ενεργειακή εξοικονόμηση**: Αυτόματος υπολογισμός
-- **Χρονικό διάστημα**: Διάρκεια επένδυσης σε έτη (default: 15)
-- **Απόδοση νέου συστήματος**: Ποσοστό απόδοσης (10%-100%, default: 90%)
-- **Τιμή φυσικού αερίου**: Προαιρετικό (€/kWh), εάν δεν οριστεί χρησιμοποιείται η τιμή καυσίμου από το έργο
-
-### Αυτοματοποιήσεις
-
-1. **Τρέχον κόστος ενέργειας**: Υπολογίζεται από Energy Consumptions με διαφορετικά κόστη ανά πηγή
-2. **Κόστος φυσικού αερίου**: Υπολογίζεται από θερμική απαίτηση και απόδοση συστήματος
-3. **Εξοικονομήσεις**: Αυτόματη διαφορά των δύο κοστών
-4. **Οικονομικοί δείκτες**: Αυτόματος υπολογισμός όλων των δεικτών
-
-### Υλοποίηση
-
-- **Backend**: `naturalGasNetwork/models.py`, `naturalGasNetwork/views.py`
-- **Frontend**: `NaturalGasNetworkTabContent.jsx`
-- **API Endpoints**: `/natural_gas_networks/`
-- **Database**: Δύο νέα πεδία: `new_system_efficiency`, `natural_gas_price_per_kwh`
-
----
-
-## 9. Εγκατάσταση Εξωτερικών Περσίδων
-
-### Περιγραφή
-
-Υπολογισμός οικονομικών οφελών από την εγκατάσταση εξωτερικών περσίδων για την βελτίωση της ενεργειακής απόδοσης κτιρίου μέσω μείωσης της κατανάλωσης ψύξης.
-
-### Μαθηματικοί Τύποι
-
-#### Κόστος Επένδυσης
-
-**Συνολικό κόστος επένδυσης:**
-
-```
-Total_investment_cost = (Window_area × Cost_per_m2) + Installation_cost
-```
-
-Όπου:
-- `Window_area`: Επιφάνεια παραθύρων σε m²
-- `Cost_per_m2`: Κόστος περσίδων ανά τετραγωνικό μέτρο
-- `Installation_cost`: Επιπλέον κόστος εγκατάστασης
-
-#### Ενεργειακές Εξοικονομήσεις
-
-**Ετήσια ενεργειακή εξοικονόμηση:**
-
-```
-Annual_energy_savings = Cooling_energy_savings × Energy_cost_kwh
-```
-
-Όπου:
-- `Cooling_energy_savings`: Εξοικονόμηση ενέργειας ψύξης σε kWh/έτος
-- `Energy_cost_kwh`: Κόστος ενέργειας σε €/kWh
-
-#### Οικονομικοί Δείκτες
-
-**Ετήσιο οικονομικό όφελος:**
-
-```
-Annual_economic_benefit = Annual_energy_savings - Maintenance_cost
-```
-
-**Περίοδος αποπληρωμής:**
-
-```
-Payback_period = Total_investment_cost ÷ Annual_economic_benefit
-```
-
-**Καθαρή Παρούσα Αξία (NPV):**
-
-```
-NPV = Σ(Annual_economic_benefit ÷ (1 + discount_rate)^year) - Total_investment_cost
-```
-
-**Εσωτερικός Βαθμός Απόδοσης (IRR):**
-
-```
-IRR = (Annual_economic_benefit ÷ Total_investment_cost) × 100
-```
-
-### Δεδομένα Εισόδου
-
-- **Επιφάνεια παραθύρων (m²)**: Συνολική επιφάνεια παραθύρων
-- **Κόστος ανά m² (€)**: Κόστος περσίδων ανά τετραγωνικό μέτρο
-- **Κόστος εγκατάστασης (€)**: Επιπλέον κόστος εγκατάστασης
-- **Ετήσιο κόστος συντήρησης (€)**: Κόστος συντήρησης των περσίδων
-- **Εξοικονόμηση ενέργειας ψύξης (kWh/έτος)**: Ετήσια εξοικονόμηση
-- **Κόστος ενέργειας (€/kWh)**: Τιμή ενέργειας
-- **Χρονικό διάστημα (έτη)**: Διάρκεια αξιολόγησης (default: 20)
-- **Προεξοφλητικός συντελεστής (%)**: Για υπολογισμό NPV (default: 5%)
-
-### Υλοποίηση
-
-- **Backend**: `exteriorBlinds/models.py`, `exteriorBlinds/views.py`
-- **Frontend**: `ExteriorBlindsTabContent.jsx`
-- **API Endpoints**: `/exterior_blinds/`
-
----
-
-## 10. Εγκατάσταση Συστήματος Αυτομάτου Ελέγχου Τεχνητού Φωτισμού
-
-### Περιγραφή
-
-Υπολογισμός οικονομικών οφελών από την εγκατάσταση συστήματος αυτομάτου ελέγχου φωτισμού που βελτιστοποιεί την κατανάλωση ενέργειας μέσω αισθητήρων κίνησης και φωτός.
-
-### Μαθηματικοί Τύποι
-
-#### Κόστος Επένδυσης
-
-**Συνολικό κόστος επένδυσης:**
-
-```
-Total_investment_cost = System_cost + Installation_cost
-```
-
-Όπου:
-- `System_cost`: Κόστος συστήματος αυτομάτου ελέγχου
-- `Installation_cost`: Κόστος εγκατάστασης του συστήματος
-
-#### Ενεργειακές Εξοικονομήσεις
-
-**Ετήσια εξοικονόμηση ενέργειας σε kWh:**
-
-```
-Annual_energy_savings_kwh = Current_lighting_consumption × (Energy_savings_percentage ÷ 100)
-```
-
-**Ετήσια εξοικονόμηση ενέργειας σε ευρώ:**
-
-```
-Annual_energy_savings = Annual_energy_savings_kwh × Energy_cost_kwh
-```
-
-Όπου:
-- `Current_lighting_consumption`: Τρέχουσα κατανάλωση φωτισμού σε kWh/έτος
-- `Energy_savings_percentage`: Ποσοστό εξοικονόμησης (default: 30%)
-- `Energy_cost_kwh`: Κόστος ενέργειας σε €/kWh
-
-#### Οικονομικοί Δείκτες
-
-**Ετήσιο οικονομικό όφελος:**
-
-```
-Annual_economic_benefit = Annual_energy_savings - Maintenance_cost
-```
-
-**Περίοδος αποπληρωμής:**
-
-```
-Payback_period = Total_investment_cost ÷ Annual_economic_benefit
-```
-
-**Καθαρή Παρούσα Αξία (NPV):**
-
-```
-NPV = Σ(Annual_economic_benefit ÷ (1 + discount_rate)^year) - Total_investment_cost
-```
-
-**Εσωτερικός Βαθμός Απόδοσης (IRR):**
-
-```
-IRR = (Annual_economic_benefit ÷ Total_investment_cost) × 100
-```
-
-### Δεδομένα Εισόδου
-
-- **Κόστος συστήματος (€)**: Κόστος συστήματος αυτομάτου ελέγχου
-- **Κόστος εγκατάστασης (€)**: Κόστος εγκατάστασης
-- **Ετήσιο κόστος συντήρησης (€)**: Κόστος συντήρησης
-- **Τρέχουσα κατανάλωση φωτισμού (kWh/έτος)**: Ετήσια κατανάλωση ενέργειας
-- **Ποσοστό εξοικονόμησης (%)**: Αναμενόμενη εξοικονόμηση (default: 30%)
-- **Κόστος ενέργειας (€/kWh)**: Τιμή ενέργειας
-- **Χρονικό διάστημα (έτη)**: Διάρκεια αξιολόγησης (default: 15)
-- **Προεξοφλητικός συντελεστής (%)**: Για υπολογισμό NPV (default: 5%)
-
-### Υλοποίηση
-
-- **Backend**: `automaticLightingControl/models.py`, `automaticLightingControl/views.py`
-- **Frontend**: `AutomaticLightingControlTabContent.jsx`
-- **API Endpoints**: `/automatic_lighting_controls/`
-
----
-
-## 11. Αντικατάσταση Λέβητα
-
-### Περιγραφή
-
-Υπολογισμός οικονομικών οφελών από την αντικατάσταση παλαιού λέβητα με νέο υψηλής απόδοσης για βελτίωση της ενεργειακής απόδοσης συστήματος θέρμανσης.
-
-### Μαθηματικοί Τύποι
-
-#### Κόστος Επένδυσης
-
-**Συνολικό κόστος επένδυσης:**
-
-```
-Total_investment_cost = New_boiler_cost + Installation_cost + Additional_equipment_cost
-```
-
-Όπου:
-- `New_boiler_cost`: Κόστος νέου λέβητα
-- `Installation_cost`: Κόστος εγκατάστασης
-- `Additional_equipment_cost`: Κόστος επιπλέον εξοπλισμού
-
-#### Ενεργειακές Εξοικονομήσεις
-
-**Βελτίωση απόδοσης:**
-
-```
-Efficiency_improvement = New_boiler_efficiency - Old_boiler_efficiency
-```
-
-**Ετήσια εξοικονόμηση καυσίμου:**
-
-```
-Annual_fuel_savings = Current_fuel_consumption × (Efficiency_improvement ÷ Old_boiler_efficiency)
-```
-
-**Ετήσια οικονομική εξοικονόμηση:**
-
-```
-Annual_energy_savings = Annual_fuel_savings × Fuel_cost_per_unit
-```
-
-Όπου:
-- `Old_boiler_efficiency`: Απόδοση παλαιού λέβητα (%)
-- `New_boiler_efficiency`: Απόδοση νέου λέβητα (%)
-- `Current_fuel_consumption`: Τρέχουσα κατανάλωση καυσίμου
-- `Fuel_cost_per_unit`: Κόστος καυσίμου ανά μονάδα
-
-#### Οικονομικοί Δείκτες
-
-**Ετήσιο οικονομικό όφελος:**
-
-```
-Annual_economic_benefit = Annual_energy_savings - Additional_maintenance_cost
-```
-
-**Περίοδος αποπληρωμής:**
-
-```
-Payback_period = Total_investment_cost ÷ Annual_economic_benefit
-```
-
-**Καθαρή Παρούσα Αξία (NPV):**
-
-```
-NPV = Σ(Annual_economic_benefit ÷ (1 + discount_rate)^year) - Total_investment_cost
-```
-
-**Εσωτερικός Βαθμός Απόδοσης (IRR):**
-
-```
-IRR = (Annual_economic_benefit ÷ Total_investment_cost) × 100
-```
-
-### Δεδομένα Εισόδου
-
-- **Κόστος νέου λέβητα (€)**: Κόστος αγοράς νέου λέβητα
-- **Κόστος εγκατάστασης (€)**: Κόστος εγκατάστασης
-- **Κόστος επιπλέον εξοπλισμού (€)**: Πρόσθετα υλικά/εξοπλισμός
-- **Απόδοση παλαιού λέβητα (%)**: Τρέχουσα απόδοση
-- **Απόδοση νέου λέβητα (%)**: Απόδοση νέου λέβητα
-- **Τρέχουσα κατανάλωση καυσίμου**: Ετήσια κατανάλωση
-- **Κόστος καυσίμου ανά μονάδα (€)**: Τιμή καυσίμου
-- **Επιπλέον κόστος συντήρησης (€/έτος)**: Διαφορά συντήρησης
-- **Χρονικό διάστημα (έτη)**: Διάρκεια αξιολόγησης (default: 20)
-- **Προεξοφλητικός συντελεστής (%)**: Για υπολογισμό NPV (default: 5%)
-
-### Υλοποίηση
-
-- **Backend**: `boilerReplacement/models.py`, `boilerReplacement/views.py`
-- **Frontend**: `BoilerReplacementTabContent.jsx`
-- **API Endpoints**: `/boiler_replacements/`
-
---- **Θερμομόνωση Εξωτερικής Τοιχοποιίας**
+1. **Θερμομόνωση Εξωτερικής Τοιχοποιίας**
 2. **Θερμομόνωση Οροφής**
 3. **Φωτοβολταϊκά Συστήματα**
 4. **Αντικατάσταση Παλαιών Υαλοπινάκων**
 5. **Αντικατάσταση Λαμπτήρων Πυράκτωσης**
 6. **Αντικατάσταση Κλιματιστικών**
 7. **Κατανάλωση Ενέργειας**
-8. **Εγκατάσταση Δικτύου Φυσικού Αερίου** *(Νέο)*
+8. **Εγκατάσταση Δικτύου Φυσικού Αερίου**
+9. **Αντικατάσταση Λέβητα**
+10. **Αυτόματος Έλεγχος Φωτισμού**
+11. **Εξωτερικές Περσίδες**
+12. **Αναβάθμιση Συστήματος Ζεστού Νερού Χρήσης**
+13. **Ηλιακοί Συλλέκτες**
 
 ---
 
@@ -592,6 +235,7 @@ Current_annual_cost = Σ(Consumption_i × Cost_rate_i)
 ```
 
 Όπου:
+
 - `Consumption_i`: kWh ισοδύναμο κατανάλωσης για κάθε πηγή ενέργειας
 - `Cost_rate_i`: Κόστος ανά kWh για κάθε πηγή (electricity ή fuel)
 
@@ -604,6 +248,7 @@ Natural_gas_annual_cost = (Thermal_requirement ÷ New_system_efficiency) × Natu
 ```
 
 Όπου:
+
 - `Thermal_requirement`: Θερμική απαίτηση από Energy Consumptions (μη-ηλεκτρικές πηγές)
 - `New_system_efficiency`: Απόδοση νέου συστήματος φυσικού αερίου (0.1-1.0, default: 0.90)
 - `Natural_gas_price_per_kwh`: Τιμή φυσικού αερίου ανά kWh (€/kWh)
@@ -613,7 +258,7 @@ Natural_gas_annual_cost = (Thermal_requirement ÷ New_system_efficiency) × Natu
 **Συνολικό κόστος επένδυσης:**
 
 ```
-Total_investment_cost = Burner_replacement_cost + Gas_pipes_cost + 
+Total_investment_cost = Burner_replacement_cost + Gas_pipes_cost +
                        Gas_detection_systems_cost + Boiler_cleaning_cost
 ```
 
@@ -656,7 +301,7 @@ IRR = (Annual_economic_benefit ÷ Total_investment_cost) × 100
 #### Στοιχεία Συστήματος
 
 - **Αντικατάσταση καυστήρα**: Ποσότητα και τιμή μονάδας
-- **Γαλβανισμένος σιδηροσωλήνας**: Ποσότητα και τιμή μονάδας  
+- **Γαλβανισμένος σιδηροσωλήνας**: Ποσότητα και τιμή μονάδας
 - **Συστήματα ανίχνευσης διαρροής**: Ποσότητα και τιμή μονάδας
 - **Καθαρισμός λέβητα**: Ποσότητα και τιμή μονάδας
 
@@ -685,3 +330,319 @@ IRR = (Annual_economic_benefit ÷ Total_investment_cost) × 100
 
 ---
 
+## 9. Αντικατάσταση Λέβητα
+
+### Περιγραφή
+
+Υπολογισμός οικονομικών οφελών από την αντικατάσταση παλαιού λέβητα με νέο υψηλής απόδοσης.
+
+### Μαθηματικοί Τύποι
+
+#### Κόστος Επένδυσης
+
+**Συνολικό κόστος επένδυσης:**
+
+```
+Total_investment_cost = New_boiler_cost + Installation_cost + Additional_equipment_cost
+```
+
+#### Ενεργειακές Εξοικονομήσεις
+
+**Βελτίωση απόδοσης:**
+
+```
+Efficiency_improvement = New_boiler_efficiency - Old_boiler_efficiency
+```
+
+**Ετήσια εξοικονόμηση καυσίμου:**
+
+```
+Annual_fuel_savings = Current_fuel_consumption × (Efficiency_improvement ÷ Old_boiler_efficiency)
+```
+
+**Ετήσια οικονομική εξοικονόμηση:**
+
+```
+Annual_energy_savings = Annual_fuel_savings × Fuel_cost_per_unit
+```
+
+#### Οικονομικοί Δείκτες
+
+**Ετήσιο οικονομικό όφελος:**
+
+```
+Annual_economic_benefit = Annual_energy_savings - Additional_maintenance_cost
+```
+
+**Περίοδος αποπληρωμής:**
+
+```
+Payback_period = Total_investment_cost ÷ Annual_economic_benefit
+```
+
+**Καθαρή Παρούσα Αξία (NPV):**
+
+```
+NPV = Σ(Annual_economic_benefit ÷ (1 + discount_rate)^year) - Total_investment_cost
+```
+
+### Δεδομένα Εισόδου
+
+- **Κόστος νέου λέβητα (€)**, **Κόστος εγκατάστασης (€)**, **Κόστος επιπλέον εξοπλισμού (€)**
+- **Απόδοση παλαιού λέβητα (%)**, **Απόδοση νέου λέβητα (%)**
+- **Τρέχουσα κατανάλωση καυσίμου**, **Κόστος καυσίμου ανά μονάδα (€)**
+- **Επιπλέον κόστος συντήρησης (€/έτος)**
+- **Χρονικό διάστημα (έτη)**: default 20, **Προεξοφλητικός συντελεστής (%)**: default 5%
+
+### Υλοποίηση
+
+- **Backend**: `boilerReplacement/models.py`, `boilerReplacement/views.py`
+- **Frontend**: `BoilerReplacementTabContent.jsx`
+
+---
+
+## 10. Αυτόματος Έλεγχος Φωτισμού
+
+### Περιγραφή
+
+Υπολογισμός οφελών από την εγκατάσταση αυτόματου συστήματος ελέγχου φωτισμού.
+
+### Μαθηματικοί Τύποι
+
+#### Κόστος Επένδυσης
+
+**Συνολικό κόστος επένδυσης:**
+
+```
+Total_investment_cost = (Lighting_area × Cost_per_m2) + Installation_cost
+```
+
+#### Ενεργειακές Εξοικονομήσεις
+
+**Εξοικονόμηση ενέργειας:**
+
+```
+Annual_energy_savings = Current_consumption × (Savings_percentage ÷ 100) × Energy_cost_kwh
+```
+
+#### Οικονομικοί Δείκτες
+
+Χρήση των βασικών οικονομικών δεικτών (NPV, IRR, Payback Period).
+
+### Δεδομένα Εισόδου
+
+- **Επιφάνεια φωτισμού (m²)**, **Κόστος ανά m² (€/m²)**, **Κόστος εγκατάστασης (€)**
+- **Τρέχουσα κατανάλωση (kWh)**, **Ποσοστό εξοικονόμησης (%)**, **Κόστος ενέργειας (€/kWh)**
+
+### Υλοποίηση
+
+- **Backend**: `automaticLightingControl/models.py`, `automaticLightingControl/views.py`
+- **Frontend**: `AutomaticLightingControlTabContent.jsx`
+
+---
+
+## 11. Εξωτερικές Περσίδες
+
+### Περιγραφή
+
+Υπολογισμός οφελών από την εγκατάσταση εξωτερικών περσίδων για μείωση κατανάλωσης ψύξης.
+
+### Μαθηματικοί Τύποι
+
+#### Κόστος Επένδυσης
+
+**Συνολικό κόστος επένδυσης:**
+
+```
+Total_investment_cost = (Window_area × Cost_per_m2) + Installation_cost
+```
+
+#### Ενεργειακές Εξοικονομήσεις
+
+**Ετήσια εξοικονόμηση:**
+
+```
+Annual_energy_savings = Cooling_energy_savings × Energy_cost_kwh - Maintenance_cost
+```
+
+### Δεδομένα Εισόδου
+
+- **Επιφάνεια παραθύρων (m²)**, **Κόστος ανά m² (€/m²)**, **Κόστος εγκατάστασης (€)**
+- **Εξοικονόμηση ψύξης (kWh)**, **Κόστος ενέργειας (€/kWh)**, **Κόστος συντήρησης (€)**
+
+### Υλοποίηση
+
+- **Backend**: `exteriorBlinds/models.py`, `exteriorBlinds/views.py`
+
+---
+
+## 12. Αναβάθμιση Συστήματος Ζεστού Νερού Χρήσης
+
+### Περιγραφή
+
+Υπολογισμός οικονομικών οφελών από την αναβάθμιση συστήματος ζεστού νερού χρήσης με ηλιακούς συλλέκτες.
+
+### Μαθηματικοί Τύποι
+
+#### Κόστος Επένδυσης - Υπομερίσματα
+
+```
+Solar_collectors_subtotal = Solar_collectors_quantity × Solar_collectors_unit_price
+Metal_support_bases_subtotal = Metal_support_bases_quantity × Metal_support_bases_unit_price
+Solar_system_subtotal = Solar_system_quantity × Solar_system_unit_price
+Insulated_pipes_subtotal = Insulated_pipes_quantity × Insulated_pipes_unit_price
+Central_heater_installation_subtotal = Central_heater_installation_quantity × Central_heater_installation_unit_price
+
+Total_investment_cost = Άθροισμα όλων των υπομερισμάτων
+```
+
+#### Ενεργειακοί Υπολογισμοί
+
+```
+Annual_energy_consumption_kwh = (Electric_heater_power ÷ 1000) × Operating_hours_per_year
+Annual_solar_savings_kwh = Annual_energy_consumption_kwh × (Solar_utilization_percentage ÷ 100)
+Annual_economic_benefit = Annual_solar_savings_kwh × Energy_cost_kwh
+```
+
+#### Οικονομικοί Δείκτες
+
+```
+Payback_period = Total_investment_cost ÷ Annual_economic_benefit
+NPV = (Annual_economic_benefit × Lifespan_years) - Total_investment_cost
+IRR = (Annual_economic_benefit ÷ Total_investment_cost) × 100
+```
+
+### Δεδομένα Εισόδου
+
+- **Στοιχεία Συστήματος**: Ποσότητες και τιμές για ηλιακούς συλλέκτες, βάσεις στήριξης, ηλιακό σύστημα, μονωμένες σωληνώσεις, εγκατάσταση θερμοσίφωνα
+- **Ενεργειακά Στοιχεία**: Ισχύς ηλεκτρικού θερμοσίφωνα, ώρες λειτουργίας, ποσοστό ηλιακής αξιοποίησης (default 80%), κόστος ενέργειας, διάρκεια ζωής (default 10 έτη)
+
+### Υλοποίηση
+
+- **Backend**: `hotWaterUpgrade/models.py`, `hotWaterUpgrade/views.py`
+- **Frontend**: `HotWaterUpgradeTabContent.jsx`
+
+---
+
+## 13. Ηλιακοί Συλλέκτες
+
+### Περιγραφή
+
+Σύστημα καταγραφής και ανάλυσης ηλιακών συλλεκτών για ζεστό νερό και θέρμανση.
+
+### Τεχνικά Χαρακτηριστικά
+
+#### Τύπος και Χρήση
+
+- **Χρήση ηλιακών συλλεκτών**: Προσδιορισμός χρήσης (ζεστό νερό, θέρμανση)
+- **Τύπος ηλιακού συλλέκτη**: Κατηγορία συλλέκτη (επίπεδος, κενού αέρα κ.λπ.)
+
+#### Γεωμετρικά Στοιχεία
+
+- **Επιφάνεια ηλιακών συλλεκτών (m²)**: Συνολική επιφάνεια συλλογής
+- **Χωρητικότητα δοχείου αποθήκευσης ΖΝΧ (L)**: Όγκος αποθήκευσης ζεστού νερού χρήσης
+- **Χωρητικότητα δοχείου αποθήκευσης θέρμανσης (L)**: Όγκος αποθήκευσης για θέρμανση
+
+#### Λειτουργικά Χαρακτηριστικά
+
+- **Είδος αντιψυκτικού υγρού**, **Ποσοστό αντιψυκτικού (%)**, **Αποδοτικότητα συλλέκτη (%)**
+- **Κλίση εγκατάστασης (μοίρες)**, **Προσανατολισμός (μοίρες)**
+
+### Υλοποίηση
+
+- **Backend**: `solarCollectors/models.py`, `solarCollectors/views.py`
+- **Frontend**: `SolarCollectorsTabContent.jsx`
+
+---
+
+## Γενικές Φόρμουλες Backend
+
+### 1. Οικονομικοί Δείκτες
+
+**Περίοδος Αποπληρωμής:**
+
+```
+Payback_period = Total_investment_cost ÷ Annual_economic_benefit
+```
+
+**Καθαρή Παρούσα Αξία (NPV):**
+
+```
+NPV = Σ[Annual_benefit ÷ (1 + discount_rate)^year] - Initial_investment
+```
+
+**Εσωτερικός Βαθμός Απόδοσης (IRR):**
+
+```
+IRR = (Annual_economic_benefit ÷ Total_investment_cost) × 100
+```
+
+### 2. Ενεργειακοί Υπολογισμοί
+
+**Κλιματιστικά - Μετατροπή BTU:**
+
+```
+Power_watts = BTU × 0.293
+Heating_consumption = (Power_watts ÷ (COP ÷ 100)) × Heating_hours × Quantity ÷ 1000
+Cooling_consumption = (Power_watts ÷ (EER ÷ 100)) × Cooling_hours × Quantity ÷ 1000
+```
+
+**Λαμπτήρες - Εξοικονόμηση:**
+
+```
+Energy_savings = ((Old_power × Old_count) - (New_power × New_count)) × Operating_hours ÷ 1000
+```
+
+### 3. Θερμικοί Υπολογισμοί
+
+**Συντελεστής Θερμοπερατότητας (U-value):**
+
+```
+U = 1 ÷ Σ(Thickness_i ÷ Thermal_conductivity_i + Thermal_resistances)
+```
+
+**Θερμικές Απώλειες:**
+
+```
+Thermal_losses = U × Area × Temperature_difference × Time_hours
+```
+
+**Ενεργειακή Εξοικονόμηση Θερμομόνωσης:**
+
+```
+Energy_savings = (U_before - U_after) × Area × Degree_days × 24 ÷ 1000
+```
+
+### 4. Φωτοβολταϊκά Συστήματα
+
+**Ετήσια Παραγωγή:**
+
+```
+Annual_production = Panel_capacity × Peak_sun_hours × 365 × System_efficiency
+```
+
+**Κόστος Συστήματος:**
+
+```
+Total_cost = Equipment_cost + (Equipment_cost × Unexpected_expenses_rate) +
+            (Equipment_cost × (1 + Unexpected_expenses_rate) × Tax_rate)
+```
+
+### Αυτοματοποιήσεις Backend
+
+1. **Αυτόματος υπολογισμός**: Όλα τα models καλούν calculation functions στο `save()` method
+2. **Ασφαλής χειρισμός σφαλμάτων**: Try/except blocks για διαίρεση με μηδέν
+3. **Στρογγυλοποίηση αποτελεσμάτων**: Συνήθως 2 δεκαδικά ψηφία
+4. **Υπολογισμός NPV με προεξοφλητικό συντελεστή**: Πλήρης φόρμουλα παρούσας αξίας
+5. **Έλεγχος εγκυρότητας δεδομένων**: Έλεγχος για μηδενικά ή αρνητικά κόστη
+
+### Κοινά Πεδία Συστημάτων
+
+- `created_at`: Αυτόματη ημερομηνία δημιουργίας
+- `updated_at`: Αυτόματη ημερομηνία ενημέρωσης
+- `user/created_by`: Σύνδεση με χρήστη που δημιούργησε
+- `building`: Σύνδεση με κτίριο
+- `project`: Σύνδεση με έργο
+- `uuid`: Μοναδικό αναγνωριστικό για κάθε εγγραφή
+
+---

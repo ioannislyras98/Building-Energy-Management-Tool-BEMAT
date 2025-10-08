@@ -22,6 +22,9 @@ python manage.py populate_prefectures
 echo "Loading initial materials data..."
 python manage.py load_materials
 
+echo "Loading initial numeric values..."
+python manage.py create_numeric_values
+
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 

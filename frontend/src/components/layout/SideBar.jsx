@@ -15,6 +15,7 @@ import {
   FaCubes,
   FaBuilding,
   FaTools,
+  FaCalculator,
 } from "react-icons/fa";
 import { IoHome, IoFolderOpen, IoFolder } from "react-icons/io5";
 
@@ -235,6 +236,12 @@ export default function Sidenav() {
                     className="admin-submenu-item flex items-center py-2 px-3 text-sm text-primary hover:text-primary-bold cursor-pointer">
                     <FaTools className="mr-2 text-xs" />
                     <span>{params.materials}</span>
+                  </div>
+                  <div
+                    onClick={() => navigate("/admin/numeric-values")}
+                    className="admin-submenu-item flex items-center py-2 px-3 text-sm text-primary hover:text-primary-bold cursor-pointer">
+                    <FaCalculator className="mr-2 text-xs" />
+                    <span>{language === "en" ? "Numeric Values" : "Αριθμητικές Τιμές"}</span>
                   </div>
                 </div>
               )}
