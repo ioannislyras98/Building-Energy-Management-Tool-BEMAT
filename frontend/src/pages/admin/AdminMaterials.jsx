@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import InputEntryModal from "../../modals/shared/InputEntryModal";
 import ConfirmationDialog from "../../components/dialogs/ConfirmationDialog";
 import "../../assets/styles/forms.css";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies();
 
@@ -135,7 +136,7 @@ const AdminMaterials = () => {
   const fetchCategories = async () => {
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/materials/categories/list/",
+        `${API_BASE_URL}/materials/categories/list/`,
         {
           headers: {
             Authorization: `Token ${token}`,
@@ -157,7 +158,7 @@ const AdminMaterials = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "http://127.0.0.1:8000/materials/admin/all/",
+        `${API_BASE_URL}/materials/admin/all/`,
         {
           headers: {
             Authorization: `Token ${token}`,
@@ -212,10 +213,10 @@ const AdminMaterials = () => {
 
     try {
       const url = editingMaterial
-        ? `http://127.0.0.1:8000/materials/${
+        ? `${API_BASE_URL}/materials/${
             editingMaterial.uuid || editingMaterial.id
           }/`
-        : "http://127.0.0.1:8000/materials/";
+        : `${API_BASE_URL}/materials/`;
 
       const method = editingMaterial ? "PUT" : "POST";
 
@@ -271,7 +272,7 @@ const AdminMaterials = () => {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/materials/${
+        `${API_BASE_URL}/materials/${
           materialToDelete.uuid || materialToDelete.id
         }/`,
         {
@@ -323,7 +324,7 @@ const AdminMaterials = () => {
   const handleBulkDeleteConfirm = async () => {
     try {
       const deletePromises = selectedMaterials.map((id) =>
-        fetch(`http://127.0.0.1:8000/materials/${id}/`, {
+        fetch(`${API_BASE_URL}/materials/${id}/`, {
           method: "DELETE",
           headers: {
             Authorization: `Token ${token}`,

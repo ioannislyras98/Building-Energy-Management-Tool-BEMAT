@@ -27,6 +27,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import "../../assets/styles/forms.css";
+import API_BASE_URL from "../../config/api";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -117,7 +118,7 @@ const AirConditioningReplacementTabContent = ({
     try {
       // Fetch old ACs
       const oldACResponse = await $.ajax({
-        url: `http://127.0.0.1:8000/air_conditioning_replacements/old/building/${buildingUuid}/`,
+        url: `${API_BASE_URL}/air_conditioning_replacements/old/building/${buildingUuid}/`,
         method: "GET",
         headers: { Authorization: `Token ${token}` },
       });
@@ -127,7 +128,7 @@ const AirConditioningReplacementTabContent = ({
 
       // Fetch new ACs
       const newACResponse = await $.ajax({
-        url: `http://127.0.0.1:8000/air_conditioning_replacements/new/building/${buildingUuid}/`,
+        url: `${API_BASE_URL}/air_conditioning_replacements/new/building/${buildingUuid}/`,
         method: "GET",
         headers: { Authorization: `Token ${token}` },
       });
@@ -137,7 +138,7 @@ const AirConditioningReplacementTabContent = ({
 
       // Fetch analysis
       const analysisResponse = await $.ajax({
-        url: `http://127.0.0.1:8000/air_conditioning_replacements/analysis/building/${buildingUuid}/`,
+        url: `${API_BASE_URL}/air_conditioning_replacements/analysis/building/${buildingUuid}/`,
         method: "GET",
         headers: { Authorization: `Token ${token}` },
       });
@@ -168,7 +169,7 @@ const AirConditioningReplacementTabContent = ({
       let response;
       if (oldACModal.editMode) {
         response = await $.ajax({
-          url: `http://127.0.0.1:8000/air_conditioning_replacements/old/update/${oldACModal.data.id}/`,
+          url: `${API_BASE_URL}/air_conditioning_replacements/old/update/${oldACModal.data.id}/`,
           method: "PUT",
           headers: {
             Authorization: `Token ${token}`,
@@ -178,7 +179,7 @@ const AirConditioningReplacementTabContent = ({
         });
       } else {
         response = await $.ajax({
-          url: "http://127.0.0.1:8000/air_conditioning_replacements/old/create/",
+          url: `${API_BASE_URL}/air_conditioning_replacements/old/create/`,
           method: "POST",
           headers: {
             Authorization: `Token ${token}`,
@@ -214,7 +215,7 @@ const AirConditioningReplacementTabContent = ({
       let response;
       if (newACModal.editMode) {
         response = await $.ajax({
-          url: `http://127.0.0.1:8000/air_conditioning_replacements/new/update/${newACModal.data.id}/`,
+          url: `${API_BASE_URL}/air_conditioning_replacements/new/update/${newACModal.data.id}/`,
           method: "PUT",
           headers: {
             Authorization: `Token ${token}`,
@@ -224,7 +225,7 @@ const AirConditioningReplacementTabContent = ({
         });
       } else {
         response = await $.ajax({
-          url: "http://127.0.0.1:8000/air_conditioning_replacements/new/create/",
+          url: `${API_BASE_URL}/air_conditioning_replacements/new/create/`,
           method: "POST",
           headers: {
             Authorization: `Token ${token}`,
@@ -256,7 +257,7 @@ const AirConditioningReplacementTabContent = ({
     ) {
       try {
         const response = await $.ajax({
-          url: `http://127.0.0.1:8000/air_conditioning_replacements/old/delete/${id}/`,
+          url: `${API_BASE_URL}/air_conditioning_replacements/old/delete/${id}/`,
           method: "DELETE",
           headers: { Authorization: `Token ${token}` },
         });
@@ -278,7 +279,7 @@ const AirConditioningReplacementTabContent = ({
     ) {
       try {
         const response = await $.ajax({
-          url: `http://127.0.0.1:8000/air_conditioning_replacements/new/delete/${id}/`,
+          url: `${API_BASE_URL}/air_conditioning_replacements/new/delete/${id}/`,
           method: "DELETE",
           headers: { Authorization: `Token ${token}` },
         });
@@ -304,7 +305,7 @@ const AirConditioningReplacementTabContent = ({
       let response;
       if (analysis) {
         response = await $.ajax({
-          url: `http://127.0.0.1:8000/air_conditioning_replacements/analysis/update/${analysis.id}/`,
+          url: `${API_BASE_URL}/air_conditioning_replacements/analysis/update/${analysis.id}/`,
           method: "PUT",
           headers: {
             Authorization: `Token ${token}`,
@@ -314,7 +315,7 @@ const AirConditioningReplacementTabContent = ({
         });
       } else {
         response = await $.ajax({
-          url: "http://127.0.0.1:8000/air_conditioning_replacements/analysis/create/",
+          url: `${API_BASE_URL}/air_conditioning_replacements/analysis/create/`,
           method: "POST",
           headers: {
             Authorization: `Token ${token}`,

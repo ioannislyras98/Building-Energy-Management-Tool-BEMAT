@@ -5,6 +5,7 @@ import ConfirmationDialog from "../dialogs/ConfirmationDialog";
 import DataTable from "./DataTable";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies();
 
@@ -48,7 +49,7 @@ const ProjectsManagement = () => {
       });
 
       const response = await fetch(
-        `http://127.0.0.1:8000/admin-api/projects-table/?${queryParams}`,
+        `${API_BASE_URL}/admin-api/projects-table/?${queryParams}`,
         {
           method: "GET",
           headers: {
@@ -85,7 +86,7 @@ const ProjectsManagement = () => {
   const handleBulkDelete = async (projectIds) => {
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/admin-api/projects/bulk-delete/",
+        `${API_BASE_URL}/admin-api/projects/bulk-delete/`,
         {
           method: "DELETE",
           headers: {

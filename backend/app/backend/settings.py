@@ -27,15 +27,10 @@ secrets.token_hex(50)
 # You can generate one using: python -c 'import secrets; print(secrets.token_hex(50))'
 SECRET_KEY = os.environ.get("SECRET_KEY", 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2')
 
-DEBUG = True  # Or False, depending on your needs
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    # Add any other specific IPs or hostnames you use for testing
-    # e.g., if you access it via a local network IP like '192.168.1.100'
-    # '192.168.1.100',
-]
+# Read ALLOWED_HOSTS from environment variable (comma-separated)
+ALLOWED_HOSTS = [host.strip() for host in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if host.strip()]
 
 
 # Application definition
@@ -112,7 +107,17 @@ TEMPLATES = [
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "mediafiles"
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://localhost:8000", "http://127.0.0.1:3000", "http://127.0.0.1:8000"]
+# CSRF Trusted Origins - Dynamic configuration from environment variable
+# Set CSRF_TRUSTED_ORIGINS in .env with comma-separated origins (including protocol)
+# Example: CSRF_TRUSTED_ORIGINS=http://localhost:3000,https://energymanagement.epu.ntua.gr
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip() 
+    for origin in os.environ.get(
+        "CSRF_TRUSTED_ORIGINS", 
+        "http://localhost:3000,http://localhost:8000,http://127.0.0.1:3000,http://127.0.0.1:8000"
+    ).split(",") 
+    if origin.strip()
+]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
@@ -174,9 +179,16 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# CORS Origin Whitelist - Dynamic configuration from environment variable
+# Set CORS_ORIGIN_WHITELIST in .env with comma-separated origins (including protocol)
+# Example: CORS_ORIGIN_WHITELIST=http://localhost:3000,https://energymanagement.epu.ntua.gr
 CORS_ORIGIN_WHITELIST = [
-     'http://localhost:3000',
-     'http://127.0.0.1:3000'
+    origin.strip() 
+    for origin in os.environ.get(
+        "CORS_ORIGIN_WHITELIST", 
+        "http://localhost:3000,http://127.0.0.1:3000"
+    ).split(",") 
+    if origin.strip()
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -213,9 +225,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'ioannis.lyras98@gmail.com'
-EMAIL_HOST_PASSWORD = 'optf etzu yswt esze'
-DEFAULT_FROM_EMAIL = 'ioannis.lyras98@gmail.com'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'ioannis.lyras98@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'optf etzu yswt esze')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'ioannis.lyras98@gmail.com')
 
 # Logging configuration
 LOGGING = {

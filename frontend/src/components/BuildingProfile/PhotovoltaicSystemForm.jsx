@@ -4,6 +4,7 @@ import Cookies from "universal-cookie";
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies();
 
@@ -190,8 +191,8 @@ const PhotovoltaicSystemForm = ({
       };
 
       const url = editItem
-        ? `http://127.0.0.1:8000/photovoltaic_systems/${editItem.uuid}/`
-        : `http://127.0.0.1:8000/photovoltaic_systems/`;
+        ? `${API_BASE_URL}/photovoltaic_systems/${editItem.uuid}/`
+        : `${API_BASE_URL}/photovoltaic_systems/`;
 
       const method = editItem ? "PUT" : "POST";
 

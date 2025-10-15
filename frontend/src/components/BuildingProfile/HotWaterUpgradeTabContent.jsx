@@ -25,6 +25,7 @@ import Cookies from "universal-cookie";
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 // TabPanel component για τα tabs
 function TabPanel(props) {
@@ -70,7 +71,7 @@ const HotWaterUpgradeTabContent = ({
 
   const fetchExistingData = () => {
     $.ajax({
-      url: `http://127.0.0.1:8000/hot_water_upgrades/building/${buildingUuid}/`,
+      url: `${API_BASE_URL}/hot_water_upgrades/building/${buildingUuid}/`,
       method: "GET",
       headers: {
         Authorization: `Token ${token}`,
@@ -156,7 +157,7 @@ const HotWaterUpgradeTabContent = ({
     };
 
     $.ajax({
-      url: "http://127.0.0.1:8000/hot_water_upgrades/create/",
+      url: `${API_BASE_URL}/hot_water_upgrades/create/`,
       method: "POST",
       headers: {
         Authorization: `Token ${token}`,
@@ -305,7 +306,7 @@ const HotWaterUpgradeTabContent = ({
     };
 
     $.ajax({
-      url: "http://127.0.0.1:8000/hot_water_upgrades/create/",
+      url: `${API_BASE_URL}/hot_water_upgrades/create/`,
       method: "POST",
       headers: {
         Authorization: `Token ${token}`,

@@ -11,6 +11,7 @@ import Cookies from "universal-cookie";
 import $ from "jquery";
 import { useModalBlur } from "../hooks/useModals";
 import { Modals } from "../components/Modals";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -56,7 +57,7 @@ export default function BuildingProfilePage() {
     }
     setLoading(true);
     $.ajax({
-      url: `http://127.0.0.1:8000/buildings/get/${buildingUuid}/`,
+      url: `${API_BASE_URL}/buildings/get/${buildingUuid}/`,
       method: "GET",
       headers: {
         Authorization: `Token ${token}`,
@@ -133,7 +134,7 @@ export default function BuildingProfilePage() {
     }
 
     const settings = {
-      url: `http://127.0.0.1:8000/buildings/delete/${buildingToDelete.data.uuid}/`,
+      url: `${API_BASE_URL}/buildings/delete/${buildingToDelete.data.uuid}/`,
       method: "DELETE",
       timeout: 0,
       headers: {

@@ -22,6 +22,7 @@ import Cookies from "universal-cookie";
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 // TabPanel component για τα tabs
 function TabPanel(props) {
@@ -123,7 +124,7 @@ const NaturalGasNetworkTabContent = ({
 
   const fetchEnergyConsumptions = () => {
     $.ajax({
-      url: `http://127.0.0.1:8000/energy_consumptions/get_by_building/${buildingUuid}/`,
+      url: `${API_BASE_URL}/energy_consumptions/get_by_building/${buildingUuid}/`,
       method: "GET",
       headers: {
         Authorization: `Token ${token}`,
@@ -174,7 +175,7 @@ const NaturalGasNetworkTabContent = ({
 
   const fetchExistingData = () => {
     $.ajax({
-      url: `http://127.0.0.1:8000/natural_gas_networks/building/${buildingUuid}/`,
+      url: `${API_BASE_URL}/natural_gas_networks/building/${buildingUuid}/`,
       method: "GET",
       headers: {
         Authorization: `Token ${token}`,
@@ -243,7 +244,7 @@ const NaturalGasNetworkTabContent = ({
     };
 
     $.ajax({
-      url: "http://127.0.0.1:8000/natural_gas_networks/create/",
+      url: `${API_BASE_URL}/natural_gas_networks/create/`,
       method: "POST",
       headers: {
         Authorization: `Token ${token}`,
@@ -394,7 +395,7 @@ const NaturalGasNetworkTabContent = ({
     };
 
     $.ajax({
-      url: "http://127.0.0.1:8000/natural_gas_networks/create/",
+      url: `${API_BASE_URL}/natural_gas_networks/create/`,
       method: "POST",
       headers: {
         Authorization: `Token ${token}`,

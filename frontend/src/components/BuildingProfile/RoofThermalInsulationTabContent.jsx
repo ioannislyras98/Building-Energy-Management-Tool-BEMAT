@@ -26,6 +26,7 @@ import RoofThermalInsulationMaterialModal from "../../modals/building/RoofTherma
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -102,7 +103,7 @@ const RoofThermalInsulationTabContent = ({
     setLoading(true);
 
     $.ajax({
-      url: `http://127.0.0.1:8000/roof_thermal_insulations/building/${buildingUuid}/`,
+      url: `${API_BASE_URL}/roof_thermal_insulations/building/${buildingUuid}/`,
       method: "GET",
       headers: {
         Authorization: `Token ${token}`,
@@ -143,7 +144,7 @@ const RoofThermalInsulationTabContent = ({
       net_present_value: 0,
     };
     $.ajax({
-      url: "http://127.0.0.1:8000/roof_thermal_insulations/create/",
+      url: `${API_BASE_URL}/roof_thermal_insulations/create/`,
       method: "POST",
       headers: {
         Authorization: `Token ${token}`,
@@ -187,7 +188,7 @@ const RoofThermalInsulationTabContent = ({
     };
 
     $.ajax({
-      url: `http://127.0.0.1:8000/roof_thermal_insulations/${currentRoofThermalInsulation.uuid}/`,
+      url: `${API_BASE_URL}/roof_thermal_insulations/${currentRoofThermalInsulation.uuid}/`,
       method: "PUT",
       headers: {
         Authorization: `Token ${token}`,
@@ -197,7 +198,7 @@ const RoofThermalInsulationTabContent = ({
       success: (data) => {
         // After successful save, trigger recalculation
         $.ajax({
-          url: `http://127.0.0.1:8000/roof_thermal_insulations/${currentRoofThermalInsulation.uuid}/recalculate/`,
+          url: `${API_BASE_URL}/roof_thermal_insulations/${currentRoofThermalInsulation.uuid}/recalculate/`,
           method: "POST",
           headers: {
             Authorization: `Token ${token}`,
@@ -259,7 +260,7 @@ const RoofThermalInsulationTabContent = ({
     if (!deletingMaterial || !token) return;
 
     $.ajax({
-      url: `http://127.0.0.1:8000/roof_thermal_insulations/material-layers/${deletingMaterial.uuid}/`,
+      url: `${API_BASE_URL}/roof_thermal_insulations/material-layers/${deletingMaterial.uuid}/`,
       method: "DELETE",
       headers: {
         Authorization: `Token ${token}`,
@@ -294,7 +295,7 @@ const RoofThermalInsulationTabContent = ({
   const onMaterialSaveSuccess = () => {
     if (currentRoofThermalInsulation) {
       $.ajax({
-        url: `http://127.0.0.1:8000/roof_thermal_insulations/${currentRoofThermalInsulation.uuid}/`,
+        url: `${API_BASE_URL}/roof_thermal_insulations/${currentRoofThermalInsulation.uuid}/`,
         method: "GET",
         headers: {
           Authorization: `Token ${token}`,
@@ -306,7 +307,7 @@ const RoofThermalInsulationTabContent = ({
 
           // Trigger recalculation after material changes
           $.ajax({
-            url: `http://127.0.0.1:8000/roof_thermal_insulations/${currentRoofThermalInsulation.uuid}/recalculate/`,
+            url: `${API_BASE_URL}/roof_thermal_insulations/${currentRoofThermalInsulation.uuid}/recalculate/`,
             method: "POST",
             headers: {
               Authorization: `Token ${token}`,

@@ -7,6 +7,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import { BiHide, BiShow } from "react-icons/bi";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -28,7 +29,7 @@ function LogInForm({ params }) {
     };
 
     var settings = {
-      url: "http://127.0.0.1:8000/users/login/",
+      url: `${API_BASE_URL}/users/login/`,
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -65,7 +66,7 @@ function LogInForm({ params }) {
       return;
     }
     var settings = {
-      url: "http://127.0.0.1:8000/users/password-reset/",
+      url: `${API_BASE_URL}/users/password-reset/`,
       method: "POST",
       timeout: 0,
       headers: {

@@ -7,6 +7,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useModalBlur } from '../hooks/useModals';
 import InputEntryModal from '../modals/shared/InputEntryModal';
 import '../assets/styles/forms.css';
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies(null, { path: '/' });
 
@@ -113,7 +114,7 @@ function AdminNumericValues() {
 
     try {
       await $.ajax({
-        url: `http://127.0.0.1:8000/numeric_values/${editingValue.uuid}/`,
+        url: `${API_BASE_URL}/numeric_values/${editingValue.uuid}/`,
         method: 'PATCH',
         headers: {
           Authorization: `Token ${token}`,

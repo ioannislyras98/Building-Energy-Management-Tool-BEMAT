@@ -26,6 +26,7 @@ import ThermalInsulationMaterialModal from "../../modals/building/ThermalInsulat
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -101,7 +102,7 @@ const ThermalInsulationTabContent = ({
     setLoading(true);
 
     $.ajax({
-      url: `http://127.0.0.1:8000/thermal_insulations/building/${buildingUuid}/`,
+      url: `${API_BASE_URL}/thermal_insulations/building/${buildingUuid}/`,
       method: "GET",
       headers: {
         Authorization: `Token ${token}`,
@@ -142,7 +143,7 @@ const ThermalInsulationTabContent = ({
       net_present_value: 0,
     };
     $.ajax({
-      url: "http://127.0.0.1:8000/thermal_insulations/create/",
+      url: `${API_BASE_URL}/thermal_insulations/create/`,
       method: "POST",
       headers: {
         Authorization: `Token ${token}`,
@@ -185,7 +186,7 @@ const ThermalInsulationTabContent = ({
     };
 
     $.ajax({
-      url: `http://127.0.0.1:8000/thermal_insulations/${currentThermalInsulation.uuid}/`,
+      url: `${API_BASE_URL}/thermal_insulations/${currentThermalInsulation.uuid}/`,
       method: "PUT",
       headers: {
         Authorization: `Token ${token}`,
@@ -234,7 +235,7 @@ const ThermalInsulationTabContent = ({
     if (!deletingMaterial || !token) return;
 
     $.ajax({
-      url: `http://127.0.0.1:8000/thermal_insulations/material-layers/${deletingMaterial.uuid}/`,
+      url: `${API_BASE_URL}/thermal_insulations/material-layers/${deletingMaterial.uuid}/`,
       method: "DELETE",
       headers: {
         Authorization: `Token ${token}`,
@@ -269,7 +270,7 @@ const ThermalInsulationTabContent = ({
   const onMaterialSaveSuccess = () => {
     if (currentThermalInsulation) {
       $.ajax({
-        url: `http://127.0.0.1:8000/thermal_insulations/${currentThermalInsulation.uuid}/`,
+        url: `${API_BASE_URL}/thermal_insulations/${currentThermalInsulation.uuid}/`,
         method: "GET",
         headers: {
           Authorization: `Token ${token}`,

@@ -20,6 +20,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import ElectricalConsumptionModal from "../../modals/building/ElectricalConsumptionModal";
+import API_BASE_URL from "../../config/api";
 
 const ElectricalConsumptionTabContent = ({
   buildingUuid,
@@ -88,7 +89,7 @@ const ElectricalConsumptionTabContent = ({
     if (!deletingItem || !token) return;
 
     $.ajax({
-      url: `http://127.0.0.1:8000/electrical_consumptions/delete/${deletingItem.uuid}/`,
+      url: `${API_BASE_URL}/electrical_consumptions/delete/${deletingItem.uuid}/`,
       method: "DELETE",
       headers: {
         Authorization: `Token ${token}`,
@@ -126,7 +127,7 @@ const ElectricalConsumptionTabContent = ({
     setError(null);
 
     $.ajax({
-      url: `http://127.0.0.1:8000/electrical_consumptions/building/${buildingUuid}/`,
+      url: `${API_BASE_URL}/electrical_consumptions/building/${buildingUuid}/`,
       method: "GET",
       headers: {
         Authorization: `Token ${token}`,

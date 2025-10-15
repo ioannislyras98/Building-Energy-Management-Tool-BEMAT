@@ -13,6 +13,7 @@ import { MdTranslate } from "react-icons/md";
 
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -30,7 +31,7 @@ export default function TopBar() {
   useEffect(() => {
     if (token) {
       const settings = {
-        url: "http://127.0.0.1:8000/users/me/",
+        url: `${API_BASE_URL}/users/me/`,
         method: "GET",
         timeout: 0,
         headers: {
@@ -50,7 +51,7 @@ export default function TopBar() {
       // Fetch pending projects data
       const fetchPendingProjects = () => {
         const pendingSettings = {
-          url: "http://127.0.0.1:8000/projects/pending-percentage/",
+          url: `${API_BASE_URL}/projects/pending-percentage/`,
           method: "GET",
           timeout: 0,
           headers: {

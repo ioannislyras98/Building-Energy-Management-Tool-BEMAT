@@ -8,6 +8,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import { BiHide, BiShow } from "react-icons/bi";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -32,7 +33,7 @@ function submitData(event, params, setErrorMsg) {
   };
 
   var settings = {
-    url: "http://127.0.0.1:8000/users/signup/",
+    url: `${API_BASE_URL}/users/signup/`,
     method: "POST",
     headers: {
       "Content-Type": "application/json",

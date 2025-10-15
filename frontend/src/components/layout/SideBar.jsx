@@ -21,6 +21,7 @@ import { IoHome, IoFolderOpen, IoFolder } from "react-icons/io5";
 
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -42,7 +43,7 @@ export default function Sidenav() {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/users/me/", {
+        const response = await fetch(`${API_BASE_URL}/users/me/`, {
           method: "GET",
           headers: {
             Authorization: `Token ${token}`,
@@ -61,7 +62,7 @@ export default function Sidenav() {
 
     const fetchProjects = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/projects/get/", {
+        const response = await fetch(`${API_BASE_URL}/projects/get/`, {
           method: "GET",
           headers: {
             Authorization: `Token ${token}`,

@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import Cookies from "universal-cookie";
 import english_text from "../languages/english.json";
 import greek_text from "../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -26,7 +27,7 @@ export default function BuildingBtn({
   const fetchProgressData = () => {
     if (uuid) {
       const token = cookies.get("token");
-      fetch(`http://127.0.0.1:8000/projects/building-progress/${uuid}/`, {
+      fetch(`${API_BASE_URL}/projects/building-progress/${uuid}/`, {
         method: "GET",
         headers: {
           Authorization: `Token ${token}`,

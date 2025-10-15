@@ -17,6 +17,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 // TabPanel component για τα tabs
 function TabPanel(props) {
@@ -114,7 +115,7 @@ const ExteriorBlindsTabContent = ({
     try {
       // Χρήση fetch αντί για jQuery για καλύτερο έλεγχο του error handling
       const response = await fetch(
-        `http://127.0.0.1:8000/exterior_blinds/building/${buildingUuid}/`,
+        `${API_BASE_URL}/exterior_blinds/building/${buildingUuid}/`,
         {
           method: "GET",
           headers: {
@@ -186,7 +187,7 @@ const ExteriorBlindsTabContent = ({
       };
 
       const response = await fetch(
-        "http://127.0.0.1:8000/exterior_blinds/create/",
+        `${API_BASE_URL}/exterior_blinds/create/`,
         {
           method: "POST",
           headers: {

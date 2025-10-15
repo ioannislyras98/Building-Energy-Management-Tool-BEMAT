@@ -33,6 +33,7 @@ import Fireplace from "@mui/icons-material/Fireplace";
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 const ResultsTabContent = ({
   buildingUuid,
@@ -204,7 +205,7 @@ const ResultsTabContent = ({
             `Fetching ${config.name} from: http://127.0.0.1:8000/${config.endpoint}/building/${buildingUuid}/`
           );
           const response = await fetch(
-            `http://127.0.0.1:8000/${config.endpoint}/building/${buildingUuid}/`,
+            `${API_BASE_URL}/${config.endpoint}/building/${buildingUuid}/`,
             {
               method: "GET",
               headers: {

@@ -19,6 +19,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -62,7 +63,7 @@ const WindowReplacementTabContent = ({
 
   const fetchExistingData = () => {
     $.ajax({
-      url: `http://127.0.0.1:8000/window_replacements/building/${buildingUuid}/`,
+      url: `${API_BASE_URL}/window_replacements/building/${buildingUuid}/`,
       method: "GET",
       headers: {
         Authorization: `Token ${token}`,
@@ -134,7 +135,7 @@ const WindowReplacementTabContent = ({
     };
 
     $.ajax({
-      url: "http://127.0.0.1:8000/window_replacements/create/",
+      url: `${API_BASE_URL}/window_replacements/create/`,
       method: "POST",
       headers: {
         Authorization: `Token ${token}`,
@@ -303,7 +304,7 @@ const WindowReplacementTabContent = ({
     };
 
     $.ajax({
-      url: "http://127.0.0.1:8000/window_replacements/create/",
+      url: `${API_BASE_URL}/window_replacements/create/`,
       method: "POST",
       headers: {
         Authorization: `Token ${token}`,

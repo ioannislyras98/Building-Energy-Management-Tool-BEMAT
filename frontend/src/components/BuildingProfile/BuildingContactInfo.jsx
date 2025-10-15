@@ -15,6 +15,7 @@ import Cookies from "universal-cookie";
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 export default function BuildingContactInfo({
   building,
@@ -57,7 +58,7 @@ export default function BuildingContactInfo({
   const confirmDelete = () => {
     if (currentContact && onDeleteContact) {
       const settings = {
-        url: `http://127.0.0.1:8000/buildings/${building.data.uuid}/contacts/${currentContact.uuid}/delete/`,
+        url: `${API_BASE_URL}/buildings/${building.data.uuid}/contacts/${currentContact.uuid}/delete/`,
         method: "DELETE",
         timeout: 0,
         headers: {

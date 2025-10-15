@@ -19,6 +19,7 @@ import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import EnergyConsumptionModal from "../../modals/building/EnergyConsumptionModal";
 import {
+import API_BASE_URL from "../../config/api";
   AreaChart,
   Area,
   XAxis,
@@ -110,7 +111,7 @@ const EnergyProfileTabContent = ({
     if (!deletingItem || !token) return;
 
     $.ajax({
-      url: `http://127.0.0.1:8000/energy_consumptions/delete/${deletingItem.id}/`,
+      url: `${API_BASE_URL}/energy_consumptions/delete/${deletingItem.id}/`,
       method: "DELETE",
       headers: {
         Authorization: `Token ${token}`,
@@ -143,7 +144,7 @@ const EnergyProfileTabContent = ({
     setLoading(true);
     setError(null);
     $.ajax({
-      url: `http://127.0.0.1:8000/energy_consumptions/get_by_building/${buildingUuid}/`,
+      url: `${API_BASE_URL}/energy_consumptions/get_by_building/${buildingUuid}/`,
       method: "GET",
       headers: {
         Authorization: `Token ${token}`,

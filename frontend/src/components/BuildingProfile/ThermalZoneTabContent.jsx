@@ -18,6 +18,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import ThermalZoneModal from "../../modals/building/ThermalZoneModal";
+import API_BASE_URL from "../../config/api";
 
 const ThermalZoneTabContent = ({
   buildingUuid,
@@ -67,7 +68,7 @@ const ThermalZoneTabContent = ({
     if (!deletingItem || !token) return;
 
     $.ajax({
-      url: `http://127.0.0.1:8000/thermal_zones/delete/${deletingItem.uuid}/`,
+      url: `${API_BASE_URL}/thermal_zones/delete/${deletingItem.uuid}/`,
       method: "DELETE",
       headers: {
         Authorization: `Token ${token}`,
@@ -105,7 +106,7 @@ const ThermalZoneTabContent = ({
     setError(null);
 
     $.ajax({
-      url: `http://127.0.0.1:8000/thermal_zones/building/${buildingUuid}/`,
+      url: `${API_BASE_URL}/thermal_zones/building/${buildingUuid}/`,
       method: "GET",
       headers: {
         Authorization: `Token ${token}`,

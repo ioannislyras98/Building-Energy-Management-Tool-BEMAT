@@ -8,6 +8,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import { BiHide, BiShow } from "react-icons/bi";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -36,7 +37,7 @@ function ResetPasswordConfirmForm({ params }) {
     setPasswordsMatch(false);
 
     const settings = {
-      url: `http://127.0.0.1:8000/users/reset-password-confirm/${uid}/${token}/`,
+      url: `${API_BASE_URL}/users/reset-password-confirm/${uid}/${token}/`,
       method: "POST",
       timeout: 0,
       headers: {

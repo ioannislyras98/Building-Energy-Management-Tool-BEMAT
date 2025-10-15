@@ -13,6 +13,7 @@ import {
 } from "react-icons/fa";
 import Cookies from "universal-cookie";
 import $ from "jquery";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -58,7 +59,7 @@ export default function Settings() {
 
     try {
       const response = await $.ajax({
-        url: "http://127.0.0.1:8000/users/me/",
+        url: `${API_BASE_URL}/users/me/`,
         method: "GET",
         headers: {
           Authorization: `Token ${token}`,
@@ -104,7 +105,7 @@ export default function Settings() {
 
     try {
       await $.ajax({
-        url: "http://127.0.0.1:8000/users/update-profile/",
+        url: `${API_BASE_URL}/users/update-profile/`,
         method: "PUT",
         headers: {
           Authorization: `Token ${token}`,
@@ -164,7 +165,7 @@ export default function Settings() {
 
     try {
       await $.ajax({
-        url: "http://127.0.0.1:8000/users/change-password/",
+        url: `${API_BASE_URL}/users/change-password/`,
         method: "PUT",
         headers: {
           Authorization: `Token ${token}`,

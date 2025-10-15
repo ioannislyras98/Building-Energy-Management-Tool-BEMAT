@@ -8,6 +8,7 @@ import HeatingSystemModal from "../../modals/systems/HeatingSystemModal";
 import HotWaterSystemModal from "../../modals/systems/HotWaterSystemModal";
 import SolarCollectorsModal from "../../modals/systems/SolarCollectorsModal";
 import ConfirmationDialog from "../dialogs/ConfirmationDialog";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies();
 
@@ -72,7 +73,7 @@ const SystemsTabContent = ({
   const fetchBoilerData = () => {
     return new Promise((resolve) => {
       $.ajax({
-        url: `http://127.0.0.1:8000/boiler_details/building/${buildingUuid}/`,
+        url: `${API_BASE_URL}/boiler_details/building/${buildingUuid}/`,
         method: "GET",
         headers: { Authorization: `Token ${token}` },
         success: (response) => {
@@ -92,7 +93,7 @@ const SystemsTabContent = ({
   const fetchCoolingData = () => {
     return new Promise((resolve) => {
       $.ajax({
-        url: `http://127.0.0.1:8000/cooling_systems/building/${buildingUuid}/`,
+        url: `${API_BASE_URL}/cooling_systems/building/${buildingUuid}/`,
         method: "GET",
         headers: { Authorization: `Token ${token}` },
         success: (response) => {
@@ -112,7 +113,7 @@ const SystemsTabContent = ({
   const fetchHeatingData = () => {
     return new Promise((resolve) => {
       $.ajax({
-        url: `http://127.0.0.1:8000/heating_systems/building/${buildingUuid}/`,
+        url: `${API_BASE_URL}/heating_systems/building/${buildingUuid}/`,
         method: "GET",
         headers: { Authorization: `Token ${token}` },
         success: (response) => {
@@ -132,7 +133,7 @@ const SystemsTabContent = ({
   const fetchHotWaterData = () => {
     return new Promise((resolve) => {
       $.ajax({
-        url: `http://127.0.0.1:8000/domestic_hot_water_systems/building/${buildingUuid}/`,
+        url: `${API_BASE_URL}/domestic_hot_water_systems/building/${buildingUuid}/`,
         method: "GET",
         headers: { Authorization: `Token ${token}` },
         success: (response) => {
@@ -152,7 +153,7 @@ const SystemsTabContent = ({
   const fetchSolarCollectorsData = () => {
     return new Promise((resolve) => {
       $.ajax({
-        url: `http://127.0.0.1:8000/solar_collectors/building/${buildingUuid}/`,
+        url: `${API_BASE_URL}/solar_collectors/building/${buildingUuid}/`,
         method: "GET",
         headers: { Authorization: `Token ${token}` },
         success: (response) => {
@@ -210,7 +211,7 @@ const SystemsTabContent = ({
     };
 
     $.ajax({
-      url: `http://127.0.0.1:8000/${endpoints[systemType]}`,
+      url: `${API_BASE_URL}/${endpoints[systemType]}`,
       method: "DELETE",
       headers: { Authorization: `Token ${token}` },
       success: () => {

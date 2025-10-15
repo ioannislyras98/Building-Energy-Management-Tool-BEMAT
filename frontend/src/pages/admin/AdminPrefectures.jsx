@@ -16,6 +16,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "../../assets/styles/forms.css";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies();
 
@@ -101,7 +102,7 @@ const AdminPrefectures = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "http://127.0.0.1:8000/prefectures/admin/all/",
+        `${API_BASE_URL}/prefectures/admin/all/`,
         {
           headers: {
             Authorization: `Token ${token}`,
@@ -149,10 +150,10 @@ const AdminPrefectures = () => {
 
     try {
       const url = editingPrefecture
-        ? `http://127.0.0.1:8000/prefectures/${
+        ? `${API_BASE_URL}/prefectures/${
             editingPrefecture.uuid || editingPrefecture.id
           }/`
-        : "http://127.0.0.1:8000/prefectures/";
+        : `${API_BASE_URL}/prefectures/`;
 
       const method = editingPrefecture ? "PUT" : "POST";
 
@@ -220,7 +221,7 @@ const AdminPrefectures = () => {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/prefectures/${
+        `${API_BASE_URL}/prefectures/${
           prefectureToDelete.uuid || prefectureToDelete.id
         }/`,
         {
@@ -272,7 +273,7 @@ const AdminPrefectures = () => {
   const handleBulkDeleteConfirm = async () => {
     try {
       const deletePromises = selectedPrefectures.map((id) =>
-        fetch(`http://127.0.0.1:8000/prefectures/${id}/`, {
+        fetch(`${API_BASE_URL}/prefectures/${id}/`, {
           method: "DELETE",
           headers: {
             Authorization: `Token ${token}`,

@@ -3,6 +3,7 @@ import $ from "jquery";
 import Cookies from "universal-cookie";
 import { useProgress } from "../context/ProgressContext";
 import { useSidebar } from "../context/SidebarContext";
+import API_BASE_URL from "../../config/api";
 
 export const useProjects = () => {
   const [projects, setProjects] = useState([]);
@@ -18,7 +19,7 @@ export const useProjects = () => {
     setLoading(true);
 
     const settings = {
-      url: "http://127.0.0.1:8000/projects/get/",
+      url: `${API_BASE_URL}/projects/get/`,
       method: "GET",
       timeout: 0,
       headers: {
@@ -59,7 +60,7 @@ export const useProjects = () => {
 
   const handleDeleteProject = (projectUuid, params) => {
     const settings = {
-      url: `http://127.0.0.1:8000/projects/delete/${projectUuid}/`,
+      url: `${API_BASE_URL}/projects/delete/${projectUuid}/`,
       method: "DELETE",
       timeout: 0,
       headers: {

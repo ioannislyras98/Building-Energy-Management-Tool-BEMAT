@@ -8,6 +8,7 @@ import ProjectsManagement from "../components/admin/ProjectsManagement";
 import english_text from "../languages/english.json";
 import greek_text from "../languages/greek.json";
 import {
+import API_BASE_URL from "../../config/api";
   FaChartBar,
   FaUsers,
   FaProjectDiagram,
@@ -34,7 +35,7 @@ const AdminDashboard = () => {
       }
 
       try {
-        const response = await fetch("http://127.0.0.1:8000/users/me/", {
+        const response = await fetch(`${API_BASE_URL}/users/me/`, {
           method: "GET",
           headers: {
             Authorization: `Token ${token}`,

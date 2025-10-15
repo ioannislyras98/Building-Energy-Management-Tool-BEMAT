@@ -12,6 +12,7 @@ import { useBuildings } from "../hooks/useBuildings";
 import { useModalBlur } from "../hooks/useModals";
 import english_text from "../languages/english.json";
 import greek_text from "../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -126,7 +127,7 @@ export default function ProjectView() {
     
     try {
       const token = cookies.get("token");
-      const response = await fetch(`http://127.0.0.1:8000/projects/submit/${selectedProject.uuid}/`, {
+      const response = await fetch(`${API_BASE_URL}/projects/submit/${selectedProject.uuid}/`, {
         method: "POST",
         headers: {
           "Authorization": `Token ${token}`,

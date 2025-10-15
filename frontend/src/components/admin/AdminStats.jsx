@@ -3,6 +3,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import Cookies from "universal-cookie";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies();
 
@@ -24,7 +25,7 @@ const AdminStats = () => {
 
         // Fetch dashboard stats from dedicated endpoint
         const statsResponse = await fetch(
-          "http://127.0.0.1:8000/admin-api/dashboard-stats/",
+          `${API_BASE_URL}/admin-api/dashboard-stats/`,
           {
             method: "GET",
             headers: {

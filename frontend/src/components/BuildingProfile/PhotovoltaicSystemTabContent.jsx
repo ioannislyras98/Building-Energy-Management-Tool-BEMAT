@@ -24,6 +24,7 @@ import ConfirmationDialog from "../dialogs/ConfirmationDialog";
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -176,7 +177,7 @@ const PhotovoltaicSystemTabContent = ({
     setLoading(true);
 
     $.ajax({
-      url: `http://127.0.0.1:8000/photovoltaic_systems/building/${buildingUuid}/`,
+      url: `${API_BASE_URL}/photovoltaic_systems/building/${buildingUuid}/`,
       method: "GET",
       headers: {
         Authorization: `Token ${token}`,
@@ -344,8 +345,8 @@ const PhotovoltaicSystemTabContent = ({
       currentPhotovoltaicSystem && currentPhotovoltaicSystem.uuid;
     const method = isUpdate ? "PUT" : "POST";
     const url = isUpdate
-      ? `http://127.0.0.1:8000/photovoltaic_systems/${currentPhotovoltaicSystem.uuid}/`
-      : "http://127.0.0.1:8000/photovoltaic_systems/";
+      ? `${API_BASE_URL}/photovoltaic_systems/${currentPhotovoltaicSystem.uuid}/`
+      : `${API_BASE_URL}/photovoltaic_systems/`;
 
     console.log(`${isUpdate ? "Updating" : "Creating"} photovoltaic system:`, {
       method,

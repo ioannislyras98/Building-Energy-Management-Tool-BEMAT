@@ -13,6 +13,7 @@ import greek_text from "../../languages/greek.json";
 import AddImageModal from "../../modals/images/AddImageModal";
 import EditImageModal from "../../modals/images/EditImageModal";
 import ConfirmationDialog from "../dialogs/ConfirmationDialog";
+import API_BASE_URL from "../../config/api";
 
 const ImagesTabContent = ({
   buildingUuid,
@@ -47,7 +48,7 @@ const ImagesTabContent = ({
     setLoading(true);
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/building-images/building/${buildingUuid}/`,
+        `${API_BASE_URL}/building-images/building/${buildingUuid}/`,
         {
           method: "GET",
           headers: {
@@ -90,7 +91,7 @@ const ImagesTabContent = ({
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/building-images/${selectedImage.id}/`,
+        `${API_BASE_URL}/building-images/${selectedImage.id}/`,
         {
           method: "DELETE",
           headers: {

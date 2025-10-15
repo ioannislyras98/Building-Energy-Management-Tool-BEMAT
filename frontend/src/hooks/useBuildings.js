@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import $ from "jquery";
 import Cookies from "universal-cookie";
 import { useSidebar } from "../context/SidebarContext";
+import API_BASE_URL from "../../config/api";
 
 export const useBuildings = () => {
   const [buildings, setBuildings] = useState([]);
@@ -23,7 +24,7 @@ export const useBuildings = () => {
       setError(null);
 
       const settings = {
-        url: `http://127.0.0.1:8000/buildings/get/?project=${projectUuid}`,
+        url: `${API_BASE_URL}/buildings/get/?project=${projectUuid}`,
         method: "GET",
         timeout: 0,
         headers: {

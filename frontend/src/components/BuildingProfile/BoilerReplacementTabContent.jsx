@@ -17,6 +17,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 // TabPanel component για τα tabs
 function TabPanel(props) {
@@ -115,7 +116,7 @@ const BoilerReplacementTabContent = ({
     try {
       // Χρήση fetch αντί για jQuery για καλύτερο έλεγχο του error handling
       const response = await fetch(
-        `http://127.0.0.1:8000/boiler_replacement/building/${buildingUuid}/`,
+        `${API_BASE_URL}/boiler_replacement/building/${buildingUuid}/`,
         {
           method: "GET",
           headers: {
@@ -187,7 +188,7 @@ const BoilerReplacementTabContent = ({
       };
 
       const response = await $.ajax({
-        url: "http://127.0.0.1:8000/boiler_replacement/create/",
+        url: `${API_BASE_URL}/boiler_replacement/create/`,
         type: "POST",
         headers: {
           Authorization: `Token ${token}`,

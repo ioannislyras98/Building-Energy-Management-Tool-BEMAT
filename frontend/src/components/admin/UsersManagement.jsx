@@ -5,6 +5,7 @@ import ConfirmationDialog from "../dialogs/ConfirmationDialog";
 import DataTable from "./DataTable";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 const cookies = new Cookies();
 
@@ -47,7 +48,7 @@ const UsersManagement = () => {
       });
 
       const response = await fetch(
-        `http://127.0.0.1:8000/admin-api/users-table/?${queryParams}`,
+        `${API_BASE_URL}/admin-api/users-table/?${queryParams}`,
         {
           method: "GET",
           headers: {
@@ -84,7 +85,7 @@ const UsersManagement = () => {
   const handleBulkDelete = async (userIds) => {
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/admin-api/users/bulk-delete/",
+        `${API_BASE_URL}/admin-api/users/bulk-delete/`,
         {
           method: "DELETE",
           headers: {

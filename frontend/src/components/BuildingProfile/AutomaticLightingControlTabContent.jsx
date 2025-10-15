@@ -17,6 +17,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
+import API_BASE_URL from "../../config/api";
 
 // TabPanel component για τα tabs
 function TabPanel(props) {
@@ -115,7 +116,7 @@ const AutomaticLightingControlTabContent = ({
     try {
       // Χρήση fetch αντί για jQuery για καλύτερο έλεγχο του error handling
       const response = await fetch(
-        `http://127.0.0.1:8000/automatic_lighting_control/building/${buildingUuid}/`,
+        `${API_BASE_URL}/automatic_lighting_control/building/${buildingUuid}/`,
         {
           method: "GET",
           headers: {
@@ -187,7 +188,7 @@ const AutomaticLightingControlTabContent = ({
       };
 
       const response = await $.ajax({
-        url: "http://127.0.0.1:8000/automatic_lighting_control/create/",
+        url: `${API_BASE_URL}/automatic_lighting_control/create/`,
         type: "POST",
         headers: {
           Authorization: `Token ${token}`,

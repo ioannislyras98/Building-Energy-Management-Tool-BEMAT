@@ -1,11 +1,12 @@
 import axios from "axios";
 import Cookies from "universal-cookie";
+import API_BASE_URL from "../src/config/api";
 
 const cookies = new Cookies();
 
 export function getuser() {
   return axios
-    .get("http://127.0.0.1:8000/user/")
+    .get(`${API_BASE_URL}/user/`)
     .then((response) => {
       return response.data;
     })
@@ -18,7 +19,7 @@ export function getuser() {
 export function getAllPrefectures() {
   const token = cookies.get("token") || "";
   return axios
-    .get("http://127.0.0.1:8000/prefectures/active/all/", {
+    .get(`${API_BASE_URL}/prefectures/active/all/`, {
       headers: {
         Authorization: `Token ${token}`,
       },
@@ -35,7 +36,7 @@ export function getAllPrefectures() {
 export function getAllPrefecturesAdmin() {
   const token = cookies.get("token") || "";
   return axios
-    .get("http://127.0.0.1:8000/prefectures/admin/all/", {
+    .get(`${API_BASE_URL}/prefectures/admin/all/`, {
       headers: {
         Authorization: `Token ${token}`,
       },
@@ -52,7 +53,7 @@ export function getAllPrefecturesAdmin() {
 export function getPrefecturesByZone(zone) {
   const token = cookies.get("token") || "";
   return axios
-    .get(`http://127.0.0.1:8000/prefectures/zone/${zone}/`, {
+    .get(`${API_BASE_URL}/prefectures/zone/${zone}/`, {
       headers: {
         Authorization: `Token ${token}`,
       },
@@ -69,7 +70,7 @@ export function getPrefecturesByZone(zone) {
 export function getEnergyZones() {
   const token = cookies.get("token") || "";
   return axios
-    .get("http://127.0.0.1:8000/prefectures/zones/list/", {
+    .get(`${API_BASE_URL}/prefectures/zones/list/`, {
       headers: {
         Authorization: `Token ${token}`,
       },
@@ -87,7 +88,7 @@ export function getEnergyZones() {
 export function createPrefecture(data) {
   const token = cookies.get("token") || "";
   return axios
-    .post("http://127.0.0.1:8000/prefectures/", data, {
+    .post(`${API_BASE_URL}/prefectures/`, data, {
       headers: {
         Authorization: `Token ${token}`,
         "Content-Type": "application/json",
@@ -105,7 +106,7 @@ export function createPrefecture(data) {
 export function updatePrefecture(uuid, data) {
   const token = cookies.get("token") || "";
   return axios
-    .put(`http://127.0.0.1:8000/prefectures/${uuid}/`, data, {
+    .put(`${API_BASE_URL}/prefectures/${uuid}/`, data, {
       headers: {
         Authorization: `Token ${token}`,
         "Content-Type": "application/json",
@@ -123,7 +124,7 @@ export function updatePrefecture(uuid, data) {
 export function deletePrefecture(uuid) {
   const token = cookies.get("token") || "";
   return axios
-    .delete(`http://127.0.0.1:8000/prefectures/${uuid}/`, {
+    .delete(`${API_BASE_URL}/prefectures/${uuid}/`, {
       headers: {
         Authorization: `Token ${token}`,
       },
@@ -143,16 +144,12 @@ export function deletePrefecture(uuid) {
 export function createOldAirConditioning(data) {
   const token = cookies.get("token") || "";
   return axios
-    .post(
-      "http://127.0.0.1:8000/air_conditioning_replacements/old/create/",
-      data,
-      {
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    )
+    .post(`${API_BASE_URL}/air_conditioning_replacements/old/create/`, data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
     .then((response) => {
       return response.data;
     })
@@ -166,7 +163,7 @@ export function getOldAirConditioningsByBuilding(buildingUuid) {
   const token = cookies.get("token") || "";
   return axios
     .get(
-      `http://127.0.0.1:8000/air_conditioning_replacements/old/building/${buildingUuid}/`,
+      `${API_BASE_URL}/air_conditioning_replacements/old/building/${buildingUuid}/`,
       {
         headers: {
           Authorization: `Token ${token}`,
@@ -186,7 +183,7 @@ export function updateOldAirConditioning(acUuid, data) {
   const token = cookies.get("token") || "";
   return axios
     .put(
-      `http://127.0.0.1:8000/air_conditioning_replacements/old/update/${acUuid}/`,
+      `${API_BASE_URL}/air_conditioning_replacements/old/update/${acUuid}/`,
       data,
       {
         headers: {
@@ -208,7 +205,7 @@ export function deleteOldAirConditioning(acUuid) {
   const token = cookies.get("token") || "";
   return axios
     .delete(
-      `http://127.0.0.1:8000/air_conditioning_replacements/old/delete/${acUuid}/`,
+      `${API_BASE_URL}/air_conditioning_replacements/old/delete/${acUuid}/`,
       {
         headers: {
           Authorization: `Token ${token}`,
@@ -228,16 +225,12 @@ export function deleteOldAirConditioning(acUuid) {
 export function createNewAirConditioning(data) {
   const token = cookies.get("token") || "";
   return axios
-    .post(
-      "http://127.0.0.1:8000/air_conditioning_replacements/new/create/",
-      data,
-      {
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    )
+    .post(`${API_BASE_URL}/air_conditioning_replacements/new/create/`, data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
     .then((response) => {
       return response.data;
     })
@@ -251,7 +244,7 @@ export function getNewAirConditioningsByBuilding(buildingUuid) {
   const token = cookies.get("token") || "";
   return axios
     .get(
-      `http://127.0.0.1:8000/air_conditioning_replacements/new/building/${buildingUuid}/`,
+      `${API_BASE_URL}/air_conditioning_replacements/new/building/${buildingUuid}/`,
       {
         headers: {
           Authorization: `Token ${token}`,
@@ -271,7 +264,7 @@ export function updateNewAirConditioning(acUuid, data) {
   const token = cookies.get("token") || "";
   return axios
     .put(
-      `http://127.0.0.1:8000/air_conditioning_replacements/new/update/${acUuid}/`,
+      `${API_BASE_URL}/air_conditioning_replacements/new/update/${acUuid}/`,
       data,
       {
         headers: {
@@ -293,7 +286,7 @@ export function deleteNewAirConditioning(acUuid) {
   const token = cookies.get("token") || "";
   return axios
     .delete(
-      `http://127.0.0.1:8000/air_conditioning_replacements/new/delete/${acUuid}/`,
+      `${API_BASE_URL}/air_conditioning_replacements/new/delete/${acUuid}/`,
       {
         headers: {
           Authorization: `Token ${token}`,
@@ -314,7 +307,7 @@ export function createAirConditioningAnalysis(data) {
   const token = cookies.get("token") || "";
   return axios
     .post(
-      "http://127.0.0.1:8000/air_conditioning_replacements/analysis/create/",
+      `${API_BASE_URL}/air_conditioning_replacements/analysis/create/`,
       data,
       {
         headers: {
@@ -336,7 +329,7 @@ export function getAirConditioningAnalysisByBuilding(buildingUuid) {
   const token = cookies.get("token") || "";
   return axios
     .get(
-      `http://127.0.0.1:8000/air_conditioning_replacements/analysis/building/${buildingUuid}/`,
+      `${API_BASE_URL}/air_conditioning_replacements/analysis/building/${buildingUuid}/`,
       {
         headers: {
           Authorization: `Token ${token}`,
@@ -356,7 +349,7 @@ export function updateAirConditioningAnalysis(analysisUuid, data) {
   const token = cookies.get("token") || "";
   return axios
     .put(
-      `http://127.0.0.1:8000/air_conditioning_replacements/analysis/update/${analysisUuid}/`,
+      `${API_BASE_URL}/air_conditioning_replacements/analysis/update/${analysisUuid}/`,
       data,
       {
         headers: {
