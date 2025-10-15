@@ -8,7 +8,7 @@ import HeatingSystemModal from "../../modals/systems/HeatingSystemModal";
 import HotWaterSystemModal from "../../modals/systems/HotWaterSystemModal";
 import SolarCollectorsModal from "../../modals/systems/SolarCollectorsModal";
 import ConfirmationDialog from "../dialogs/ConfirmationDialog";
-import API_BASE_URL from "../../config/api";
+import API_BASE_URL from "../../config/api.js";
 
 const cookies = new Cookies();
 

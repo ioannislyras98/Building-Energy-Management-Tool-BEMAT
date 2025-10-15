@@ -7,8 +7,8 @@ import UsersManagement from "../components/admin/UsersManagement";
 import ProjectsManagement from "../components/admin/ProjectsManagement";
 import english_text from "../languages/english.json";
 import greek_text from "../languages/greek.json";
+import API_BASE_URL from "../config/api.js";
 import {
-import API_BASE_URL from "../../config/api";
   FaChartBar,
   FaUsers,
   FaProjectDiagram,

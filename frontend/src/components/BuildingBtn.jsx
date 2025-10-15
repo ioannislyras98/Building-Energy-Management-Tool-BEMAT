@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import Cookies from "universal-cookie";
 import english_text from "../languages/english.json";
 import greek_text from "../languages/greek.json";
-import API_BASE_URL from "../../config/api";
+import API_BASE_URL from "../config/api.js";
 
 const cookies = new Cookies(null, { path: "/" });
 

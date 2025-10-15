@@ -11,7 +11,7 @@ import Cookies from "universal-cookie";
 import $ from "jquery";
 import { useModalBlur } from "../hooks/useModals";
 import { Modals } from "../components/Modals";
-import API_BASE_URL from "../../config/api";
+import API_BASE_URL from "../config/api.js";
 
 const cookies = new Cookies(null, { path: "/" });
 

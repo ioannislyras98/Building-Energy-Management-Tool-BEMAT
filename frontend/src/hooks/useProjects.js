@@ -3,7 +3,7 @@ import $ from "jquery";
 import Cookies from "universal-cookie";
 import { useProgress } from "../context/ProgressContext";
 import { useSidebar } from "../context/SidebarContext";
-import API_BASE_URL from "../../config/api";
+import API_BASE_URL from "../config/api.js";
 
 export const useProjects = () => {
   const [projects, setProjects] = useState([]);

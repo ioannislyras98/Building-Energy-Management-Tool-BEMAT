@@ -18,8 +18,8 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import EnergyConsumptionModal from "../../modals/building/EnergyConsumptionModal";
+import API_BASE_URL from "../../config/api.js";
 import {
-import API_BASE_URL from "../../config/api";
   AreaChart,
   Area,
   XAxis,

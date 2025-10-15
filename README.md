@@ -162,6 +162,7 @@ docker-compose -f docker-compose.frontend.yml up --build -d
 
 ```bash
 # Δημιουργία admin user
+cd backend
 docker-compose exec web python manage.py createsuperuser
 ```
 

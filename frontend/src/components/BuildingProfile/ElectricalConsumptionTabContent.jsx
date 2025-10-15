@@ -20,7 +20,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import ElectricalConsumptionModal from "../../modals/building/ElectricalConsumptionModal";
-import API_BASE_URL from "../../config/api";
+import API_BASE_URL from "../../config/api.js";
 
 const ElectricalConsumptionTabContent = ({
   buildingUuid,

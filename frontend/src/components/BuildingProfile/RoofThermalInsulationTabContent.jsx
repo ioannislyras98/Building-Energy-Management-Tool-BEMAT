@@ -26,7 +26,7 @@ import RoofThermalInsulationMaterialModal from "../../modals/building/RoofTherma
 import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
-import API_BASE_URL from "../../config/api";
+import API_BASE_URL from "../../config/api.js";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;

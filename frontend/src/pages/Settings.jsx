@@ -13,7 +13,7 @@ import {
 } from "react-icons/fa";
 import Cookies from "universal-cookie";
 import $ from "jquery";
-import API_BASE_URL from "../../config/api";
+import API_BASE_URL from "../config/api.js";
 
 const cookies = new Cookies(null, { path: "/" });
 

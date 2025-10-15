@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import InputEntryModal from "../../modals/shared/InputEntryModal";
 import ConfirmationDialog from "../../components/dialogs/ConfirmationDialog";
 import "../../assets/styles/forms.css";
-import API_BASE_URL from "../../config/api";
+import API_BASE_URL from "../../config/api.js";
 
 const cookies = new Cookies();
 

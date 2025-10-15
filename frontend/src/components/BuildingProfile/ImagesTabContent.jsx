@@ -13,7 +13,7 @@ import greek_text from "../../languages/greek.json";
 import AddImageModal from "../../modals/images/AddImageModal";
 import EditImageModal from "../../modals/images/EditImageModal";
 import ConfirmationDialog from "../dialogs/ConfirmationDialog";
-import API_BASE_URL from "../../config/api";
+import API_BASE_URL from "../../config/api.js";
 
 const ImagesTabContent = ({
   buildingUuid,

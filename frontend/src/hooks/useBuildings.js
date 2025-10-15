@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import $ from "jquery";
 import Cookies from "universal-cookie";
 import { useSidebar } from "../context/SidebarContext";
-import API_BASE_URL from "../../config/api";
+import API_BASE_URL from "../config/api.js";
 
 export const useBuildings = () => {
   const [buildings, setBuildings] = useState([]);
