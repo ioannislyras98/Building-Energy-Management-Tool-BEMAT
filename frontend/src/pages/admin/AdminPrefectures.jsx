@@ -101,15 +101,12 @@ const AdminPrefectures = () => {
   const fetchPrefectures = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `${API_BASE_URL}/prefectures/admin/all/`,
-        {
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/prefectures/admin/all/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response.ok) {
         const data = await response.json();

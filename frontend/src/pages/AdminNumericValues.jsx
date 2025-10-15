@@ -1,29 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import $ from 'jquery';
-import Cookies from 'universal-cookie';
-import { FaCalculator, FaEdit, FaArrowLeft } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import { useLanguage } from '../context/LanguageContext';
-import { useModalBlur } from '../hooks/useModals';
-import InputEntryModal from '../modals/shared/InputEntryModal';
-import '../assets/styles/forms.css';
+import React, { useState, useEffect } from "react";
+import $ from "jquery";
+import Cookies from "universal-cookie";
+import { FaCalculator, FaEdit, FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../context/LanguageContext";
+import { useModalBlur } from "../hooks/useModals";
+import InputEntryModal from "../modals/shared/InputEntryModal";
+import "../assets/styles/forms.css";
 import API_BASE_URL from "../config/api.js";
 
-const cookies = new Cookies(null, { path: '/' });
+const cookies = new Cookies(null, { path: "/" });
 
 function AdminNumericValues() {
   const navigate = useNavigate();
   const { language } = useLanguage();
-  const token = cookies.get('token');
-  
+  const token = cookies.get("token");
+
   const [numericValues, setNumericValues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingValue, setEditingValue] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
-    value: ''
+    name: "",
+    value: "",
   });
   const [errors, setErrors] = useState({});
   const [showValidationErrors, setShowValidationErrors] = useState(false);
@@ -35,7 +35,7 @@ function AdminNumericValues() {
     if (token) {
       fetchNumericValues();
     } else {
-      setError('Δεν έχετε συνδεθεί. Παρακαλώ κάντε login.');
+      setError("Δεν έχετε συνδεθεί. Παρακαλώ κάντε login.");
     }
   }, [token]);
 
@@ -50,16 +50,16 @@ function AdminNumericValues() {
   const fetchNumericValues = async () => {
     try {
       setLoading(true);
-      
+
       if (!token) {
-        setError('Δεν έχετε συνδεθεί. Παρακαλώ κάντε login.');
+        setError("Δεν έχετε συνδεθεί. Παρακαλώ κάντε login.");
         setLoading(false);
         return;
       }
 
       const response = await $.ajax({
-        url: 'http://127.0.0.1:8000/numeric_values/',
-        method: 'GET',
+        url: "http://127.0.0.1:8000/numeric_values/",
+        method: "GET",
         headers: {
           Authorization: `Token ${token}`,
         },
@@ -67,11 +67,11 @@ function AdminNumericValues() {
       setNumericValues(response);
       setError(null);
     } catch (err) {
-      console.error('Error fetching numeric values:', err);
+      console.error("Error fetching numeric values:", err);
       if (err.status === 401) {
-        setError('Μη εξουσιοδοτημένη πρόσβαση. Παρακαλώ κάντε login ξανά.');
+        setError("Μη εξουσιοδοτημένη πρόσβαση. Παρακαλώ κάντε login ξανά.");
       } else {
-        setError('Αποτυχία φόρτωσης αριθμητικών τιμών');
+        setError("Αποτυχία φόρτωσης αριθμητικών τιμών");
       }
     } finally {
       setLoading(false);
@@ -81,8 +81,8 @@ function AdminNumericValues() {
   const handleEdit = (numericValue) => {
     setEditingValue(numericValue);
     setFormData({
-      name: numericValue.name || '',
-      value: numericValue.value || ''
+      name: numericValue.name || "",
+      value: numericValue.value || "",
     });
     setShowEditModal(true);
   };
@@ -91,7 +91,7 @@ function AdminNumericValues() {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
     if (errors[id]) {
-      setErrors({ ...errors, [id]: '' });
+      setErrors({ ...errors, [id]: "" });
     }
   };
 
@@ -101,10 +101,10 @@ function AdminNumericValues() {
 
     // Validation - only value is required
     const newErrors = {};
-    if (!formData.value || formData.value === '') {
-      newErrors.value = 'Η τιμή είναι υποχρεωτική';
+    if (!formData.value || formData.value === "") {
+      newErrors.value = "Η τιμή είναι υποχρεωτική";
     } else if (parseFloat(formData.value) < 0) {
-      newErrors.value = 'Η τιμή πρέπει να είναι θετική';
+      newErrors.value = "Η τιμή πρέπει να είναι θετική";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -115,31 +115,34 @@ function AdminNumericValues() {
     try {
       await $.ajax({
         url: `${API_BASE_URL}/numeric_values/${editingValue.uuid}/`,
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
           Authorization: `Token ${token}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         data: JSON.stringify({ value: parseFloat(formData.value) }),
       });
 
       // Update local state
-      setNumericValues(numericValues.map(nv => 
-        nv.uuid === editingValue.uuid ? { ...nv, value: parseFloat(formData.value) } : nv
-      ));
+      setNumericValues(
+        numericValues.map((nv) =>
+          nv.uuid === editingValue.uuid
+            ? { ...nv, value: parseFloat(formData.value) }
+            : nv
+        )
+      );
 
       setShowEditModal(false);
       setEditingValue(null);
-      setFormData({ name: '', value: '' });
+      setFormData({ name: "", value: "" });
       setErrors({});
       setShowValidationErrors(false);
-      
     } catch (err) {
-      console.error('Error updating numeric value:', err);
+      console.error("Error updating numeric value:", err);
       if (err.status === 401) {
-        setError('Μη εξουσιοδοτημένη πρόσβαση. Παρακαλώ κάντε login ξανά.');
+        setError("Μη εξουσιοδοτημένη πρόσβαση. Παρακαλώ κάντε login ξανά.");
       } else {
-        setError('Αποτυχία ενημέρωσης τιμής');
+        setError("Αποτυχία ενημέρωσης τιμής");
       }
     }
   };
@@ -159,15 +162,15 @@ function AdminNumericValues() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => navigate('/admin')}
+              onClick={() => navigate("/admin")}
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
               <FaArrowLeft className="mr-2" size={18} />
-              {language === 'en' ? 'Back to Admin' : 'Επιστροφή στο Admin'}
+              {language === "en" ? "Back to Admin" : "Επιστροφή στο Admin"}
             </button>
             <div className="flex items-center space-x-3">
               <FaCalculator className="text-primary text-xl" />
               <h1 className="text-2xl font-bold text-gray-800">
-                {language === 'en' ? 'Numeric Values' : 'Αριθμητικές Τιμές'}
+                {language === "en" ? "Numeric Values" : "Αριθμητικές Τιμές"}
               </h1>
             </div>
           </div>
@@ -187,19 +190,19 @@ function AdminNumericValues() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {language === 'en' ? 'Name' : 'Όνομα'}
+                {language === "en" ? "Name" : "Όνομα"}
               </th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {language === 'en' ? 'Value' : 'Τιμή'}
+                {language === "en" ? "Value" : "Τιμή"}
               </th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {language === 'en' ? 'Created By' : 'Δημιουργήθηκε από'}
+                {language === "en" ? "Created By" : "Δημιουργήθηκε από"}
               </th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {language === 'en' ? 'Last Updated' : 'Τελευταία Ενημέρωση'}
+                {language === "en" ? "Last Updated" : "Τελευταία Ενημέρωση"}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {language === 'en' ? 'Actions' : 'Ενέργειες'}
+                {language === "en" ? "Actions" : "Ενέργειες"}
               </th>
             </tr>
           </thead>
@@ -210,7 +213,9 @@ function AdminNumericValues() {
                   <div className="text-gray-500">
                     <FaCalculator className="mx-auto h-8 w-8 text-gray-400 mb-4" />
                     <p className="text-lg font-medium">
-                      {language === 'en' ? 'No numeric values available' : 'Δεν υπάρχουν διαθέσιμες αριθμητικές τιμές'}
+                      {language === "en"
+                        ? "No numeric values available"
+                        : "Δεν υπάρχουν διαθέσιμες αριθμητικές τιμές"}
                     </p>
                   </div>
                 </td>
@@ -225,10 +230,12 @@ function AdminNumericValues() {
                     {nv.value}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-700">
-                    {nv.created_by_username || '-'}
+                    {nv.created_by_username || "-"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-700">
-                    {nv.updated_at ? new Date(nv.updated_at).toLocaleDateString('el-GR') : '-'}
+                    {nv.updated_at
+                      ? new Date(nv.updated_at).toLocaleDateString("el-GR")
+                      : "-"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
@@ -251,12 +258,14 @@ function AdminNumericValues() {
             <div className="modal-header">
               <h3 className="modal-title">
                 <FaCalculator className="modal-icon" />
-                {language === 'en' ? 'Edit Numeric Value' : 'Επεξεργασία Αριθμητικής Τιμής'}
+                {language === "en"
+                  ? "Edit Numeric Value"
+                  : "Επεξεργασία Αριθμητικής Τιμής"}
               </h3>
             </div>
             <form onSubmit={handleSubmit} className="modal-form">
               <InputEntryModal
-                entry={language === 'en' ? 'Name' : 'Όνομα'}
+                entry={language === "en" ? "Name" : "Όνομα"}
                 id="name"
                 type="text"
                 value={formData.name}
@@ -266,13 +275,17 @@ function AdminNumericValues() {
               />
 
               <InputEntryModal
-                entry={language === 'en' ? 'Value' : 'Τιμή'}
+                entry={language === "en" ? "Value" : "Τιμή"}
                 id="value"
                 type="number"
                 value={formData.value}
                 onChange={handleChange}
-                example={language === 'en' ? 'Enter numeric value' : 'Εισάγετε αριθμητική τιμή'}
-                error={showValidationErrors ? errors.value : ''}
+                example={
+                  language === "en"
+                    ? "Enter numeric value"
+                    : "Εισάγετε αριθμητική τιμή"
+                }
+                error={showValidationErrors ? errors.value : ""}
                 step="0.01"
                 required
               />
@@ -283,15 +296,15 @@ function AdminNumericValues() {
                   onClick={() => {
                     setShowEditModal(false);
                     setEditingValue(null);
-                    setFormData({ name: '', value: '' });
+                    setFormData({ name: "", value: "" });
                     setErrors({});
                     setShowValidationErrors(false);
                   }}
                   className="close-modal">
-                  {language === 'en' ? 'Cancel' : 'Άκυρο'}
+                  {language === "en" ? "Cancel" : "Άκυρο"}
                 </button>
                 <button type="submit" className="confirm-button">
-                  {language === 'en' ? 'Update Value' : 'Ενημέρωση Τιμής'}
+                  {language === "en" ? "Update Value" : "Ενημέρωση Τιμής"}
                 </button>
               </div>
             </form>

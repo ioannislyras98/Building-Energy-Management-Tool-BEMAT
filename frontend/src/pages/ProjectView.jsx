@@ -19,15 +19,16 @@ const cookies = new Cookies(null, { path: "/" });
 export default function ProjectView() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  
+
   // Individual modal state management
   const [isBuildingModalOpen, setIsBuildingModalOpen] = useState(false);
-  const [isUpdateProjectModalOpen, setIsUpdateProjectModalOpen] = useState(false);
-  
+  const [isUpdateProjectModalOpen, setIsUpdateProjectModalOpen] =
+    useState(false);
+
   // Apply blur effects for each modal
   useModalBlur(isBuildingModalOpen);
   useModalBlur(isUpdateProjectModalOpen);
-  
+
   const { language } = useLanguage();
   const paramsText = language === "en" ? english_text.Home : greek_text.Home;
 
@@ -124,33 +125,39 @@ export default function ProjectView() {
 
   const handleSubmitProject = async () => {
     if (!selectedProject) return;
-    
+
     try {
       const token = cookies.get("token");
-      const response = await fetch(`${API_BASE_URL}/projects/submit/${selectedProject.uuid}/`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      
+      const response = await fetch(
+        `${API_BASE_URL}/projects/submit/${selectedProject.uuid}/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       if (response.ok) {
         const data = await response.json();
         console.log("Project submitted successfully:", data);
-        
+
         // Update the selected project in state
         const updatedProject = { ...selectedProject, is_submitted: true };
         setSelectedProject(updatedProject);
-        
+
         // Also update in the projects list
         handleProjectUpdated(updatedProject);
-        
+
         // Refresh projects to get updated data
         refreshProjects();
-        
+
         // Show success message
-        alert(paramsText?.projectSubmittedSuccess || "Project submitted successfully!");
+        alert(
+          paramsText?.projectSubmittedSuccess ||
+            "Project submitted successfully!"
+        );
       } else {
         const errorData = await response.json();
         console.error("Failed to submit project:", errorData);
@@ -163,7 +170,7 @@ export default function ProjectView() {
   };
 
   if (!selectedProject && !projectsLoading) {
-    return null; 
+    return null;
   }
 
   if (projectsLoading) {
