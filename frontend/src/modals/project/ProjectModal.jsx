@@ -5,6 +5,7 @@ import InputEntry from "../../pages/auth/InputEntry";
 import { useLanguage } from "../../context/LanguageContext";
 import { useModalBlur } from "../../hooks/useModals";
 import { useSidebar } from "../../context/SidebarContext";
+import API_BASE_URL from "../../config/api.js";
 
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
@@ -45,8 +46,8 @@ function ProjectModalForm({
     e.preventDefault();
 
     const url = isEditMode
-      ? `http://127.0.0.1:8000/projects/update/${project.uuid}/`
-      : "http://127.0.0.1:8000/projects/create/";
+      ? `${API_BASE_URL}/projects/update/${project.uuid}/`
+      : `${API_BASE_URL}/projects/create/`;
 
     const method = isEditMode ? "PUT" : "POST";
 

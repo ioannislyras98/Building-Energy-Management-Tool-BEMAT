@@ -28,6 +28,7 @@ import ThermostatIcon from "@mui/icons-material/Thermostat";
 import $ from "jquery";
 import Cookies from "universal-cookie";
 import { useLanguage } from "../../context/LanguageContext";
+import API_BASE_URL from "../../config/api.js";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import ThermalInsulationMaterialModal from "./ThermalInsulationMaterialModal";
@@ -131,7 +132,7 @@ const ThermalInsulationModal = ({
 
     setLoading(true);
     $.ajax({
-      url: `http://127.0.0.1:8000/thermal_insulations/${editItem.uuid}/`,
+      url: `${API_BASE_URL}/thermal_insulations/${editItem.uuid}/`,
       method: "GET",
       headers: {
         Authorization: `Token ${token}`,
@@ -164,8 +165,8 @@ const ThermalInsulationModal = ({
     setError(null);
 
     const url = isEdit
-      ? `http://127.0.0.1:8000/thermal_insulations/${editItem.uuid}/`
-      : `http://127.0.0.1:8000/thermal_insulations/create/`;
+      ? `${API_BASE_URL}/thermal_insulations/${editItem.uuid}/`
+      : `${API_BASE_URL}/thermal_insulations/create/`;
 
     const method = isEdit ? "PUT" : "POST";
 
@@ -217,7 +218,7 @@ const ThermalInsulationModal = ({
     if (!deletingMaterial || !token) return;
 
     $.ajax({
-      url: `http://127.0.0.1:8000/thermal_insulations/material-layers/${deletingMaterial.uuid}/`,
+      url: `${API_BASE_URL}/thermal_insulations/material-layers/${deletingMaterial.uuid}/`,
       method: "DELETE",
       headers: {
         Authorization: `Token ${token}`,

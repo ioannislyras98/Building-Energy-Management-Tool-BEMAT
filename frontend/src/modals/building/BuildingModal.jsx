@@ -5,6 +5,7 @@ import "./../../assets/styles/forms.css";
 import { useLanguage } from "../../context/LanguageContext";
 import { useModalBlur } from "../../hooks/useModals";
 import { getAllPrefectures } from "../../../services/ApiService";
+import API_BASE_URL from "../../config/api.js";
 
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
@@ -288,8 +289,8 @@ function BuildingModalForm({
     });
 
     const url = isEdit
-      ? `http://127.0.0.1:8000/buildings/update/${editItem.data.uuid}/`
-      : "http://127.0.0.1:8000/buildings/create/";
+      ? `${API_BASE_URL}/buildings/update/${editItem.data.uuid}/`
+      : `${API_BASE_URL}/buildings/create/`;
 
     const method = isEdit ? "PUT" : "POST";
 

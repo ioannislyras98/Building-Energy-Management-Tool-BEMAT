@@ -4,6 +4,7 @@ import Cookies from "universal-cookie";
 import "./../../assets/styles/forms.css";
 import { useLanguage } from "../../context/LanguageContext";
 import { useModalBlur } from "../../hooks/useModals";
+import API_BASE_URL from "../../config/api.js";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import InputEntryModal from "../shared/InputEntryModal";
@@ -85,7 +86,7 @@ function EditContactModalForm({
     if (!validateForm()) return;
 
     $.ajax({
-      url: `http://127.0.0.1:8000/buildings/${buildingUuid}/contacts/${contact.uuid}/update/`,
+      url: `${API_BASE_URL}/buildings/${buildingUuid}/contacts/${contact.uuid}/update/`,
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

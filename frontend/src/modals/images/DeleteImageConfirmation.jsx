@@ -3,13 +3,20 @@ import Cookies from "universal-cookie";
 import "./../../assets/styles/forms.css";
 import { useLanguage } from "../../context/LanguageContext";
 import { useModalBlur } from "../../hooks/useModals";
+import API_BASE_URL from "../../config/api.js";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 
-function DeleteImageConfirmationForm({ isOpen, onClose, onImageDeleted, image, params }) {
+function DeleteImageConfirmationForm({
+  isOpen,
+  onClose,
+  onImageDeleted,
+  image,
+  params,
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   const cookies = new Cookies();
   const token = cookies.get("token");
 
@@ -18,17 +25,20 @@ function DeleteImageConfirmationForm({ isOpen, onClose, onImageDeleted, image, p
 
   const handleDelete = async () => {
     if (!image) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
-      const response = await fetch(`http://127.0.0.1:8000/building-images/${image.id}/`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/building-images/${image.id}/`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
 
       if (response.ok) {
         onImageDeleted(image.id);
@@ -59,29 +69,27 @@ function DeleteImageConfirmationForm({ isOpen, onClose, onImageDeleted, image, p
           )}
           <p className="text-sm text-red-600 mt-2">{params.warning}</p>
         </div>
-        
+
         {error && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
             {error}
           </div>
         )}
-        
+
         <div className="flex justify-between">
-          <button 
-            type="button" 
-            onClick={onClose} 
+          <button
+            type="button"
+            onClick={onClose}
             className="close-modal"
-            disabled={loading}
-          >
+            disabled={loading}>
             {params.cancel}
           </button>
-          <button 
-            type="button" 
-            onClick={handleDelete} 
+          <button
+            type="button"
+            onClick={handleDelete}
             className="confirm-button bg-red-600 hover:bg-red-700"
-            disabled={loading}
-          >
-            {loading ? (params.deleting || "Διαγραφή...") : params.delete}
+            disabled={loading}>
+            {loading ? params.deleting || "Διαγραφή..." : params.delete}
           </button>
         </div>
       </div>
@@ -89,7 +97,12 @@ function DeleteImageConfirmationForm({ isOpen, onClose, onImageDeleted, image, p
   );
 }
 
-export default function DeleteImageConfirmation({ isOpen, onClose, onImageDeleted, image }) {
+export default function DeleteImageConfirmation({
+  isOpen,
+  onClose,
+  onImageDeleted,
+  image,
+}) {
   const { language } = useLanguage();
   const params =
     language === "en"

@@ -58,7 +58,7 @@ function AdminNumericValues() {
       }
 
       const response = await $.ajax({
-        url: "http://127.0.0.1:8000/numeric_values/",
+        url: `${API_BASE_URL}/numeric_values/`,
         method: "GET",
         headers: {
           Authorization: `Token ${token}`,

@@ -4,6 +4,7 @@ import Cookies from "universal-cookie";
 import "./../../assets/styles/forms.css";
 import { useLanguage } from "../../context/LanguageContext";
 import { useModalBlur } from "../../hooks/useModals";
+import API_BASE_URL from "../../config/api.js";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import InputEntryModal from "../shared/InputEntryModal";
@@ -130,7 +131,7 @@ function AddImageModalForm({
       image_size: selectedFile.size,
     };
 
-    const submitUrl = `http://127.0.0.1:8000/building-images/upload/`;
+    const submitUrl = `${API_BASE_URL}/building-images/upload/`;
     console.log("AddImageModal - Submit URL:", submitUrl);
 
     $.ajax({

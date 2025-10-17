@@ -3,6 +3,7 @@ import $ from "jquery";
 import Cookies from "universal-cookie";
 import { useLanguage } from "../../context/LanguageContext";
 import { useModalBlur } from "../../hooks/useModals";
+import API_BASE_URL from "../../config/api.js";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import InputEntryModal from "../shared/InputEntryModal";
@@ -138,7 +139,7 @@ function EnergyConsumptionModalForm({
 
     if (isEditMode) {
       $.ajax({
-        url: `http://127.0.0.1:8000/energy_consumptions/update/${editItem.id}/`,
+        url: `${API_BASE_URL}/energy_consumptions/update/${editItem.id}/`,
         method: "PUT",
         timeout: 0,
         headers: {
@@ -159,7 +160,7 @@ function EnergyConsumptionModalForm({
       });
     } else {
       $.ajax({
-        url: "http://127.0.0.1:8000/energy_consumptions/create/",
+        url: `${API_BASE_URL}/energy_consumptions/create/`,
         method: "POST",
         timeout: 0,
         headers: {

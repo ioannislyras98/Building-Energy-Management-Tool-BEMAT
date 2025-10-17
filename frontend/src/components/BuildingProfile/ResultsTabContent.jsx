@@ -202,7 +202,7 @@ const ResultsTabContent = ({
       for (const [key, config] of Object.entries(scenarioConfig)) {
         try {
           console.log(
-            `Fetching ${config.name} from: http://127.0.0.1:8000/${config.endpoint}/building/${buildingUuid}/`
+            `Fetching ${config.name} from: ${API_BASE_URL}/${config.endpoint}/building/${buildingUuid}/`
           );
           const response = await fetch(
             `${API_BASE_URL}/${config.endpoint}/building/${buildingUuid}/`,

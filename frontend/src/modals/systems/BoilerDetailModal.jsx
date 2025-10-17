@@ -3,6 +3,7 @@ import $ from "jquery";
 import Cookies from "universal-cookie";
 import { useLanguage } from "../../context/LanguageContext";
 import { useModalBlur } from "../../hooks/useModals";
+import API_BASE_URL from "../../config/api.js";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import InputEntryModal from "../shared/InputEntryModal";
@@ -170,8 +171,8 @@ function BoilerDetailModalForm({
     };
 
     const url = isEditMode
-      ? `http://127.0.0.1:8000/boiler_details/update/${editItem.uuid}/`
-      : "http://127.0.0.1:8000/boiler_details/create/";
+      ? `${API_BASE_URL}/boiler_details/update/${editItem.uuid}/`
+      : `${API_BASE_URL}/boiler_details/create/`;
 
     const method = isEditMode ? "PUT" : "POST";
 

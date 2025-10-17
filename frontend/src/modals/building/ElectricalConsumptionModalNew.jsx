@@ -3,6 +3,7 @@ import $ from "jquery";
 import Cookies from "universal-cookie";
 import { useLanguage } from "../../context/LanguageContext";
 import { useModalBlur } from "../../hooks/useModals";
+import API_BASE_URL from "../../config/api.js";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import InputEntryModal from "../shared/InputEntryModal";
@@ -192,7 +193,7 @@ function ElectricalConsumptionModalForm({
     if (!buildingUuid || !token) return;
 
     $.ajax({
-      url: `http://127.0.0.1:8000/thermal_zones/building/${buildingUuid}/`,
+      url: `${API_BASE_URL}/thermal_zones/building/${buildingUuid}/`,
       method: "GET",
       headers: {
         Authorization: `Token ${token}`,
@@ -211,7 +212,7 @@ function ElectricalConsumptionModalForm({
     if (!buildingUuid || !token) return;
 
     $.ajax({
-      url: `http://127.0.0.1:8000/energy_consumptions/get_by_building/${buildingUuid}/`,
+      url: `${API_BASE_URL}/energy_consumptions/get_by_building/${buildingUuid}/`,
       method: "GET",
       headers: {
         Authorization: `Token ${token}`,
@@ -289,8 +290,8 @@ function ElectricalConsumptionModalForm({
     };
 
     const url = editItem
-      ? `http://127.0.0.1:8000/electrical_consumptions/update/${editItem.uuid}/`
-      : `http://127.0.0.1:8000/electrical_consumptions/create/`;
+      ? `${API_BASE_URL}/electrical_consumptions/update/${editItem.uuid}/`
+      : `${API_BASE_URL}/electrical_consumptions/create/`;
 
     const method = editItem ? "PUT" : "POST";
 
