@@ -45,8 +45,6 @@ def admin_dashboard_stats(request):
             count=Count('uuid')
         ).order_by('-count')[:10]
         
-        # Activity statistics removed - buildingActivity app deleted
-        
         # Recent registrations (last 30 days)
         month_ago = timezone.now() - timedelta(days=30)
         recent_registrations = User.objects.filter(date_joined__gte=month_ago).count()
@@ -228,10 +226,9 @@ def admin_users_table(request):
         users_data = []
         for user in page_obj:
             users_data.append({
-                'id': str(user.uuid),  # Use uuid as id since User model doesn't have id field
-                'uuid': str(user.uuid),
+                'id': str(user.uuid), 
                 'email': user.email,
-                'username': user.email,  # Use email as username since no username field exists
+                'username': user.email,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
 
@@ -305,9 +302,7 @@ def admin_projects_table(request):
             queryset = queryset.filter(date_created__date__gte=date_from)
         if date_to:
             queryset = queryset.filter(date_created__date__lte=date_to)
-        
-        # Note: buildings_count is already a field in the Project model, no annotation needed
-        
+
         # Apply sorting
         valid_sort_fields = [
             'name', '-name', 'date_created', '-date_created', 'is_submitted', 
@@ -326,13 +321,13 @@ def admin_projects_table(request):
         projects_data = []
         for project in page_obj:
             projects_data.append({
-                'id': str(project.uuid),  # Use uuid as id since models use uuid as primary key
+                'id': str(project.uuid),  
                 'uuid': str(project.uuid),
                 'name': project.name,
                 'user': {
-                    'id': str(project.user.uuid),  # Use user uuid as id
+                    'id': str(project.user.uuid), 
                     'email': project.user.email,
-                    'username': project.user.email,  # Use email as username since no username field exists
+                    'username': project.user.email, 
                 },
                 'is_submitted': project.is_submitted,
                 'date_created': project.date_created.isoformat() if project.date_created else None,
@@ -398,7 +393,6 @@ def admin_bulk_delete_users(request):
             deleted_count = users_to_delete.count()
             user_emails = list(users_to_delete.values_list('email', flat=True))
             
-            # Delete users (cascade will handle related data)
             users_to_delete.delete()
         
         return standard_success_response({

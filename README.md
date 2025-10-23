@@ -148,14 +148,14 @@ docker volume prune -f
 
 ```bash
 cd backend
-docker-compose up --build -d
+docker compose up --build -d
 ```
 
 #### Frontend
 
 ```bash
 cd frontend
-docker-compose -f docker-compose.frontend.yml up --build -d
+docker compose -f docker-compose.frontend.yml up --build -d
 ```
 
 ### Δημιουργία Superuser (όλα τα platforms)
@@ -163,7 +163,7 @@ docker-compose -f docker-compose.frontend.yml up --build -d
 ```bash
 # Δημιουργία admin user
 cd backend
-docker-compose exec web python manage.py createsuperuser
+docker compose exec web python manage.py createsuperuser
 ```
 
 ## Διαχείριση Database
@@ -171,7 +171,7 @@ docker-compose exec web python manage.py createsuperuser
 ### Σύνδεση στη βάση
 
 ```bash
-docker-compose exec db psql --username=backend --dbname=backend_dev
+docker compose exec db psql --username=backend --dbname=backend_dev
 ```
 
 ### Νέος πίνακας (Django App)
@@ -194,7 +194,7 @@ python manage.py migrate
 
 ```bash
 docker ps -a
-docker-compose ps
+docker compose ps
 ```
 
 ### Παρακολούθηση logs
@@ -204,11 +204,11 @@ docker-compose ps
 ```powershell
 # Backend
 cd backend
-docker-compose logs -f web
+docker compose logs -f web
 
 # Frontend
 cd frontend
-docker-compose -f docker-compose.frontend.yml logs -f frontend
+docker compose -f docker-compose.frontend.yml logs -f frontend
 ```
 
 **Linux/macOS (Bash):**
@@ -216,11 +216,11 @@ docker-compose -f docker-compose.frontend.yml logs -f frontend
 ```bash
 # Backend
 cd backend
-docker-compose logs -f web
+docker compose logs -f web
 
 # Frontend
 cd frontend
-docker-compose -f docker-compose.frontend.yml logs -f frontend
+docker compose -f docker-compose.frontend.yml logs -f frontend
 ```
 
 ### Μπες σε container
@@ -237,8 +237,8 @@ docker exec -it frontend-frontend-1 sh
 
 ```bash
 # Σταματήστε όλα τα services πρώτα
-docker-compose down
-cd ../frontend && docker-compose -f docker-compose.frontend.yml down
+docker compose down
+cd ../frontend && docker compose -f docker-compose.frontend.yml down
 
 # Καθαρισμός Docker
 docker system prune -a -f

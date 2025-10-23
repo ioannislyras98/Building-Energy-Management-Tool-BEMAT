@@ -13,7 +13,6 @@ db.sqlite3
 db.sqlite3-journal
 
 # ---- Environment & secret files ----
-# Κρατάμε μόνο το .env με τα defaults για development
 # .env
 .env.local
 .env.production

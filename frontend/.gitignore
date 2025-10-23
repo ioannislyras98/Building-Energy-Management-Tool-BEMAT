@@ -12,7 +12,9 @@ dist
 dist-ssr
 *.local
 
-# Environment files (κρατάμε το .env με defaults)
+# Environment files
+# Το .env τώρα ανεβαίνει στο Git (για να το βλέπει ο καθηγητής)
+# Προσοχή: ΜΗΝ βάλετε sensitive passwords σε production!
 # .env
 .env.local
 .env.production

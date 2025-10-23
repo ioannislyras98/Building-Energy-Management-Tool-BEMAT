@@ -43,10 +43,10 @@ function Stop-Existing {
     Write-Host "Stopping existing containers..." -ForegroundColor Yellow
     
     Set-Location "$PSScriptRoot\backend"
-    docker-compose down 2>$null
+    docker compose down 2>$null
     
     Set-Location "$PSScriptRoot\frontend"
-    docker-compose -f docker-compose.frontend.yml down 2>$null
+    docker compose -f docker-compose.frontend.yml down 2>$null
     
     Write-Host "OK: Existing containers stopped" -ForegroundColor Green
     Set-Location $PSScriptRoot
@@ -58,13 +58,13 @@ function Start-Services {
     # Start backend first
     Write-Host "Starting backend..." -ForegroundColor Yellow
     Set-Location "$PSScriptRoot\backend"
-    docker-compose up -d --build
+    docker compose up -d --build
     Write-Host "Backend started" -ForegroundColor Green
     
     # Start frontend second
     Write-Host "Starting frontend..." -ForegroundColor Yellow
     Set-Location "$PSScriptRoot\frontend"
-    docker-compose -f docker-compose.frontend.yml up -d --build
+    docker compose -f docker-compose.frontend.yml up -d --build
     Write-Host "Frontend started" -ForegroundColor Green
     
     Write-Host "OK: All services started" -ForegroundColor Green
@@ -168,7 +168,7 @@ function Invoke-CleanDockerAndRebuild {
     Write-Host ""
     Write-Host "Building backend..." -ForegroundColor Yellow
     Set-Location "$PSScriptRoot\backend"
-    docker-compose up -d --build --force-recreate
+    docker compose up -d --build --force-recreate
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Backend built successfully" -ForegroundColor Green
     } else {
@@ -182,7 +182,7 @@ function Invoke-CleanDockerAndRebuild {
     Write-Host ""
     Write-Host "Building frontend..." -ForegroundColor Yellow
     Set-Location "$PSScriptRoot\frontend"
-    docker-compose -f docker-compose.frontend.yml up -d --build --force-recreate
+    docker compose -f docker-compose.frontend.yml up -d --build --force-recreate
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Frontend built successfully" -ForegroundColor Green
     } else {

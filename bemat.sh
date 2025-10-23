@@ -59,7 +59,7 @@ start_bemat() {
     
     print_status "Building and starting Backend (Django + PostgreSQL)..."
     cd backend
-    docker-compose up --build -d
+    docker compose up --build -d
     
     # Wait for backend to be ready
     print_status "Waiting for backend to be ready..."
@@ -67,7 +67,7 @@ start_bemat() {
     
     print_status "Building and starting Frontend (React + Vite)..."
     cd ../frontend
-    docker-compose -f docker-compose.frontend.yml up --build -d
+    docker compose -f docker-compose.frontend.yml up --build -d
     
     # Wait a bit for frontend to start
     sleep 10
@@ -103,10 +103,10 @@ stop_services() {
     print_header "🛑 Stopping BEMAT Services..."
     
     cd backend
-    docker-compose down
+    docker compose down
     
     cd ../frontend
-    docker-compose -f docker-compose.frontend.yml down
+    docker compose -f docker-compose.frontend.yml down
     
     print_status "✅ All services stopped successfully!"
     cd ..
@@ -149,7 +149,7 @@ system_diagnostics() {
     print_header "Docker Information:"
     if docker info >/dev/null 2>&1; then
         echo "Docker Version: $(docker --version)"
-        echo "Docker Compose Version: $(docker-compose --version)"
+        echo "Docker Compose Version: $(docker compose version)"
         echo "Docker Status: ✅ Running"
     else
         echo "Docker Status: ❌ Not Running"

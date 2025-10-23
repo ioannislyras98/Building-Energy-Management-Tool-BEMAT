@@ -179,13 +179,13 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CORS Origin Whitelist - Dynamic configuration from environment variable
-# Set CORS_ORIGIN_WHITELIST in .env with comma-separated origins (including protocol)
-# Example: CORS_ORIGIN_WHITELIST=http://localhost:3000,https://energymanagement.epu.ntua.gr
-CORS_ORIGIN_WHITELIST = [
+# CORS Configuration - Using CORS_ALLOWED_ORIGINS (new standard)
+# Set CORS_ALLOWED_ORIGINS in .env with comma-separated origins (including protocol)
+# Example: CORS_ALLOWED_ORIGINS=http://localhost:3000,https://energymanagement.epu.ntua.gr
+CORS_ALLOWED_ORIGINS = [
     origin.strip() 
     for origin in os.environ.get(
-        "CORS_ORIGIN_WHITELIST", 
+        "CORS_ALLOWED_ORIGINS", 
         "http://localhost:3000,http://127.0.0.1:3000"
     ).split(",") 
     if origin.strip()
