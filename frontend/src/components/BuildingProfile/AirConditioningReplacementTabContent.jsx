@@ -78,7 +78,7 @@ const AirConditioningReplacementTabContent = ({
       analysisData.maintenance_cost_annual &&
       analysisData.lifespan_years &&
       analysisData.discount_rate &&
-      oldACs.length > 0 && 
+      oldACs.length > 0 &&
       newACs.length > 0
     ) {
       const timer = setTimeout(() => {
@@ -138,7 +138,10 @@ const AirConditioningReplacementTabContent = ({
       if (analysisResponse.success && analysisResponse.data) {
         setAnalysis(analysisResponse.data);
         setAnalysisData({
-          energy_cost_kwh: analysisResponse.data.project_electricity_cost || analysisResponse.data.energy_cost_kwh || "",
+          energy_cost_kwh:
+            analysisResponse.data.project_electricity_cost ||
+            analysisResponse.data.energy_cost_kwh ||
+            "",
           maintenance_cost_annual:
             analysisResponse.data.maintenance_cost_annual || "",
           lifespan_years: analysisResponse.data.lifespan_years || "15",
@@ -323,7 +326,7 @@ const AirConditioningReplacementTabContent = ({
         setAnalysis(response.data);
       }
     } catch (error) {
-      console.error('Analysis error:', error);
+      console.error("Analysis error:", error);
       setError(error.responseJSON?.message || "Σφάλμα κατά την αποθήκευση");
     }
     setLoading(false);
@@ -336,9 +339,7 @@ const AirConditioningReplacementTabContent = ({
       flex: 1,
       minWidth: 120,
       renderCell: (params) => (
-        <span className="font-medium">
-          {params.value} BTU
-        </span>
+        <span className="font-medium">{params.value} BTU</span>
       ),
     },
     {
@@ -429,9 +430,7 @@ const AirConditioningReplacementTabContent = ({
       flex: 1,
       minWidth: 120,
       renderCell: (params) => (
-        <span className="font-medium">
-          {params.value} BTU
-        </span>
+        <span className="font-medium">{params.value} BTU</span>
       ),
     },
     {
@@ -645,7 +644,8 @@ const AirConditioningReplacementTabContent = ({
             {oldACs.length === 0 && (
               <Card sx={{ mt: 3, textAlign: "center", p: 3 }}>
                 <Typography variant="body1" color="text.secondary">
-                  {translations.noOldACs || "Δεν έχουν προστεθεί παλαιά κλιματιστικά"}
+                  {translations.noOldACs ||
+                    "Δεν έχουν προστεθεί παλαιά κλιματιστικά"}
                 </Typography>
               </Card>
             )}
@@ -695,7 +695,8 @@ const AirConditioningReplacementTabContent = ({
             {newACs.length === 0 && (
               <Card sx={{ mt: 3, textAlign: "center", p: 3 }}>
                 <Typography variant="body1" color="text.secondary">
-                  {translations.noNewACs || "Δεν έχουν προστεθεί νέα κλιματιστικά"}
+                  {translations.noNewACs ||
+                    "Δεν έχουν προστεθεί νέα κλιματιστικά"}
                 </Typography>
               </Card>
             )}
@@ -712,7 +713,8 @@ const AirConditioningReplacementTabContent = ({
               <TextField
                 fullWidth
                 label={
-                  (translations.energyCostKwh || "Κόστος ενέργειας") + " (€/kWh)"
+                  (translations.energyCostKwh || "Κόστος ενέργειας") +
+                  " (€/kWh)"
                 }
                 type="number"
                 value={analysisData.energy_cost_kwh}
@@ -723,18 +725,22 @@ const AirConditioningReplacementTabContent = ({
                   }))
                 }
                 variant="outlined"
-                helperText={analysis?.project_electricity_cost ? "Αυτόματη τιμή από το έργο" : ""}
+                helperText={
+                  analysis?.project_electricity_cost
+                    ? "Αυτόματη τιμή από το έργο"
+                    : ""
+                }
                 sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '&:hover fieldset': {
-                      borderColor: 'var(--color-primary)',
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover fieldset": {
+                      borderColor: "var(--color-primary)",
                     },
-                    '&.Mui-focused fieldset': {
-                      borderColor: 'var(--color-primary)',
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
                     },
                   },
-                  '& .MuiInputLabel-root.Mui-focused': {
-                    color: 'var(--color-primary)',
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "var(--color-primary)",
                   },
                 }}
               />
@@ -756,16 +762,16 @@ const AirConditioningReplacementTabContent = ({
                 }
                 variant="outlined"
                 sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '&:hover fieldset': {
-                      borderColor: 'var(--color-primary)',
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover fieldset": {
+                      borderColor: "var(--color-primary)",
                     },
-                    '&.Mui-focused fieldset': {
-                      borderColor: 'var(--color-primary)',
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
                     },
                   },
-                  '& .MuiInputLabel-root.Mui-focused': {
-                    color: 'var(--color-primary)',
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "var(--color-primary)",
                   },
                 }}
               />
@@ -789,16 +795,16 @@ const AirConditioningReplacementTabContent = ({
                 }
                 variant="outlined"
                 sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '&:hover fieldset': {
-                      borderColor: 'var(--color-primary)',
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover fieldset": {
+                      borderColor: "var(--color-primary)",
                     },
-                    '&.Mui-focused fieldset': {
-                      borderColor: 'var(--color-primary)',
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
                     },
                   },
-                  '& .MuiInputLabel-root.Mui-focused': {
-                    color: 'var(--color-primary)',
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "var(--color-primary)",
                   },
                 }}
               />
@@ -806,7 +812,9 @@ const AirConditioningReplacementTabContent = ({
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label={(translations.discountRate || "Επιτόκιο αναγωγής") + " (%)"}
+                label={
+                  (translations.discountRate || "Επιτόκιο αναγωγής") + " (%)"
+                }
                 type="number"
                 value={analysisData.discount_rate}
                 onChange={(e) =>
@@ -817,16 +825,16 @@ const AirConditioningReplacementTabContent = ({
                 }
                 variant="outlined"
                 sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '&:hover fieldset': {
-                      borderColor: 'var(--color-primary)',
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover fieldset": {
+                      borderColor: "var(--color-primary)",
                     },
-                    '&.Mui-focused fieldset': {
-                      borderColor: 'var(--color-primary)',
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
                     },
                   },
-                  '& .MuiInputLabel-root.Mui-focused': {
-                    color: 'var(--color-primary)',
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "var(--color-primary)",
                   },
                 }}
               />
@@ -845,7 +853,7 @@ const AirConditioningReplacementTabContent = ({
                       {translations.annualSavings || "Ετήσια Εξοικονόμηση"}
                     </Typography>
                     <Typography variant="h6" color="success.main">
-                      €{analysis.annual_cost_savings?.toFixed(2) || '0.00'}
+                      €{analysis.annual_cost_savings?.toFixed(2) || "0.00"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={4}>
@@ -853,7 +861,7 @@ const AirConditioningReplacementTabContent = ({
                       {translations.paybackPeriod || "Περίοδος Αποπληρωμής"}
                     </Typography>
                     <Typography variant="h6" color="success.main">
-                      {analysis.payback_period?.toFixed(1) || '0.0'}{" "}
+                      {analysis.payback_period?.toFixed(1) || "0.0"}{" "}
                       {translations.years || "έτη"}
                     </Typography>
                   </Grid>
@@ -868,7 +876,7 @@ const AirConditioningReplacementTabContent = ({
                           ? "success.main"
                           : "error.main"
                       }>
-                      €{analysis.net_present_value?.toFixed(2) || '0.00'}
+                      €{analysis.net_present_value?.toFixed(2) || "0.00"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={4}>
@@ -876,7 +884,7 @@ const AirConditioningReplacementTabContent = ({
                       {translations.irr || "Εσωτερικός Βαθμός Απόδοσης"}
                     </Typography>
                     <Typography variant="h6" color="success.main">
-                      {analysis.internal_rate_of_return?.toFixed(2) || '0.00'}%
+                      {analysis.internal_rate_of_return?.toFixed(2) || "0.00"}%
                     </Typography>
                   </Grid>
                 </Grid>
@@ -943,10 +951,12 @@ const ACModal = ({
     heating_hours_per_year: "",
     cooling_hours_per_year: "",
     quantity: "1",
-    ...(isOld ? {} : {
-      cost_per_unit: "",
-      installation_cost: "",
-    }),
+    ...(isOld
+      ? {}
+      : {
+          cost_per_unit: "",
+          installation_cost: "",
+        }),
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -961,10 +971,12 @@ const ACModal = ({
         heating_hours_per_year: data.heating_hours_per_year || "",
         cooling_hours_per_year: data.cooling_hours_per_year || "",
         quantity: data.quantity || "1",
-        ...(isOld ? {} : {
-          cost_per_unit: data.cost_per_unit || "",
-          installation_cost: data.installation_cost || "",
-        }),
+        ...(isOld
+          ? {}
+          : {
+              cost_per_unit: data.cost_per_unit || "",
+              installation_cost: data.installation_cost || "",
+            }),
       });
     } else {
       setFormData({
@@ -974,10 +986,12 @@ const ACModal = ({
         heating_hours_per_year: "",
         cooling_hours_per_year: "",
         quantity: "1",
-        ...(isOld ? {} : {
-          cost_per_unit: "",
-          installation_cost: "",
-        }),
+        ...(isOld
+          ? {}
+          : {
+              cost_per_unit: "",
+              installation_cost: "",
+            }),
       });
     }
     setError(null);
@@ -1006,32 +1020,50 @@ const ACModal = ({
     }
 
     if (!formData.cop_percentage || parseFloat(formData.cop_percentage) <= 0) {
-      errors.cop_percentage = "Η απόδοση θέρμανσης (COP) πρέπει να είναι μεγαλύτερη από 0";
+      errors.cop_percentage =
+        "Η απόδοση θέρμανσης (COP) πρέπει να είναι μεγαλύτερη από 0";
     }
 
     if (!formData.eer_percentage || parseFloat(formData.eer_percentage) <= 0) {
-      errors.eer_percentage = "Η απόδοση ψύξης (EER) πρέπει να είναι μεγαλύτερη από 0";
+      errors.eer_percentage =
+        "Η απόδοση ψύξης (EER) πρέπει να είναι μεγαλύτερη από 0";
     }
 
-    if (!formData.heating_hours_per_year || parseInt(formData.heating_hours_per_year) < 0 || parseInt(formData.heating_hours_per_year) > 8760) {
-      errors.heating_hours_per_year = "Οι ώρες θέρμανσης πρέπει να είναι μεταξύ 0-8760";
+    if (
+      !formData.heating_hours_per_year ||
+      parseInt(formData.heating_hours_per_year) < 0 ||
+      parseInt(formData.heating_hours_per_year) > 8760
+    ) {
+      errors.heating_hours_per_year =
+        "Οι ώρες θέρμανσης πρέπει να είναι μεταξύ 0-8760";
     }
 
-    if (!formData.cooling_hours_per_year || parseInt(formData.cooling_hours_per_year) < 0 || parseInt(formData.cooling_hours_per_year) > 8760) {
-      errors.cooling_hours_per_year = "Οι ώρες ψύξης πρέπει να είναι μεταξύ 0-8760";
+    if (
+      !formData.cooling_hours_per_year ||
+      parseInt(formData.cooling_hours_per_year) < 0 ||
+      parseInt(formData.cooling_hours_per_year) > 8760
+    ) {
+      errors.cooling_hours_per_year =
+        "Οι ώρες ψύξης πρέπει να είναι μεταξύ 0-8760";
     }
 
     if (!formData.quantity || parseInt(formData.quantity) <= 0) {
-      errors.quantity = "Ο αριθμός κλιματιστικών πρέπει να είναι μεγαλύτερος από 0";
+      errors.quantity =
+        "Ο αριθμός κλιματιστικών πρέπει να είναι μεγαλύτερος από 0";
     }
 
     if (!isOld) {
       if (!formData.cost_per_unit || parseFloat(formData.cost_per_unit) < 0) {
-        errors.cost_per_unit = "Το κόστος ανά μονάδα πρέπει να είναι μεγαλύτερο ή ίσο από 0";
+        errors.cost_per_unit =
+          "Το κόστος ανά μονάδα πρέπει να είναι μεγαλύτερο ή ίσο από 0";
       }
 
-      if (!formData.installation_cost || parseFloat(formData.installation_cost) < 0) {
-        errors.installation_cost = "Το κόστος εγκατάστασης πρέπει να είναι μεγαλύτερο ή ίσο από 0";
+      if (
+        !formData.installation_cost ||
+        parseFloat(formData.installation_cost) < 0
+      ) {
+        errors.installation_cost =
+          "Το κόστος εγκατάστασης πρέπει να είναι μεγαλύτερο ή ίσο από 0";
       }
     }
 
@@ -1040,7 +1072,7 @@ const ACModal = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
@@ -1066,10 +1098,12 @@ const ACModal = ({
       heating_hours_per_year: "",
       cooling_hours_per_year: "",
       quantity: "1",
-      ...(isOld ? {} : {
-        cost_per_unit: "",
-        installation_cost: "",
-      }),
+      ...(isOld
+        ? {}
+        : {
+            cost_per_unit: "",
+            installation_cost: "",
+          }),
     });
     setError(null);
     setValidationErrors({});
@@ -1101,9 +1135,13 @@ const ACModal = ({
                 id="btu_type"
                 value={formData.btu_type}
                 onChange={(e) => handleInputChange("btu_type", e.target.value)}
-                className={`input-field ${validationErrors.btu_type ? "error-input" : ""}`}
+                className={`input-field ${
+                  validationErrors.btu_type ? "error-input" : ""
+                }`}
                 required>
-                <option value="">{translations.selectBtuType || "Επιλέξτε τύπο"}</option>
+                <option value="">
+                  {translations.selectBtuType || "Επιλέξτε τύπο"}
+                </option>
                 {btuTypes.map((btu) => (
                   <option key={btu} value={btu}>
                     {btu} BTU
@@ -1111,7 +1149,9 @@ const ACModal = ({
                 ))}
               </select>
               {validationErrors.btu_type && (
-                <div className="text-red-500 text-xs mt-1">{validationErrors.btu_type}</div>
+                <div className="text-red-500 text-xs mt-1">
+                  {validationErrors.btu_type}
+                </div>
               )}
             </div>
 
@@ -1128,13 +1168,19 @@ const ACModal = ({
                 min="0"
                 max="1000"
                 value={formData.cop_percentage}
-                onChange={(e) => handleInputChange("cop_percentage", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("cop_percentage", e.target.value)
+                }
                 placeholder="π.χ. 350"
-                className={`input-field ${validationErrors.cop_percentage ? "error-input" : ""}`}
+                className={`input-field ${
+                  validationErrors.cop_percentage ? "error-input" : ""
+                }`}
                 required
               />
               {validationErrors.cop_percentage && (
-                <div className="text-red-500 text-xs mt-1">{validationErrors.cop_percentage}</div>
+                <div className="text-red-500 text-xs mt-1">
+                  {validationErrors.cop_percentage}
+                </div>
               )}
             </div>
 
@@ -1151,13 +1197,19 @@ const ACModal = ({
                 min="0"
                 max="1000"
                 value={formData.eer_percentage}
-                onChange={(e) => handleInputChange("eer_percentage", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("eer_percentage", e.target.value)
+                }
                 placeholder="π.χ. 300"
-                className={`input-field ${validationErrors.eer_percentage ? "error-input" : ""}`}
+                className={`input-field ${
+                  validationErrors.eer_percentage ? "error-input" : ""
+                }`}
                 required
               />
               {validationErrors.eer_percentage && (
-                <div className="text-red-500 text-xs mt-1">{validationErrors.eer_percentage}</div>
+                <div className="text-red-500 text-xs mt-1">
+                  {validationErrors.eer_percentage}
+                </div>
               )}
             </div>
 
@@ -1174,13 +1226,19 @@ const ACModal = ({
                 min="0"
                 max="8760"
                 value={formData.heating_hours_per_year}
-                onChange={(e) => handleInputChange("heating_hours_per_year", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("heating_hours_per_year", e.target.value)
+                }
                 placeholder="π.χ. 1200"
-                className={`input-field ${validationErrors.heating_hours_per_year ? "error-input" : ""}`}
+                className={`input-field ${
+                  validationErrors.heating_hours_per_year ? "error-input" : ""
+                }`}
                 required
               />
               {validationErrors.heating_hours_per_year && (
-                <div className="text-red-500 text-xs mt-1">{validationErrors.heating_hours_per_year}</div>
+                <div className="text-red-500 text-xs mt-1">
+                  {validationErrors.heating_hours_per_year}
+                </div>
               )}
             </div>
 
@@ -1197,13 +1255,19 @@ const ACModal = ({
                 min="0"
                 max="8760"
                 value={formData.cooling_hours_per_year}
-                onChange={(e) => handleInputChange("cooling_hours_per_year", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("cooling_hours_per_year", e.target.value)
+                }
                 placeholder="π.χ. 800"
-                className={`input-field ${validationErrors.cooling_hours_per_year ? "error-input" : ""}`}
+                className={`input-field ${
+                  validationErrors.cooling_hours_per_year ? "error-input" : ""
+                }`}
                 required
               />
               {validationErrors.cooling_hours_per_year && (
-                <div className="text-red-500 text-xs mt-1">{validationErrors.cooling_hours_per_year}</div>
+                <div className="text-red-500 text-xs mt-1">
+                  {validationErrors.cooling_hours_per_year}
+                </div>
               )}
             </div>
 
@@ -1221,11 +1285,15 @@ const ACModal = ({
                 value={formData.quantity}
                 onChange={(e) => handleInputChange("quantity", e.target.value)}
                 placeholder="π.χ. 1"
-                className={`input-field ${validationErrors.quantity ? "error-input" : ""}`}
+                className={`input-field ${
+                  validationErrors.quantity ? "error-input" : ""
+                }`}
                 required
               />
               {validationErrors.quantity && (
-                <div className="text-red-500 text-xs mt-1">{validationErrors.quantity}</div>
+                <div className="text-red-500 text-xs mt-1">
+                  {validationErrors.quantity}
+                </div>
               )}
             </div>
 
@@ -1244,13 +1312,19 @@ const ACModal = ({
                     step="0.01"
                     min="0"
                     value={formData.cost_per_unit}
-                    onChange={(e) => handleInputChange("cost_per_unit", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("cost_per_unit", e.target.value)
+                    }
                     placeholder="π.χ. 1500.00"
-                    className={`input-field ${validationErrors.cost_per_unit ? "error-input" : ""}`}
+                    className={`input-field ${
+                      validationErrors.cost_per_unit ? "error-input" : ""
+                    }`}
                     required
                   />
                   {validationErrors.cost_per_unit && (
-                    <div className="text-red-500 text-xs mt-1">{validationErrors.cost_per_unit}</div>
+                    <div className="text-red-500 text-xs mt-1">
+                      {validationErrors.cost_per_unit}
+                    </div>
                   )}
                 </div>
 
@@ -1266,13 +1340,19 @@ const ACModal = ({
                     step="0.01"
                     min="0"
                     value={formData.installation_cost}
-                    onChange={(e) => handleInputChange("installation_cost", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("installation_cost", e.target.value)
+                    }
                     placeholder="π.χ. 300.00"
-                    className={`input-field ${validationErrors.installation_cost ? "error-input" : ""}`}
+                    className={`input-field ${
+                      validationErrors.installation_cost ? "error-input" : ""
+                    }`}
                     required
                   />
                   {validationErrors.installation_cost && (
-                    <div className="text-red-500 text-xs mt-1">{validationErrors.installation_cost}</div>
+                    <div className="text-red-500 text-xs mt-1">
+                      {validationErrors.installation_cost}
+                    </div>
                   )}
                 </div>
               </>
@@ -1287,10 +1367,7 @@ const ACModal = ({
               disabled={loading}>
               {translations.cancel || "Ακύρωση"}
             </button>
-            <button 
-              type="submit" 
-              className="confirm-button" 
-              disabled={loading}>
+            <button type="submit" className="confirm-button" disabled={loading}>
               {loading
                 ? translations.saving || "Αποθήκευση..."
                 : editMode

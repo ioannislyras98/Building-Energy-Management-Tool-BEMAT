@@ -123,7 +123,13 @@ const WindowReplacementTabContent = ({
   const [debounceTimeout, setDebounceTimeout] = useState(null);
 
   const autoSave = useCallback(() => {
-    if (!buildingUuid || !token || !formData.old_thermal_conductivity || !formData.new_thermal_conductivity || !formData.window_area) {
+    if (
+      !buildingUuid ||
+      !token ||
+      !formData.old_thermal_conductivity ||
+      !formData.new_thermal_conductivity ||
+      !formData.window_area
+    ) {
       return;
     }
 
@@ -144,7 +150,9 @@ const WindowReplacementTabContent = ({
       data: JSON.stringify(submitData),
       success: (response) => {
         console.log("Window replacement data auto-saved:", response);
-        setSuccess(translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς");
+        setSuccess(
+          translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
+        );
         setTimeout(() => setSuccess(null), 3000);
       },
       error: (jqXHR) => {
@@ -156,30 +164,49 @@ const WindowReplacementTabContent = ({
         );
       },
     });
-  }, [buildingUuid, projectUuid, token, formData, calculatedResults, translations]);
+  }, [
+    buildingUuid,
+    projectUuid,
+    token,
+    formData,
+    calculatedResults,
+    translations,
+  ]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
-    
+
     // Αυτόματος υπολογισμός όταν αλλάζουν τα δεδομένα
-    if (["old_thermal_conductivity", "new_thermal_conductivity", "window_area"].includes(field)) {
-      calculateLosses(field === "old_thermal_conductivity" ? value : formData.old_thermal_conductivity,
-                     field === "new_thermal_conductivity" ? value : formData.new_thermal_conductivity,
-                     field === "window_area" ? value : formData.window_area);
+    if (
+      [
+        "old_thermal_conductivity",
+        "new_thermal_conductivity",
+        "window_area",
+      ].includes(field)
+    ) {
+      calculateLosses(
+        field === "old_thermal_conductivity"
+          ? value
+          : formData.old_thermal_conductivity,
+        field === "new_thermal_conductivity"
+          ? value
+          : formData.new_thermal_conductivity,
+        field === "window_area" ? value : formData.window_area
+      );
     }
 
     // Auto-save with 1 second debouncing
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
-    
+
     const newTimeout = setTimeout(() => {
       autoSave();
     }, 1000);
-    
+
     setDebounceTimeout(newTimeout);
   };
 
@@ -189,19 +216,23 @@ const WindowReplacementTabContent = ({
       const oldKValue = parseFloat(oldK);
       const newKValue = parseFloat(newK);
       const areaValue = parseFloat(area);
-      
+
       // Εκτίμηση απωλειών για θερινούς και χειμερινούς μήνες
       // Χρησιμοποιούμε τυπικές τιμές διαφοράς θερμοκρασίας
       const summerTempDiff = 10; // °C
       const winterTempDiff = 20; // °C
       const hoursPerSeason = 2190; // 6 μήνες x 365 ημέρες / 2
-      
-      const oldLossesSummer = oldKValue * areaValue * summerTempDiff * hoursPerSeason / 1000;
-      const oldLossesWinter = oldKValue * areaValue * winterTempDiff * hoursPerSeason / 1000;
-      const newLossesSummer = newKValue * areaValue * summerTempDiff * hoursPerSeason / 1000;
-      const newLossesWinter = newKValue * areaValue * winterTempDiff * hoursPerSeason / 1000;
-      
-      setFormData(prev => ({
+
+      const oldLossesSummer =
+        (oldKValue * areaValue * summerTempDiff * hoursPerSeason) / 1000;
+      const oldLossesWinter =
+        (oldKValue * areaValue * winterTempDiff * hoursPerSeason) / 1000;
+      const newLossesSummer =
+        (newKValue * areaValue * summerTempDiff * hoursPerSeason) / 1000;
+      const newLossesWinter =
+        (newKValue * areaValue * winterTempDiff * hoursPerSeason) / 1000;
+
+      setFormData((prev) => ({
         ...prev,
         old_losses_summer: oldLossesSummer.toFixed(2),
         old_losses_winter: oldLossesWinter.toFixed(2),
@@ -224,9 +255,16 @@ const WindowReplacementTabContent = ({
       lifespan_years,
     } = formData;
 
-    if (old_losses_summer && old_losses_winter && new_losses_summer && new_losses_winter) {
-      const energySavingsSummer = parseFloat(old_losses_summer) - parseFloat(new_losses_summer);
-      const energySavingsWinter = parseFloat(old_losses_winter) - parseFloat(new_losses_winter);
+    if (
+      old_losses_summer &&
+      old_losses_winter &&
+      new_losses_summer &&
+      new_losses_winter
+    ) {
+      const energySavingsSummer =
+        parseFloat(old_losses_summer) - parseFloat(new_losses_summer);
+      const energySavingsWinter =
+        parseFloat(old_losses_winter) - parseFloat(new_losses_winter);
       const totalEnergySavings = energySavingsSummer + energySavingsWinter;
 
       let annualCostSavings = 0;
@@ -240,23 +278,26 @@ const WindowReplacementTabContent = ({
       }
 
       if (window_area && cost_per_sqm) {
-        totalInvestmentCost = parseFloat(window_area) * parseFloat(cost_per_sqm);
+        totalInvestmentCost =
+          parseFloat(window_area) * parseFloat(cost_per_sqm);
       }
 
       if (annualCostSavings > 0 && totalInvestmentCost > 0) {
         paybackPeriod = totalInvestmentCost / annualCostSavings;
-        
+
         // Υπολογισμός NPV (απλοποιημένος)
         const discountRate = 0.05; // 5%
         const years = parseFloat(lifespan_years) || 20;
         let pvSavings = 0;
-        
+
         for (let year = 1; year <= years; year++) {
-          pvSavings += (annualCostSavings - parseFloat(maintenance_cost_annual || 0)) / Math.pow(1 + discountRate, year);
+          pvSavings +=
+            (annualCostSavings - parseFloat(maintenance_cost_annual || 0)) /
+            Math.pow(1 + discountRate, year);
         }
-        
+
         npv = pvSavings - totalInvestmentCost;
-        
+
         // Εκτίμηση IRR (απλοποιημένη)
         irr = (annualCostSavings / totalInvestmentCost) * 100;
       }
@@ -313,7 +354,9 @@ const WindowReplacementTabContent = ({
       data: JSON.stringify(submitData),
       success: (response) => {
         console.log("Window replacement data saved:", response);
-        setSuccess(translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς");
+        setSuccess(
+          translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
+        );
         setLoading(false);
       },
       error: (jqXHR) => {
@@ -333,17 +376,23 @@ const WindowReplacementTabContent = ({
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Typography variant="h6" className="font-semibold text-gray-800 mb-4">
-            {translations.windowReplacementData || "Στοιχεία αντικατάστασης υαλοπινάκων"}
+            {translations.windowReplacementData ||
+              "Στοιχεία αντικατάστασης υαλοπινάκων"}
           </Typography>
         </Grid>
 
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={(translations.oldThermalConductivity || "Παλαιός συντελεστής θερμικής αγωγιμότητας") + " (W/m²K) *"}
+            label={
+              (translations.oldThermalConductivity ||
+                "Παλαιός συντελεστής θερμικής αγωγιμότητας") + " (W/m²K) *"
+            }
             type="number"
             value={formData.old_thermal_conductivity}
-            onChange={(e) => handleInputChange("old_thermal_conductivity", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("old_thermal_conductivity", e.target.value)
+            }
             variant="outlined"
             required
             sx={{
@@ -367,10 +416,15 @@ const WindowReplacementTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={(translations.newThermalConductivity || "Νέος συντελεστής θερμικής αγωγιμότητας") + " (W/m²K) *"}
+            label={
+              (translations.newThermalConductivity ||
+                "Νέος συντελεστής θερμικής αγωγιμότητας") + " (W/m²K) *"
+            }
             type="number"
             value={formData.new_thermal_conductivity}
-            onChange={(e) => handleInputChange("new_thermal_conductivity", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("new_thermal_conductivity", e.target.value)
+            }
             variant="outlined"
             required
             sx={{
@@ -394,7 +448,9 @@ const WindowReplacementTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={(translations.windowArea || "Επιφάνεια υαλοπινάκων") + " (m²) *"}
+            label={
+              (translations.windowArea || "Επιφάνεια υαλοπινάκων") + " (m²) *"
+            }
             type="number"
             value={formData.window_area}
             onChange={(e) => handleInputChange("window_area", e.target.value)}
@@ -421,10 +477,14 @@ const WindowReplacementTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={(translations.energyCostKwh || "Κόστος ενέργειας") + " (€/kWh)"}
+            label={
+              (translations.energyCostKwh || "Κόστος ενέργειας") + " (€/kWh)"
+            }
             type="number"
             value={formData.energy_cost_kwh}
-            onChange={(e) => handleInputChange("energy_cost_kwh", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("energy_cost_kwh", e.target.value)
+            }
             variant="outlined"
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -473,10 +533,17 @@ const WindowReplacementTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={(translations.lifespanYears || "Διάρκεια ζωής") + " (" + (translations.years || "έτη") + ")"}
+            label={
+              (translations.lifespanYears || "Διάρκεια ζωής") +
+              " (" +
+              (translations.years || "έτη") +
+              ")"
+            }
             type="number"
             value={formData.lifespan_years}
-            onChange={(e) => handleInputChange("lifespan_years", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("lifespan_years", e.target.value)
+            }
             variant="outlined"
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -499,10 +566,15 @@ const WindowReplacementTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={(translations.maintenanceCostAnnual || "Ετήσιο κόστος συντήρησης") + " (€)"}
+            label={
+              (translations.maintenanceCostAnnual ||
+                "Ετήσιο κόστος συντήρησης") + " (€)"
+            }
             type="number"
             value={formData.maintenance_cost_annual}
-            onChange={(e) => handleInputChange("maintenance_cost_annual", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("maintenance_cost_annual", e.target.value)
+            }
             variant="outlined"
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -599,7 +671,8 @@ const WindowReplacementTabContent = ({
             </Grid>
             <Grid item xs={12} md={3}>
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                {translations.totalAnnualSavings || "Συνολική Ετήσια Εξοικονόμηση"}
+                {translations.totalAnnualSavings ||
+                  "Συνολική Ετήσια Εξοικονόμηση"}
               </Typography>
               <Typography variant="h6" color="success.main">
                 {calculatedResults.total_energy_savings.toFixed(2)} kWh
@@ -610,8 +683,14 @@ const WindowReplacementTabContent = ({
                 {translations.efficiencyImprovement || "Βελτίωση Απόδοσης"}
               </Typography>
               <Typography variant="h6" color="success.main">
-                {((calculatedResults.energy_savings_summer + calculatedResults.energy_savings_winter) / 
-                  (parseFloat(formData.old_losses_summer || 0) + parseFloat(formData.old_losses_winter || 0)) * 100).toFixed(1)}%
+                {(
+                  ((calculatedResults.energy_savings_summer +
+                    calculatedResults.energy_savings_winter) /
+                    (parseFloat(formData.old_losses_summer || 0) +
+                      parseFloat(formData.old_losses_winter || 0))) *
+                  100
+                ).toFixed(1)}
+                %
               </Typography>
             </Grid>
           </Grid>
@@ -623,28 +702,44 @@ const WindowReplacementTabContent = ({
           {translations.detailedAnalysis || "Λεπτομερής Ανάλυση"}
         </Typography>
         <Typography variant="body1" className="mb-2">
-          • {translations.thermalConductivityReduction || "Μείωση θερμικής αγωγιμότητας"}: {
-            formData.old_thermal_conductivity && formData.new_thermal_conductivity
-              ? ((parseFloat(formData.old_thermal_conductivity) - parseFloat(formData.new_thermal_conductivity)) / 
-                 parseFloat(formData.old_thermal_conductivity) * 100).toFixed(1)
-              : 0
-          }%
+          •{" "}
+          {translations.thermalConductivityReduction ||
+            "Μείωση θερμικής αγωγιμότητας"}
+          :{" "}
+          {formData.old_thermal_conductivity &&
+          formData.new_thermal_conductivity
+            ? (
+                ((parseFloat(formData.old_thermal_conductivity) -
+                  parseFloat(formData.new_thermal_conductivity)) /
+                  parseFloat(formData.old_thermal_conductivity)) *
+                100
+              ).toFixed(1)
+            : 0}
+          %
         </Typography>
         <Typography variant="body1" className="mb-2">
-          • {translations.summerLossReduction || "Μείωση θερινών απωλειών"}: {
-            formData.old_losses_summer && formData.new_losses_summer
-              ? ((parseFloat(formData.old_losses_summer) - parseFloat(formData.new_losses_summer)) / 
-                 parseFloat(formData.old_losses_summer) * 100).toFixed(1)
-              : 0
-          }%
+          • {translations.summerLossReduction || "Μείωση θερινών απωλειών"}:{" "}
+          {formData.old_losses_summer && formData.new_losses_summer
+            ? (
+                ((parseFloat(formData.old_losses_summer) -
+                  parseFloat(formData.new_losses_summer)) /
+                  parseFloat(formData.old_losses_summer)) *
+                100
+              ).toFixed(1)
+            : 0}
+          %
         </Typography>
         <Typography variant="body1">
-          • {translations.winterLossReduction || "Μείωση χειμερινών απωλειών"}: {
-            formData.old_losses_winter && formData.new_losses_winter
-              ? ((parseFloat(formData.old_losses_winter) - parseFloat(formData.new_losses_winter)) / 
-                 parseFloat(formData.old_losses_winter) * 100).toFixed(1)
-              : 0
-          }%
+          • {translations.winterLossReduction || "Μείωση χειμερινών απωλειών"}:{" "}
+          {formData.old_losses_winter && formData.new_losses_winter
+            ? (
+                ((parseFloat(formData.old_losses_winter) -
+                  parseFloat(formData.new_losses_winter)) /
+                  parseFloat(formData.old_losses_winter)) *
+                100
+              ).toFixed(1)
+            : 0}
+          %
         </Typography>
       </Paper>
     </div>
@@ -655,19 +750,22 @@ const WindowReplacementTabContent = ({
       <Typography variant="h6" gutterBottom>
         {translations.economicAnalysis || "Οικονομική Ανάλυση"}
       </Typography>
-      
+
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
-            label={`${
-              translations.totalCost || "Συνολικό κόστος (€)"
-            } - ${translations.autoCalculated || "Αυτόματος Υπολογισμός"}`}
+            label={`${translations.totalCost || "Συνολικό κόστος (€)"} - ${
+              translations.autoCalculated || "Αυτόματος Υπολογισμός"
+            }`}
             type="text"
-            value={calculatedResults.total_investment_cost.toLocaleString("el-GR", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            value={calculatedResults.total_investment_cost.toLocaleString(
+              "el-GR",
+              {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }
+            )}
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
@@ -684,18 +782,21 @@ const WindowReplacementTabContent = ({
             }
           />
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
-            label={`${
-              translations.annualBenefit || "Ετήσιο όφελος (€)"
-            } - ${translations.autoCalculated || "Αυτόματος Υπολογισμός"}`}
+            label={`${translations.annualBenefit || "Ετήσιο όφελος (€)"} - ${
+              translations.autoCalculated || "Αυτόματος Υπολογισμός"
+            }`}
             type="text"
-            value={calculatedResults.annual_cost_savings.toLocaleString("el-GR", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            value={calculatedResults.annual_cost_savings.toLocaleString(
+              "el-GR",
+              {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }
+            )}
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
@@ -712,17 +813,21 @@ const WindowReplacementTabContent = ({
             }
           />
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
             label={
-              (translations.timePeriodYears ||
-              "Χρονικό διάστημα") + " (" + (translations.years || "έτη") + ")"
+              (translations.timePeriodYears || "Χρονικό διάστημα") +
+              " (" +
+              (translations.years || "έτη") +
+              ")"
             }
             type="number"
             value={formData.lifespan_years || 20}
-            onChange={(e) => handleInputChange("lifespan_years", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("lifespan_years", e.target.value)
+            }
             inputProps={{ step: 1, min: 1, max: 50 }}
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -741,17 +846,19 @@ const WindowReplacementTabContent = ({
             }}
           />
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
             label={
               (translations.annualOperatingCosts ||
-              "Λειτουργικά έξοδα ανά έτος") + " (€)"
+                "Λειτουργικά έξοδα ανά έτος") + " (€)"
             }
             type="number"
             value={formData.maintenance_cost_annual || ""}
-            onChange={(e) => handleInputChange("maintenance_cost_annual", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("maintenance_cost_annual", e.target.value)
+            }
             inputProps={{ step: 0.01, min: 0 }}
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -770,18 +877,19 @@ const WindowReplacementTabContent = ({
             }}
           />
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
-            label={
-              (translations.discountRate || "Επιτόκιο αναγωγής") + " (%)"
-            }
+            label={(translations.discountRate || "Επιτόκιο αναγωγής") + " (%)"}
             type="number"
             value={5} // Προεπιλεγμένη τιμή 5%
             InputProps={{ readOnly: true }}
             inputProps={{ step: 0.1, min: 0, max: 100 }}
-            helperText={translations.discountRateHelper || "Σταθερή τιμή 5% για τους υπολογισμούς NPV"}
+            helperText={
+              translations.discountRateHelper ||
+              "Σταθερή τιμή 5% για τους υπολογισμούς NPV"
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -799,14 +907,11 @@ const WindowReplacementTabContent = ({
             }}
           />
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
-            label={
-              translations.netPresentValue ||
-              "Καθαρή παρούσα αξία (€)"
-            }
+            label={translations.netPresentValue || "Καθαρή παρούσα αξία (€)"}
             type="text"
             value={calculatedResults.net_present_value.toLocaleString("el-GR", {
               minimumFractionDigits: 2,
@@ -816,9 +921,7 @@ const WindowReplacementTabContent = ({
             sx={{
               "& .MuiInputBase-input": {
                 color:
-                  calculatedResults.net_present_value >= 0
-                    ? "green"
-                    : "red",
+                  calculatedResults.net_present_value >= 0 ? "green" : "red",
                 fontWeight: "bold",
               },
             }}
@@ -828,13 +931,11 @@ const WindowReplacementTabContent = ({
             }
           />
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
-            label={
-              translations.paybackPeriod || "Περίοδος Αποπληρωμής (έτη)"
-            }
+            label={translations.paybackPeriod || "Περίοδος Αποπληρωμής (έτη)"}
             type="text"
             value={calculatedResults.payback_period.toFixed(1)}
             InputProps={{ readOnly: true }}
@@ -853,13 +954,11 @@ const WindowReplacementTabContent = ({
             }
           />
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
-            label={
-              translations.irr || "Εσωτερικός Βαθμός Απόδοσης (%)"
-            }
+            label={translations.irr || "Εσωτερικός Βαθμός Απόδοσης (%)"}
             type="text"
             value={calculatedResults.internal_rate_of_return.toFixed(2)}
             InputProps={{ readOnly: true }}
@@ -873,8 +972,7 @@ const WindowReplacementTabContent = ({
               },
             }}
             helperText={
-              translations.irrHelperText ||
-              "Απόδοση της επένδυσης ως ποσοστό"
+              translations.irrHelperText || "Απόδοση της επένδυσης ως ποσοστό"
             }
           />
         </Grid>
@@ -896,7 +994,8 @@ const WindowReplacementTabContent = ({
                 {translations.title || "Αντικατάσταση παλαιών υαλοπινάκων"}
               </h2>
               <p className="text-gray-600 mt-1">
-                {translations.subtitle || "Ανάλυση και υπολογισμός οφελών από την αντικατάσταση υαλοπινάκων"}
+                {translations.subtitle ||
+                  "Ανάλυση και υπολογισμός οφελών από την αντικατάσταση υαλοπινάκων"}
               </p>
             </div>
           </div>
@@ -911,7 +1010,9 @@ const WindowReplacementTabContent = ({
                 backgroundColor: "var(--color-primary-dark)",
               },
             }}>
-            {loading ? (translations.saving || "Αποθήκευση...") : (translations.save || "Αποθήκευση")}
+            {loading
+              ? translations.saving || "Αποθήκευση..."
+              : translations.save || "Αποθήκευση"}
           </Button>
         </div>
       </div>

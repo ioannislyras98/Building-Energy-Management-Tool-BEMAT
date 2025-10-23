@@ -11,12 +11,12 @@ export const useModalBlur = (isOpen) => {
   useEffect(() => {
     if (isOpen) {
       openModalCount++;
-      
-      let backdrop = document.getElementById('modal-backdrop');
-      
+
+      let backdrop = document.getElementById("modal-backdrop");
+
       if (!backdrop) {
-        backdrop = document.createElement('div');
-        backdrop.id = 'modal-backdrop';
+        backdrop = document.createElement("div");
+        backdrop.id = "modal-backdrop";
         backdrop.style.cssText = `
           position: fixed;
           top: 0;
@@ -31,15 +31,15 @@ export const useModalBlur = (isOpen) => {
         `;
         document.body.appendChild(backdrop);
       }
-      
-      backdrop.style.display = 'block';
+
+      backdrop.style.display = "block";
     } else {
       openModalCount = Math.max(0, openModalCount - 1);
-      
+
       if (openModalCount === 0) {
-        const backdrop = document.getElementById('modal-backdrop');
+        const backdrop = document.getElementById("modal-backdrop");
         if (backdrop) {
-          backdrop.style.display = 'none';
+          backdrop.style.display = "none";
         }
       }
     }
@@ -48,9 +48,9 @@ export const useModalBlur = (isOpen) => {
       if (isOpen) {
         openModalCount = Math.max(0, openModalCount - 1);
         if (openModalCount === 0) {
-          const backdrop = document.getElementById('modal-backdrop');
+          const backdrop = document.getElementById("modal-backdrop");
           if (backdrop) {
-            backdrop.style.display = 'none';
+            backdrop.style.display = "none";
           }
         }
       }

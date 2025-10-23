@@ -19,7 +19,7 @@ export default function Home() {
   const { projects, handleProjectCreated, refreshProjects } = useProjects();
 
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-  
+
   useModalBlur(isProjectModalOpen);
 
   const openProjectModal = () => setIsProjectModalOpen(true);

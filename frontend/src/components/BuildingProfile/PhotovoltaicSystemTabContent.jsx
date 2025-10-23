@@ -177,7 +177,9 @@ const PhotovoltaicSystemTabContent = ({
           setPhotovoltaicSystem(existing);
           setHasBackendData(true); // Mark that we have backend data
         } else {
-          console.log("No existing photovoltaic system found, setting up for new one");
+          console.log(
+            "No existing photovoltaic system found, setting up for new one"
+          );
           // No existing system found - set up for creating a new one
           setCurrentPhotovoltaicSystem(null);
           setHasBackendData(false); // No backend data for new system
@@ -297,7 +299,7 @@ const PhotovoltaicSystemTabContent = ({
         [field]: value,
       }));
     }
-    
+
     // Reset backend data flag when user manually changes input
     // This allows frontend calculations to take effect again
     if (hasBackendData) {
@@ -353,13 +355,16 @@ const PhotovoltaicSystemTabContent = ({
           } successfully:`,
           data
         );
-        
+
         // Backend now returns full data with calculated fields, no need for additional GET request
-        console.log("Using backend response data with calculated fields:", data);
+        console.log(
+          "Using backend response data with calculated fields:",
+          data
+        );
         setPhotovoltaicSystem(data);
         setCurrentPhotovoltaicSystem(data);
         setHasBackendData(true); // Mark that we have backend data
-        
+
         setSuccess(
           isUpdate
             ? translations.successSave ||
@@ -387,21 +392,33 @@ const PhotovoltaicSystemTabContent = ({
   // Calculate economic indicators automatically
   const calculateEconomicIndicators = () => {
     // Calculate individual costs
-    const pvPanelsCost = (parseFloat(photovoltaicSystem.pv_panels_quantity) || 0) *
+    const pvPanelsCost =
+      (parseFloat(photovoltaicSystem.pv_panels_quantity) || 0) *
       (parseFloat(photovoltaicSystem.pv_panels_unit_price) || 0);
-    const metalBasesCost = (parseFloat(photovoltaicSystem.metal_bases_quantity) || 0) *
+    const metalBasesCost =
+      (parseFloat(photovoltaicSystem.metal_bases_quantity) || 0) *
       (parseFloat(photovoltaicSystem.metal_bases_unit_price) || 0);
-    const pipingCost = (parseFloat(photovoltaicSystem.piping_quantity) || 0) *
+    const pipingCost =
+      (parseFloat(photovoltaicSystem.piping_quantity) || 0) *
       (parseFloat(photovoltaicSystem.piping_unit_price) || 0);
-    const wiringCost = (parseFloat(photovoltaicSystem.wiring_quantity) || 0) *
+    const wiringCost =
+      (parseFloat(photovoltaicSystem.wiring_quantity) || 0) *
       (parseFloat(photovoltaicSystem.wiring_unit_price) || 0);
-    const inverterCost = (parseFloat(photovoltaicSystem.inverter_quantity) || 0) *
+    const inverterCost =
+      (parseFloat(photovoltaicSystem.inverter_quantity) || 0) *
       (parseFloat(photovoltaicSystem.inverter_unit_price) || 0);
-    const installationCost = (parseFloat(photovoltaicSystem.installation_quantity) || 0) *
+    const installationCost =
+      (parseFloat(photovoltaicSystem.installation_quantity) || 0) *
       (parseFloat(photovoltaicSystem.installation_unit_price) || 0);
 
     // Calculate total cost from installation data
-    const totalCost = pvPanelsCost + metalBasesCost + pipingCost + wiringCost + inverterCost + installationCost;
+    const totalCost =
+      pvPanelsCost +
+      metalBasesCost +
+      pipingCost +
+      wiringCost +
+      inverterCost +
+      installationCost;
 
     // Calculate unexpected expenses (9% of total cost)
     const unexpectedExpenses = totalCost * 0.09;
@@ -424,11 +441,11 @@ const PhotovoltaicSystemTabContent = ({
       inverter_cost: inverterCost,
       installation_cost: installationCost,
       // Economic indicators
-      estimated_cost: totalCost,  // Αυτό είναι το αρχικό κόστος εξοπλισμού
+      estimated_cost: totalCost, // Αυτό είναι το αρχικό κόστος εξοπλισμού
       unexpected_expenses: unexpectedExpenses,
       value_after_unexpected: valueAfterUnexpected,
       tax_burden: taxBurden,
-      total_cost: totalProjectCost,  // Αυτό είναι το συνολικό κόστος με ΦΠΑ
+      total_cost: totalProjectCost, // Αυτό είναι το συνολικό κόστος με ΦΠΑ
     };
   };
 
@@ -1029,18 +1046,14 @@ const PhotovoltaicSystemTabContent = ({
               <TextField
                 fullWidth
                 label={`${
-                  translations.fields?.totalCost ||
-                  "Συνολικό κόστος έργου (€)"
+                  translations.fields?.totalCost || "Συνολικό κόστος έργου (€)"
                 } - ${translations.autoCalculated || "Αυτόματος Υπολογισμός"}`}
                 type="text"
                 value={
-                  photovoltaicSystem.total_cost?.toLocaleString(
-                    "el-GR",
-                    {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }
-                  ) || "0.00"
+                  photovoltaicSystem.total_cost?.toLocaleString("el-GR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }) || "0.00"
                 }
                 InputProps={{ readOnly: true }}
                 sx={{
@@ -1093,9 +1106,7 @@ const PhotovoltaicSystemTabContent = ({
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label={
-                  translations.fields?.netCost || "Καθαρό κόστος (€)"
-                }
+                label={translations.fields?.netCost || "Καθαρό κόστος (€)"}
                 type="number"
                 value={photovoltaicSystem.net_cost || 0}
                 InputProps={{ readOnly: true }}
@@ -1157,7 +1168,8 @@ const PhotovoltaicSystemTabContent = ({
               <TextField
                 fullWidth
                 label={
-                  translations.fields?.paybackPeriod || "Περίοδος απόσβεσης (έτη)"
+                  translations.fields?.paybackPeriod ||
+                  "Περίοδος απόσβεσης (έτη)"
                 }
                 type="number"
                 value={photovoltaicSystem.payback_period || 0}
@@ -1185,7 +1197,8 @@ const PhotovoltaicSystemTabContent = ({
               <TextField
                 fullWidth
                 label={
-                  translations.fields?.annualSavings || "Ετήσια εξοικονόμηση (€)"
+                  translations.fields?.annualSavings ||
+                  "Ετήσια εξοικονόμηση (€)"
                 }
                 type="number"
                 value={photovoltaicSystem.annual_savings || 0}
@@ -1213,7 +1226,8 @@ const PhotovoltaicSystemTabContent = ({
               <TextField
                 fullWidth
                 label={
-                  translations.fields?.investmentReturn || "Απόδοση επένδυσης (%)"
+                  translations.fields?.investmentReturn ||
+                  "Απόδοση επένδυσης (%)"
                 }
                 type="number"
                 value={photovoltaicSystem.investment_return || 0}
@@ -1349,7 +1363,8 @@ const PhotovoltaicSystemTabContent = ({
                   },
                 }}>
                 <option value="electricity">
-                  {translations.pvUsageOptions?.electricity || "Ηλεκτρική Ενέργεια"}
+                  {translations.pvUsageOptions?.electricity ||
+                    "Ηλεκτρική Ενέργεια"}
                 </option>
                 <option value="hot_water">
                   {translations.pvUsageOptions?.hotWater || "Ζεστό Νερό"}
@@ -1385,7 +1400,8 @@ const PhotovoltaicSystemTabContent = ({
                   },
                 }}>
                 <option value="grid_connected">
-                  {translations.pvSystemTypeOptions?.gridConnected || "Διασυνδεδεμένο"}
+                  {translations.pvSystemTypeOptions?.gridConnected ||
+                    "Διασυνδεδεμένο"}
                 </option>
                 <option value="standalone">
                   {translations.pvSystemTypeOptions?.standalone || "Αυτόνομο"}

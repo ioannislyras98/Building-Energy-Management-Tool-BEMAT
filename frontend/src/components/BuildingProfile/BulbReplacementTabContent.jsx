@@ -148,7 +148,14 @@ const BulbReplacementTabContent = ({
   const [debounceTimeout, setDebounceTimeout] = useState(null);
 
   const autoSave = useCallback(() => {
-    if (!buildingUuid || !token || !formData.old_power_per_bulb || !formData.old_bulb_count || !formData.new_power_per_bulb || !formData.new_bulb_count) {
+    if (
+      !buildingUuid ||
+      !token ||
+      !formData.old_power_per_bulb ||
+      !formData.old_bulb_count ||
+      !formData.new_power_per_bulb ||
+      !formData.new_bulb_count
+    ) {
       return;
     }
 
@@ -169,7 +176,9 @@ const BulbReplacementTabContent = ({
       data: JSON.stringify(submitData),
       success: (response) => {
         console.log("Bulb replacement data auto-saved:", response);
-        setSuccess(translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς");
+        setSuccess(
+          translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
+        );
         setTimeout(() => setSuccess(null), 3000);
       },
       error: (jqXHR) => {
@@ -181,7 +190,14 @@ const BulbReplacementTabContent = ({
         );
       },
     });
-  }, [buildingUuid, projectUuid, token, formData, calculatedResults, translations]);
+  }, [
+    buildingUuid,
+    projectUuid,
+    token,
+    formData,
+    calculatedResults,
+    translations,
+  ]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -193,11 +209,11 @@ const BulbReplacementTabContent = ({
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
-    
+
     const newTimeout = setTimeout(() => {
       autoSave();
     }, 1000);
-    
+
     setDebounceTimeout(newTimeout);
   };
 
@@ -487,7 +503,8 @@ const BulbReplacementTabContent = ({
       <Card sx={{ mt: 3, backgroundColor: "#fef2f2" }}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            {translations.calculatedConsumption || "Υπολογιζόμενη Κατανάλωση - Παλαιό Σύστημα"}
+            {translations.calculatedConsumption ||
+              "Υπολογιζόμενη Κατανάλωση - Παλαιό Σύστημα"}
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
@@ -503,7 +520,11 @@ const BulbReplacementTabContent = ({
                 Συνολική Ισχύς Παλαιού Συστήματος
               </Typography>
               <Typography variant="h6" color="error">
-                {(formData.old_power_per_bulb * formData.old_bulb_count / 1000).toFixed(2)} kW
+                {(
+                  (formData.old_power_per_bulb * formData.old_bulb_count) /
+                  1000
+                ).toFixed(2)}{" "}
+                kW
               </Typography>
             </Grid>
           </Grid>
@@ -516,7 +537,9 @@ const BulbReplacementTabContent = ({
     <div className="space-y-4">
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Typography variant="h6" className="font-semibold text-green-700 mb-4">
+          <Typography
+            variant="h6"
+            className="font-semibold text-green-700 mb-4">
             {translations.newLightingSystem || "Νέο Σύστημα Φωτισμού"}
           </Typography>
         </Grid>
@@ -652,7 +675,8 @@ const BulbReplacementTabContent = ({
       <Card sx={{ mt: 3, backgroundColor: "#f0fdf4" }}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            {translations.calculatedConsumption || "Υπολογιζόμενη Κατανάλωση - Νέο Σύστημα"}
+            {translations.calculatedConsumption ||
+              "Υπολογιζόμενη Κατανάλωση - Νέο Σύστημα"}
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} md={4}>
@@ -668,7 +692,11 @@ const BulbReplacementTabContent = ({
                 Συνολική Ισχύς Νέου Συστήματος
               </Typography>
               <Typography variant="h6" color="success.main">
-                {(formData.new_power_per_bulb * formData.new_bulb_count / 1000).toFixed(2)} kW
+                {(
+                  (formData.new_power_per_bulb * formData.new_bulb_count) /
+                  1000
+                ).toFixed(2)}{" "}
+                kW
               </Typography>
             </Grid>
             <Grid item xs={12} md={4}>
@@ -853,484 +881,468 @@ const BulbReplacementTabContent = ({
   );
 
   // Old function removed - content split into separate tab functions
-    <div className="space-y-4">
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Typography variant="h6" className="font-semibold text-gray-800 mb-4">
-            {translations.bulbReplacementData ||
-              "Στοιχεία αντικατάστασης λαμπτήρων"}
-          </Typography>
-        </Grid>
-
-        {/* Old Lighting System */}
-        <Grid item xs={12}>
-          <Typography variant="h6" className="font-semibold text-red-700 mb-4">
-            {translations.oldLightingSystem || "Παλαιό Σύστημα Φωτισμού"}
-          </Typography>
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel id="old-bulb-type-label">
-              {translations.oldBulbType || "Τύπος παλαιού φορτίου"}
-            </InputLabel>
-            <Select
-              labelId="old-bulb-type-label"
-              value={formData.old_bulb_type}
-              label={translations.oldBulbType || "Τύπος παλαιού φορτίου"}
-              onChange={(e) =>
-                handleInputChange("old_bulb_type", e.target.value)
-              }
-              sx={{
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgba(0, 0, 0, 0.23)",
-                },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "var(--color-primary)",
-                },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "var(--color-primary)",
-                },
-              }}>
-              {oldBulbTypes.map((type) => (
-                <MenuItem key={type} value={type}>
-                  {type}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={
-              (translations.oldPowerPerBulb || "Ισχύς παλαιού φορτίου") +
-              " (W) *"
-            }
-            type="number"
-            value={formData.old_power_per_bulb}
-            onChange={(e) =>
-              handleInputChange("old_power_per_bulb", e.target.value)
-            }
-            variant="outlined"
-            required
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                "&.Mui-focused": {
-                  color: "var(--color-primary)",
-                },
-              },
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={
-              (translations.oldBulbCount || "Πλήθος παλαιών λαμπτήρων") + " *"
-            }
-            type="number"
-            value={formData.old_bulb_count}
-            onChange={(e) =>
-              handleInputChange("old_bulb_count", e.target.value)
-            }
-            variant="outlined"
-            required
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                "&.Mui-focused": {
-                  color: "var(--color-primary)",
-                },
-              },
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={
-              (translations.oldOperatingHours || "Ώρες λειτουργίας ανά έτος") +
-              " *"
-            }
-            type="number"
-            value={formData.old_operating_hours}
-            onChange={(e) =>
-              handleInputChange("old_operating_hours", e.target.value)
-            }
-            variant="outlined"
-            required
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                "&.Mui-focused": {
-                  color: "var(--color-primary)",
-                },
-              },
-            }}
-          />
-        </Grid>
-
-        {/* New Lighting System */}
-        <Grid item xs={12}>
-          <Typography
-            variant="h6"
-            className="font-semibold text-green-700 mb-4 mt-6">
-            {translations.newLightingSystem || "Νέο Σύστημα Φωτισμού"}
-          </Typography>
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel id="new-bulb-type-label">
-              {translations.newBulbType || "Τύπος νέου φορτίου"}
-            </InputLabel>
-            <Select
-              labelId="new-bulb-type-label"
-              value={formData.new_bulb_type}
-              label={translations.newBulbType || "Τύπος νέου φορτίου"}
-              onChange={(e) =>
-                handleInputChange("new_bulb_type", e.target.value)
-              }
-              sx={{
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgba(0, 0, 0, 0.23)",
-                },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "var(--color-primary)",
-                },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "var(--color-primary)",
-                },
-              }}>
-              {newBulbTypes.map((type) => (
-                <MenuItem key={type} value={type}>
-                  {type}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={
-              (translations.newPowerPerBulb || "Ισχύς νέου φορτίου") + " (W) *"
-            }
-            type="number"
-            value={formData.new_power_per_bulb}
-            onChange={(e) =>
-              handleInputChange("new_power_per_bulb", e.target.value)
-            }
-            variant="outlined"
-            required
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                "&.Mui-focused": {
-                  color: "var(--color-primary)",
-                },
-              },
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={
-              (translations.newBulbCount || "Πλήθος νέων λαμπτήρων") + " *"
-            }
-            type="number"
-            value={formData.new_bulb_count}
-            onChange={(e) =>
-              handleInputChange("new_bulb_count", e.target.value)
-            }
-            variant="outlined"
-            required
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                "&.Mui-focused": {
-                  color: "var(--color-primary)",
-                },
-              },
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={
-              (translations.newOperatingHours || "Ώρες λειτουργίας ανά έτος") +
-              " *"
-            }
-            type="number"
-            value={formData.new_operating_hours}
-            onChange={(e) =>
-              handleInputChange("new_operating_hours", e.target.value)
-            }
-            variant="outlined"
-            required
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                "&.Mui-focused": {
-                  color: "var(--color-primary)",
-                },
-              },
-            }}
-          />
-        </Grid>
-
-        {/* Economic Data */}
-        <Grid item xs={12}>
-          <Typography
-            variant="h6"
-            className="font-semibold text-green-700 mb-4 mt-6">
-            {translations.economicData || "Οικονομικά Στοιχεία"}
-          </Typography>
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={
-              (translations.costPerNewBulb || "Κόστος ανά νέο λαμπτήρα") +
-              " (€)"
-            }
-            type="number"
-            value={formData.cost_per_new_bulb}
-            onChange={(e) =>
-              handleInputChange("cost_per_new_bulb", e.target.value)
-            }
-            variant="outlined"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                "&.Mui-focused": {
-                  color: "var(--color-primary)",
-                },
-              },
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={
-              (translations.installationCost || "Κόστος εγκατάστασης") + " (€)"
-            }
-            type="number"
-            value={formData.installation_cost}
-            onChange={(e) =>
-              handleInputChange("installation_cost", e.target.value)
-            }
-            variant="outlined"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                "&.Mui-focused": {
-                  color: "var(--color-primary)",
-                },
-              },
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={
-              (translations.energyCostKwh || "Κόστος ενέργειας") + " (€/kWh)"
-            }
-            type="number"
-            value={formData.energy_cost_kwh}
-            onChange={(e) =>
-              handleInputChange("energy_cost_kwh", e.target.value)
-            }
-            variant="outlined"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                "&.Mui-focused": {
-                  color: "var(--color-primary)",
-                },
-              },
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={
-              (translations.lifespanYears || "Διάρκεια ζωής") +
-              " (" +
-              (translations.years || "έτη") +
-              ")"
-            }
-            type="number"
-            value={formData.lifespan_years}
-            onChange={(e) =>
-              handleInputChange("lifespan_years", e.target.value)
-            }
-            variant="outlined"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                "&.Mui-focused": {
-                  color: "var(--color-primary)",
-                },
-              },
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={
-              (translations.maintenanceCostAnnual ||
-                "Ετήσιο κόστος συντήρησης") + " (€)"
-            }
-            type="number"
-            value={formData.maintenance_cost_annual}
-            onChange={(e) =>
-              handleInputChange("maintenance_cost_annual", e.target.value)
-            }
-            variant="outlined"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                "&.Mui-focused": {
-                  color: "var(--color-primary)",
-                },
-              },
-            }}
-          />
-        </Grid>
+  <div className="space-y-4">
+    <Grid container spacing={3}>
+      <Grid item xs={12}>
+        <Typography variant="h6" className="font-semibold text-gray-800 mb-4">
+          {translations.bulbReplacementData ||
+            "Στοιχεία αντικατάστασης λαμπτήρων"}
+        </Typography>
       </Grid>
 
-      {/* Calculation Card for Consumption */}
-      <Card sx={{ mt: 3, backgroundColor: "#f8f9fa" }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            {translations.calculatedConsumption || "Υπολογιζόμενη Κατανάλωση"}
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={4}>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                {translations.oldConsumption || "Κατανάλωση παλαιών λαμπτήρων"}
-              </Typography>
-              <Typography variant="h6" color="error">
-                {calculatedResults.old_consumption_kwh.toFixed(2)} kWh
-              </Typography>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                {translations.newConsumption || "Κατανάλωση νέων λαμπτήρων"}
-              </Typography>
-              <Typography variant="h6" color="success.main">
-                {calculatedResults.new_consumption_kwh.toFixed(2)} kWh
-              </Typography>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                {translations.energySavings || "Ενεργειακή εξοικονόμηση"}
-              </Typography>
-              <Typography variant="h6" color="success.main">
-                {calculatedResults.energy_savings_kwh.toFixed(2)} kWh
-              </Typography>
-            </Grid>
+      {/* Old Lighting System */}
+      <Grid item xs={12}>
+        <Typography variant="h6" className="font-semibold text-red-700 mb-4">
+          {translations.oldLightingSystem || "Παλαιό Σύστημα Φωτισμού"}
+        </Typography>
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <FormControl fullWidth>
+          <InputLabel id="old-bulb-type-label">
+            {translations.oldBulbType || "Τύπος παλαιού φορτίου"}
+          </InputLabel>
+          <Select
+            labelId="old-bulb-type-label"
+            value={formData.old_bulb_type}
+            label={translations.oldBulbType || "Τύπος παλαιού φορτίου"}
+            onChange={(e) => handleInputChange("old_bulb_type", e.target.value)}
+            sx={{
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: "rgba(0, 0, 0, 0.23)",
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: "var(--color-primary)",
+              },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "var(--color-primary)",
+              },
+            }}>
+            {oldBulbTypes.map((type) => (
+              <MenuItem key={type} value={type}>
+                {type}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label={
+            (translations.oldPowerPerBulb || "Ισχύς παλαιού φορτίου") + " (W) *"
+          }
+          type="number"
+          value={formData.old_power_per_bulb}
+          onChange={(e) =>
+            handleInputChange("old_power_per_bulb", e.target.value)
+          }
+          variant="outlined"
+          required
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&:hover fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              "&.Mui-focused": {
+                color: "var(--color-primary)",
+              },
+            },
+          }}
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label={
+            (translations.oldBulbCount || "Πλήθος παλαιών λαμπτήρων") + " *"
+          }
+          type="number"
+          value={formData.old_bulb_count}
+          onChange={(e) => handleInputChange("old_bulb_count", e.target.value)}
+          variant="outlined"
+          required
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&:hover fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              "&.Mui-focused": {
+                color: "var(--color-primary)",
+              },
+            },
+          }}
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label={
+            (translations.oldOperatingHours || "Ώρες λειτουργίας ανά έτος") +
+            " *"
+          }
+          type="number"
+          value={formData.old_operating_hours}
+          onChange={(e) =>
+            handleInputChange("old_operating_hours", e.target.value)
+          }
+          variant="outlined"
+          required
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&:hover fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              "&.Mui-focused": {
+                color: "var(--color-primary)",
+              },
+            },
+          }}
+        />
+      </Grid>
+
+      {/* New Lighting System */}
+      <Grid item xs={12}>
+        <Typography
+          variant="h6"
+          className="font-semibold text-green-700 mb-4 mt-6">
+          {translations.newLightingSystem || "Νέο Σύστημα Φωτισμού"}
+        </Typography>
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <FormControl fullWidth>
+          <InputLabel id="new-bulb-type-label">
+            {translations.newBulbType || "Τύπος νέου φορτίου"}
+          </InputLabel>
+          <Select
+            labelId="new-bulb-type-label"
+            value={formData.new_bulb_type}
+            label={translations.newBulbType || "Τύπος νέου φορτίου"}
+            onChange={(e) => handleInputChange("new_bulb_type", e.target.value)}
+            sx={{
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: "rgba(0, 0, 0, 0.23)",
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: "var(--color-primary)",
+              },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "var(--color-primary)",
+              },
+            }}>
+            {newBulbTypes.map((type) => (
+              <MenuItem key={type} value={type}>
+                {type}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label={
+            (translations.newPowerPerBulb || "Ισχύς νέου φορτίου") + " (W) *"
+          }
+          type="number"
+          value={formData.new_power_per_bulb}
+          onChange={(e) =>
+            handleInputChange("new_power_per_bulb", e.target.value)
+          }
+          variant="outlined"
+          required
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&:hover fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              "&.Mui-focused": {
+                color: "var(--color-primary)",
+              },
+            },
+          }}
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label={(translations.newBulbCount || "Πλήθος νέων λαμπτήρων") + " *"}
+          type="number"
+          value={formData.new_bulb_count}
+          onChange={(e) => handleInputChange("new_bulb_count", e.target.value)}
+          variant="outlined"
+          required
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&:hover fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              "&.Mui-focused": {
+                color: "var(--color-primary)",
+              },
+            },
+          }}
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label={
+            (translations.newOperatingHours || "Ώρες λειτουργίας ανά έτος") +
+            " *"
+          }
+          type="number"
+          value={formData.new_operating_hours}
+          onChange={(e) =>
+            handleInputChange("new_operating_hours", e.target.value)
+          }
+          variant="outlined"
+          required
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&:hover fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              "&.Mui-focused": {
+                color: "var(--color-primary)",
+              },
+            },
+          }}
+        />
+      </Grid>
+
+      {/* Economic Data */}
+      <Grid item xs={12}>
+        <Typography
+          variant="h6"
+          className="font-semibold text-green-700 mb-4 mt-6">
+          {translations.economicData || "Οικονομικά Στοιχεία"}
+        </Typography>
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label={
+            (translations.costPerNewBulb || "Κόστος ανά νέο λαμπτήρα") + " (€)"
+          }
+          type="number"
+          value={formData.cost_per_new_bulb}
+          onChange={(e) =>
+            handleInputChange("cost_per_new_bulb", e.target.value)
+          }
+          variant="outlined"
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&:hover fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              "&.Mui-focused": {
+                color: "var(--color-primary)",
+              },
+            },
+          }}
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label={
+            (translations.installationCost || "Κόστος εγκατάστασης") + " (€)"
+          }
+          type="number"
+          value={formData.installation_cost}
+          onChange={(e) =>
+            handleInputChange("installation_cost", e.target.value)
+          }
+          variant="outlined"
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&:hover fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              "&.Mui-focused": {
+                color: "var(--color-primary)",
+              },
+            },
+          }}
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label={
+            (translations.energyCostKwh || "Κόστος ενέργειας") + " (€/kWh)"
+          }
+          type="number"
+          value={formData.energy_cost_kwh}
+          onChange={(e) => handleInputChange("energy_cost_kwh", e.target.value)}
+          variant="outlined"
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&:hover fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              "&.Mui-focused": {
+                color: "var(--color-primary)",
+              },
+            },
+          }}
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label={
+            (translations.lifespanYears || "Διάρκεια ζωής") +
+            " (" +
+            (translations.years || "έτη") +
+            ")"
+          }
+          type="number"
+          value={formData.lifespan_years}
+          onChange={(e) => handleInputChange("lifespan_years", e.target.value)}
+          variant="outlined"
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&:hover fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              "&.Mui-focused": {
+                color: "var(--color-primary)",
+              },
+            },
+          }}
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label={
+            (translations.maintenanceCostAnnual || "Ετήσιο κόστος συντήρησης") +
+            " (€)"
+          }
+          type="number"
+          value={formData.maintenance_cost_annual}
+          onChange={(e) =>
+            handleInputChange("maintenance_cost_annual", e.target.value)
+          }
+          variant="outlined"
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&:hover fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              "&.Mui-focused": {
+                color: "var(--color-primary)",
+              },
+            },
+          }}
+        />
+      </Grid>
+    </Grid>
+
+    {/* Calculation Card for Consumption */}
+    <Card sx={{ mt: 3, backgroundColor: "#f8f9fa" }}>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          {translations.calculatedConsumption || "Υπολογιζόμενη Κατανάλωση"}
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={4}>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              {translations.oldConsumption || "Κατανάλωση παλαιών λαμπτήρων"}
+            </Typography>
+            <Typography variant="h6" color="error">
+              {calculatedResults.old_consumption_kwh.toFixed(2)} kWh
+            </Typography>
           </Grid>
-        </CardContent>
-      </Card>
-    </div>
+          <Grid item xs={12} md={4}>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              {translations.newConsumption || "Κατανάλωση νέων λαμπτήρων"}
+            </Typography>
+            <Typography variant="h6" color="success.main">
+              {calculatedResults.new_consumption_kwh.toFixed(2)} kWh
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              {translations.energySavings || "Ενεργειακή εξοικονόμηση"}
+            </Typography>
+            <Typography variant="h6" color="success.main">
+              {calculatedResults.energy_savings_kwh.toFixed(2)} kWh
+            </Typography>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  </div>;
   const renderEnergyBenefits = () => (
     <div className="space-y-4">
       <Typography variant="h6" className="font-semibold text-green-700 mb-4">
@@ -1691,7 +1703,9 @@ const BulbReplacementTabContent = ({
                 backgroundColor: "var(--color-primary-dark)",
               },
             }}>
-            {loading ? (translations.saving || "Αποθήκευση...") : (translations.save || "Αποθήκευση")}
+            {loading
+              ? translations.saving || "Αποθήκευση..."
+              : translations.save || "Αποθήκευση"}
           </Button>
         </div>
       </div>
@@ -1733,8 +1747,12 @@ const BulbReplacementTabContent = ({
               backgroundColor: "var(--color-primary)",
             },
           }}>
-          <Tab label={translations.oldLightingSystem || "Παλαιό Σύστημα Φωτισμού"} />
-          <Tab label={translations.newLightingSystem || "Νέο Σύστημα Φωτισμού"} />
+          <Tab
+            label={translations.oldLightingSystem || "Παλαιό Σύστημα Φωτισμού"}
+          />
+          <Tab
+            label={translations.newLightingSystem || "Νέο Σύστημα Φωτισμού"}
+          />
           <Tab label={translations.economicData || "Οικονομικά Στοιχεία"} />
           <Tab label={translations.energyBenefits || "Ενεργειακά Οφέλη"} />
           <Tab label={translations.economicBenefits || "Οικονομικά Οφέλη"} />
