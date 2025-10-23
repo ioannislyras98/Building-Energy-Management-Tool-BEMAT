@@ -20,12 +20,10 @@ export default function ProjectView() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  // Individual modal state management
   const [isBuildingModalOpen, setIsBuildingModalOpen] = useState(false);
   const [isUpdateProjectModalOpen, setIsUpdateProjectModalOpen] =
     useState(false);
 
-  // Apply blur effects for each modal
   useModalBlur(isBuildingModalOpen);
   useModalBlur(isUpdateProjectModalOpen);
 
@@ -50,7 +48,6 @@ export default function ProjectView() {
     clearBuildings,
   } = useBuildings();
 
-  // Modal control functions
   const openBuildingModal = () => setIsBuildingModalOpen(true);
   const closeBuildingModal = () => setIsBuildingModalOpen(false);
   const openUpdateProjectModal = (project) => {
@@ -119,7 +116,6 @@ export default function ProjectView() {
     if (selectedProject) {
       updateBuildingCount(selectedProject.uuid, true);
     }
-    // Refresh projects to update completion status
     refreshProjects();
   };
 
@@ -143,17 +139,13 @@ export default function ProjectView() {
         const data = await response.json();
         console.log("Project submitted successfully:", data);
 
-        // Update the selected project in state
         const updatedProject = { ...selectedProject, is_submitted: true };
         setSelectedProject(updatedProject);
 
-        // Also update in the projects list
         handleProjectUpdated(updatedProject);
 
-        // Refresh projects to get updated data
         refreshProjects();
 
-        // Show success message
         alert(
           paramsText?.projectSubmittedSuccess ||
             "Project submitted successfully!"

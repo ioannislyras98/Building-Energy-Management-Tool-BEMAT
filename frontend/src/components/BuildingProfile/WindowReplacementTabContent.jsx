@@ -618,7 +618,6 @@ const WindowReplacementTabContent = ({
         </CardContent>
       </Card>
 
-      {/* Analysis Details */}
       <Paper sx={{ p: 3 }}>
         <Typography variant="h6" className="font-semibold mb-3">
           {translations.detailedAnalysis || "Λεπτομερής Ανάλυση"}

@@ -76,7 +76,7 @@ export const useBuildings = () => {
   const handleBuildingCreated = useCallback(
     (newBuilding) => {
       setBuildings((prevBuildings) => [...prevBuildings, newBuilding]);
-      refreshSidebar(); // Refresh sidebar to show updated building count
+      refreshSidebar();
     },
     [refreshSidebar]
   );
@@ -86,7 +86,7 @@ export const useBuildings = () => {
       setBuildings((prevBuildings) =>
         prevBuildings.filter((building) => building.uuid !== buildingUuid)
       );
-      refreshSidebar(); // Refresh sidebar to show updated building count
+      refreshSidebar();
     },
     [refreshSidebar]
   );

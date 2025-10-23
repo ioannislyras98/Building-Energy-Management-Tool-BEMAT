@@ -23,7 +23,6 @@ class WindowReplacement(models.Model):
         verbose_name="Έργο"
     )
     
-    # Window thermal properties
     old_thermal_conductivity = models.FloatField(
         verbose_name="Παλαιός συντελεστής θερμικής αγωγιμότητας (W/m²K)",
         help_text="Συντελεστής θερμικής αγωγιμότητας παλαιών υαλοπινάκων"
@@ -37,7 +36,6 @@ class WindowReplacement(models.Model):
         help_text="Συνολική επιφάνεια υαλοπινάκων προς αντικατάσταση"
     )
     
-    # Calculated energy losses
     old_losses_summer = models.FloatField(
         verbose_name="Απώλειες πριν - Θερινοί Μήνες (kWh)",
         help_text="Ενεργειακές απώλειες με παλαιούς υαλοπίνακες κατά τους θερινούς μήνες",
@@ -63,7 +61,6 @@ class WindowReplacement(models.Model):
         blank=True
     )
     
-    # Economic data
     cost_per_sqm = models.FloatField(
         verbose_name="Κόστος ανά m² (€/m²)",
         help_text="Κόστος αντικατάστασης ανά τετραγωνικό μέτρο",
@@ -91,7 +88,6 @@ class WindowReplacement(models.Model):
         default=20
     )
     
-    # Calculated results - Energy Benefits
     energy_savings_summer = models.FloatField(
         verbose_name="Ενεργειακή εξοικονόμηση καλοκαίρι (kWh)",
         help_text="Ετήσια ενεργειακή εξοικονόμηση κατά τους θερινούς μήνες",
@@ -111,7 +107,6 @@ class WindowReplacement(models.Model):
         blank=True
     )
     
-    # Calculated results - Economic Benefits
     annual_cost_savings = models.FloatField(
         verbose_name="Ετήσια οικονομική εξοικονόμηση (€)",
         help_text="Ετήσια εξοικονόμηση σε κόστος ενέργειας",
@@ -143,7 +138,6 @@ class WindowReplacement(models.Model):
         blank=True
     )
     
-    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ημερομηνία δημιουργίας")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Ημερομηνία ενημέρωσης")
 
@@ -160,7 +154,6 @@ class WindowReplacement(models.Model):
         """
         Override save to calculate energy and economic benefits automatically
         """
-        # Auto-populate user if not set
         if not self.user_id and hasattr(self, '_user'):
             self.user = self._user
             
@@ -189,7 +182,6 @@ class WindowReplacement(models.Model):
         if self.annual_cost_savings and self.total_investment_cost and self.annual_cost_savings > 0:
             self.payback_period = self.total_investment_cost / self.annual_cost_savings
             
-            # Calculate NPV (simplified calculation with 5% discount rate)
             discount_rate = 0.05
             years = self.lifespan_years or 20
             annual_net_savings = self.annual_cost_savings - (self.maintenance_cost_annual or 0)
@@ -200,7 +192,6 @@ class WindowReplacement(models.Model):
                 
             self.net_present_value = pv_savings - self.total_investment_cost
             
-            # Calculate IRR (simplified estimate)
             if self.total_investment_cost > 0:
                 self.internal_rate_of_return = (annual_net_savings / self.total_investment_cost) * 100
 

@@ -28,17 +28,14 @@ export default function BuildingProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Individual modal state management
   const [isEditBuildingModalOpen, setIsEditBuildingModalOpen] = useState(false);
   const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
   const [isEditContactModalOpen, setIsEditContactModalOpen] = useState(false);
 
-  // Apply blur effects for each modal
   useModalBlur(isEditBuildingModalOpen);
   useModalBlur(isAddContactModalOpen);
   useModalBlur(isEditContactModalOpen);
 
-  // Modal control functions
   const openEditBuildingModal = () => setIsEditBuildingModalOpen(true);
   const closeEditBuildingModal = () => setIsEditBuildingModalOpen(false);
   const openAddContactModal = () => setIsAddContactModalOpen(true);

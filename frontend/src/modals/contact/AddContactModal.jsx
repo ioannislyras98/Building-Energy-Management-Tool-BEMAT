@@ -20,7 +20,6 @@ function AddContactModalForm({
 }) {
   console.log("AddContactModal - isOpen:", isOpen, "params:", params);
 
-  // Apply blur effect when modal is open
   useModalBlur(isOpen);
 
   const [formData, setFormData] = useState({
@@ -33,7 +32,6 @@ function AddContactModalForm({
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const token = cookies.get("token") || "";
 
-  // Reset validation state when modal opens/closes
   React.useEffect(() => {
     if (isOpen) {
       setFormData({ name: "", role: "", email: "", phone_number: "" });

@@ -34,7 +34,6 @@ function CoolingSystemModalForm({
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const token = cookies.get("token") || "";
 
-  // Apply blur effect using hook
   useModalBlur(open);
 
   useEffect(() => {

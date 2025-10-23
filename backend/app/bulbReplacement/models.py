@@ -183,11 +183,9 @@ class BulbReplacement(models.Model):
         Calculate energy consumption for old and new bulbs
         """
         if all([self.old_power_per_bulb, self.old_bulb_count, self.old_operating_hours]):
-            # Old consumption: Power (W) × Count × Hours / 1000 (to convert W to kW)
             self.old_consumption_kwh = (self.old_power_per_bulb * self.old_bulb_count * self.old_operating_hours) / 1000
             
         if all([self.new_power_per_bulb, self.new_bulb_count, self.new_operating_hours]):
-            # New consumption: Power (W) × Count × Hours / 1000 (to convert W to kW)
             self.new_consumption_kwh = (self.new_power_per_bulb * self.new_bulb_count * self.new_operating_hours) / 1000
 
     def calculate_energy_savings(self):

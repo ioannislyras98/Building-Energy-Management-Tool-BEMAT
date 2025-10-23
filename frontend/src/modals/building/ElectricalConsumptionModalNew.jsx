@@ -20,7 +20,6 @@ function ElectricalConsumptionModalForm({
   editItem,
   params,
 }) {
-  // Apply blur effect when modal is open
   useModalBlur(open);
 
   const [formData, setFormData] = useState({
@@ -231,7 +230,6 @@ function ElectricalConsumptionModalForm({
     const { id, name, value } = event.target;
     const fieldName = id || name;
 
-    // Reset load_type when consumption_type changes
     if (
       fieldName === "consumption_type" &&
       value !== formData.consumption_type
@@ -241,7 +239,6 @@ function ElectricalConsumptionModalForm({
       setFormData({ ...formData, [fieldName]: value });
     }
 
-    // Clear error for this field
     if (errors[fieldName]) {
       setErrors({ ...errors, [fieldName]: "" });
     }

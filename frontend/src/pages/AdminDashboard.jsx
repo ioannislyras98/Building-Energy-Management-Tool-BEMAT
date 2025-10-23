@@ -49,7 +49,6 @@ const AdminDashboard = () => {
 
         const data = await response.json();
 
-        // Handle different response structures
         let userData;
         if (data.success && data.data && data.data.user) {
           userData = data.data.user;

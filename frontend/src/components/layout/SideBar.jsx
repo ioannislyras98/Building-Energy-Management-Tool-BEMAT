@@ -39,7 +39,6 @@ export default function Sidenav() {
 
   const token = cookies.get("token") || "";
 
-  // Fetch user info and projects
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -72,8 +71,7 @@ export default function Sidenav() {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("Projects API response:", data); // Debug log
-          // Handle different response structures based on useProjects hook
+          console.log("Projects API response:", data);
           if (Array.isArray(data)) {
             setProjects(data);
           } else if (data.projects && Array.isArray(data.projects)) {
@@ -108,7 +106,6 @@ export default function Sidenav() {
     }
   }, [sidebarExpanded]);
 
-  // Close dropdowns when sidebar is collapsed
   useEffect(() => {
     if (!sidebarExpanded) {
       setProjectsExpanded(false);

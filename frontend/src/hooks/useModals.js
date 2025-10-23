@@ -10,7 +10,6 @@ let openModalCount = 0;
 export const useModalBlur = (isOpen) => {
   useEffect(() => {
     if (isOpen) {
-      // Increment counter and show backdrop
       openModalCount++;
       
       let backdrop = document.getElementById('modal-backdrop');
@@ -35,7 +34,6 @@ export const useModalBlur = (isOpen) => {
       
       backdrop.style.display = 'block';
     } else {
-      // Decrement counter and hide backdrop if no modals left
       openModalCount = Math.max(0, openModalCount - 1);
       
       if (openModalCount === 0) {
@@ -46,7 +44,6 @@ export const useModalBlur = (isOpen) => {
       }
     }
 
-    // Cleanup function when component unmounts
     return () => {
       if (isOpen) {
         openModalCount = Math.max(0, openModalCount - 1);

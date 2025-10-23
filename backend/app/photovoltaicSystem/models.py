@@ -373,13 +373,11 @@ class PhotovoltaicSystem(models.Model):
             # Default electricity cost per kWh in Greece (approx €0.15/kWh)
             electricity_cost_per_kwh = Decimal('0.15')
             
-            # Annual energy production in kWh
             annual_energy_kwh = float(self.annual_energy_production or 0)
             
             if annual_energy_kwh <= 0:
                 return Decimal('0')
             
-            # Calculate annual savings: energy production × electricity cost
             annual_savings = Decimal(str(annual_energy_kwh)) * electricity_cost_per_kwh
             
             return round(annual_savings, 2)
@@ -389,7 +387,6 @@ class PhotovoltaicSystem(models.Model):
     def calculate_payback_period(self):
         """Υπολογισμός περιόδου απόσβεσης σε έτη"""
         try:
-            # Use total_cost if net_cost is negative (subsidy > total cost)
             initial_investment = float(self.net_cost or 0)
             if initial_investment <= 0:
                 initial_investment = float(self.total_cost or 0)
@@ -399,7 +396,6 @@ class PhotovoltaicSystem(models.Model):
             if initial_investment <= 0 or annual_savings <= 0:
                 return Decimal('0')
             
-            # Payback Period = Initial Investment / Annual Savings
             payback_years = initial_investment / annual_savings
             
             return round(Decimal(str(payback_years)), 2)
@@ -409,7 +405,6 @@ class PhotovoltaicSystem(models.Model):
     def calculate_investment_return(self):
         """Υπολογισμός απόδοσης επένδυσης (ROI) ως ποσοστό"""
         try:
-            # Use total_cost if net_cost is negative (subsidy > total cost)
             initial_investment = float(self.net_cost or 0)
             if initial_investment <= 0:
                 initial_investment = float(self.total_cost or 0)
@@ -438,7 +433,6 @@ class PhotovoltaicSystem(models.Model):
             if initial_investment <= 0 or annual_savings <= 0:
                 return 0
             
-            # Calculate NPV: NPV = -Initial_Investment + Σ(Annual_Savings / (1 + discount_rate)^year)
             npv = -initial_investment
             for year in range(1, project_lifetime_years + 1):
                 npv += annual_savings / ((1 + discount_rate) ** year)

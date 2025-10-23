@@ -138,9 +138,6 @@ export function deletePrefecture(uuid) {
     });
 }
 
-// Air Conditioning Replacement API functions
-
-// Old Air Conditioning Units
 export function createOldAirConditioning(data) {
   const token = cookies.get("token") || "";
   return axios
@@ -302,7 +299,6 @@ export function deleteNewAirConditioning(acUuid) {
     });
 }
 
-// Air Conditioning Analysis
 export function createAirConditioningAnalysis(data) {
   const token = cookies.get("token") || "";
   return axios

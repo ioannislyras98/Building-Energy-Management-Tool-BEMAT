@@ -28,7 +28,6 @@ def create_solar_collector(request):
     user = request.user
     data = request.data
     
-    # Validate required fields
     required_fields = ["building"]
     missing_fields = [field for field in required_fields if not data.get(field)]
     if missing_fields:
@@ -36,7 +35,6 @@ def create_solar_collector(request):
             f"Missing required fields: {', '.join(missing_fields)}"
         )
     
-    # Validate building
     if not validate_uuid(data.get("building")):
         return standard_error_response("Invalid building UUID")
     
@@ -45,11 +43,9 @@ def create_solar_collector(request):
     except Building.DoesNotExist:
         return standard_error_response("Building not found", 404)
     
-    # Check ownership
     if not has_access_permission(user, building):
         return standard_error_response("You don't have permission to add solar collectors to this building", 403)
     
-    # Validate project if provided
     project = None
     if data.get("project"):
         if not validate_uuid(data.get("project")):
@@ -62,7 +58,6 @@ def create_solar_collector(request):
         except Project.DoesNotExist:
             return standard_error_response("Project not found", 404)
     
-    # Create solar collector using serializer
     serializer_data = data.copy()
     serializer_data['building'] = building.uuid
     serializer_data['user'] = user.uuid
@@ -86,11 +81,9 @@ def create_solar_collector(request):
 @permission_classes([IsAuthenticated])
 def get_building_solar_collectors(request, building_uuid):
     try:
-        # Validate building UUID
         if not validate_uuid(building_uuid):
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check building exists and user has permission
         try:
             building = Building.objects.get(uuid=building_uuid)
         except Building.DoesNotExist:
@@ -99,7 +92,6 @@ def get_building_solar_collectors(request, building_uuid):
         if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not have permission to view systems for this building", status.HTTP_403_FORBIDDEN)
         
-        # Get solar collectors for building - Admin users see all, regular users see only their own
         if is_admin_user(request.user):
             solar_collectors = SolarCollector.objects.filter(building=building)
         else:
@@ -115,11 +107,9 @@ def get_building_solar_collectors(request, building_uuid):
 @permission_classes([IsAuthenticated])
 def update_solar_collector(request, system_uuid):
     try:
-        # Validate system UUID
         if not validate_uuid(system_uuid):
             return standard_error_response("Invalid system UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Get solar collector
         try:
             solar_collector = SolarCollector.objects.get(uuid=system_uuid)
         except SolarCollector.DoesNotExist:

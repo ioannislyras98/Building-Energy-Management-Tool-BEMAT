@@ -36,7 +36,6 @@ export default function BuildingBtn({
       })
         .then((response) => response.json())
         .then((data) => {
-          // Check if data is wrapped in a success response
           const actualData = data?.data || data;
 
           if (
@@ -55,7 +54,6 @@ export default function BuildingBtn({
     }
   };
 
-  // Expose refresh function for manual calls when systems are added/updated
   const refreshProgress = () => {
     fetchProgressData();
     if (refreshProjects) {
@@ -86,7 +84,6 @@ export default function BuildingBtn({
       : greek_text.ProjectProgress;
 
   const getProgressDisplay = () => {
-    // Show default progress if no data is available
     const displayData = progressData || {
       systems_completed: 0,
       systems_total: 5,

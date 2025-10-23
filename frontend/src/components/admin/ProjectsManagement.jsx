@@ -100,12 +100,10 @@ const ProjectsManagement = () => {
       const data = await response.json();
 
       if (data.status === "success") {
-        // Refresh the projects list
         await fetchProjects();
         setSelectedProjects([]);
         setBulkDeleteDialogOpen(false);
 
-        // Show success message
         alert(`Successfully deleted ${data.data.deleted_count} projects`);
       } else {
         throw new Error(data.error || "Failed to delete projects");
@@ -363,7 +361,6 @@ const ProjectsManagement = () => {
     </div>
   );
 
-  // Action handlers
   const handleDeleteProjectClick = (project) => {
     setProjectToDelete(project);
     setDeleteDialogOpen(true);

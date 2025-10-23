@@ -57,7 +57,6 @@ const RoofThermalInsulationTabContent = ({
       ? english_text.RoofThermalInsulationTabContent || {}
       : greek_text.RoofThermalInsulationTabContent || {};
 
-  // State management
   const [currentRoofThermalInsulation, setCurrentRoofThermalInsulation] =
     useState(null);
   const [roofThermalInsulation, setRoofThermalInsulation] = useState({
@@ -88,11 +87,9 @@ const RoofThermalInsulationTabContent = ({
   const [editingMaterial, setEditingMaterial] = useState(null);
   const [materialType, setMaterialType] = useState("new");
 
-  // Delete dialog states
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingMaterial, setDeletingMaterial] = useState(null);
 
-  // Functions for data fetching and manipulation
   useEffect(() => {
     fetchOrCreateRoofThermalInsulation();
   }, [buildingUuid]);

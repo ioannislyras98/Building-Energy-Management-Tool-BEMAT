@@ -46,12 +46,10 @@ const DataTable = ({
 
     const { current_page, total_pages, has_prev, has_next } = pagination;
 
-    // Calculate page numbers to show
-    const maxPages = 7; // Show max 7 page numbers
+    const maxPages = 7;
     let startPage = Math.max(1, current_page - Math.floor(maxPages / 2));
     let endPage = Math.min(total_pages, startPage + maxPages - 1);
 
-    // Adjust start page if we're near the end
     if (endPage - startPage + 1 < maxPages) {
       startPage = Math.max(1, endPage - maxPages + 1);
     }

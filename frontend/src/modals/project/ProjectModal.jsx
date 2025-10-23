@@ -22,7 +22,6 @@ function ProjectModalForm({
   isEditMode,
   params,
 }) {
-  // Apply blur effect when modal is open
   useModalBlur(isOpen);
   const { refreshSidebar } = useSidebar();
 

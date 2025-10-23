@@ -29,23 +29,19 @@ def admin_dashboard_stats(request):
         return standard_error_response("Access denied: Admin privileges required", status.HTTP_403_FORBIDDEN)
     
     try:
-        # User statistics
         total_users = User.objects.count()
         active_users = User.objects.filter(last_login__isnull=False).count()
         
-        # Project statistics
         total_projects = Project.objects.count()
         projects_by_user = Project.objects.values('user__email').annotate(
             count=Count('uuid')
         ).order_by('-count')[:10]
         
-        # Building statistics
         total_buildings = Building.objects.count()
         buildings_by_user = Building.objects.values('user__email').annotate(
             count=Count('uuid')
         ).order_by('-count')[:10]
         
-        # Recent registrations (last 30 days)
         month_ago = timezone.now() - timedelta(days=30)
         recent_registrations = User.objects.filter(date_joined__gte=month_ago).count()
         
@@ -117,7 +113,6 @@ def admin_user_detail(request, user_uuid):
     try:
         user = User.objects.get(uuid=user_uuid)
         
-        # Get user's projects with building counts
         projects = Project.objects.filter(user=user)
         projects_data = [{
             'uuid': project.uuid,
@@ -128,7 +123,6 @@ def admin_user_detail(request, user_uuid):
             'cost_per_kwh_electricity': str(project.cost_per_kwh_electricity)
         } for project in projects]
         
-        # Get user's buildings
         buildings = Building.objects.filter(user=user)
         buildings_data = [{
             'uuid': building.uuid,
@@ -139,7 +133,6 @@ def admin_user_detail(request, user_uuid):
             'total_area': building.total_area
         } for building in buildings]
         
-        # Activities feature removed
         activities_data = []
         
         user_data = {
@@ -173,7 +166,6 @@ def admin_users_table(request):
         return standard_error_response("Access denied: Admin privileges required", status.HTTP_403_FORBIDDEN)
     
     try:
-        # Get query parameters
         search = request.GET.get('search', '')
         page = int(request.GET.get('page', 1))
         per_page = int(request.GET.get('per_page', 25))
@@ -182,10 +174,8 @@ def admin_users_table(request):
         date_from = request.GET.get('date_from')
         date_to = request.GET.get('date_to')
         
-        # Build query
         queryset = User.objects.all()
         
-        # Apply search
         if search:
             queryset = queryset.filter(
                 Q(email__icontains=search) |
@@ -193,22 +183,18 @@ def admin_users_table(request):
                 Q(last_name__icontains=search)
             )
         
-        # Apply filters
         if is_staff_filter is not None:
             queryset = queryset.filter(is_staff=is_staff_filter.lower() == 'true')
         
-        # Apply date filters
         if date_from:
             queryset = queryset.filter(date_joined__date__gte=date_from)
         if date_to:
             queryset = queryset.filter(date_joined__date__lte=date_to)
         
-        # Add annotations
         queryset = queryset.annotate(
             projects_count=Count('projects')
         )
         
-        # Apply sorting
         valid_sort_fields = [
             'email', '-email', 'date_joined', '-date_joined', 
             'first_name', '-first_name', 'last_name', '-last_name', 
@@ -218,11 +204,9 @@ def admin_users_table(request):
         if sort_by in valid_sort_fields:
             queryset = queryset.order_by(sort_by)
         
-        # Paginate
         paginator = Paginator(queryset, per_page)
         page_obj = paginator.get_page(page)
         
-        # Serialize data
         users_data = []
         for user in page_obj:
             users_data.append({
@@ -269,7 +253,6 @@ def admin_projects_table(request):
         return standard_error_response("Access denied: Admin privileges required", status.HTTP_403_FORBIDDEN)
     
     try:
-        # Get query parameters
         search = request.GET.get('search', '')
         page = int(request.GET.get('page', 1))
         per_page = int(request.GET.get('per_page', 25))
@@ -279,10 +262,8 @@ def admin_projects_table(request):
         date_from = request.GET.get('date_from')
         date_to = request.GET.get('date_to')
         
-        # Build query
         queryset = Project.objects.select_related('user')
         
-        # Apply search
         if search:
             queryset = queryset.filter(
                 Q(name__icontains=search) | 
@@ -290,20 +271,17 @@ def admin_projects_table(request):
                 Q(user__email__icontains=search)
             )
         
-        # Apply filters
         if is_submitted_filter is not None:
             queryset = queryset.filter(is_submitted=is_submitted_filter.lower() == 'true')
         
         if user_id_filter:
             queryset = queryset.filter(user__uuid=user_id_filter)
         
-        # Apply date filters
         if date_from:
             queryset = queryset.filter(date_created__date__gte=date_from)
         if date_to:
             queryset = queryset.filter(date_created__date__lte=date_to)
 
-        # Apply sorting
         valid_sort_fields = [
             'name', '-name', 'date_created', '-date_created', 'is_submitted', 
             '-is_submitted', 'user__email', '-user__email', 'buildings_count', 
@@ -313,11 +291,9 @@ def admin_projects_table(request):
         if sort_by in valid_sort_fields:
             queryset = queryset.order_by(sort_by)
         
-        # Paginate
         paginator = Paginator(queryset, per_page)
         page_obj = paginator.get_page(page)
         
-        # Serialize data
         projects_data = []
         for project in page_obj:
             projects_data.append({
@@ -373,22 +349,18 @@ def admin_bulk_delete_users(request):
         if not user_ids:
             return standard_error_response('No user IDs provided', status.HTTP_400_BAD_REQUEST)
         
-        # Get users to delete
         users_to_delete = User.objects.filter(uuid__in=user_ids)
         
         if not users_to_delete.exists():
             return standard_error_response('No users found with provided IDs', status.HTTP_404_NOT_FOUND)
         
-        # Prevent deletion of superusers (safety)
         superusers = users_to_delete.filter(is_superuser=True)
         if superusers.exists():
             return standard_error_response('Cannot delete superusers', status.HTTP_400_BAD_REQUEST)
         
-        # Prevent deletion of current user
         if str(request.user.uuid) in user_ids:
             return standard_error_response('Cannot delete yourself', status.HTTP_400_BAD_REQUEST)
         
-        # Perform bulk delete
         with transaction.atomic():
             deleted_count = users_to_delete.count()
             user_emails = list(users_to_delete.values_list('email', flat=True))
@@ -397,7 +369,7 @@ def admin_bulk_delete_users(request):
         
         return standard_success_response({
             'deleted_count': deleted_count,
-            'deleted_users': user_emails[:10],  # Show first 10
+            'deleted_users': user_emails[:10],
             'message': f'Successfully deleted {deleted_count} users'
         })
         
@@ -423,23 +395,20 @@ def admin_bulk_delete_projects(request):
         if not project_ids:
             return standard_error_response('No project IDs provided', status.HTTP_400_BAD_REQUEST)
         
-        # Get projects to delete
         projects_to_delete = Project.objects.filter(uuid__in=project_ids)
         
         if not projects_to_delete.exists():
             return standard_error_response('No projects found with provided IDs', status.HTTP_404_NOT_FOUND)
         
-        # Perform bulk delete
         with transaction.atomic():
             deleted_count = projects_to_delete.count()
             project_names = list(projects_to_delete.values_list('name', flat=True))
             
-            # Delete projects (cascade will handle related data)
             projects_to_delete.delete()
         
         return standard_success_response({
             'deleted_count': deleted_count,
-            'deleted_projects': project_names[:10],  # Show first 10
+            'deleted_projects': project_names[:10],
             'message': f'Successfully deleted {deleted_count} projects'
         })
         

@@ -28,7 +28,6 @@ function AdminNumericValues() {
   const [errors, setErrors] = useState({});
   const [showValidationErrors, setShowValidationErrors] = useState(false);
 
-  // Apply blur effect when modal is open
   useModalBlur(showEditModal);
 
   useEffect(() => {
@@ -39,7 +38,6 @@ function AdminNumericValues() {
     }
   }, [token]);
 
-  // Reset validation state when modal opens/closes
   useEffect(() => {
     if (showEditModal) {
       setErrors({});
@@ -123,7 +121,6 @@ function AdminNumericValues() {
         data: JSON.stringify({ value: parseFloat(formData.value) }),
       });
 
-      // Update local state
       setNumericValues(
         numericValues.map((nv) =>
           nv.uuid === editingValue.uuid

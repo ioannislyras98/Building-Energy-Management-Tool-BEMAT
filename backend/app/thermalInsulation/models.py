@@ -274,7 +274,6 @@ class ExternalWallThermalInsulation(models.Model):
         
         for material_layer in materials:
             try:
-                # Safe access to attributes with None checks
                 thickness = float(material_layer.thickness or 0)
                 thermal_conductivity = float(material_layer.material.thermal_conductivity or 1)
                 surface_area = float(material_layer.surface_area or 0)
@@ -285,26 +284,23 @@ class ExternalWallThermalInsulation(models.Model):
                 
                 total_area += surface_area
             except (AttributeError, TypeError, ValueError):
-                # Skip this material if there are any issues
                 continue
         
         r_total = R_si + R_se + materials_r_sum
         u_coefficient = 1 / r_total if r_total > 0 else 0
         
-        # Calculate hourly losses: U × A × ΔT / 1000 (kW)
         hourly_losses = (u_coefficient * total_area * temperature_difference) / 1000
         return hourly_losses
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # Recalculate U coefficient, annual benefit, NPV, payback period, and IRR after saving
         try:
             self.u_coefficient = self.calculate_u_coefficient()
             self.annual_benefit = self.calculate_annual_benefit()
             self.net_present_value = self.calculate_npv()
             self.payback_period = self.calculate_payback_period()
             self.internal_rate_of_return = self.calculate_internal_rate_of_return()
-            if self.pk:  # Only update if object exists (avoid recursion)
+            if self.pk:
                 ExternalWallThermalInsulation.objects.filter(pk=self.pk).update(
                     u_coefficient=self.u_coefficient,
                     annual_benefit=self.annual_benefit,
@@ -313,7 +309,6 @@ class ExternalWallThermalInsulation(models.Model):
                     internal_rate_of_return=self.internal_rate_of_return
                 )
         except Exception as e:
-            # Log the error but don't crash the save operation
             print(f"Error calculating thermal insulation values: {e}")
             pass
 

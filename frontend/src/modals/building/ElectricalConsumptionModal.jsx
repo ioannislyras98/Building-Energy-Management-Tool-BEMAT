@@ -20,7 +20,6 @@ function ElectricalConsumptionModalForm({
   editItem,
   params,
 }) {
-  // Apply blur effect when modal is open
   useModalBlur(open);
   const [formData, setFormData] = useState({
     consumption_type: "",
@@ -223,7 +222,6 @@ function ElectricalConsumptionModalForm({
     const { id, name, value } = event.target;
     const fieldName = id || name;
 
-    // Reset load_type when consumption_type changes
     if (
       fieldName === "consumption_type" &&
       value !== formData.consumption_type
@@ -233,7 +231,6 @@ function ElectricalConsumptionModalForm({
       setFormData({ ...formData, [fieldName]: value });
     }
 
-    // Clear error for this field
     if (errors[fieldName]) {
       setErrors({ ...errors, [fieldName]: "" });
     }
@@ -289,7 +286,6 @@ function ElectricalConsumptionModalForm({
       ...formData,
       building: buildingUuid,
       project: projectUuid,
-      // Convert empty strings to null for decimal fields
       load_power:
         formData.load_power && formData.load_power !== ""
           ? parseFloat(formData.load_power)
@@ -299,7 +295,6 @@ function ElectricalConsumptionModalForm({
         formData.operating_hours_per_year !== ""
           ? parseFloat(formData.operating_hours_per_year)
           : null,
-      // Convert empty strings to null for integer fields
       quantity:
         formData.quantity && formData.quantity !== ""
           ? parseInt(formData.quantity)

@@ -20,7 +20,6 @@ function EditImageModalForm({
 }) {
   console.log("EditImageModal - isOpen:", isOpen, "image:", image);
 
-  // Apply blur effect when modal is open
   useModalBlur(isOpen);
 
   const [formData, setFormData] = useState({
@@ -55,7 +54,6 @@ function EditImageModalForm({
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
       const allowedTypes = [
         "image/jpeg",
         "image/jpg",
@@ -71,7 +69,6 @@ function EditImageModalForm({
         return;
       }
 
-      // Validate file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
         setErrors({
           image:
@@ -81,7 +78,6 @@ function EditImageModalForm({
         return;
       }
 
-      // Convert file to base64
       const reader = new FileReader();
       reader.onload = function (e) {
         const base64String = e.target.result;

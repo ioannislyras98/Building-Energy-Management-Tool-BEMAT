@@ -57,7 +57,6 @@ const ThermalInsulationTabContent = ({
       ? english_text.ThermalInsulationPage || {}
       : greek_text.ThermalInsulationPage || {};
 
-  // State management
   const [currentThermalInsulation, setCurrentThermalInsulation] =
     useState(null);
   const [thermalInsulation, setThermalInsulation] = useState({
@@ -88,10 +87,9 @@ const ThermalInsulationTabContent = ({
   const [editingMaterial, setEditingMaterial] = useState(null);
   const [materialType, setMaterialType] = useState("new");
 
-  // Delete dialog states
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingMaterial, setDeletingMaterial] = useState(null);
-  // Functions for data fetching and manipulation
+
   useEffect(() => {
     fetchOrCreateThermalInsulation();
   }, [buildingUuid]);

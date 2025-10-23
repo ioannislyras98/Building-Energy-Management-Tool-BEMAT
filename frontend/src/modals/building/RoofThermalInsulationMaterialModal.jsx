@@ -17,10 +17,8 @@ const RoofThermalInsulationMaterialModal = ({
   editItem = null,
   onSubmitSuccess,
 }) => {
-  // Apply blur effect when modal is open
   useModalBlur(open);
 
-  // Initialize form data based on material type
   const getInitialFormData = () => {
     const baseData = {
       material: "",
@@ -30,7 +28,6 @@ const RoofThermalInsulationMaterialModal = ({
       material_type: materialType,
     };
 
-    // Only include cost for new materials
     if (materialType === "new") {
       baseData.cost = "";
     }
@@ -64,18 +61,15 @@ const RoofThermalInsulationMaterialModal = ({
     },
   ];
 
-  // Load available materials on mount
   useEffect(() => {
     if (open) {
       fetchAvailableMaterials();
     }
   }, [open]);
 
-  // Reset form when modal opens/closes or editItem changes
   useEffect(() => {
     if (open) {
       if (editItem) {
-        // Edit mode - populate form with existing data
         setFormData({
           material: editItem.material || "",
           surface_type: editItem.surface_type || "external_horizontal_roof",
@@ -85,7 +79,6 @@ const RoofThermalInsulationMaterialModal = ({
           ...(materialType === "new" && { cost: editItem.cost || "" }),
         });
 
-        // Set selected material if editing
         if (editItem.material) {
           const material = availableMaterials.find(
             (m) => m.uuid === editItem.material
@@ -95,7 +88,6 @@ const RoofThermalInsulationMaterialModal = ({
           }
         }
       } else {
-        // Create mode - reset to initial state
         setFormData(getInitialFormData());
         setSelectedMaterial(null);
       }

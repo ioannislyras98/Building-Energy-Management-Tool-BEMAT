@@ -45,7 +45,7 @@ export const useProjects = () => {
 
   const handleProjectCreated = (newProject) => {
     setProjects((prevProjects) => [...prevProjects, newProject]);
-    refreshSidebar(); // Refresh sidebar to show new project
+    refreshSidebar();
   };
 
   const handleProjectUpdated = (updatedProject) => {
@@ -54,7 +54,7 @@ export const useProjects = () => {
         project.uuid === updatedProject.uuid ? updatedProject : project
       )
     );
-    refreshSidebar(); // Refresh sidebar to show updated project
+    refreshSidebar();
     return updatedProject;
   };
 
@@ -74,7 +74,7 @@ export const useProjects = () => {
           setProjects((prevProjects) =>
             prevProjects.filter((project) => project.uuid !== projectUuid)
           );
-          refreshSidebar(); // Refresh sidebar to remove deleted project
+          refreshSidebar();
           resolve(response);
         })
         .fail(function (error) {
@@ -98,14 +98,14 @@ export const useProjects = () => {
           : project
       )
     );
-    refreshSidebar(); // Refresh sidebar to show updated building count
+    refreshSidebar();
   };
 
   useEffect(() => {
     if (token) {
       fetchProjects();
     }
-  }, [token, refreshTrigger]); // Re-fetch when refreshTrigger changes
+  }, [token, refreshTrigger]);
 
   return {
     projects,

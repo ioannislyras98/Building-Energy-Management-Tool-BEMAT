@@ -57,7 +57,6 @@ function PhotovoltaicSystemModalForm({
   const [loading, setLoading] = useState(false);
   const token = cookies.get("token") || "";
 
-  // Apply blur effect using hook
   useModalBlur(open);
 
   const { language } = useLanguage();
@@ -128,7 +127,6 @@ function PhotovoltaicSystemModalForm({
     const newErrors = {};
     let hasErrors = false;
 
-    // Validation for positive numbers
     const positiveFields = [
       "pv_panels_quantity",
       "pv_panels_unit_price",
@@ -152,7 +150,6 @@ function PhotovoltaicSystemModalForm({
       }
     });
 
-    // Validation for percentage fields
     if (
       formData.collector_efficiency &&
       (parseFloat(formData.collector_efficiency) < 0 ||
@@ -163,7 +160,6 @@ function PhotovoltaicSystemModalForm({
       hasErrors = true;
     }
 
-    // Validation for angle
     if (
       formData.installation_angle &&
       (parseFloat(formData.installation_angle) < 0 ||
@@ -192,7 +188,6 @@ function PhotovoltaicSystemModalForm({
       project: projectUuid,
     };
 
-    // Convert empty strings to null for numeric fields
     Object.keys(requestData).forEach((key) => {
       if (requestData[key] === "") {
         requestData[key] = null;
@@ -240,7 +235,6 @@ function PhotovoltaicSystemModalForm({
         onSubmitSuccess(data);
         onClose();
 
-        // Reset form
         setFormData({
           pv_panels_quantity: "",
           pv_panels_unit_price: "",

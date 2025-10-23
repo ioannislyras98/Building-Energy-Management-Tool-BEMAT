@@ -18,10 +18,8 @@ export default function Home() {
 
   const { projects, handleProjectCreated, refreshProjects } = useProjects();
 
-  // Individual modal state management
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   
-  // Apply blur effect for project modal
   useModalBlur(isProjectModalOpen);
 
   const openProjectModal = () => setIsProjectModalOpen(true);
@@ -33,7 +31,7 @@ export default function Home() {
 
   const handleProjectCreatedWithRefresh = (newProject) => {
     handleProjectCreated(newProject);
-    refreshProjects(); // Refresh to get updated completion status
+    refreshProjects();
   };
 
   return (

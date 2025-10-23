@@ -37,14 +37,12 @@ class WindowReplacementSerializer(serializers.ModelSerializer):
         return obj.get_total_lifetime_savings()
 
     def create(self, validated_data):
-        # Set the user from the request
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             validated_data['user'] = request.user
         
         instance = WindowReplacement.objects.create(**validated_data)
         
-        # Calculate all metrics after creation
         instance.calculate_energy_savings()
         instance.calculate_economic_benefits()
         instance.save()
@@ -55,7 +53,6 @@ class WindowReplacementSerializer(serializers.ModelSerializer):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         
-        # Recalculate metrics after update
         instance.calculate_energy_savings()
         instance.calculate_economic_benefits()
         instance.save()

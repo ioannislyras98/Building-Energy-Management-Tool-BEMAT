@@ -16,17 +16,14 @@ export const Modals = ({
   projectUuid,
   handleProjectUpdated,
   selectedProject,
-  // Props for EditBuildingModal
   isEditBuildingModalOpen,
   closeEditBuildingModal,
   editingBuilding,
   handleBuildingUpdated,
-  // Props for AddContactModal
   isAddContactModalOpen,
   closeAddContactModal,
-  targetBuildingUuidForContact,
-  handleContactAdded,
-  // Props for EditContactModal
+  buildingUuid,
+  handleContactCreated,
   isEditContactModalOpen,
   closeEditContactModal,
   currentContact,

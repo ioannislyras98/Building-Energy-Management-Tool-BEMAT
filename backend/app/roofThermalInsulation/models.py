@@ -290,7 +290,6 @@ class RoofThermalInsulation(models.Model):
         r_total = R_si + R_se + materials_r_sum
         u_coefficient = 1 / r_total if r_total > 0 else 0
         
-        # Calculate hourly losses: U × A × ΔT / 1000 (kW)
         hourly_losses = (u_coefficient * total_area * temperature_difference) / 1000
         return hourly_losses
 

@@ -20,7 +20,6 @@ function BoilerDetailModalForm({
   editItem,
   params,
 }) {
-  // Apply blur effect when modal is open
   useModalBlur(open);
 
   const [formData, setFormData] = useState({

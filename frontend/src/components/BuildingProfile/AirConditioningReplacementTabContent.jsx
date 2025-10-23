@@ -62,7 +62,6 @@ const AirConditioningReplacementTabContent = ({
       ? english_text.AirConditioningReplacementTabContent || {}
       : greek_text.AirConditioningReplacementTabContent || {};
 
-  // State για τα δεδομένα
   const [oldACs, setOldACs] = useState([]);
   const [newACs, setNewACs] = useState([]);
   const [analysis, setAnalysis] = useState(null);
@@ -73,7 +72,6 @@ const AirConditioningReplacementTabContent = ({
     discount_rate: "5",
   });
 
-  // Auto-calculate analysis when data changes
   useEffect(() => {
     if (
       analysisData.energy_cost_kwh &&
@@ -81,17 +79,16 @@ const AirConditioningReplacementTabContent = ({
       analysisData.lifespan_years &&
       analysisData.discount_rate &&
       oldACs.length > 0 && 
-      newACs.length > 0 // Χρειαζόμαστε και παλαιά και νέα κλιματιστικά
+      newACs.length > 0
     ) {
       const timer = setTimeout(() => {
         handleAnalysisSubmit();
-      }, 1000); // Debounce για 1 δευτερόλεπτο
+      }, 1000);
 
       return () => clearTimeout(timer);
     }
   }, [analysisData, oldACs, newACs]);
 
-  // State για τα modals
   const [oldACModal, setOldACModal] = useState({
     open: false,
     data: null,
@@ -103,7 +100,6 @@ const AirConditioningReplacementTabContent = ({
     editMode: false,
   });
 
-  // BTU types για dropdown
   const btuTypes = [
     7000, 9000, 10000, 12000, 15000, 18000, 24000, 30000, 36000,
   ];
@@ -116,7 +112,6 @@ const AirConditioningReplacementTabContent = ({
 
   const fetchData = async () => {
     try {
-      // Fetch old ACs
       const oldACResponse = await $.ajax({
         url: `${API_BASE_URL}/air_conditioning_replacements/old/building/${buildingUuid}/`,
         method: "GET",
@@ -126,7 +121,6 @@ const AirConditioningReplacementTabContent = ({
         setOldACs(oldACResponse.data);
       }
 
-      // Fetch new ACs
       const newACResponse = await $.ajax({
         url: `${API_BASE_URL}/air_conditioning_replacements/new/building/${buildingUuid}/`,
         method: "GET",
@@ -136,7 +130,6 @@ const AirConditioningReplacementTabContent = ({
         setNewACs(newACResponse.data);
       }
 
-      // Fetch analysis
       const analysisResponse = await $.ajax({
         url: `${API_BASE_URL}/air_conditioning_replacements/analysis/building/${buildingUuid}/`,
         method: "GET",
@@ -197,7 +190,7 @@ const AirConditioningReplacementTabContent = ({
     } catch (error) {
       console.error("Error submitting old AC:", error);
       setError(error.responseJSON?.message || "Σφάλμα κατά την αποθήκευση");
-      throw error; // Re-throw για το modal να το διαχειριστεί
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -243,7 +236,7 @@ const AirConditioningReplacementTabContent = ({
     } catch (error) {
       console.error("Error submitting new AC:", error);
       setError(error.responseJSON?.message || "Σφάλμα κατά την αποθήκευση");
-      throw error; // Re-throw για το modal να το διαχειριστεί
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -336,7 +329,6 @@ const AirConditioningReplacementTabContent = ({
     setLoading(false);
   };
 
-  // Columns for Old ACs DataGrid
   const oldACColumns = [
     {
       field: "btu_type",
@@ -430,7 +422,6 @@ const AirConditioningReplacementTabContent = ({
     },
   ];
 
-  // Columns for New ACs DataGrid
   const newACColumns = [
     {
       field: "btu_type",
@@ -550,7 +541,6 @@ const AirConditioningReplacementTabContent = ({
 
   return (
     <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
       <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-primary">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -570,7 +560,6 @@ const AirConditioningReplacementTabContent = ({
         </div>
       </div>
 
-      {/* Alerts */}
       {error && (
         <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
           {error}
@@ -585,7 +574,6 @@ const AirConditioningReplacementTabContent = ({
         </Alert>
       )}
 
-      {/* Tabs */}
       <div className="bg-white rounded-xl shadow-md">
         <Tabs
           value={tabValue}
@@ -614,7 +602,6 @@ const AirConditioningReplacementTabContent = ({
           <Tab label={translations.economicAnalysis || "Οικονομική Ανάλυση"} />
         </Tabs>
 
-        {/* Tab 1: Old Air Conditionings */}
         <TabPanel value={tabValue} index={0}>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -665,7 +652,6 @@ const AirConditioningReplacementTabContent = ({
           </div>
         </TabPanel>
 
-        {/* Tab 2: New Air Conditionings */}
         <TabPanel value={tabValue} index={1}>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -716,7 +702,6 @@ const AirConditioningReplacementTabContent = ({
           </div>
         </TabPanel>
 
-        {/* Tab 3: Economic Analysis */}
         <TabPanel value={tabValue} index={2}>
           <Typography variant="h6" gutterBottom>
             {translations.economicAnalysis || "Οικονομική Ανάλυση"}
@@ -901,7 +886,6 @@ const AirConditioningReplacementTabContent = ({
         </TabPanel>
       </div>
 
-      {/* Old AC Modal */}
       <ACModal
         open={oldACModal.open}
         onClose={() =>
@@ -920,7 +904,6 @@ const AirConditioningReplacementTabContent = ({
         isOld={true}
       />
 
-      {/* New AC Modal */}
       <ACModal
         open={newACModal.open}
         onClose={() =>
@@ -942,7 +925,6 @@ const AirConditioningReplacementTabContent = ({
   );
 };
 
-// AC Modal Component
 const ACModal = ({
   open,
   onClose,
@@ -1008,7 +990,6 @@ const ACModal = ({
       [field]: value,
     }));
 
-    // Clear validation error for this field when user starts typing
     if (validationErrors[field]) {
       setValidationErrors((prev) => ({
         ...prev,
@@ -1044,7 +1025,6 @@ const ACModal = ({
       errors.quantity = "Ο αριθμός κλιματιστικών πρέπει να είναι μεγαλύτερος από 0";
     }
 
-    // Validation για νέα κλιματιστικά
     if (!isOld) {
       if (!formData.cost_per_unit || parseFloat(formData.cost_per_unit) < 0) {
         errors.cost_per_unit = "Το κόστος ανά μονάδα πρέπει να είναι μεγαλύτερο ή ίσο από 0";
@@ -1070,7 +1050,6 @@ const ACModal = ({
     setLoading(true);
     try {
       await onSubmit(formData);
-      // Κλείσιμο modal μόνο αν δεν υπάρχει σφάλμα
       handleCancel();
     } catch (error) {
       setError(error.message || "Σφάλμα κατά την αποθήκευση");

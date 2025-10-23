@@ -19,7 +19,6 @@ function submitData(event, params, setErrorMsg) {
   const firstName = $(event.currentTarget).find("#name").val().trim();
   const lastName = $(event.currentTarget).find("#surname").val().trim();
 
-  // Validate required fields
   if (!firstName || !lastName) {
     setErrorMsg("Το όνομα και το επώνυμο είναι υποχρεωτικά πεδία");
     return;

@@ -27,15 +27,12 @@ def create_thermal_zone(request):
     try:
         data = request.data
         
-        # Validate required fields
         if not data.get("building"):
             return standard_error_response("Building is required", status.HTTP_400_BAD_REQUEST)
         
-        # Validate building UUID
         if not validate_uuid(data.get("building")):
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check building exists and user has permission
         try:
             building = Building.objects.get(uuid=data.get("building"))
         except Building.DoesNotExist:
@@ -44,7 +41,6 @@ def create_thermal_zone(request):
         if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
         
-        # Check project exists and user has permission (if provided)
         project = None
         if data.get("project"):
             if not validate_uuid(data.get("project")):
@@ -57,7 +53,6 @@ def create_thermal_zone(request):
             except Project.DoesNotExist:
                 return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
         
-        # Create thermal zone
         thermal_zone = ThermalZone.objects.create(
             building=building,
             project=project,
@@ -80,11 +75,9 @@ def create_thermal_zone(request):
 @permission_classes([IsAuthenticated])
 def get_building_thermal_zones(request, building_uuid):
     try:
-        # Validate building UUID
         if not validate_uuid(building_uuid):
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check building exists and user has permission
         try:
             building = Building.objects.get(uuid=building_uuid)
         except Building.DoesNotExist:
@@ -93,12 +86,9 @@ def get_building_thermal_zones(request, building_uuid):
         if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not have permission to view thermal zones for this building", status.HTTP_403_FORBIDDEN)
         
-        # Get thermal zones for building
         if is_admin_user(request.user):
-            # Admin can see all thermal zones for the building
             thermal_zones = ThermalZone.objects.filter(building=building)
         else:
-            # Regular users can only see their own thermal zones
             thermal_zones = ThermalZone.objects.filter(
                 building=building, 
                 user=request.user
@@ -115,11 +105,9 @@ def get_building_thermal_zones(request, building_uuid):
 @permission_classes([IsAuthenticated])
 def update_thermal_zone(request, zone_uuid):
     try:
-        # Validate zone UUID
         if not validate_uuid(zone_uuid):
             return standard_error_response("Invalid thermal zone UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check thermal zone exists and user has permission
         try:
             thermal_zone = ThermalZone.objects.get(uuid=zone_uuid)
         except ThermalZone.DoesNotExist:
@@ -130,7 +118,6 @@ def update_thermal_zone(request, zone_uuid):
         
         data = request.data
         
-        # Update thermal zone fields
         if "thermal_zone_usage" in data:
             thermal_zone.thermal_zone_usage = data.get("thermal_zone_usage")
         if "description" in data:
@@ -155,11 +142,9 @@ def update_thermal_zone(request, zone_uuid):
 @permission_classes([IsAuthenticated])
 def delete_thermal_zone(request, zone_uuid):
     try:
-        # Validate zone UUID
         if not validate_uuid(zone_uuid):
             return standard_error_response("Invalid thermal zone UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check thermal zone exists and user has permission
         try:
             thermal_zone = ThermalZone.objects.get(uuid=zone_uuid)
         except ThermalZone.DoesNotExist:

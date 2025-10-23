@@ -55,17 +55,6 @@ const PhotovoltaicSystemTabContent = ({
       ? english_text.PhotovoltaicSystemTabContent || {}
       : greek_text.PhotovoltaicSystemTabContent || {};
 
-  // Debug logging
-  useEffect(() => {
-    console.log("PhotovoltaicSystemTabContent props:", {
-      buildingUuid,
-      projectUuid,
-      buildingData: !!buildingData,
-      params: !!params,
-    });
-  }, [buildingUuid, projectUuid, buildingData, params]);
-
-  // State management
   const [currentPhotovoltaicSystem, setCurrentPhotovoltaicSystem] =
     useState(null);
   const [hasBackendData, setHasBackendData] = useState(false);
@@ -113,16 +102,13 @@ const PhotovoltaicSystemTabContent = ({
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  // Delete dialog states
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingSystem, setDeletingSystem] = useState(null);
 
-  // Functions for data fetching and manipulation
   useEffect(() => {
     if (buildingUuid) {
       fetchOrCreatePhotovoltaicSystem();
     } else {
-      // If no buildingUuid, prepare for creating a new system
       setCurrentPhotovoltaicSystem(null);
       setPhotovoltaicSystem({
         building: null,
@@ -331,11 +317,9 @@ const PhotovoltaicSystemTabContent = ({
 
     setLoading(true);
 
-    // Calculate and update economic indicators before saving
     const updatedPhotovoltaicSystem = {
       ...photovoltaicSystem,
       ...calculateEconomicIndicators(),
-      // Ensure building is set if buildingUuid exists
       building: buildingUuid || photovoltaicSystem.building,
       project: projectUuid || photovoltaicSystem.project,
     };

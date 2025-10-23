@@ -90,25 +90,20 @@ class Project(models.Model):
             # windowReplacement uses default related name
             if hasattr(building, 'windowreplacement_set') and building.windowreplacement_set.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
                 scenarios_completed += 1
-            # bulbReplacement uses default related name  
             if hasattr(building, 'bulbreplacement_set') and building.bulbreplacement_set.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
                 scenarios_completed += 1
             if hasattr(building, 'boiler_replacements') and building.boiler_replacements.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
                 scenarios_completed += 1
-            # Air conditioning has multiple related names, check only ac_analyses which has NPV
             if hasattr(building, 'ac_analyses') and building.ac_analyses.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
                 scenarios_completed += 1
             if hasattr(building, 'roof_thermal_insulations') and building.roof_thermal_insulations.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
                 scenarios_completed += 1
-            # External Wall Thermal Insulation
             if hasattr(building, 'externalwallthermalinsulation_set') and building.externalwallthermalinsulation_set.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
                 scenarios_completed += 1
             if hasattr(building, 'exterior_blinds') and building.exterior_blinds.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
                 scenarios_completed += 1
-            # Photovoltaic systems - check for NPV != 0
             if hasattr(building, 'photovoltaic_systems') and building.photovoltaic_systems.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
                 scenarios_completed += 1
-            # hotWaterUpgrade uses default related name
             if hasattr(building, 'hotwaterupgrade_set') and building.hotwaterupgrade_set.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
                 scenarios_completed += 1
             if hasattr(building, 'automatic_lighting_controls') and building.automatic_lighting_controls.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():

@@ -41,7 +41,6 @@ const AdminPrefectures = () => {
   });
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Delete confirmation states
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [prefectureToDelete, setPrefectureToDelete] = useState(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
@@ -58,7 +57,6 @@ const AdminPrefectures = () => {
   const navigate = useNavigate();
   const token = cookies.get("token") || "";
 
-  // Apply blur effect when modal is open
   useModalBlur(showAddModal);
 
   const zoneOptions = [
@@ -77,7 +75,6 @@ const AdminPrefectures = () => {
     }
   };
 
-  // Reset validation state when modal opens/closes
   useEffect(() => {
     if (showAddModal) {
       setErrors({});
@@ -246,7 +243,6 @@ const AdminPrefectures = () => {
     setPrefectureToDelete(null);
   };
 
-  // Bulk selection functions
   const handleSelectAll = (checked) => {
     setSelectAll(checked);
     if (checked) {
@@ -292,7 +288,6 @@ const AdminPrefectures = () => {
     setBulkDeleteDialogOpen(false);
   };
 
-  // Sorting logic
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {

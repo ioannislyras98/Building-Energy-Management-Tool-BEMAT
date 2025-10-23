@@ -20,7 +20,6 @@ function DeleteImageConfirmationForm({
   const cookies = new Cookies();
   const token = cookies.get("token");
 
-  // Apply blur effect when modal is open
   useModalBlur(isOpen);
 
   const handleDelete = async () => {

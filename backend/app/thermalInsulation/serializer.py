@@ -99,7 +99,6 @@ class ExternalWallThermalInsulationCreateSerializer(serializers.ModelSerializer)
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
         
-        # Check if thermal insulation already exists for this building/user
         building = validated_data.get('building')
         user = validated_data['user']
         

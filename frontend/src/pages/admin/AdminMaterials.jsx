@@ -42,7 +42,6 @@ const AdminMaterials = () => {
     is_active: true,
   });
 
-  // Delete confirmation states
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [materialToDelete, setMaterialToDelete] = useState(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
@@ -52,7 +51,6 @@ const AdminMaterials = () => {
   const { language } = useLanguage();
   const text = language === "en" ? english_text.SideBar : greek_text.SideBar;
 
-  // Apply blur effect when modal is open
   useModalBlur(showAddModal);
   const navigate = useNavigate();
   const token = cookies.get("token") || "";
@@ -116,7 +114,6 @@ const AdminMaterials = () => {
     fetchCategories();
   }, []);
 
-  // Reset validation state when modal opens/closes
   useEffect(() => {
     if (showAddModal) {
       setErrors({});
@@ -297,7 +294,6 @@ const AdminMaterials = () => {
     setMaterialToDelete(null);
   };
 
-  // Bulk selection functions
   const handleSelectAll = (checked) => {
     setSelectAll(checked);
     if (checked) {

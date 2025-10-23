@@ -80,14 +80,12 @@ def get_thermal_insulations_by_building(request, building_uuid):
     try:
         building = get_object_or_404(Building, uuid=building_uuid)
         
-        # Check if user has access to this building (admin can access all, regular users only their own)
         if not has_access_permission(request.user, building):
             return Response(
                 {"detail": "You don't have permission to access this building."}, 
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Admin can see all thermal insulations for this building, regular users only their own
         if is_admin_user(request.user):
             thermal_insulations = ExternalWallThermalInsulation.objects.filter(building=building)
         else:

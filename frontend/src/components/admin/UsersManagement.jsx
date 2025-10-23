@@ -99,12 +99,10 @@ const UsersManagement = () => {
       const data = await response.json();
 
       if (data.status === "success") {
-        // Refresh the users list
         await fetchUsers();
         setSelectedUsers([]);
         setBulkDeleteDialogOpen(false);
 
-        // Show success message
         alert(`Successfully deleted ${data.data.deleted_count} users`);
       } else {
         throw new Error(data.error || "Failed to delete users");
@@ -334,7 +332,6 @@ const UsersManagement = () => {
     </div>
   );
 
-  // Action handlers
   const handleDeleteUserClick = (user) => {
     setUserToDelete(user);
     setDeleteDialogOpen(true);

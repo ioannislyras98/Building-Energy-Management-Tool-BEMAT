@@ -29,7 +29,6 @@ function EditContactModalForm({
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const token = cookies.get("token") || "";
 
-  // Apply blur effect when modal is open
   useModalBlur(isOpen);
 
   useEffect(() => {
@@ -41,7 +40,6 @@ function EditContactModalForm({
         phone_number: contact.phone_number || "",
       });
     }
-    // Reset validation state when modal opens/closes
     setErrors({});
     setShowValidationErrors(false);
   }, [contact, isOpen]);

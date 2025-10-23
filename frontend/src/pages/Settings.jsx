@@ -43,7 +43,6 @@ export default function Settings() {
     fetchUserData();
   }, []);
 
-  // Clear error when language changes
   useEffect(() => {
     if (error) {
       setError("");
@@ -90,7 +89,6 @@ export default function Settings() {
     setMessage("");
     setError("");
 
-    // Validate current password is provided
     if (!userData.current_password.trim()) {
       setError(
         language === "en"
@@ -121,7 +119,6 @@ export default function Settings() {
             ? "Profile updated successfully!"
             : "Το προφίλ ενημερώθηκε επιτυχώς!")
       );
-      // Clear the password field after successful update
       setUserData((prev) => ({ ...prev, current_password: "" }));
     } catch (error) {
       console.error("Profile update failed:", error);
@@ -218,7 +215,6 @@ export default function Settings() {
 
   return (
     <div className="admin-container p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
       <div className="bg-white shadow-sm rounded-lg p-6 mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -245,7 +241,6 @@ export default function Settings() {
       </div>
 
       <div className="max-w-4xl mx-auto">
-        {/* Messages */}
         {message && (
           <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
             {message}
@@ -258,7 +253,6 @@ export default function Settings() {
           </div>
         )}
 
-        {/* Tabs */}
         <div className="bg-white shadow-sm rounded-lg mb-6">
           <nav className="flex space-x-8 border-b border-gray-200 px-6 pt-6">
             <button
@@ -283,7 +277,6 @@ export default function Settings() {
             </button>
           </nav>
 
-          {/* Content */}
           <div className="p-6">
             {activeTab === "profile" && (
               <form onSubmit={handleProfileUpdate}>

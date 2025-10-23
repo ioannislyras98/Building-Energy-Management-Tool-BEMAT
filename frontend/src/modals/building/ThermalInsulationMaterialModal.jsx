@@ -17,10 +17,8 @@ const ThermalInsulationMaterialModal = ({
   editItem = null,
   onSubmitSuccess,
 }) => {
-  // Apply blur effect when modal is open
   useModalBlur(open);
 
-  // Initialize form data based on material type
   const getInitialFormData = () => {
     const baseData = {
       material: "",
@@ -30,7 +28,6 @@ const ThermalInsulationMaterialModal = ({
       material_type: materialType,
     };
 
-    // Only include cost for new materials
     if (materialType === "new") {
       baseData.cost = "";
     }
@@ -74,7 +71,6 @@ const ThermalInsulationMaterialModal = ({
         material_type: editItem.material_type || materialType,
       };
 
-      // Only include cost for new materials
       if (materialType === "new") {
         editData.cost = editItem.cost || "";
       }
@@ -231,7 +227,6 @@ const ThermalInsulationMaterialModal = ({
       material_type: materialType,
     };
 
-    // Only include cost for new materials
     if (materialType === "new") {
       resetData.cost = "";
     }

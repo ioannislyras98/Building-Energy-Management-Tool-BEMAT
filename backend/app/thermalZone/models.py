@@ -29,7 +29,6 @@ class ThermalZone(models.Model):
         verbose_name='Χρήστης'
     )
     
-    # Specific fields for thermal zone
     thermal_zone_usage = models.CharField(
         max_length=255,
         blank=True,
@@ -61,7 +60,6 @@ class ThermalZone(models.Model):
         verbose_name='Συνολική επιφάνεια θερμικής ζώνης (m²)'
     )
     
-    # Timestamps
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Ημερομηνία δημιουργίας'

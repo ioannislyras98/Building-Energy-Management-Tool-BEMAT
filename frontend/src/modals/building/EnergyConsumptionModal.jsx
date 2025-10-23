@@ -22,7 +22,6 @@ function EnergyConsumptionModalForm({
 }) {
   console.log("EnergyConsumptionModalForm: Rendering, open prop is:", open);
 
-  // Apply blur effect when modal is open
   useModalBlur(open);
 
   const [formData, setFormData] = useState({
