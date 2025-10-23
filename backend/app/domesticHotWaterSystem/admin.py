@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import DomesticHotWaterSystem
 
-# Register your models here.
 @admin.register(DomesticHotWaterSystem)
 class DomesticHotWaterSystemAdmin(admin.ModelAdmin):
     list_display = [

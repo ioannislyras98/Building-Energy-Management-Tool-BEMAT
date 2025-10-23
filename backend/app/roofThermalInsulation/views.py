@@ -18,7 +18,6 @@ from materials.serializers import MaterialListSerializer
 from common.utils import is_admin_user, has_access_permission
 
 
-# Get available materials for roof thermal insulation
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_available_materials(request):
@@ -46,10 +45,8 @@ class RoofThermalInsulationListView(generics.ListAPIView):
 
     def get_queryset(self):
         if is_admin_user(self.request.user):
-            # Admin can see all roof thermal insulation records
             return RoofThermalInsulation.objects.all()
         else:
-            # Regular users can only see their own records
             return RoofThermalInsulation.objects.filter(created_by=self.request.user)
 
 
@@ -82,7 +79,6 @@ class RoofThermalInsulationDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'uuid'
 
     def get_queryset(self):
-        # Admin can access all roof thermal insulation records, regular users only their own
         if is_admin_user(self.request.user):
             return RoofThermalInsulation.objects.all()
         return RoofThermalInsulation.objects.filter(created_by=self.request.user)
@@ -153,7 +149,6 @@ def recalculate_u_coefficient(request, thermal_insulation_uuid):
             created_by=request.user
         )
         
-        # Get new materials for calculation
         new_materials = roof_thermal_insulation.material_layers.filter(material_type='new')
         
         if not new_materials.exists():
@@ -162,25 +157,19 @@ def recalculate_u_coefficient(request, thermal_insulation_uuid):
                 "error": "Δεν υπάρχουν νέα υλικά για υπολογισμό"
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        # Calculate thermal resistance for roof
-        # Φόρτωση θερμικών αντιστάσεων επιφάνειας από τη βάση
         R_si = NumericValue.get_value('Εσωτερική Οροφής (Rsi)')
         R_se = NumericValue.get_value('Εξωτερική (Rse)')
         
-        # Calculate resistance of materials
         R_materials = sum([
             material.thickness / material.material_thermal_conductivity 
             for material in new_materials 
             if material.material_thermal_conductivity > 0
         ])
         
-        # Total thermal resistance
         R_total = R_si + R_se + R_materials
         
-        # Calculate U coefficient
         u_coefficient = 1 / R_total if R_total > 0 else 0
         
-        # Update the roof thermal insulation
         roof_thermal_insulation.u_coefficient = u_coefficient
         roof_thermal_insulation.save()
         
@@ -202,14 +191,12 @@ def recalculate_u_coefficient(request, thermal_insulation_uuid):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-# Material Layer Views
 class RoofThermalInsulationMaterialLayerCreateView(generics.CreateAPIView):
     """Create a new material layer for roof thermal insulation"""
     serializer_class = RoofThermalInsulationMaterialLayerSerializer
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        # Get thermal_insulation_uuid from URL kwargs if present
         if 'thermal_insulation_uuid' in self.kwargs:
             roof_thermal_insulation = get_object_or_404(
                 RoofThermalInsulation,
@@ -218,7 +205,6 @@ class RoofThermalInsulationMaterialLayerCreateView(generics.CreateAPIView):
             )
             serializer.save(roof_thermal_insulation=roof_thermal_insulation)
         else:
-            # Verify that the roof thermal insulation belongs to the user
             roof_thermal_insulation = serializer.validated_data['roof_thermal_insulation']
             if roof_thermal_insulation.created_by != self.request.user:
                 raise PermissionError("You don't have permission to add materials to this roof thermal insulation")
@@ -248,7 +234,6 @@ def recalculate_roof_thermal_insulation(request, roof_thermal_insulation_uuid):
             created_by=request.user
         )
         
-        # Trigger recalculation by saving
         roof_thermal_insulation.save()
         
         serializer = RoofThermalInsulationSerializer(roof_thermal_insulation)

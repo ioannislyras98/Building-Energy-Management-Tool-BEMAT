@@ -25,7 +25,7 @@ class ExternalWallThermalInsulationAdmin(admin.ModelAdmin):
     inlines = [ThermalInsulationMaterialLayerInline]
     
     def save_model(self, request, obj, form, change):
-        if not change:  # If creating new object
+        if not change:
             obj.user = request.user
         super().save_model(request, obj, form, change)
 

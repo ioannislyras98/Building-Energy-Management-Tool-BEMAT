@@ -15,7 +15,6 @@ class BulbReplacementSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        # Set user from request context
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             validated_data['user'] = request.user

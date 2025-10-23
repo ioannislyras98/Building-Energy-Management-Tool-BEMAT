@@ -28,7 +28,7 @@ class Project(models.Model):
     buildings_count = models.IntegerField(
         default=0, 
         verbose_name="Αριθμός Κτιρίων",
-        editable=False  # Managed by signals, not direct user input
+        editable=False
     )
     is_submitted = models.BooleanField(
         default=False,
@@ -63,31 +63,23 @@ class Project(models.Model):
         buildings_progress = []
         total_systems_completed = 0
         total_scenarios_completed = 0
-        total_systems_required = total_buildings * 5  # 5 systems per building
-        total_scenarios_required = total_buildings * 11  # 11 scenarios per building
+        total_systems_required = total_buildings * 5 
+        total_scenarios_required = total_buildings * 11
         
         for building in buildings:
-            # Count completed systems (5 systems)
             systems_completed = 0
-            # 1. Boiler Details
             if hasattr(building, 'boiler_details') and building.boiler_details.exists():
                 systems_completed += 1
-            # 2. Cooling System
             if hasattr(building, 'cooling_systems') and building.cooling_systems.exists():
                 systems_completed += 1
-            # 3. Heating System
             if hasattr(building, 'heating_systems') and building.heating_systems.exists():
                 systems_completed += 1
-            # 4. Hot Water System (HWS)
             if hasattr(building, 'domestic_hot_water_systems') and building.domestic_hot_water_systems.exists():
                 systems_completed += 1
-            # 5. Solar Collectors
             if hasattr(building, 'solar_collectors') and building.solar_collectors.exists():
                 systems_completed += 1
             
-            # Count completed scenarios (11 scenarios) - A scenario is complete only if NPV != 0
             scenarios_completed = 0
-            # windowReplacement uses default related name
             if hasattr(building, 'windowreplacement_set') and building.windowreplacement_set.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
                 scenarios_completed += 1
             if hasattr(building, 'bulbreplacement_set') and building.bulbreplacement_set.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
@@ -128,7 +120,6 @@ class Project(models.Model):
         overall_systems_progress = round((total_systems_completed / total_systems_required) * 100, 1) if total_systems_required > 0 else 0
         overall_scenarios_progress = round((total_scenarios_completed / total_scenarios_required) * 100, 1) if total_scenarios_required > 0 else 0
         
-        # Project can be submitted at any time (regardless of completion)
         can_submit = True
         
         return {

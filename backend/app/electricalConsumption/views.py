@@ -29,7 +29,6 @@ def create_electrical_consumption(request):
     try:
         data = request.data
         
-        # Validate required fields
         if not data.get("building"):
             return standard_error_response("Building is required", status.HTTP_400_BAD_REQUEST)
         
@@ -39,11 +38,9 @@ def create_electrical_consumption(request):
         if not data.get("consumption_type"):
             return standard_error_response("Consumption type is required", status.HTTP_400_BAD_REQUEST)
         
-        # Validate building UUID
         if not validate_uuid(data.get("building")):
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check building exists and user has permission
         try:
             building = Building.objects.get(uuid=data.get("building"))
         except Building.DoesNotExist:
@@ -52,7 +49,6 @@ def create_electrical_consumption(request):
         if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
         
-        # Check thermal zone exists and belongs to the building
         try:
             thermal_zone = ThermalZone.objects.get(uuid=data.get("thermal_zone"))
             if thermal_zone.building != building:
@@ -60,7 +56,6 @@ def create_electrical_consumption(request):
         except ThermalZone.DoesNotExist:
             return standard_error_response("Thermal zone not found", status.HTTP_404_NOT_FOUND)
         
-        # Check project exists and user has permission (if provided)
         project = None
         if data.get("project"):
             if not validate_uuid(data.get("project")):
@@ -73,7 +68,6 @@ def create_electrical_consumption(request):
             except Project.DoesNotExist:
                 return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
         
-        # Check energy consumption exists (if provided)
         energy_consumption = None
         if data.get("energy_consumption"):
             if not validate_uuid(data.get("energy_consumption")):
@@ -86,7 +80,6 @@ def create_electrical_consumption(request):
             except EnergyConsumption.DoesNotExist:
                 return standard_error_response("Energy consumption not found", status.HTTP_404_NOT_FOUND)
         
-        # Create electrical consumption
         electrical_consumption = ElectricalConsumption.objects.create(
             building=building,
             project=project,
@@ -112,11 +105,9 @@ def create_electrical_consumption(request):
 @permission_classes([IsAuthenticated])
 def get_building_electrical_consumptions(request, building_uuid):
     try:
-        # Validate building UUID
         if not validate_uuid(building_uuid):
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check building exists and user has permission
         try:
             building = Building.objects.get(uuid=building_uuid)
         except Building.DoesNotExist:
@@ -125,14 +116,11 @@ def get_building_electrical_consumptions(request, building_uuid):
         if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not have permission to view electrical consumptions for this building", status.HTTP_403_FORBIDDEN)
         
-        # Get electrical consumptions for building
         if is_admin_user(request.user):
-            # Admin can see all electrical consumptions for the building
             electrical_consumptions = ElectricalConsumption.objects.filter(
                 building=building
             ).select_related('thermal_zone', 'energy_consumption')
         else:
-            # Regular users can only see their own electrical consumptions
             electrical_consumptions = ElectricalConsumption.objects.filter(
                 building=building, 
                 user=request.user
@@ -149,11 +137,9 @@ def get_building_electrical_consumptions(request, building_uuid):
 @permission_classes([IsAuthenticated])
 def update_electrical_consumption(request, consumption_uuid):
     try:
-        # Validate consumption UUID
         if not validate_uuid(consumption_uuid):
             return standard_error_response("Invalid electrical consumption UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check electrical consumption exists and user has permission
         try:
             electrical_consumption = ElectricalConsumption.objects.get(uuid=consumption_uuid)
         except ElectricalConsumption.DoesNotExist:
@@ -164,7 +150,6 @@ def update_electrical_consumption(request, consumption_uuid):
         
         data = request.data
         
-        # Update thermal zone if provided
         if "thermal_zone" in data and data.get("thermal_zone"):
             try:
                 thermal_zone = ThermalZone.objects.get(uuid=data.get("thermal_zone"))
@@ -174,7 +159,6 @@ def update_electrical_consumption(request, consumption_uuid):
             except ThermalZone.DoesNotExist:
                 return standard_error_response("Thermal zone not found", status.HTTP_404_NOT_FOUND)
         
-        # Update energy consumption if provided
         if "energy_consumption" in data and data.get("energy_consumption"):
             try:
                 energy_consumption = EnergyConsumption.objects.get(uuid=data.get("energy_consumption"))
@@ -184,7 +168,6 @@ def update_electrical_consumption(request, consumption_uuid):
             except EnergyConsumption.DoesNotExist:
                 return standard_error_response("Energy consumption not found", status.HTTP_404_NOT_FOUND)
         
-        # Update other fields
         if "consumption_type" in data:
             electrical_consumption.consumption_type = data.get("consumption_type")
         if "period" in data:
@@ -211,11 +194,9 @@ def update_electrical_consumption(request, consumption_uuid):
 @permission_classes([IsAuthenticated])
 def delete_electrical_consumption(request, consumption_uuid):
     try:
-        # Validate consumption UUID
         if not validate_uuid(consumption_uuid):
             return standard_error_response("Invalid electrical consumption UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check electrical consumption exists and user has permission
         try:
             electrical_consumption = ElectricalConsumption.objects.get(uuid=consumption_uuid)
         except ElectricalConsumption.DoesNotExist:

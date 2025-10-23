@@ -54,23 +54,19 @@ class BuildingImageCreateUpdateSerializer(serializers.ModelSerializer):
     def validate_image(self, value):
         """Validate base64 image data"""
         try:
-            # Check if it's a data URL format
             if value.startswith('data:'):
                 header, data = value.split(',', 1)
                 image_type = header.split(':')[1].split(';')[0]
             else:
-                # Assume it's just base64 data
                 data = value
-                image_type = 'image/jpeg'  # default
+                image_type = 'image/jpeg' 
             
-            # Decode base64 data
             image_data = base64.b64decode(data)
             
             # Check file size (10MB = 10 * 1024 * 1024 bytes)
             if len(image_data) > 10 * 1024 * 1024:
                 raise serializers.ValidationError("File size cannot exceed 10MB.")
             
-            # Check image type
             allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
             if image_type not in allowed_types:
                 raise serializers.ValidationError(
@@ -90,7 +86,6 @@ class BuildingImageCreateUpdateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         image_info = validated_data.pop('image')
         
-        # Create the instance with image data
         instance = BuildingImage.objects.create(
             image_data=image_info['data'],
             image_type=image_info['type'],

@@ -26,15 +26,12 @@ def create_cooling_system(request):
     try:
         data = request.data
         
-        # Validate required fields
         if not data.get("building"):
             return standard_error_response("Building is required", status.HTTP_400_BAD_REQUEST)
         
-        # Validate building UUID
         if not validate_uuid(data.get("building")):
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check building exists and user has permission
         try:
             building = Building.objects.get(uuid=data.get("building"))
         except Building.DoesNotExist:
@@ -43,7 +40,6 @@ def create_cooling_system(request):
         if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
         
-        # Check project exists and user has permission (if provided)
         project = None
         if data.get("project"):
             if not validate_uuid(data.get("project")):
@@ -56,7 +52,6 @@ def create_cooling_system(request):
             except Project.DoesNotExist:
                 return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
         
-        # Create cooling system
         cooling_system = CoolingSystem.objects.create(
             building=building,
             project=project,
@@ -81,11 +76,9 @@ def create_cooling_system(request):
 @permission_classes([IsAuthenticated])
 def get_building_cooling_systems(request, building_uuid):
     try:
-        # Validate building UUID
         if not validate_uuid(building_uuid):
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check building exists and user has permission
         try:
             building = Building.objects.get(uuid=building_uuid)
         except Building.DoesNotExist:
@@ -94,7 +87,6 @@ def get_building_cooling_systems(request, building_uuid):
         if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not have permission to view systems for this building", status.HTTP_403_FORBIDDEN)
         
-        # Get cooling systems for building - Admin users see all, regular users see only their own
         if is_admin_user(request.user):
             cooling_systems = CoolingSystem.objects.filter(building=building)
         else:
@@ -110,21 +102,17 @@ def get_building_cooling_systems(request, building_uuid):
 @permission_classes([IsAuthenticated])
 def update_cooling_system(request, system_uuid):
     try:
-        # Validate system UUID
         if not validate_uuid(system_uuid):
             return standard_error_response("Invalid system UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Get cooling system
         try:
             cooling_system = CoolingSystem.objects.get(uuid=system_uuid)
         except CoolingSystem.DoesNotExist:
             return standard_error_response("Cooling system not found", status.HTTP_404_NOT_FOUND)
         
-        # Check user permission
         if not has_access_permission(request.user, cooling_system):
             return standard_error_response("Access denied: You do not have permission to update this system", status.HTTP_403_FORBIDDEN)
         
-        # Update system
         serializer = CoolingSystemSerializer(
             cooling_system, 
             data=request.data, 
@@ -144,21 +132,17 @@ def update_cooling_system(request, system_uuid):
 @permission_classes([IsAuthenticated])
 def delete_cooling_system(request, system_uuid):
     try:
-        # Validate system UUID
         if not validate_uuid(system_uuid):
             return standard_error_response("Invalid system UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Get cooling system
         try:
             cooling_system = CoolingSystem.objects.get(uuid=system_uuid)
         except CoolingSystem.DoesNotExist:
             return standard_error_response("Cooling system not found", status.HTTP_404_NOT_FOUND)
         
-        # Check user permission
         if not has_access_permission(request.user, cooling_system):
             return standard_error_response("Access denied: You do not have permission to delete this system", status.HTTP_403_FORBIDDEN)
         
-        # Delete system
         cooling_system.delete()
         return standard_success_response("Cooling system deleted successfully")
         

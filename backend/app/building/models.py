@@ -13,9 +13,8 @@ class Building(models.Model):
         'user.User', 
         on_delete=models.CASCADE,
         related_name="buildings",
-        to_field='uuid'  # Add this to specify the target field on the User model
+        to_field='uuid'
     )
-    # Βασικές πληροφορίες
     name = models.CharField(
         max_length=100, 
         verbose_name='Σύνολο Κτιρίου'
@@ -26,7 +25,7 @@ class Building(models.Model):
         help_text='π.χ. Νοσοκομείο, Κλινικές'
     )
     description = models.TextField(
-        blank=False,  # Changed from blank=True to make it required
+        blank=False,  
         verbose_name='Περιγραφή'
     )
     year_built = models.PositiveIntegerField(
@@ -36,7 +35,7 @@ class Building(models.Model):
     )
     address = models.CharField(
         max_length=200,
-        blank=False,  # Changed from blank=True to make it required
+        blank=False, 
         verbose_name='Διεύθυνση'
     )
     
@@ -51,10 +50,9 @@ class Building(models.Model):
         max_length=1,
         blank=False,
         verbose_name='Ενεργειακή Ζώνη',
-        editable=False  # This will be auto-populated from prefecture
+        editable=False 
     )
     
-    # Λογικές τιμές
     is_insulated = models.BooleanField(
         default=False,
         verbose_name='Μονωμένο'
@@ -64,7 +62,6 @@ class Building(models.Model):
         verbose_name='Πιστοποιημένο'
     )
     
-    # Στοιχεία επιφάνειας
     energy_class = models.CharField(
         max_length=50,
         blank=True,
@@ -93,7 +90,6 @@ class Building(models.Model):
         verbose_name='Αριθμός Εξεταζόμενων Ορόφων'
     )
     
-    # New fields
     floor_height = models.DecimalField(
         max_digits=5,
         decimal_places=2,
@@ -149,56 +145,12 @@ class Building(models.Model):
         help_text='Μέσος αριθμός ατόμων στο κτίριο'
     )
     
-    # # Μετρήσεις / Συνθήκες - keeping these for backward compatibility
-    # room_temperature = models.DecimalField(
-    #     max_digits=5,
-    #     decimal_places=2,
-    #     default=25,
-    #     validators=[MinValueValidator(0)],
-    #     verbose_name='Θερμοκρασία Χώρου (°C)'
-    # )
-    # no_ppm = models.DecimalField(
-    #     max_digits=5,
-    #     decimal_places=2,
-    #     validators=[MaxValueValidator(65)],
-    #     verbose_name='Μονοξείδιο του Αζώτου - NO (ppm)',
-    #     help_text='Βεβαιωθείτε ότι η τιμή είναι ≤ 65'
-    # )
-    # nox_ppm = models.DecimalField(
-    #     max_digits=5,
-    #     decimal_places=2,
-    #     validators=[MaxValueValidator(65)],
-    #     verbose_name='Οξείδια του Αζώτου - NOx (ppm)',
-    #     help_text='Βεβαιωθείτε ότι η τιμή είναι ≤ 65'
-    # )
-    # co2_ppm = models.DecimalField(
-    #     max_digits=5,
-    #     decimal_places=2,
-    #     validators=[MaxValueValidator(125)],
-    #     verbose_name='Διοξείδιο του Άνθρακα (ppm)',
-    #     help_text='Βεβαιωθείτε ότι η τιμή είναι ≤ 125'
-    # )
-    # smoke_scale = models.PositiveIntegerField(
-    #     validators=[MaxValueValidator(9)],
-    #     verbose_name='Κάπνός (Brigon smoke scale 0-9)',
-    #     help_text='Βεβαιωθείτε ότι η τιμή είναι ≤ 9'
-    # )
-    # exhaust_temperature = models.DecimalField(
-    #     max_digits=5,
-    #     decimal_places=2,
-    #     validators=[MinValueValidator(180)],
-    #     verbose_name='Θερμοκρασία Καυσαερίων (°C)',
-    #     help_text='Βεβαιωθείτε ότι η τιμή είναι ≥ 180'
-    # )
-    
-    # Χρονική σήμανση
     date_created = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Ημερομηνία Δημιουργίας'
     )
     
     def save(self, *args, **kwargs):
-        # Auto-populate energy_zone from prefecture
         if self.prefecture:
             self.energy_zone = self.prefecture.zone
         super().save(*args, **kwargs)

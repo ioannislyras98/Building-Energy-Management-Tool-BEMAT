@@ -23,36 +23,31 @@ from common.utils import (
 def create_heating_system(request):
     try:
         data = request.data
-        print(f"Received data: {data}")  # Debug log
-        print(f"User: {request.user}")   # Debug log
+        print(f"Received data: {data}")
+        print(f"User: {request.user}")
         
-        # Validate required fields
         if not data.get("building"):
             return standard_error_response("Building is required", status.HTTP_400_BAD_REQUEST)
         
         if not data.get("project"):
             return standard_error_response("Project is required", status.HTTP_400_BAD_REQUEST)
         
-        # Validate building UUID
         if not validate_uuid(data.get("building")):
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Validate project UUID
         if not validate_uuid(data.get("project")):
             return standard_error_response("Invalid project UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check building exists and user has permission
         try:
             building = Building.objects.get(uuid=data.get("building"))
-            print(f"Found building: {building}, owner: {building.user}")  # Debug log
+            print(f"Found building: {building}, owner: {building.user}")
         except Building.DoesNotExist:
-            print(f"Building with UUID {data.get('building')} not found")  # Debug log
+            print(f"Building with UUID {data.get('building')} not found")
             return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
         
         if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
         
-        # Check project exists and user has permission
         try:
             project = Project.objects.get(uuid=data.get("project"))
             if not has_access_permission(request.user, project):
@@ -60,7 +55,6 @@ def create_heating_system(request):
         except Project.DoesNotExist:
             return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
         
-        # Create heating system
         heating_system = HeatingSystem.objects.create(
             building=building,
             project=project,
@@ -86,11 +80,9 @@ def create_heating_system(request):
 @permission_classes([IsAuthenticated])
 def get_building_heating_systems(request, building_uuid):
     try:
-        # Validate building UUID
         if not validate_uuid(building_uuid):
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check building exists and user has permission
         try:
             building = Building.objects.get(uuid=building_uuid)
         except Building.DoesNotExist:
@@ -99,7 +91,6 @@ def get_building_heating_systems(request, building_uuid):
         if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not have permission to view systems for this building", status.HTTP_403_FORBIDDEN)
         
-        # Get heating systems for building - Admin users see all, regular users see only their own
         if is_admin_user(request.user):
             heating_systems = HeatingSystem.objects.filter(building=building)
         else:
@@ -115,21 +106,17 @@ def get_building_heating_systems(request, building_uuid):
 @permission_classes([IsAuthenticated])
 def update_heating_system(request, system_uuid):
     try:
-        # Validate system UUID
         if not validate_uuid(system_uuid):
             return standard_error_response("Invalid system UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Get heating system
         try:
             heating_system = HeatingSystem.objects.get(uuid=system_uuid)
         except HeatingSystem.DoesNotExist:
             return standard_error_response("Heating system not found", status.HTTP_404_NOT_FOUND)
         
-        # Check user permission
         if not has_access_permission(request.user, heating_system):
             return standard_error_response("Access denied: You do not have permission to update this system", status.HTTP_403_FORBIDDEN)
         
-        # Update system
         serializer = HeatingSystemSerializer(
             heating_system, 
             data=request.data, 
@@ -149,21 +136,17 @@ def update_heating_system(request, system_uuid):
 @permission_classes([IsAuthenticated])
 def delete_heating_system(request, system_uuid):
     try:
-        # Validate system UUID
         if not validate_uuid(system_uuid):
             return standard_error_response("Invalid system UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Get heating system
         try:
             heating_system = HeatingSystem.objects.get(uuid=system_uuid)
         except HeatingSystem.DoesNotExist:
             return standard_error_response("Heating system not found", status.HTTP_404_NOT_FOUND)
         
-        # Check user permission
         if not has_access_permission(request.user, heating_system):
             return standard_error_response("Access denied: You do not have permission to delete this system", status.HTTP_403_FORBIDDEN)
         
-        # Delete system
         heating_system.delete()
         return standard_success_response("Heating system deleted successfully")
         

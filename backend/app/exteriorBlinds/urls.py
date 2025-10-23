@@ -2,7 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # API endpoints για εξωτερικές περσίδες
     path('', views.exterior_blinds_list, name='exterior_blinds_list'),
     path('create/', views.exterior_blinds_create, name='exterior_blinds_create'),
     path('<uuid:uuid>/', views.exterior_blinds_detail, name='exterior_blinds_detail'),

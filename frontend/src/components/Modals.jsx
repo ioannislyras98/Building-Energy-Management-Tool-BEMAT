@@ -31,8 +31,8 @@ export const Modals = ({
 }) => {
   console.log("Modals - AddContact props:", {
     isAddContactModalOpen,
-    targetBuildingUuidForContact,
-    shouldRenderModal: isAddContactModalOpen && targetBuildingUuidForContact,
+    buildingUuid,
+    shouldRenderModal: isAddContactModalOpen && buildingUuid,
   });
 
   return (
@@ -78,8 +78,8 @@ export const Modals = ({
         <AddContactModal
           isOpen={isAddContactModalOpen}
           onClose={closeAddContactModal}
-          buildingUuid={targetBuildingUuidForContact || ""}
-          onContactAdded={handleContactAdded}
+          buildingUuid={buildingUuid || ""}
+          onContactAdded={handleContactCreated}
         />
       )}
 
@@ -88,7 +88,7 @@ export const Modals = ({
           isOpen={isEditContactModalOpen}
           onClose={closeEditContactModal}
           contact={currentContact}
-          buildingUuid={targetBuildingUuidForContact || ""}
+          buildingUuid={buildingUuid || ""}
           onContactUpdated={handleContactUpdated}
         />
       )}
@@ -96,7 +96,7 @@ export const Modals = ({
       {isAddContactModalOpen &&
         console.log(
           "Modals - Rendering AddContactModal with buildingUuid:",
-          targetBuildingUuidForContact
+          buildingUuid
         )}
     </>
   );

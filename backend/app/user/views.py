@@ -19,7 +19,7 @@ from rest_framework.decorators import api_view, permission_classes
 User = get_user_model()
 
 class CustomAuthToken(ObtainAuthToken):
-    serializer_class = CustomAuthTokenSerializer  # Χρησιμοποιούμε το custom serializer
+    serializer_class = CustomAuthTokenSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data,
@@ -61,7 +61,7 @@ class ChangePasswordView(APIView):
             return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
 
 class PasswordResetRequestView(APIView):
-    permission_classes = []  # Δεν απαιτείται αυθεντικοποίηση
+    permission_classes = [] 
     def post(self, request, *args, **kwargs):
         serializer = PasswordResetRequestSerializer(data=request.data)
         if serializer.is_valid():
@@ -70,7 +70,7 @@ class PasswordResetRequestView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PasswordResetConfirmView(APIView):
-    permission_classes = []  # Δεν απαιτείται αυθεντικοποίηση
+    permission_classes = []
     def post(self, request, uid, token, *args, **kwargs):
         data = request.data.copy()
         data['uid'] = uid

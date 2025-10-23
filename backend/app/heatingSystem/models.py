@@ -16,7 +16,6 @@ class HeatingSystem(models.Model):
     building = models.ForeignKey('building.Building', on_delete=models.CASCADE, related_name='heating_systems')
     project = models.ForeignKey('project.Project', on_delete=models.CASCADE, related_name='heating_systems')
     
-    # Specific fields for heating system
     heating_system_type = models.CharField(
         max_length=255,
         blank=True,

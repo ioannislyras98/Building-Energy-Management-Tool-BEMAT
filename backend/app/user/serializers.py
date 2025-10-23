@@ -8,7 +8,7 @@ from django.core.mail import send_mail
 from django.utils.translation import gettext_lazy as _
 User = get_user_model()
 
-class UserSerializer(serializers.ModelSerializer):  # Use this version
+class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     first_name = serializers.CharField(required=True, allow_blank=False)
     last_name = serializers.CharField(required=True, allow_blank=False)

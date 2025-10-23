@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Project
 
 class ProjectSerializer(serializers.ModelSerializer):
-    buildings_count = serializers.ReadOnlyField()  # Αυτό διαβάζει το @property
+    buildings_count = serializers.ReadOnlyField()
     completion_status = serializers.SerializerMethodField()
     
     class Meta:

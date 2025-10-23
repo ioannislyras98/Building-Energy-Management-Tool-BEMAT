@@ -19,10 +19,8 @@ def get_automatic_lighting_control_by_building(request, building_id):
     Λήψη στοιχείων αυτόματου ελέγχου φωτισμού για συγκεκριμένο κτίριο
     """
     try:
-        # Έλεγχος ότι το κτίριο υπάρχει
         building = get_object_or_404(Building, uuid=building_id)
         
-        # Αναζήτηση εγγραφής αυτόματου ελέγχου φωτισμού
         automatic_lighting_control = AutomaticLightingControl.objects.get(building=building)
         
         serializer = AutomaticLightingControlSerializer(automatic_lighting_control)
@@ -47,7 +45,6 @@ def automatic_lighting_control_create(request):
     Δημιουργία ή ενημέρωση στοιχείων αυτόματου ελέγχου φωτισμού
     """
     try:
-        # Λήψη building και project από το request
         building_id = request.data.get('building')
         project_id = request.data.get('project')
         
@@ -57,21 +54,18 @@ def automatic_lighting_control_create(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Έλεγχος ότι το κτίριο και το έργο υπάρχουν
         building = get_object_or_404(Building, uuid=building_id)
         project = get_object_or_404(Project, id=project_id)
         
-        # Προσπάθεια εύρεσης υπάρχουσας εγγραφής
         try:
             automatic_lighting_control = AutomaticLightingControl.objects.get(building=building)
-            # Ενημέρωση υπάρχουσας εγγραφής
+           
             serializer = AutomaticLightingControlSerializer(
                 automatic_lighting_control, 
                 data=request.data, 
                 partial=True
             )
         except AutomaticLightingControl.DoesNotExist:
-            # Δημιουργία νέας εγγραφής
             serializer = AutomaticLightingControlSerializer(data=request.data)
         
         if serializer.is_valid():

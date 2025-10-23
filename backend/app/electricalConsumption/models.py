@@ -4,14 +4,12 @@ from django.conf import settings
 
 
 class ElectricalConsumption(models.Model):
-    # Choices για τύπο κατανάλωσης
     CONSUMPTION_TYPE_CHOICES = [
         ('lighting', 'Φωτισμός'),
         ('air_conditioning', 'Κλιματισμός'),
         ('other_electrical_devices', 'Άλλες ηλεκτρικές συσκευές'),
     ]
     
-    # Choices για τύπο φορτίου
     LOAD_TYPE_CHOICES = [
         ('continuous', 'Συνεχής'),
         ('intermittent', 'Διαλείπων'),
@@ -44,7 +42,6 @@ class ElectricalConsumption(models.Model):
         verbose_name='Χρήστης'
     )
     
-    # Specific fields for electrical consumption
     consumption_type = models.CharField(
         max_length=50,
         choices=CONSUMPTION_TYPE_CHOICES,
@@ -96,7 +93,6 @@ class ElectricalConsumption(models.Model):
         verbose_name='Ώρες λειτουργίας ανά έτος'
     )
     
-    # Timestamps
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Ημερομηνία δημιουργίας'

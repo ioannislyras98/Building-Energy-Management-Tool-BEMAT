@@ -20,7 +20,6 @@ from materials.serializers import MaterialListSerializer
 from common.utils import is_admin_user, has_access_permission
 
 
-# Get available materials for thermal insulation
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_available_materials(request):
@@ -41,17 +40,14 @@ def get_available_materials(request):
         )
 
 
-# External Wall Thermal Insulation Views
 class ExternalWallThermalInsulationListView(generics.ListAPIView):
     serializer_class = ExternalWallThermalInsulationSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         if is_admin_user(self.request.user):
-            # Admin can see all thermal insulation records
             return ExternalWallThermalInsulation.objects.all()
         else:
-            # Regular users can only see their own records
             return ExternalWallThermalInsulation.objects.filter(user=self.request.user)
 
 
@@ -67,7 +63,6 @@ class ExternalWallThermalInsulationDetailView(generics.RetrieveUpdateDestroyAPIV
     lookup_field = 'uuid'
 
     def get_queryset(self):
-        # Admin can access all thermal insulation records, regular users only their own
         if is_admin_user(self.request.user):
             return ExternalWallThermalInsulation.objects.all()
         return ExternalWallThermalInsulation.objects.filter(user=self.request.user)
@@ -115,7 +110,6 @@ def get_thermal_insulations_by_project(request, project_uuid):
     try:
         project = get_object_or_404(Project, uuid=project_uuid)
         
-        # Check if user has access to this project
         if project.user != request.user:
             return Response(
                 {"detail": "You don't have permission to access this project."}, 
@@ -141,7 +135,6 @@ def get_thermal_insulations_by_project(request, project_uuid):
         )
 
 
-# Material Layer Views
 class ThermalInsulationMaterialLayerCreateView(generics.CreateAPIView):
     queryset = ThermalInsulationMaterialLayer.objects.all()
     serializer_class = ThermalInsulationMaterialLayerSerializer

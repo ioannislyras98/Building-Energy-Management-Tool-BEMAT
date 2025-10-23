@@ -7,7 +7,6 @@ from .models import Prefecture
 from .serializers import PrefectureSerializer, PrefectureListSerializer
 
 
-# Prefecture Views (Admin Only for Create/Update/Delete)
 class PrefectureListCreateView(generics.ListCreateAPIView):
     queryset = Prefecture.objects.filter(is_active=True)
     permission_classes = [IsAuthenticated]

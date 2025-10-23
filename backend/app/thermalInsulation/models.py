@@ -23,8 +23,6 @@ class ExternalWallThermalInsulation(models.Model):
         on_delete=models.CASCADE, 
         verbose_name="Έργο"
     )
-    
-    # Calculated fields
     u_coefficient = models.FloatField(
         verbose_name="Συντελεστής U (W/m²K)",
         help_text="Υπολογίζεται αυτόματα: U = 1/R_total",
@@ -41,8 +39,6 @@ class ExternalWallThermalInsulation(models.Model):
         null=True,
         blank=True
     )
-    
-    # Heating and Cooling Hours
     heating_hours_per_year = models.FloatField(
         verbose_name="Ώρες θέρμανσης ανά έτος",
         null=True,
@@ -56,7 +52,6 @@ class ExternalWallThermalInsulation(models.Model):
         help_text="Ώρες λειτουργίας ψύξης ανά έτος"
     )
     
-    # Economic Analysis
     total_cost = models.FloatField(
         verbose_name="Συνολικό κόστος (€)",
         null=True,
@@ -113,7 +108,6 @@ class ExternalWallThermalInsulation(models.Model):
         verbose_name = "Θερμομόνωση Εξωτερικής Τοιχοποιίας"
         verbose_name_plural = "Θερμομονώσεις Εξωτερικής Τοιχοποιίας"
         ordering = ['-created_at']
-        # Ensure one thermal insulation per building
         unique_together = [['building', 'user']]
 
     def __str__(self):
@@ -127,11 +121,9 @@ class ExternalWallThermalInsulation(models.Model):
         R_si = 0.13 m²K/W (internal - walls)
         R_se = 0.04 m²K/W (external)
         """
-        # Φόρτωση θερμικών αντιστάσεων επιφάνειας από τη βάση
         R_si = NumericValue.get_value('Εσωτερική Τοίχου (Rsi)')
         R_se = NumericValue.get_value('Εξωτερική (Rse)')
         
-        # Calculate sum of all NEW material resistances only
         materials_r_sum = 0
         for material_layer in self.material_layers.filter(material_type='new'):
             if material_layer.material.thermal_conductivity > 0:
@@ -145,7 +137,6 @@ class ExternalWallThermalInsulation(models.Model):
     def calculate_npv(self):
         """Calculate Net Present Value"""
         try:
-            # Check for required fields and convert to float to ensure they're not None
             if (not self.annual_benefit or not self.annual_operating_costs or 
                 not self.discount_rate or not self.time_period_years or not self.total_cost):
                 return 0
@@ -159,13 +150,13 @@ class ExternalWallThermalInsulation(models.Model):
             if total_cost <= 0:
                 return 0
                 
-            npv = -total_cost  # Initial investment (negative)
+            npv = -total_cost 
             annual_net_benefit = annual_benefit - annual_operating_costs
             discount_rate_decimal = discount_rate / 100
             
             for year in range(1, time_period_years + 1):
                 npv += annual_net_benefit / ((1 + discount_rate_decimal) ** year)
-            return round(npv, 2)  # Round to 2 decimal places
+            return round(npv, 2) 
         except (TypeError, ValueError, ZeroDivisionError) as e:
             print(f"Error calculating NPV: {e}")
             return 0
@@ -177,14 +168,12 @@ class ExternalWallThermalInsulation(models.Model):
                   difference in summer hourly losses × heating hours per year) × electricity cost per kWh
         """
         try:
-            # Check for required values with safe defaults
             heating_hours = float(self.heating_hours_per_year or 0)
             cooling_hours = float(self.cooling_hours_per_year or 0)
             
             if heating_hours <= 0 and cooling_hours <= 0:
                 return 0
             
-            # Check project and electricity cost
             if not self.project:
                 return 0
                 
@@ -194,30 +183,25 @@ class ExternalWallThermalInsulation(models.Model):
             else:
                 return 0
         
-            # Calculate hourly losses for old and new materials
             old_materials = self.material_layers.filter(material_type='old')
             new_materials = self.material_layers.filter(material_type='new')
         
-            # Calculate winter hourly losses (kW) for both old and new materials
-            winter_losses_old = self._calculate_hourly_losses(old_materials, 17)  # 17Kdifference for winter
+            winter_losses_old = self._calculate_hourly_losses(old_materials, 17) 
             winter_losses_new = self._calculate_hourly_losses(new_materials, 17)
         
-            # Calculate summer hourly losses (kW) for both old and new materials  
-            summer_losses_old = self._calculate_hourly_losses(old_materials, 13)  # 13Kdifference for summer
+            summer_losses_old = self._calculate_hourly_losses(old_materials, 13)  
             summer_losses_new = self._calculate_hourly_losses(new_materials, 13)
         
-            # Calculate differences (savings)
             winter_losses_difference = winter_losses_old - winter_losses_new
-            summer_losses_difference = summer_losses_old - summer_losses_new            # Calculate annual energy savings (kWh/year)
+            summer_losses_difference = summer_losses_old - summer_losses_new
             annual_energy_savings = (
                 winter_losses_difference * cooling_hours +
                 summer_losses_difference * heating_hours
             )
             
-            # Calculate annual benefit (€/year)
             annual_benefit = annual_energy_savings * electricity_cost
         
-            return annual_benefit  # Allow negative values to show actual calculations
+            return annual_benefit 
         except Exception as e:
             print(f"Error calculating annual benefit: {e}")
             return 0
@@ -264,8 +248,6 @@ class ExternalWallThermalInsulation(models.Model):
         if not materials.exists():
             return 0
         
-        # Calculate U coefficient for these materials
-        # Φόρτωση θερμικών αντιστάσεων επιφάνειας από τη βάση
         R_si = NumericValue.get_value('Εσωτερική Τοίχου (Rsi)')
         R_se = NumericValue.get_value('Εξωτερική (Rse)')
         
@@ -388,6 +370,5 @@ class ThermalInsulationMaterialLayer(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # Trigger recalculation of U coefficient in parent
         if self.thermal_insulation:
             self.thermal_insulation.save()

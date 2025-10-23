@@ -11,7 +11,7 @@ class NumericValueListView(generics.ListAPIView):
     """
     queryset = NumericValue.objects.all().order_by('name')
     serializer_class = NumericValueSerializer
-    permission_classes = [AllowAny]  # Temporarily remove auth for testing
+    permission_classes = [AllowAny]
 
 
 class NumericValueUpdateView(generics.UpdateAPIView):
@@ -21,7 +21,7 @@ class NumericValueUpdateView(generics.UpdateAPIView):
     """
     queryset = NumericValue.objects.all()
     serializer_class = NumericValueSerializer
-    permission_classes = [AllowAny]  # Temporarily remove auth for testing
+    permission_classes = [AllowAny]
     lookup_field = 'uuid'
     
     def patch(self, request, *args, **kwargs):

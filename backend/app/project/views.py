@@ -23,7 +23,6 @@ def create_project(request):
     try:
         data = request.data
         
-        # Ορισμός των required πεδίων
         required_fields = ["name", "cost_per_kwh_fuel", "cost_per_kwh_electricity"]
         missing_fields = [field for field in required_fields if not data.get(field)]
         if missing_fields:
@@ -58,7 +57,6 @@ def delete_project(request, uuid):
             
         project = Project.objects.get(uuid=uuid)
         
-        # Admin users can delete any project, regular users only their own
         if not has_access_permission(request.user, project):
             logger.warning(f"Project with UUID {uuid} access denied for user {request.user.email}.")
             return standard_error_response("Access denied: You do not have permission to delete this project", status.HTTP_403_FORBIDDEN)
@@ -80,7 +78,6 @@ def delete_project(request, uuid):
 @permission_classes([IsAuthenticated])
 def get_projects(request):
     try:
-        # If user is admin, show all projects, otherwise only their own
         if is_admin_user(request.user):
             projects = Project.objects.all()
         else:
@@ -104,11 +101,9 @@ def get_project_detail(request, project_uuid):
             
         project = Project.objects.get(uuid=project_uuid)
         
-        # Admin users can access any project, regular users only their own
         if not has_access_permission(request.user, project):
             return standard_error_response("Access denied: You do not own this project", status.HTTP_403_FORBIDDEN)
         
-        # Επιστρέφουμε αναλυτικά όλα τα πεδία του έργου
         project_data = {
             "uuid": str(project.uuid),
             "name": project.name,
@@ -133,17 +128,14 @@ def update_project(request, uuid):
     Endpoint για την ενημέρωση ενός project.
     """
     try:
-        # Βρίσκουμε το project με το συγκεκριμένο UUID
         project = Project.objects.get(uuid=uuid)
         
-        # Ελέγχουμε αν ο χρήστης έχει δικαίωμα να ενημερώσει αυτό το project
         if not has_access_permission(request.user, project):
             return Response(
                 {"error": "You don't have permission to update this project"},
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Ενημερώνουμε το project με τα νέα δεδομένα
         serializer = ProjectSerializer(project, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -175,14 +167,9 @@ def submit_project(request, uuid):
         
         project = Project.objects.get(uuid=uuid)
         
-        # Check if user has permission to submit this project
         if not has_access_permission(request.user, project):
             return standard_error_response("Access denied: You do not own this project", status.HTTP_403_FORBIDDEN)
         
-        # Allow project submission at any time without validation
-        # Removed completion status check to allow flexible submission
-        
-        # Submit the project
         project.is_submitted = True
         project.save()
         
@@ -206,7 +193,6 @@ def get_pending_projects_percentage(request):
     Get the percentage of pending (non-submitted) projects for the notification bell.
     """
     try:
-        # Get user's projects
         user_projects = Project.objects.filter(user=request.user)
         total_projects = user_projects.count()
         
@@ -243,77 +229,58 @@ def get_building_progress(request, building_uuid):
         from building.models import Building
         building = Building.objects.get(uuid=building_uuid)
         
-        # Check if user has permission to access this building
         if not has_access_permission(request.user, building.project):
             return standard_error_response("Access denied: You do not own this building's project", status.HTTP_403_FORBIDDEN)
         
-        # Count completed systems (5 systems)
         systems_completed = 0
         
-        # 1. Boiler Details
         if hasattr(building, 'boiler_details') and building.boiler_details.exists():
             systems_completed += 1
             
-        # 2. Cooling System
         if hasattr(building, 'cooling_systems') and building.cooling_systems.exists():
             systems_completed += 1
             
-        # 3. Heating System
         if hasattr(building, 'heating_systems') and building.heating_systems.exists():
             systems_completed += 1
             
-        # 4. Hot Water System (HWS)
         if hasattr(building, 'domestic_hot_water_systems') and building.domestic_hot_water_systems.exists():
             systems_completed += 1
             
-        # 5. Solar Collectors
         if hasattr(building, 'solar_collectors') and building.solar_collectors.exists():
             systems_completed += 1
         
-        # Count completed scenarios (11 scenarios) - A scenario is complete only if NPV != 0
         scenarios_completed = 0
         
-        # 1. External Wall Thermal Insulation
         if hasattr(building, 'externalwallthermalinsulation_set') and building.externalwallthermalinsulation_set.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
             scenarios_completed += 1
             
-        # 2. Roof Thermal Insulation
         if hasattr(building, 'roof_thermal_insulations') and building.roof_thermal_insulations.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
             scenarios_completed += 1
             
-        # 3. Photovoltaic Systems - No NPV calculation yet, check for existence only
         if hasattr(building, 'photovoltaic_systems') and building.photovoltaic_systems.exists():
             scenarios_completed += 1
             
-        # 4. Old Window Replacement
         if hasattr(building, 'windowreplacement_set') and building.windowreplacement_set.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
             scenarios_completed += 1
             
-        # 5. Incandescent Bulb Replacement
         if hasattr(building, 'bulbreplacement_set') and building.bulbreplacement_set.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
             scenarios_completed += 1
             
-        # 6. Air Conditioning Replacement - Only ac_analyses has NPV calculation
         if hasattr(building, 'ac_analyses') and building.ac_analyses.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
             scenarios_completed += 1
             
-        # 7. Hot Water Production System Upgrade
         if hasattr(building, 'hotwaterupgrade_set') and building.hotwaterupgrade_set.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
             scenarios_completed += 1
             
-        # 8. Natural Gas Network Installation
         if hasattr(building, 'natural_gas_networks') and building.natural_gas_networks.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
             scenarios_completed += 1
             
-        # 9. Exterior Blinds Installation
         if hasattr(building, 'exterior_blinds') and building.exterior_blinds.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
             scenarios_completed += 1
             
-        # 10. Automatic Lighting Control System Installation
         if hasattr(building, 'automatic_lighting_controls') and building.automatic_lighting_controls.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
             scenarios_completed += 1
             
-        # 11. Boiler Replacement
         if hasattr(building, 'boiler_replacements') and building.boiler_replacements.filter(net_present_value__isnull=False).exclude(net_present_value=0).exists():
             scenarios_completed += 1
         

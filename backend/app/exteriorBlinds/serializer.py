@@ -5,7 +5,6 @@ from .models import ExteriorBlinds
 class ExteriorBlindsSerializer(serializers.ModelSerializer):
     """Serializer for ExteriorBlinds model"""
     
-    # Read-only υπολογιζόμενα πεδία
     total_investment_cost = serializers.FloatField(read_only=True)
     annual_energy_savings = serializers.FloatField(read_only=True)
     annual_economic_benefit = serializers.FloatField(read_only=True)
@@ -17,16 +16,11 @@ class ExteriorBlindsSerializer(serializers.ModelSerializer):
         model = ExteriorBlinds
         fields = [
             'uuid', 'building', 'project',
-            # Οικονομικά στοιχεία εισόδου
             'window_area', 'cost_per_m2', 'installation_cost', 'maintenance_cost',
-            # Ενεργειακά στοιχεία
             'cooling_energy_savings', 'energy_cost_kwh',
-            # Οικονομικοί παράμετροι
             'time_period', 'discount_rate',
-            # Αυτόματοι υπολογισμοί (read-only)
             'total_investment_cost', 'annual_energy_savings', 'annual_economic_benefit',
             'payback_period', 'net_present_value', 'internal_rate_of_return',
-            # Metadata
             'created_at', 'updated_at'
         ]
         read_only_fields = [
@@ -37,7 +31,6 @@ class ExteriorBlindsSerializer(serializers.ModelSerializer):
     
     def to_internal_value(self, data):
         """Προ-επεξεργασία δεδομένων εισόδου"""
-        # Μετατροπή κενών strings σε None για numeric πεδία
         for field in ['window_area', 'cost_per_m2', 'installation_cost', 'maintenance_cost',
                       'cooling_energy_savings', 'energy_cost_kwh', 'time_period', 'discount_rate']:
             if field in data and data[field] == '':
@@ -47,15 +40,13 @@ class ExteriorBlindsSerializer(serializers.ModelSerializer):
     
     def validate(self, data):
         """Δυναμικά multilingual validations"""
-        # Λήψη γλώσσας από το request context
         request = self.context.get('request')
-        language = 'el'  # Default Greek
+        language = 'el'
         if request and hasattr(request, 'META'):
             accept_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
             if 'en' in accept_language.lower():
                 language = 'en'
         
-        # Δυναμικά error messages - συγχρονισμένα με frontend translations
         error_messages = {
             'en': {
                 'window_area': "The field 'Window area' is required and must be greater than 0",
@@ -71,7 +62,6 @@ class ExteriorBlindsSerializer(serializers.ModelSerializer):
         
         messages = error_messages.get(language, error_messages['el'])
         
-        # Validation logic με δυναμικά messages
         required_fields = ['window_area', 'cost_per_m2', 'cooling_energy_savings']
         
         for field in required_fields:

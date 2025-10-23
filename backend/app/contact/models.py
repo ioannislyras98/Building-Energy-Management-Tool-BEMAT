@@ -1,12 +1,11 @@
 import uuid
 from django.db import models
-from building.models import Building # Εισαγωγή του μοντέλου Building
-from user.models import User # Αν θέλετε να συνδέσετε την επαφή και με τον χρήστη που την δημιούργησε
+from building.models import Building 
+from user.models import User
 
 class Contact(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
     building = models.ForeignKey(Building, related_name='contacts', on_delete=models.CASCADE)
-    # user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True) # Προαιρετικά
     name = models.CharField(max_length=255)
     role = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField()

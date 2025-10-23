@@ -21,7 +21,7 @@ class NumericValueAdmin(admin.ModelAdmin):
     )
     
     def save_model(self, request, obj, form, change):
-        if not change:  # Αν είναι νέο αντικείμενο
+        if not change:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
 

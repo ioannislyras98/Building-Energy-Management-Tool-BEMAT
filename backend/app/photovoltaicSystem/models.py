@@ -18,8 +18,6 @@ class PhotovoltaicSystem(models.Model):
     building = models.ForeignKey('building.Building', on_delete=models.CASCADE, related_name='photovoltaic_systems')
     project = models.ForeignKey('project.Project', on_delete=models.CASCADE, related_name='photovoltaic_systems')
     
-    # Εγκατάσταση Φ/Β Συστήματος - Ποσότητα, Τιμή Μονάδας, Δαπάνη
-    # Φωτοβολταϊκά πλαίσια
     pv_panels_quantity = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
@@ -45,7 +43,6 @@ class PhotovoltaicSystem(models.Model):
         validators=[MinValueValidator(0)]
     )
     
-    # Μεταλλικές βάσεις στήριξης
     metal_bases_quantity = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
@@ -71,7 +68,6 @@ class PhotovoltaicSystem(models.Model):
         validators=[MinValueValidator(0)]
     )
     
-    # Σωληνώσεις κ.λπ.
     piping_quantity = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
@@ -97,7 +93,6 @@ class PhotovoltaicSystem(models.Model):
         validators=[MinValueValidator(0)]
     )
     
-    # Καλωδιώσεις
     wiring_quantity = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
@@ -122,8 +117,6 @@ class PhotovoltaicSystem(models.Model):
         verbose_name='Δαπάνη Καλωδιώσεων (€)',
         validators=[MinValueValidator(0)]
     )
-    
-    # Μετατροπέας ισχύος
     inverter_quantity = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
@@ -149,7 +142,6 @@ class PhotovoltaicSystem(models.Model):
         validators=[MinValueValidator(0)]
     )
     
-    # Μεταφορά, εγκατάσταση και θέση σε λειτουργία
     installation_quantity = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
@@ -175,7 +167,6 @@ class PhotovoltaicSystem(models.Model):
         validators=[MinValueValidator(0)]
     )
     
-    # Οικονομικοί Δείκτες
     estimated_cost = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
@@ -265,7 +256,6 @@ class PhotovoltaicSystem(models.Model):
         help_text='Αυτόματος υπολογισμός NPV με προεξοφλητικό συντελεστή'
     )
     
-    # Ενεργειακοί Δείκτες
     power_per_panel = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
@@ -327,7 +317,6 @@ class PhotovoltaicSystem(models.Model):
     class Meta:
         verbose_name = 'Εγκατάσταση Φωτοβολταϊκών'
         verbose_name_plural = 'Εγκαταστάσεις Φωτοβολταϊκών'
-        # Ensure one photovoltaic system per building
         unique_together = [['building', 'user']]
         
     def __str__(self):
@@ -370,7 +359,6 @@ class PhotovoltaicSystem(models.Model):
     def calculate_annual_savings(self):
         """Υπολογισμός ετήσιων εξοικονομήσεων βάσει της ετήσιας παραγωγής ενέργειας"""
         try:
-            # Default electricity cost per kWh in Greece (approx €0.15/kWh)
             electricity_cost_per_kwh = Decimal('0.15')
             
             annual_energy_kwh = float(self.annual_energy_production or 0)
@@ -414,7 +402,6 @@ class PhotovoltaicSystem(models.Model):
             if initial_investment <= 0:
                 return Decimal('0')
             
-            # Investment Return = (Annual Savings / Initial Investment) × 100
             roi_percentage = (annual_savings / initial_investment) * 100
             
             return round(Decimal(str(roi_percentage)), 2)
@@ -424,11 +411,10 @@ class PhotovoltaicSystem(models.Model):
     def calculate_net_present_value(self):
         """Υπολογισμός της Καθαρής Παρούσας Αξίας (NPV)"""
         try:
-            # Required values for NPV calculation
             initial_investment = float(self.net_cost or self.total_cost or 0)
             annual_savings = float(self.annual_savings or 0)
-            project_lifetime_years = 25  # Typical PV system lifetime
-            discount_rate = 0.05  # 5% default discount rate
+            project_lifetime_years = 25
+            discount_rate = 0.05
             
             if initial_investment <= 0 or annual_savings <= 0:
                 return 0
@@ -443,7 +429,6 @@ class PhotovoltaicSystem(models.Model):
     
     def save(self, *args, **kwargs):
         """Αυτόματος υπολογισμός οικονομικών δεικτών κατά την αποθήκευση"""
-        # Υπολογισμός κόστους για κάθε κατηγορία εξοπλισμού
         if self.pv_panels_quantity and self.pv_panels_unit_price:
             self.pv_panels_cost = self.pv_panels_quantity * self.pv_panels_unit_price
         
@@ -462,29 +447,23 @@ class PhotovoltaicSystem(models.Model):
         if self.installation_quantity and self.installation_unit_price:
             self.installation_cost = self.installation_quantity * self.installation_unit_price
         
-        # Υπολογισμός οικονομικών δεικτών
         self.estimated_cost = self.calculate_total_equipment_cost()
         self.unexpected_expenses = self.calculate_unexpected_expenses()
         self.value_after_unexpected = self.calculate_value_after_unexpected()
         self.tax_burden = self.calculate_tax_burden()
         self.total_cost = self.calculate_total_cost()
         
-        # Υπολογισμός καθαρού κόστους (συνολικό κόστος - επιδότηση)
         if self.total_cost and self.subsidy_amount:
             self.net_cost = self.total_cost - self.subsidy_amount
         elif self.total_cost:
             self.net_cost = self.total_cost
         
-        # Υπολογισμός ετήσιων εξοικονομήσεων
         self.annual_savings = self.calculate_annual_savings()
         
-        # Υπολογισμός περιόδου απόσβεσης
         self.payback_period = self.calculate_payback_period()
         
-        # Υπολογισμός απόδοσης επένδυσης
         self.investment_return = self.calculate_investment_return()
         
-        # Υπολογισμός NPV
         self.net_present_value = self.calculate_net_present_value()
         
         super().save(*args, **kwargs)

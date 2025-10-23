@@ -76,15 +76,13 @@ class AutomaticLightingControlSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """Δυναμικά multilingual validations"""
-        # Λήψη γλώσσας από το request context
         request = self.context.get('request')
-        language = 'el'  # Default Greek
+        language = 'el'
         if request and hasattr(request, 'META'):
             accept_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
             if 'en' in accept_language.lower():
                 language = 'en'
         
-        # Δυναμικά error messages - συγχρονισμένα με frontend translations
         error_messages = {
             'en': {
                 'lighting_area': "The field 'Lighting area' is required and must be greater than 0",
@@ -100,7 +98,6 @@ class AutomaticLightingControlSerializer(serializers.ModelSerializer):
         
         messages = error_messages.get(language, error_messages['el'])
         
-        # Validation logic με δυναμικά messages
         required_fields = ['lighting_area', 'cost_per_m2', 'lighting_energy_savings']
         
         for field in required_fields:

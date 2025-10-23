@@ -210,15 +210,15 @@ CORS_ALLOW_HEADERS = [
 
 AUTH_USER_MODEL = 'user.User'
 
+AUTHENTICATION_BACKENDS = [
+    'user.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',  # Για Token
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication', # Για JWT (αν χρησιμοποιείς SimpleJWT)
+        'rest_framework.authentication.TokenAuthentication',
     ],
-    # προαιρετικά
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.IsAuthenticated',
-    # ],
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

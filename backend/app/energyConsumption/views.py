@@ -17,7 +17,6 @@ class CreateEnergyConsumption(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-# Update an existing EnergyProfile identified by uuid
 class UpdateEnergyConsumption(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -27,7 +26,6 @@ class UpdateEnergyConsumption(APIView):
         except EnergyConsumption.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         
-        # Check permission - admin can update any, users can update only their own
         if not is_admin_user(request.user) and energy_profile.user != request.user:
             return Response({"detail": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
         
@@ -37,7 +35,6 @@ class UpdateEnergyConsumption(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-# Delete an EnergyProfile identified by uuid
 class DeleteEnergyConsumption(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -47,14 +44,12 @@ class DeleteEnergyConsumption(APIView):
         except EnergyConsumption.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         
-        # Check permission - admin can delete any, users can delete only their own
         if not is_admin_user(request.user) and energy_profile.user != request.user:
             return Response({"detail": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
         
         energy_profile.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
         
-# Retrieve all EnergyProfiles for a given building (by building uuid)
 class GetEnergyConsumptionByBuilding(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -68,16 +63,13 @@ class GetEnergyConsumptionByBuilding(APIView):
             return Response({"detail": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
             
         if is_admin_user(request.user):
-            # Admin can see all energy consumption profiles for the building
             profiles = EnergyConsumption.objects.filter(building_id=building_id)
         else:
-            # Regular users can only see their own energy consumption profiles
             profiles = EnergyConsumption.objects.filter(building_id=building_id, user=request.user)
             
         serializer = EnergyConsumptionSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
         
-# Retrieve EnergyProfiles by project (by project uuid)
 class GetEnergyConsumptionByProject(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -91,21 +83,17 @@ class GetEnergyConsumptionByProject(APIView):
             return Response({"detail": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
             
         if is_admin_user(request.user):
-            # Admin can see all energy consumption profiles for the project
             profiles = EnergyConsumption.objects.filter(project_id=project_id)
         else:
-            # Regular users can only see their own energy consumption profiles
             profiles = EnergyConsumption.objects.filter(project_id=project_id, user=request.user)
             
         serializer = EnergyConsumptionSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
         
-# Retrieve EnergyProfiles by user (by user uuid)
 class GetEnergyConsumptionByUser(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request, user_id):
-        # Only admin users can view other users' energy consumption profiles
         if str(request.user.uuid) != user_id and not is_admin_user(request.user):
             return Response({"detail": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
             
@@ -113,7 +101,6 @@ class GetEnergyConsumptionByUser(APIView):
         serializer = EnergyConsumptionSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
         
-# Retrieve a single EnergyProfile by its uuid
 class GetEnergyConsumptionByUUID(APIView):
     def get(self, request, uuid):
         try:

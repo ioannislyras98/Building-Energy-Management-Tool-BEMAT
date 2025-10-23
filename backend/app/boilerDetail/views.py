@@ -26,15 +26,12 @@ def create_boiler_detail(request):
     try:
         data = request.data
         
-        # Validate required fields
         if not data.get("building"):
             return standard_error_response("Building is required", status.HTTP_400_BAD_REQUEST)
         
-        # Validate building UUID
         if not validate_uuid(data.get("building")):
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check building exists and user has permission
         try:
             building = Building.objects.get(uuid=data.get("building"))
         except Building.DoesNotExist:
@@ -43,7 +40,6 @@ def create_boiler_detail(request):
         if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
         
-        # Check project exists and user has permission (if provided)
         project = None
         if data.get("project"):
             if not validate_uuid(data.get("project")):
@@ -56,7 +52,6 @@ def create_boiler_detail(request):
             except Project.DoesNotExist:
                 return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
         
-        # Create boiler detail
         boiler_detail = BoilerDetail.objects.create(
             building=building,
             project=project,
@@ -82,11 +77,9 @@ def create_boiler_detail(request):
 @permission_classes([IsAuthenticated])
 def get_building_boiler_details(request, building_uuid):
     try:
-        # Validate building UUID
         if not validate_uuid(building_uuid):
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check building exists and user has permission
         try:
             building = Building.objects.get(uuid=building_uuid)
         except Building.DoesNotExist:
@@ -95,7 +88,6 @@ def get_building_boiler_details(request, building_uuid):
         if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not have permission to view boiler details for this building", status.HTTP_403_FORBIDDEN)
         
-        # Get boiler details for building - Admin users see all, regular users see only their own
         if is_admin_user(request.user):
             boiler_details = BoilerDetail.objects.filter(building=building)
         else:
@@ -111,21 +103,17 @@ def get_building_boiler_details(request, building_uuid):
 @permission_classes([IsAuthenticated])
 def update_boiler_detail(request, boiler_uuid):
     try:
-        # Validate boiler UUID
         if not validate_uuid(boiler_uuid):
             return standard_error_response("Invalid boiler UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Get boiler detail
         try:
             boiler_detail = BoilerDetail.objects.get(uuid=boiler_uuid)
         except BoilerDetail.DoesNotExist:
             return standard_error_response("Boiler detail not found", status.HTTP_404_NOT_FOUND)
         
-        # Check user permission
         if not has_access_permission(request.user, boiler_detail):
             return standard_error_response("Access denied: You do not have permission to update this boiler detail", status.HTTP_403_FORBIDDEN)
         
-        # Update boiler detail
         serializer = BoilerDetailSerializer(
             boiler_detail, 
             data=request.data, 
@@ -145,21 +133,17 @@ def update_boiler_detail(request, boiler_uuid):
 @permission_classes([IsAuthenticated])
 def delete_boiler_detail(request, boiler_uuid):
     try:
-        # Validate boiler UUID
         if not validate_uuid(boiler_uuid):
             return standard_error_response("Invalid boiler UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Get boiler detail
         try:
             boiler_detail = BoilerDetail.objects.get(uuid=boiler_uuid)
         except BoilerDetail.DoesNotExist:
             return standard_error_response("Boiler detail not found", status.HTTP_404_NOT_FOUND)
         
-        # Check user permission
         if not has_access_permission(request.user, boiler_detail):
             return standard_error_response("Access denied: You do not have permission to delete this boiler detail", status.HTTP_403_FORBIDDEN)
         
-        # Delete boiler detail
         boiler_detail.delete()
         return standard_success_response("Boiler detail deleted successfully")
         

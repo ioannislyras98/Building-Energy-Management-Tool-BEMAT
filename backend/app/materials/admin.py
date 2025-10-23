@@ -27,6 +27,6 @@ class MaterialAdmin(admin.ModelAdmin):
     )
     
     def save_model(self, request, obj, form, change):
-        if not change:  # If creating new object
+        if not change:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)

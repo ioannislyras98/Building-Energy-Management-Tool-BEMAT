@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import CoolingSystem
 
-# Register your models here.
 @admin.register(CoolingSystem)
 class CoolingSystemAdmin(admin.ModelAdmin):
     list_display = [

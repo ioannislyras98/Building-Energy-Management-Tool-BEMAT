@@ -13,15 +13,12 @@ from .serializer import HotWaterUpgradeSerializer
 def create_hot_water_upgrade(request):
     """Create a new hot water upgrade system entry"""
     try:
-        # Check if an entry already exists for this building
         building_uuid = request.data.get('building')
         if building_uuid:
             existing = HotWaterUpgrade.objects.filter(building=building_uuid).first()
             if existing:
-                # Update existing entry
                 serializer = HotWaterUpgradeSerializer(existing, data=request.data, partial=True)
             else:
-                # Create new entry
                 serializer = HotWaterUpgradeSerializer(data=request.data)
         else:
             serializer = HotWaterUpgradeSerializer(data=request.data)

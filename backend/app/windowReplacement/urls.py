@@ -2,7 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Window Replacement URLs
     path('', views.WindowReplacementListView.as_view(), 
          name='window-replacements'),
     path('create/', views.WindowReplacementCreateView.as_view(), 

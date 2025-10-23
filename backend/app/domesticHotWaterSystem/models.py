@@ -19,7 +19,6 @@ class DomesticHotWaterSystem(models.Model):
         blank=True,
         verbose_name='Χρήστης'
     )
-    # New specific fields for domestic hot water system
     heating_system_type = models.CharField(
         max_length=255,
         verbose_name="Τύπος Συστήματος Θέρμανσης",
@@ -33,7 +32,6 @@ class DomesticHotWaterSystem(models.Model):
     storage_tank_state = models.CharField(max_length=255, null=True, blank=True)
     energy_metering_system = models.CharField(max_length=255, null=True, blank=True)
     
-    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

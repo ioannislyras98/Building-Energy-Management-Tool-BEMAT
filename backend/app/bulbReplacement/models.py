@@ -23,7 +23,6 @@ class BulbReplacement(models.Model):
         verbose_name="Έργο"
     )
     
-    # Old lighting system
     old_bulb_type = models.CharField(
         max_length=255,
         verbose_name="Τύπος παλαιού φορτίου",
@@ -49,7 +48,6 @@ class BulbReplacement(models.Model):
         blank=True
     )
     
-    # New lighting system
     new_bulb_type = models.CharField(
         max_length=255,
         verbose_name="Τύπος νέου φορτίου",
@@ -75,7 +73,6 @@ class BulbReplacement(models.Model):
         blank=True
     )
     
-    # Economic data
     cost_per_new_bulb = models.FloatField(
         verbose_name="Κόστος ανά νέο λαμπτήρα (€)",
         help_text="Κόστος αγοράς ενός νέου λαμπτήρα",
@@ -110,7 +107,6 @@ class BulbReplacement(models.Model):
         default=10
     )
     
-    # Calculated results - Energy Benefits
     energy_savings_kwh = models.FloatField(
         verbose_name="Ετήσια ενεργειακή εξοικονόμηση (kWh)",
         help_text="Ετήσια ενεργειακή εξοικονόμηση από την αντικατάσταση",
@@ -118,7 +114,6 @@ class BulbReplacement(models.Model):
         blank=True
     )
     
-    # Calculated results - Economic Benefits
     total_investment_cost = models.FloatField(
         verbose_name="Συνολικό κόστος επένδυσης (€)",
         help_text="Συνολικό κόστος αντικατάστασης λαμπτήρων",
@@ -150,7 +145,6 @@ class BulbReplacement(models.Model):
         blank=True
     )
     
-    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ημερομηνία δημιουργίας")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Ημερομηνία ενημέρωσης")
 
@@ -167,11 +161,9 @@ class BulbReplacement(models.Model):
         """
         Override save to calculate energy and economic benefits automatically
         """
-        # Auto-populate user if not set
         if not self.user_id and hasattr(self, '_user'):
             self.user = self._user
             
-        # Calculate consumption and benefits
         self.calculate_consumption()
         self.calculate_energy_savings()
         self.calculate_economic_benefits()
@@ -199,21 +191,17 @@ class BulbReplacement(models.Model):
         """
         Calculate economic benefits and financial metrics
         """
-        # Calculate total investment cost
         if self.new_bulb_count and self.cost_per_new_bulb:
             bulb_cost = self.new_bulb_count * self.cost_per_new_bulb
             installation_cost = self.installation_cost or 0
             self.total_investment_cost = bulb_cost + installation_cost
             
-        # Calculate annual cost savings
         if self.energy_savings_kwh and self.energy_cost_kwh:
             self.annual_cost_savings = self.energy_savings_kwh * self.energy_cost_kwh
             
-        # Calculate payback period
         if self.annual_cost_savings and self.total_investment_cost and self.annual_cost_savings > 0:
             self.payback_period = self.total_investment_cost / self.annual_cost_savings
             
-            # Calculate NPV (simplified calculation with 5% discount rate)
             discount_rate = 0.05
             years = self.lifespan_years or 10
             annual_net_savings = self.annual_cost_savings - (self.maintenance_cost_annual or 0)

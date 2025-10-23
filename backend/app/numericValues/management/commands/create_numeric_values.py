@@ -9,7 +9,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         User = get_user_model()
         
-        # Βρες τον πρώτο superuser για να τον ορίσεις ως created_by
         admin_user = User.objects.filter(is_superuser=True).first()
         if not admin_user:
             admin_user = User.objects.filter(is_staff=True).first()
@@ -22,7 +21,6 @@ class Command(BaseCommand):
             )
             return
 
-        # Numeric value data
         numeric_value_data = [
             {
                 'name': 'Εσωτερική Οροφής (Rsi)',

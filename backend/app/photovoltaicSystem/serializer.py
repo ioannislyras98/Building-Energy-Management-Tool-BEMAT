@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import PhotovoltaicSystem
 
 class PhotovoltaicSystemSerializer(serializers.ModelSerializer):
-    # Calculated fields (read-only)
+    
     total_equipment_cost = serializers.SerializerMethodField()
     calculated_unexpected_expenses = serializers.SerializerMethodField()
     calculated_value_after_unexpected = serializers.SerializerMethodField()
@@ -13,7 +13,6 @@ class PhotovoltaicSystemSerializer(serializers.ModelSerializer):
     calculated_investment_return = serializers.SerializerMethodField()
     calculated_net_present_value = serializers.SerializerMethodField()
     
-    # Related fields
     building_name = serializers.CharField(source='building.name', read_only=True)
     project_name = serializers.CharField(source='project.name', read_only=True)
     user_name = serializers.CharField(source='user.username', read_only=True)
@@ -29,37 +28,30 @@ class PhotovoltaicSystemSerializer(serializers.ModelSerializer):
             'building_name',
             'project_name',
             
-            # Εξοπλισμός - Φωτοβολταϊκά πλαίσια
             'pv_panels_quantity',
             'pv_panels_unit_price',
             'pv_panels_cost',
             
-            # Μεταλλικές βάσεις στήριξης
             'metal_bases_quantity',
             'metal_bases_unit_price',
             'metal_bases_cost',
             
-            # Σωληνώσεις
             'piping_quantity',
             'piping_unit_price',
             'piping_cost',
             
-            # Καλωδιώσεις
             'wiring_quantity',
             'wiring_unit_price',
             'wiring_cost',
             
-            # Μετατροπέας ισχύος
             'inverter_quantity',
             'inverter_unit_price',
             'inverter_cost',
             
-            # Εγκατάσταση
             'installation_quantity',
             'installation_unit_price',
             'installation_cost',
             
-            # Οικονομικοί Δείκτες
             'estimated_cost',
             'unexpected_expenses',
             'value_after_unexpected',
@@ -72,7 +64,6 @@ class PhotovoltaicSystemSerializer(serializers.ModelSerializer):
             'annual_savings',
             'investment_return',
             
-            # Ενεργειακοί Δείκτες
             'power_per_panel',
             'collector_efficiency',
             'installation_angle',
@@ -81,7 +72,6 @@ class PhotovoltaicSystemSerializer(serializers.ModelSerializer):
             'annual_energy_production',
             'carbon_footprint_reduction',
             
-            # Calculated fields
             'total_equipment_cost',
             'calculated_unexpected_expenses',
             'calculated_value_after_unexpected',
@@ -143,34 +133,26 @@ class PhotovoltaicSystemCreateSerializer(serializers.ModelSerializer):
             'building',
             'project',
             
-            # Εξοπλισμός - Φωτοβολταϊκά πλαίσια
             'pv_panels_quantity',
             'pv_panels_unit_price',
             
-            # Μεταλλικές βάσεις στήριξης
             'metal_bases_quantity',
             'metal_bases_unit_price',
             
-            # Σωληνώσεις
             'piping_quantity',
             'piping_unit_price',
             
-            # Καλωδιώσεις
             'wiring_quantity',
             'wiring_unit_price',
             
-            # Μετατροπέας ισχύος
             'inverter_quantity',
             'inverter_unit_price',
             
-            # Εγκατάσταση
             'installation_quantity',
             'installation_unit_price',
             
-            # Οικονομικοί Δείκτες (αυτά που μπορεί να εισάγει ο χρήστης)
             'subsidy_amount',
             
-            # Ενεργειακοί Δείκτες
             'power_per_panel',
             'collector_efficiency',
             'installation_angle',
@@ -182,7 +164,6 @@ class PhotovoltaicSystemCreateSerializer(serializers.ModelSerializer):
     
     def validate(self, data):
         """Επικύρωση δεδομένων"""
-        # Έλεγχος ότι building και project ανήκουν στον ίδιο χρήστη
         if 'building' in data and 'project' in data:
             if data['building'].project != data['project']:
                 raise serializers.ValidationError(

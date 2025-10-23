@@ -16,7 +16,6 @@ class BoilerReplacement(models.Model):
         related_name='boiler_replacements'
     )
     
-    # Στοιχεία Νέου Λέβητα
     boiler_power = models.FloatField(
         verbose_name="Ισχύς λέβητα (kW)",
         validators=[MinValueValidator(0.1)],
@@ -46,7 +45,6 @@ class BoilerReplacement(models.Model):
         help_text="Ετήσιο κόστος συντήρησης του νέου λέβητα"
     )
     
-    # Ενεργειακά Στοιχεία
     heating_energy_savings = models.FloatField(
         verbose_name="Εξοικονόμηση ενέργειας θέρμανσης (kWh/έτος)",
         validators=[MinValueValidator(0)],
@@ -61,7 +59,6 @@ class BoilerReplacement(models.Model):
         help_text="Τιμή ενέργειας ανά kWh"
     )
     
-    # Παράμετροι Αξιολόγησης
     time_period = models.IntegerField(
         verbose_name="Χρονικό διάστημα (έτη)",
         default=20,
@@ -77,7 +74,6 @@ class BoilerReplacement(models.Model):
         help_text="Προεξοφλητικός συντελεστής για υπολογισμό NPV"
     )
     
-    # Υπολογιζόμενα Πεδία
     total_investment_cost = models.DecimalField(
         max_digits=12,
         decimal_places=2,
@@ -141,22 +137,18 @@ class BoilerReplacement(models.Model):
     def _calculate_economics(self):
         """Υπολογισμός οικονομικών δεικτών"""
         try:
-            # Συνολικό κόστος επένδυσης
             self.total_investment_cost = (
                 float(self.boiler_cost) + float(self.installation_cost)
             )
             
-            # Ετήσια ενεργειακή εξοικονόμηση
             self.annual_energy_savings = (
                 float(self.heating_energy_savings) * float(self.energy_cost_kwh)
             )
             
-            # Ετήσιο οικονομικό όφελος
             self.annual_economic_benefit = (
                 float(self.annual_energy_savings) - float(self.maintenance_cost)
             )
             
-            # Περίοδος αποπληρωμής
             if float(self.annual_economic_benefit) > 0:
                 self.payback_period = (
                     float(self.total_investment_cost) / float(self.annual_economic_benefit)
@@ -186,7 +178,7 @@ class BoilerReplacement(models.Model):
                 self.internal_rate_of_return = 0
                 
         except (ValueError, TypeError, ZeroDivisionError):
-            # Σε περίπτωση σφάλματος, μηδενίζουμε τα υπολογιζόμενα πεδία
+            # Σε περίπτωση σφάλματος
             self.total_investment_cost = 0
             self.annual_energy_savings = 0
             self.annual_economic_benefit = 0

@@ -12,7 +12,6 @@ class ExteriorBlinds(models.Model):
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='exterior_blinds')
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='exterior_blinds')
     
-    # Οικονομικά στοιχεία
     window_area = models.FloatField(
         verbose_name="Επιφάνεια παραθύρων (m²)",
         validators=[MinValueValidator(0.1)],
@@ -38,8 +37,6 @@ class ExteriorBlinds(models.Model):
         default=0,
         help_text="Ετήσιο κόστος συντήρησης των περσίδων"
     )
-    
-    # Ενεργειακά στοιχεία
     cooling_energy_savings = models.FloatField(
         verbose_name="Εξοικονόμηση ενέργειας ψύξης (kWh/έτος)",
         validators=[MinValueValidator(0)],
@@ -53,7 +50,6 @@ class ExteriorBlinds(models.Model):
         help_text="Κόστος ενέργειας σε ευρώ ανά kWh"
     )
     
-    # Οικονομικοί παράμετροι
     time_period = models.IntegerField(
         verbose_name="Χρονικό διάστημα (έτη)",
         validators=[MinValueValidator(1), MaxValueValidator(50)],
@@ -68,7 +64,6 @@ class ExteriorBlinds(models.Model):
         help_text="Προεξοφλητικός συντελεστής για τον υπολογισμό NPV"
     )
     
-    # Αυτόματοι υπολογισμοί (read-only)
     total_investment_cost = models.FloatField(
         verbose_name="Συνολικό κόστος επένδυσης (€)",
         blank=True,
@@ -125,22 +120,17 @@ class ExteriorBlinds(models.Model):
     def _calculate_economics(self):
         """Υπολογισμός οικονομικών δεικτών"""
         try:
-            # Συνολικό κόστος επένδυσης
             self.total_investment_cost = (self.window_area * self.cost_per_m2) + self.installation_cost
             
-            # Ετήσια ενεργειακή εξοικονόμηση σε ευρώ
             self.annual_energy_savings = self.cooling_energy_savings * self.energy_cost_kwh
             
-            # Ετήσιο οικονομικό όφελος (εξοικονόμηση - συντήρηση)
             self.annual_economic_benefit = self.annual_energy_savings - self.maintenance_cost
             
-            # Περίοδος αποπληρωμής
             if self.annual_economic_benefit > 0:
                 self.payback_period = self.total_investment_cost / self.annual_economic_benefit
             else:
                 self.payback_period = None
             
-            # NPV υπολογισμός
             if self.annual_economic_benefit > 0 and self.discount_rate > 0:
                 discount_factor = self.discount_rate / 100
                 npv = 0
@@ -150,14 +140,12 @@ class ExteriorBlinds(models.Model):
             else:
                 self.net_present_value = -self.total_investment_cost
             
-            # IRR απλοποιημένος υπολογισμός
             if self.total_investment_cost > 0:
                 self.internal_rate_of_return = (self.annual_economic_benefit / self.total_investment_cost) * 100
             else:
                 self.internal_rate_of_return = 0
                 
         except (ValueError, TypeError, ZeroDivisionError):
-            # Σε περίπτωση σφάλματος, θέτουμε τις τιμές σε None
             self.total_investment_cost = None
             self.annual_energy_savings = None
             self.annual_economic_benefit = None

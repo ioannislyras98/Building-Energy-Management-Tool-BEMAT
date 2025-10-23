@@ -24,7 +24,6 @@ def create_natural_gas_network(request):
     try:
         data = request.data.copy()
         
-        # Get building
         building_id = data.get('building')
         if not building_id:
             return Response({
@@ -34,21 +33,17 @@ def create_natural_gas_network(request):
         
         building = get_object_or_404(Building, uuid=building_id)
         
-        # Get project if provided
         project = None
         project_id = data.get('project')
         if project_id:
             project = get_object_or_404(Project, uuid=project_id)
         
-        # Create or update natural gas network
         with transaction.atomic():
-            # Calculate current energy cost from building's energy consumptions
             total_annual_cost = 0
             energy_consumptions = EnergyConsumption.objects.filter(building=building)
             if energy_consumptions.exists():
-                # Get project's cost rates
-                electricity_cost_per_kwh = 0.15  # Default fallback
-                fuel_cost_per_kwh = 0.10  # Default fallback for gas/fuel
+                electricity_cost_per_kwh = 0.15
+                fuel_cost_per_kwh = 0.10
                 
                 if project:
                     if project.cost_per_kwh_electricity:
@@ -56,39 +51,31 @@ def create_natural_gas_network(request):
                     if project.cost_per_kwh_fuel:
                         fuel_cost_per_kwh = float(project.cost_per_kwh_fuel)
                 elif building.project:
-                    # Use building's project if no project provided
                     if building.project.cost_per_kwh_electricity:
                         electricity_cost_per_kwh = float(building.project.cost_per_kwh_electricity)
                     if building.project.cost_per_kwh_fuel:
                         fuel_cost_per_kwh = float(building.project.cost_per_kwh_fuel)
                 
-                # Calculate total annual energy cost based on energy source
                 for consumption in energy_consumptions:
                     kwh_equivalent = float(consumption.kwh_equivalent or 0)
                     
-                    # Use appropriate cost rate based on energy source
                     if consumption.energy_source == 'electricity':
                         cost_per_kwh = electricity_cost_per_kwh
                     else:
-                        # For natural gas, heating oil, biomass use fuel cost
                         cost_per_kwh = fuel_cost_per_kwh
                     
                     total_annual_cost += kwh_equivalent * cost_per_kwh
             
-            # Set the calculated current energy cost if not provided
             if 'current_energy_cost_per_year' not in data or not data['current_energy_cost_per_year']:
                 data['current_energy_cost_per_year'] = round(total_annual_cost, 2)
             
-            # Check if natural gas network already exists for this building
             existing_network = NaturalGasNetwork.objects.filter(building=building).first()
             
-            # Update data to use the actual building and project primary keys
-            data['building'] = building.pk  # Use pk which works for both ID and UUID
+            data['building'] = building.pk
             if project:
                 data['project'] = project.pk
             
             if existing_network:
-                # Update existing
                 serializer = NaturalGasNetworkSerializer(existing_network, data=data, partial=True)
                 if serializer.is_valid():
                     network = serializer.save()
@@ -105,7 +92,6 @@ def create_natural_gas_network(request):
                         'details': serializer.errors
                     }, status=status.HTTP_400_BAD_REQUEST)
             else:
-                # Create new
                 serializer = NaturalGasNetworkSerializer(data=data)
                 if serializer.is_valid():
                     network = serializer.save()
@@ -147,24 +133,20 @@ def get_natural_gas_networks_by_building(request, building_uuid):
             }, status=status.HTTP_403_FORBIDDEN)
         
         if is_admin_user(request.user):
-            # Admin can see all natural gas networks for the building
             networks = NaturalGasNetwork.objects.filter(building=building).order_by('-created_at')
         else:
-            # Regular users can only see their own natural gas networks
             networks = NaturalGasNetwork.objects.filter(building=building, user=request.user).order_by('-created_at')
         
         if networks.exists():
             serializer = NaturalGasNetworkSerializer(networks, many=True)
             data = serializer.data
             
-            # Calculate current energy cost from building's energy consumptions
             energy_consumptions = EnergyConsumption.objects.filter(building=building)
             if energy_consumptions.exists():
                 total_annual_cost = 0
-                # Get project's cost rates
                 project = building.project
-                electricity_cost_per_kwh = 0.15  # Default fallback
-                fuel_cost_per_kwh = 0.10  # Default fallback for gas/fuel
+                electricity_cost_per_kwh = 0.15
+                fuel_cost_per_kwh = 0.10
                 
                 if project:
                     if project.cost_per_kwh_electricity:
@@ -172,23 +154,18 @@ def get_natural_gas_networks_by_building(request, building_uuid):
                     if project.cost_per_kwh_fuel:
                         fuel_cost_per_kwh = float(project.cost_per_kwh_fuel)
                 
-                # Calculate total annual energy cost based on energy source
                 for consumption in energy_consumptions:
                     kwh_equivalent = float(consumption.kwh_equivalent or 0)
                     
-                    # Use appropriate cost rate based on energy source
                     if consumption.energy_source == 'electricity':
                         cost_per_kwh = electricity_cost_per_kwh
                     else:
-                        # For natural gas, heating oil, biomass use fuel cost
                         cost_per_kwh = fuel_cost_per_kwh
                     
                     total_annual_cost += kwh_equivalent * cost_per_kwh
                 
-                # Update the current_energy_cost_per_year in the response data
                 for item in data:
                     item['current_energy_cost_per_year'] = round(total_annual_cost, 2)
-                    # If natural_gas_cost_per_year is not set, try to calculate it
                     if not item.get('natural_gas_cost_per_year'):
                         network_obj = networks.filter(id=item['id']).first()
                         if network_obj:
@@ -201,14 +178,12 @@ def get_natural_gas_networks_by_building(request, building_uuid):
                 'count': networks.count()
             }, status=status.HTTP_200_OK)
         else:
-            # Even if no networks exist, calculate current energy cost for the building
             total_annual_cost = 0
             energy_consumptions = EnergyConsumption.objects.filter(building=building)
             if energy_consumptions.exists():
-                # Get project's cost rates
                 project = building.project
-                electricity_cost_per_kwh = 0.15  # Default fallback
-                fuel_cost_per_kwh = 0.10  # Default fallback for gas/fuel
+                electricity_cost_per_kwh = 0.15
+                fuel_cost_per_kwh = 0.10 
                 
                 if project:
                     if project.cost_per_kwh_electricity:
@@ -216,15 +191,12 @@ def get_natural_gas_networks_by_building(request, building_uuid):
                     if project.cost_per_kwh_fuel:
                         fuel_cost_per_kwh = float(project.cost_per_kwh_fuel)
                 
-                # Calculate total annual energy cost based on energy source
                 for consumption in energy_consumptions:
                     kwh_equivalent = float(consumption.kwh_equivalent or 0)
                     
-                    # Use appropriate cost rate based on energy source
                     if consumption.energy_source == 'electricity':
                         cost_per_kwh = electricity_cost_per_kwh
                     else:
-                        # For natural gas, heating oil, biomass use fuel cost
                         cost_per_kwh = fuel_cost_per_kwh
                     
                     total_annual_cost += kwh_equivalent * cost_per_kwh
@@ -341,7 +313,6 @@ def get_all_natural_gas_networks(request):
     try:
         networks = NaturalGasNetwork.objects.all().order_by('-created_at')
         
-        # Apply filters if provided
         building_id = request.GET.get('building')
         project_id = request.GET.get('project')
         

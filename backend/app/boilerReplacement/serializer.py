@@ -3,7 +3,6 @@ from .models import BoilerReplacement
 
 
 class BoilerReplacementSerializer(serializers.ModelSerializer):
-    # Υπολογιζόμενα πεδία ως read-only
     total_investment_cost = serializers.DecimalField(
         max_digits=12, 
         decimal_places=2, 
@@ -76,15 +75,13 @@ class BoilerReplacementSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """Δυναμικά multilingual validations"""
-        # Λήψη γλώσσας από το request context
         request = self.context.get('request')
-        language = 'el'  # Default Greek
+        language = 'el'  
         if request and hasattr(request, 'META'):
             accept_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
             if 'en' in accept_language.lower():
                 language = 'en'
         
-        # Δυναμικά error messages - συγχρονισμένα με frontend translations
         error_messages = {
             'en': {
                 'boiler_power': "The field 'Boiler power' is required and must be greater than 0",
@@ -100,7 +97,6 @@ class BoilerReplacementSerializer(serializers.ModelSerializer):
         
         messages = error_messages.get(language, error_messages['el'])
         
-        # Validation logic με δυναμικά messages
         required_fields = ['boiler_power', 'boiler_cost', 'heating_energy_savings']
         
         for field in required_fields:

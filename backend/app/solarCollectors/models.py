@@ -20,7 +20,6 @@ class SolarCollector(models.Model):
         verbose_name='Χρήστης'
     )
     
-    # Specific fields for solar collectors
     solar_collector_usage = models.CharField(
         max_length=255,
         blank=True,
@@ -88,7 +87,6 @@ class SolarCollector(models.Model):
         help_text='Αυτόματος υπολογισμός NPV με προεξοφλητικό συντελεστή'
     )
     
-    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

@@ -9,7 +9,6 @@ from .models import Project
 def bulk_delete_projects(modeladmin, request, queryset):
     """Custom bulk delete action with confirmation page."""
     if request.POST.get('confirm_delete'):
-        # Perform the actual deletion
         with transaction.atomic():
             count = queryset.count()
             project_names = list(queryset.values_list('name', flat=True))
@@ -22,7 +21,6 @@ def bulk_delete_projects(modeladmin, request, queryset):
         )
         return HttpResponseRedirect(request.get_full_path())
     
-    # Show confirmation page
     context = {
         'queryset': queryset,
         'projects_count': queryset.count(),

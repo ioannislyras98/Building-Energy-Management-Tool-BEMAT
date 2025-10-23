@@ -53,6 +53,6 @@ class ExteriorBlindsAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         """Προσθήκη επιπλέον readonly πεδίων για υπάρχοντα αντικείμενα"""
         readonly = list(self.readonly_fields)
-        if obj:  # Αν επεξεργαζόμαστε υπάρχον αντικείμενο
+        if obj:
             readonly.extend(['building', 'project'])
         return readonly

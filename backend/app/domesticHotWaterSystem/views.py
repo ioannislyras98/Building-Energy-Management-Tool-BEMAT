@@ -28,15 +28,12 @@ def create_domestic_hot_water_system(request):
     try:
         data = request.data
         
-        # Validate required fields
         if not data.get("building"):
             return standard_error_response("Building is required", status.HTTP_400_BAD_REQUEST)
         
-        # Validate building UUID
         if not validate_uuid(data.get("building")):
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check building exists and user has permission
         try:
             building = Building.objects.get(uuid=data.get("building"))
         except Building.DoesNotExist:
@@ -45,7 +42,6 @@ def create_domestic_hot_water_system(request):
         if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
         
-        # Check project exists and user has permission (if provided)
         project = None
         if data.get("project"):
             if not validate_uuid(data.get("project")):
@@ -58,7 +54,6 @@ def create_domestic_hot_water_system(request):
             except Project.DoesNotExist:
                 return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
         
-        # Create domestic hot water system
         domestic_hot_water_system = DomesticHotWaterSystem.objects.create(
             building=building,
             project=project,
@@ -82,11 +77,9 @@ def create_domestic_hot_water_system(request):
 @permission_classes([IsAuthenticated])
 def get_building_domestic_hot_water_systems(request, building_uuid):
     try:
-        # Validate building UUID
         if not validate_uuid(building_uuid):
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check building exists and user has permission
         try:
             building = Building.objects.get(uuid=building_uuid)
         except Building.DoesNotExist:
@@ -95,7 +88,6 @@ def get_building_domestic_hot_water_systems(request, building_uuid):
         if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not have permission to view systems for this building", status.HTTP_403_FORBIDDEN)
         
-        # Get domestic hot water systems for building - Admin users see all, regular users see only their own
         if is_admin_user(request.user):
             domestic_hot_water_systems = DomesticHotWaterSystem.objects.filter(building=building)
         else:
@@ -111,21 +103,17 @@ def get_building_domestic_hot_water_systems(request, building_uuid):
 @permission_classes([IsAuthenticated])
 def update_domestic_hot_water_system(request, system_uuid):
     try:
-        # Validate system UUID
         if not validate_uuid(system_uuid):
             return standard_error_response("Invalid system UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Get domestic hot water system
         try:
             domestic_hot_water_system = DomesticHotWaterSystem.objects.get(uuid=system_uuid)
         except DomesticHotWaterSystem.DoesNotExist:
             return standard_error_response("Domestic hot water system not found", status.HTTP_404_NOT_FOUND)
         
-        # Check user permission
         if not has_access_permission(request.user, domestic_hot_water_system):
             return standard_error_response("Access denied: You do not have permission to update this system", status.HTTP_403_FORBIDDEN)
         
-        # Update system
         serializer = DomesticHotWaterSystemSerializer(
             domestic_hot_water_system, 
             data=request.data, 
@@ -145,21 +133,17 @@ def update_domestic_hot_water_system(request, system_uuid):
 @permission_classes([IsAuthenticated])
 def delete_domestic_hot_water_system(request, system_uuid):
     try:
-        # Validate system UUID
         if not validate_uuid(system_uuid):
             return standard_error_response("Invalid system UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Get domestic hot water system
         try:
             domestic_hot_water_system = DomesticHotWaterSystem.objects.get(uuid=system_uuid)
         except DomesticHotWaterSystem.DoesNotExist:
             return standard_error_response("Domestic hot water system not found", status.HTTP_404_NOT_FOUND)
         
-        # Check user permission
         if not has_access_permission(request.user, domestic_hot_water_system):
             return standard_error_response("Access denied: You do not have permission to delete this system", status.HTTP_403_FORBIDDEN)
         
-        # Delete system
         domestic_hot_water_system.delete()
         return standard_success_response("Domestic hot water system deleted successfully")
         

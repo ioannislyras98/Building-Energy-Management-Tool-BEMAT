@@ -6,9 +6,7 @@ class Command(BaseCommand):
     help = 'Populate the prefectures table with initial data'
 
     def handle(self, *args, **options):
-        # Prefecture data with zones and estimated temperatures
         prefecture_data = [
-            # Zone A
             {'name': 'Ηρακλείου', 'zone': 'A', 'temperature_winter': 12.5, 'temperature_summer': 26.8},
             {'name': 'Χανίων', 'zone': 'A', 'temperature_winter': 12.2, 'temperature_summer': 26.5},
             {'name': 'Ρεθύμνου', 'zone': 'A', 'temperature_winter': 12.8, 'temperature_summer': 26.9},
@@ -24,7 +22,6 @@ class Command(BaseCommand):
             {'name': 'Αχαΐας', 'zone': 'A', 'temperature_winter': 12.3, 'temperature_summer': 26.1},
             {'name': 'Ηλείας', 'zone': 'A', 'temperature_winter': 12.5, 'temperature_summer': 26.8},
             
-            # Zone B
             {'name': 'Αιτωλοακαρνανίας', 'zone': 'B', 'temperature_winter': 9.8, 'temperature_summer': 25.5},
             {'name': 'Φθιώτιδας', 'zone': 'B', 'temperature_winter': 9.2, 'temperature_summer': 25.1},
             {'name': 'Φωκίδας', 'zone': 'B', 'temperature_winter': 8.9, 'temperature_summer': 24.8},
@@ -47,7 +44,6 @@ class Command(BaseCommand):
             {'name': 'Πέλλας', 'zone': 'B', 'temperature_winter': 8.3, 'temperature_summer': 24.8},
             {'name': 'Αττικής', 'zone': 'B', 'temperature_winter': 11.8, 'temperature_summer': 27.2},
             
-            # Zone C
             {'name': 'Θεσσαλονίκης', 'zone': 'C', 'temperature_winter': 7.5, 'temperature_summer': 23.8},
             {'name': 'Κιλκίς', 'zone': 'C', 'temperature_winter': 6.8, 'temperature_summer': 23.2},
             {'name': 'Χαλκιδικής', 'zone': 'C', 'temperature_winter': 8.2, 'temperature_summer': 24.5},
@@ -57,7 +53,6 @@ class Command(BaseCommand):
             {'name': 'Ροδόπης', 'zone': 'C', 'temperature_winter': 7.5, 'temperature_summer': 24.1},
             {'name': 'Έβρου', 'zone': 'C', 'temperature_winter': 7.1, 'temperature_summer': 23.8},
             
-            # Zone D
             {'name': 'Γρεβενών', 'zone': 'D', 'temperature_winter': 5.2, 'temperature_summer': 22.5},
             {'name': 'Κοζάνης', 'zone': 'D', 'temperature_winter': 5.8, 'temperature_summer': 22.8},
             {'name': 'Καστοριάς', 'zone': 'D', 'temperature_winter': 4.5, 'temperature_summer': 22.1},

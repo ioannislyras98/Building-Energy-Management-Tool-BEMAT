@@ -23,7 +23,6 @@ class NumericValue(models.Model):
         help_text="Αριθμητική τιμή"
     )
     
-    # Standard fields
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Δημιουργήθηκε")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Ενημερώθηκε")
     created_by = models.ForeignKey(
@@ -49,7 +48,6 @@ class NumericValue(models.Model):
             numeric_value = cls.objects.get(name=name)
             return numeric_value.value
         except cls.DoesNotExist:
-            # Default values αν δεν βρεθεί στη βάση
             defaults = {
                 'Εσωτερική Οροφής (Rsi)': 0.10,
                 'Εσωτερική Τοίχου (Rsi)': 0.13,
@@ -76,7 +74,6 @@ def create_default_numeric_values():
     
     User = get_user_model()
     try:
-        # Βρες τον πρώτο superuser ή δημιούργησε έναν default user
         admin_user = User.objects.filter(is_superuser=True).first()
         if not admin_user:
             admin_user = User.objects.filter(is_staff=True).first()
@@ -90,7 +87,6 @@ def create_default_numeric_values():
         print(f"Error finding user: {e}")
         return
 
-    # Προεπιλεγμένες αριθμητικές τιμές
     default_values = [
         {
             'name': 'Εσωτερική Οροφής (Rsi)',
@@ -109,7 +105,6 @@ def create_default_numeric_values():
         },
     ]
 
-    # Δημιούργησε τις εγγραφές αν δεν υπάρχουν ήδη
     for value_data in default_values:
         NumericValue.objects.get_or_create(
             name=value_data['name'],

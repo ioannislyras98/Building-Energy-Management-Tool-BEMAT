@@ -2,7 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Material URLs
     path('', views.MaterialListCreateView.as_view(), name='materials'),
     path('<uuid:uuid>/', views.MaterialDetailView.as_view(), name='material-detail'),
     path('category/<str:category>/', views.get_materials_by_category, name='materials-by-category'),

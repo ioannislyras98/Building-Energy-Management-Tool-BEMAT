@@ -79,7 +79,6 @@ class ExternalWallThermalInsulationSerializer(serializers.ModelSerializer):
             return 0
 
     def create(self, validated_data):
-        # Set user to current user
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
 

@@ -10,7 +10,6 @@ from building.models import Building
 from django.shortcuts import get_object_or_404
 from common.utils import is_admin_user, has_access_permission
 
-# Create your views here.
 
 class ContactListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -24,31 +23,24 @@ class ContactListCreateView(generics.ListCreateAPIView):
         building_uuid = self.kwargs.get('building_uuid')
         building = get_object_or_404(Building, uuid=building_uuid)
         
-        # Check if user has access permission to the building
         if not has_access_permission(self.request.user, building):
-            return Contact.objects.none() # Return empty queryset if no permission
+            return Contact.objects.none() 
             
         if is_admin_user(self.request.user):
-            # Admin can see all contacts for the building
             return Contact.objects.filter(building=building)
         else:
-            # Regular users can only see contacts they created
             return Contact.objects.filter(building=building, user=self.request.user)
 
     def perform_create(self, serializer):
         building_uuid = self.kwargs.get('building_uuid')
         building = get_object_or_404(Building, uuid=building_uuid)
         
-        # Check if user has access permission to create contact for this building
         if not has_access_permission(self.request.user, building):
             return Response({"error": "You do not have permission to add a contact to this building."},
                             status=status.HTTP_403_FORBIDDEN)
                             
         serializer.save(building=building, user=self.request.user)
 
-# Προς το παρόν, το frontend καλεί ένα συγκεκριμένο /create/ endpoint.
-# Θα μπορούσαμε να το ενσωματώσουμε στο παραπάνω view ή να έχουμε ένα ξεχωριστό.
-# Για συμβατότητα με το frontend, ας φτιάξουμε ένα view που χειρίζεται το POST στο /create/
 
 class ContactCreateForBuildingView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -58,7 +50,6 @@ class ContactCreateForBuildingView(generics.CreateAPIView):
         building_uuid = self.kwargs.get('building_uuid')
         building = get_object_or_404(Building, uuid=building_uuid)
 
-        # Admin users can add contacts to any building, regular users only their own
         if not has_access_permission(request.user, building):
             return Response(
                 {"error": "You don't have permission to add contacts to this building."},
@@ -68,45 +59,36 @@ class ContactCreateForBuildingView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         contact = serializer.save(building=building)
-        # Επιστροφή του πλήρους ContactSerializer για να έχει το frontend όλα τα δεδομένα
         return Response(ContactSerializer(contact).data, status=status.HTTP_201_CREATED)
 
-# Προαιρετικά: Views για Retrieve, Update, Delete μιας επαφής
+
 class ContactDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ContactSerializer
     queryset = Contact.objects.all()
-    lookup_field = 'uuid' # ή pk αν χρησιμοποιείτε ID
+    lookup_field = 'uuid'
 
     def get_queryset(self):
-        # Admin users can access all contacts, regular users only their own (via building's project)
         if is_admin_user(self.request.user):
             return Contact.objects.all()
         return Contact.objects.filter(building__project__user=self.request.user)
 
+
 class ContactDeleteView(APIView):
-    """
-    View for deleting a contact associated with a building.
-    """
     permission_classes = [IsAuthenticated]
     
     def delete(self, request, building_uuid, contact_uuid, *args, **kwargs):
         try:
-            # Verify the building exists
             building = Building.objects.get(uuid=building_uuid)
             
-            # Check building access permission
             if not has_access_permission(request.user, building):
                 return Response({"error": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
             
-            # Find the contact that belongs to this building
             contact = Contact.objects.get(uuid=contact_uuid, building=building)
             
-            # Check if user can delete this contact (admin or owner)
             if not is_admin_user(request.user) and contact.user != request.user:
                 return Response({"error": "Access denied - you can only delete your own contacts."}, status=status.HTTP_403_FORBIDDEN)
             
-            # Perform deletion
             contact.delete()
             return Response({"message": "Contact deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
         except Building.DoesNotExist:
@@ -114,26 +96,22 @@ class ContactDeleteView(APIView):
         except Contact.DoesNotExist:
             return Response({"error": "Contact not found."}, status=status.HTTP_404_NOT_FOUND)
 
+
 class ContactUpdateView(APIView):
     permission_classes = [IsAuthenticated]
     
     def put(self, request, building_uuid, contact_uuid, format=None):
         try:
-            # Verify building exists
             building = Building.objects.get(uuid=building_uuid)
             
-            # Check building access permission
             if not has_access_permission(request.user, building):
                 return Response({"error": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
             
-            # Get the contact that belongs to this building
             contact = Contact.objects.get(uuid=contact_uuid, building=building)
             
-            # Check if user can update this contact (admin or owner)
             if not is_admin_user(request.user) and contact.user != request.user:
                 return Response({"error": "Access denied - you can only update your own contacts."}, status=status.HTTP_403_FORBIDDEN)
             
-            # Get the data from request
             serializer = ContactSerializer(contact, data=request.data)
             if serializer.is_valid():
                 serializer.save()

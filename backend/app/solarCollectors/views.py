@@ -115,11 +115,9 @@ def update_solar_collector(request, system_uuid):
         except SolarCollector.DoesNotExist:
             return standard_error_response("Solar collector not found", status.HTTP_404_NOT_FOUND)
         
-        # Check user permission
         if not has_access_permission(request.user, solar_collector):
             return standard_error_response("Access denied: You do not have permission to update this system", status.HTTP_403_FORBIDDEN)
         
-        # Update system
         serializer = SolarCollectorSerializer(
             solar_collector, 
             data=request.data, 
@@ -139,21 +137,17 @@ def update_solar_collector(request, system_uuid):
 @permission_classes([IsAuthenticated])
 def delete_solar_collector(request, system_uuid):
     try:
-        # Validate system UUID
         if not validate_uuid(system_uuid):
             return standard_error_response("Invalid system UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Get solar collector
         try:
             solar_collector = SolarCollector.objects.get(uuid=system_uuid)
         except SolarCollector.DoesNotExist:
             return standard_error_response("Solar collector not found", status.HTTP_404_NOT_FOUND)
         
-        # Check user permission
         if not has_access_permission(request.user, solar_collector):
             return standard_error_response("Access denied: You do not have permission to delete this system", status.HTTP_403_FORBIDDEN)
         
-        # Delete system
         solar_collector.delete()
         return standard_success_response("Solar collector deleted successfully")
         

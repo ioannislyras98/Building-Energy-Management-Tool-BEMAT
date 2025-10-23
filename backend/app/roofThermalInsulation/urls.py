@@ -2,11 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Available materials
     path('materials/available/', views.get_available_materials, 
          name='roof-available-materials'),
     
-    # Roof Thermal Insulation URLs
     path('', views.RoofThermalInsulationListView.as_view(), 
          name='roof-thermal-insulations'),
     path('create/', views.RoofThermalInsulationCreateView.as_view(), 
@@ -20,7 +18,6 @@ urlpatterns = [
     path('<uuid:roof_thermal_insulation_uuid>/recalculate/', views.recalculate_roof_thermal_insulation, 
          name='roof-recalculate-thermal-insulation'),
     
-    # Material Layer URLs
     path('<uuid:thermal_insulation_uuid>/materials/add/', 
          views.RoofThermalInsulationMaterialLayerCreateView.as_view(), 
          name='roof-thermal-insulation-material-layer-create'),

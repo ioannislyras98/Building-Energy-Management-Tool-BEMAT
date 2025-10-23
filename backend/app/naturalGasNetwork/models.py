@@ -5,11 +5,9 @@ from project.models import Project
 
 
 class NaturalGasNetwork(models.Model):
-    # Foreign keys
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='natural_gas_networks')
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='natural_gas_networks', null=True, blank=True)
     
-    # System Components
     burner_replacement_quantity = models.FloatField(default=2, help_text="Quantity of burner replacements")
     burner_replacement_unit_price = models.FloatField(default=1800.0, help_text="Unit price for burner replacement (€)")
     
@@ -22,17 +20,14 @@ class NaturalGasNetwork(models.Model):
     boiler_cleaning_quantity = models.FloatField(default=1, help_text="Quantity of boiler cleaning services")
     boiler_cleaning_unit_price = models.FloatField(default=364.0, help_text="Unit price for boiler cleaning (€)")
     
-    # Economic Data
     current_energy_cost_per_year = models.FloatField(null=True, blank=True, help_text="Current annual energy cost (€)")
     natural_gas_cost_per_year = models.FloatField(null=True, blank=True, help_text="Annual natural gas cost (€)")
     annual_energy_savings = models.FloatField(null=True, blank=True, help_text="Annual energy savings (€)")
     lifespan_years = models.IntegerField(default=15, help_text="Project lifespan in years")
     
-    # Natural Gas System Efficiency
     new_system_efficiency = models.FloatField(default=0.90, help_text="Efficiency of new natural gas system (0.0-1.0)", validators=[MinValueValidator(0.1), MaxValueValidator(1.0)])
     natural_gas_price_per_kwh = models.FloatField(null=True, blank=True, help_text="Natural gas price per kWh (€/kWh)")
     
-    # Calculated Results
     burner_replacement_subtotal = models.FloatField(default=0.0, help_text="Burner replacement subtotal (€)")
     gas_pipes_subtotal = models.FloatField(default=0.0, help_text="Gas pipes subtotal (€)")
     gas_detection_systems_subtotal = models.FloatField(default=0.0, help_text="Gas detection systems subtotal (€)")
@@ -43,7 +38,6 @@ class NaturalGasNetwork(models.Model):
     net_present_value = models.FloatField(default=0.0, help_text="Net Present Value (€)")
     internal_rate_of_return = models.FloatField(default=0.0, help_text="Internal Rate of Return (%)")
     
-    # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -67,7 +61,6 @@ class NaturalGasNetwork(models.Model):
         try:
             from energyConsumption.models import EnergyConsumption
             
-            # Get heating energy consumptions (non-electricity sources)
             heating_consumptions = EnergyConsumption.objects.filter(
                 building=self.building,
                 energy_source__in=['heating_oil', 'natural_gas', 'biomass']
@@ -76,7 +69,6 @@ class NaturalGasNetwork(models.Model):
             if not heating_consumptions.exists():
                 return
             
-            # Calculate total thermal requirement in kWh per year
             total_thermal_kwh = 0
             for consumption in heating_consumptions:
                 kwh_equivalent = float(consumption.kwh_equivalent or 0)
@@ -85,40 +77,32 @@ class NaturalGasNetwork(models.Model):
             if total_thermal_kwh == 0:
                 return
             
-            # Get natural gas price per kWh
             gas_price_per_kwh = self.natural_gas_price_per_kwh
             if not gas_price_per_kwh:
-                # Try to get from project's fuel cost
                 if self.project and self.project.cost_per_kwh_fuel:
                     gas_price_per_kwh = float(self.project.cost_per_kwh_fuel)
                 elif self.building.project and self.building.project.cost_per_kwh_fuel:
                     gas_price_per_kwh = float(self.building.project.cost_per_kwh_fuel)
                 else:
-                    gas_price_per_kwh = 0.10  # Default fallback
-            
-            # Calculate natural gas consumption with new system efficiency
+                    gas_price_per_kwh = 0.10  
+
             efficiency = self.new_system_efficiency or 0.90
             natural_gas_consumption_kwh = total_thermal_kwh / efficiency
             
-            # Calculate annual cost
             self.natural_gas_cost_per_year = natural_gas_consumption_kwh * gas_price_per_kwh
             
         except Exception as e:
-            # If calculation fails, don't block the save
             pass
     
     def save(self, *args, **kwargs):
-        # Calculate natural gas cost per year if not provided
         if not self.natural_gas_cost_per_year and self.building:
             self._calculate_natural_gas_cost()
         
-        # Calculate subtotals
         self.burner_replacement_subtotal = self.burner_replacement_quantity * self.burner_replacement_unit_price
         self.gas_pipes_subtotal = self.gas_pipes_quantity * self.gas_pipes_unit_price
         self.gas_detection_systems_subtotal = self.gas_detection_systems_quantity * self.gas_detection_systems_unit_price
         self.boiler_cleaning_subtotal = self.boiler_cleaning_quantity * self.boiler_cleaning_unit_price
         
-        # Calculate total investment cost
         self.total_investment_cost = (
             self.burner_replacement_subtotal + 
             self.gas_pipes_subtotal + 
@@ -126,7 +110,6 @@ class NaturalGasNetwork(models.Model):
             self.boiler_cleaning_subtotal
         )
         
-        # Calculate annual economic benefit
         if self.current_energy_cost_per_year and self.natural_gas_cost_per_year:
             self.annual_economic_benefit = self.current_energy_cost_per_year - self.natural_gas_cost_per_year
         elif self.annual_energy_savings:
@@ -134,14 +117,12 @@ class NaturalGasNetwork(models.Model):
         else:
             self.annual_economic_benefit = 0.0
         
-        # Calculate payback period
         if self.annual_economic_benefit > 0 and self.total_investment_cost > 0:
             self.payback_period = self.total_investment_cost / self.annual_economic_benefit
         else:
             self.payback_period = 0.0
         
-        # Calculate NPV
-        discount_rate = 0.05  # 5%
+        discount_rate = 0.05
         years = self.lifespan_years
         npv = 0.0
         
@@ -154,7 +135,6 @@ class NaturalGasNetwork(models.Model):
         
         self.net_present_value = npv
         
-        # Calculate IRR (simplified)
         if self.total_investment_cost > 0:
             self.internal_rate_of_return = (self.annual_economic_benefit / self.total_investment_cost) * 100
         else:

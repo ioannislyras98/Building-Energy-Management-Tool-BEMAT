@@ -7,7 +7,6 @@ from .models import Material
 from .serializers import MaterialSerializer, MaterialListSerializer
 
 
-# Material Views (Admin Only for Create/Update/Delete)
 class MaterialListCreateView(generics.ListCreateAPIView):
     queryset = Material.objects.filter(is_active=True)
     permission_classes = [IsAuthenticated]

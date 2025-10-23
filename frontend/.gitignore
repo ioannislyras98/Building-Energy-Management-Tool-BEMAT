@@ -1,4 +1,4 @@
-# Logs
+
 logs
 *.log
 npm-debug.log*
@@ -12,15 +12,10 @@ dist
 dist-ssr
 *.local
 
-# Environment files
-# Το .env τώρα ανεβαίνει στο Git (για να το βλέπει ο καθηγητής)
-# Προσοχή: ΜΗΝ βάλετε sensitive passwords σε production!
-# .env
 .env.local
 .env.production
 .env.development
 
-# Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea

@@ -24,34 +24,28 @@ from common.utils import (
 
 logger = logging.getLogger(__name__)
 
-# Update the create_building function to match new fields
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_building(request):
     try:
         data = request.data
         
-        # Validate required fields
         required_fields = ["name", "usage", "description", "address", "total_area", "examined_area", "floors_examined", "project", "prefecture"]
         for field in required_fields:
             if field not in data or not data.get(field):
                 return standard_error_response(f"{field} is required", status.HTTP_400_BAD_REQUEST)
         
-        # Validate project UUID
         if not validate_uuid(data.get("project")):
             return standard_error_response("Invalid project UUID", status.HTTP_400_BAD_REQUEST)
         
-        # Check project exists and user has permission
         try:
             project = Project.objects.get(uuid=data.get("project"))
         except Project.DoesNotExist:
             return standard_error_response("Project not found", status.HTTP_404_NOT_FOUND)
         
-        # Admin users can create buildings in any project, regular users only their own
         if not has_access_permission(request.user, project):
             return standard_error_response("Access denied: You do not have permission to add buildings to this project", status.HTTP_403_FORBIDDEN)
         
-        # Handle prefecture (required)
         prefecture_id = data.get("prefecture")
         try:
             from prefectures.models import Prefecture
@@ -61,7 +55,6 @@ def create_building(request):
         except ValueError:
             return standard_error_response("Invalid prefecture ID", status.HTTP_400_BAD_REQUEST)
         
-        # Create building
         building_data = {
             'user': request.user,
             'project': project,
@@ -86,7 +79,6 @@ def create_building(request):
             'occupants': data.get("occupants"),
         }
         
-        # Add prefecture (required)
         building_data['prefecture'] = prefecture
         
         building = Building.objects.create(**building_data)
@@ -97,7 +89,6 @@ def create_building(request):
     except Exception as e:
         return standard_error_response(str(e), status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-# Update the get_buildings function to return all fields
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_buildings(request):
@@ -108,13 +99,11 @@ def get_buildings(request):
             if not validate_uuid(project_uuid):
                 return standard_error_response("Invalid project UUID", status.HTTP_400_BAD_REQUEST)
             
-            # Admin users can see all buildings, regular users only their own
             if is_admin_user(request.user):
                 buildings = Building.objects.filter(project__uuid=project_uuid)
             else:
                 buildings = Building.objects.filter(user=request.user, project__uuid=project_uuid)
         else:
-            # Admin users can see all buildings, regular users only their own
             if is_admin_user(request.user):
                 buildings = Building.objects.all()
             else:
@@ -138,11 +127,9 @@ def get_building_detail(request, uuid):
             
         building = Building.objects.get(uuid=uuid)
         
-        # Admin users can access any building, regular users only their own
         if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not own this building", status.HTTP_403_FORBIDDEN)
         
-        # Ανάκτηση των επαφών για το κτίριο
         contacts = Contact.objects.filter(building=building)
         contacts_data = ContactSerializer(contacts, many=True).data       
         building_data = {
@@ -199,7 +186,6 @@ def delete_building(request, uuid):
             
         building = Building.objects.get(uuid=uuid)
         
-        # Admin users can delete any building, regular users only their own
         if not has_access_permission(request.user, building):
             return standard_error_response("Access denied: You do not have permission to delete this building", status.HTTP_403_FORBIDDEN)
         
@@ -223,9 +209,7 @@ def building_post_delete_update_project_buildings_count(sender, instance, **kwar
     project = instance.project
     if project and hasattr(project, 'pk') and project.pk is not None:
         try:
-            # Re-fetch the project to ensure its state is current if it still exists
             project_instance = Project.objects.get(pk=project.pk)
-            # Recalculate count based on current state
             new_count = project_instance.buildings.count()
             if project_instance.buildings_count != new_count:
                 project_instance.buildings_count = new_count
@@ -234,14 +218,12 @@ def building_post_delete_update_project_buildings_count(sender, instance, **kwar
             else:
                 logger.info(f"buildings_count for project {project.pk} is already {new_count}. No update needed after building delete.")
         except Project.DoesNotExist:
-            # Project was deleted, which is expected if this is part of a cascade delete.
             logger.info(f"Project {project.pk if project else 'unknown'} not found during building delete signal (likely deleted). No count update needed.")
             pass
         except Exception as e:
-            # Catch any other error during .save()
             logger.error(
                 f"Could not update buildings_count for project {project.pk if project else 'unknown'} during building delete signal. Error: {str(e)}",
-                exc_info=True  # This will log the full traceback for the exception in the signal
+                exc_info=True 
             )
             pass
 
@@ -252,7 +234,7 @@ def update_building(request, uuid):
     Endpoint για την ενημέρωση ενός building.
     """
     try:
-        print(f"Received data for building update: {request.data}")  # Debug log
+        print(f"Received data for building update: {request.data}")
         
         building = Building.objects.get(uuid=uuid)
         
@@ -264,11 +246,11 @@ def update_building(request, uuid):
         
         serializer = BuildingSerializer(building, data=request.data, partial=True)
         if serializer.is_valid():
-            print(f"Serializer valid, saving building...")  # Debug log
+            print(f"Serializer valid, saving building...") 
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         
-        print(f"Serializer errors: {serializer.errors}")  # Debug log
+        print(f"Serializer errors: {serializer.errors}")
         return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
     except Building.DoesNotExist:
