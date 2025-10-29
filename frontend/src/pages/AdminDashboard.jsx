@@ -1,4 +1,4 @@
-ο»Ώimport React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
 import Cookies from "universal-cookie";
@@ -65,7 +65,7 @@ const AdminDashboard = () => {
           return;
         }
       } catch (error) {
-        console.error("Auth error:", error);
+
         navigate("/login");
       } finally {
         setLoading(false);
@@ -102,7 +102,7 @@ const AdminDashboard = () => {
     return (
       <div className="admin-container p-6 bg-gray-50 min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="text-2xl mb-4">β³</div>
+          <div className="text-2xl mb-4">?</div>
           <div className="text-lg text-gray-600">
             {text.loading || "Loading admin dashboard..."}
           </div>
@@ -120,7 +120,7 @@ const AdminDashboard = () => {
             <FaUserShield className="text-primary text-xl" />
             <h1 className="text-2xl font-bold text-gray-800">
               {text.title ||
-                (language === "en" ? "Admin Dashboard" : "Ξ Ξ―Ξ½Ξ±ΞΊΞ±Ο‚ Ξ”ΞΉΞ±Ο‡ΞµΞ―ΟΞΉΟƒΞ·Ο‚")}
+                (language === "en" ? "Admin Dashboard" : "Πίνακας Διαχείρισης")}
             </h1>
           </div>
         </div>

@@ -32,7 +32,7 @@ const BulkDeleteConfirmation = ({
       await onConfirm();
       onClose();
     } catch (error) {
-      console.error("Error during deletion:", error);
+
     } finally {
       setIsDeleting(false);
     }

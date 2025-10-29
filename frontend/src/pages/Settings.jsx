@@ -12,8 +12,7 @@ import {
   FaSave,
 } from "react-icons/fa";
 import Cookies from "universal-cookie";
-import $ from "jquery";
-import API_BASE_URL from "../config/api.js";
+import { getUserProfile, updateUserProfile, changePassword } from "../../services/ApiService";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -74,7 +73,7 @@ export default function Settings() {
         });
       }
     } catch (error) {
-      console.error("Failed to fetch user data:", error);
+
       setError(
         language === "en"
           ? "Failed to load user data"
@@ -121,7 +120,7 @@ export default function Settings() {
       );
       setUserData((prev) => ({ ...prev, current_password: "" }));
     } catch (error) {
-      console.error("Profile update failed:", error);
+
       setError(
         language === "en"
           ? "Failed to update profile"
@@ -188,7 +187,7 @@ export default function Settings() {
         confirm_password: "",
       });
     } catch (error) {
-      console.error("Password change failed:", error);
+
       setError(
         language === "en"
           ? "Failed to change password"

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import $ from "jquery";
 import Cookies from "universal-cookie";
 import { FaCalculator, FaEdit, FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -7,7 +6,7 @@ import { useLanguage } from "../context/LanguageContext";
 import { useModalBlur } from "../hooks/useModals";
 import InputEntryModal from "../modals/shared/InputEntryModal";
 import "../assets/styles/forms.css";
-import API_BASE_URL from "../config/api.js";
+import { getNumericValues, updateNumericValue } from "../../services/ApiService";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -55,18 +54,12 @@ function AdminNumericValues() {
         return;
       }
 
-      const response = await $.ajax({
-        url: `${API_BASE_URL}/numeric_values/`,
-        method: "GET",
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      });
-      setNumericValues(response);
+      const data = await getNumericValues();
+      setNumericValues(data);
       setError(null);
     } catch (err) {
-      console.error("Error fetching numeric values:", err);
-      if (err.status === 401) {
+
+      if (err.response?.status === 401) {
         setError("Μη εξουσιοδοτημένη πρόσβαση. Παρακαλώ κάντε login ξανά.");
       } else {
         setError("Αποτυχία φόρτωσης αριθμητικών τιμών");
@@ -111,15 +104,7 @@ function AdminNumericValues() {
     }
 
     try {
-      await $.ajax({
-        url: `${API_BASE_URL}/numeric_values/${editingValue.uuid}/`,
-        method: "PATCH",
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-        data: JSON.stringify({ value: parseFloat(formData.value) }),
-      });
+      await updateNumericValue(editingValue.uuid, parseFloat(formData.value));
 
       setNumericValues(
         numericValues.map((nv) =>
@@ -135,7 +120,7 @@ function AdminNumericValues() {
       setErrors({});
       setShowValidationErrors(false);
     } catch (err) {
-      console.error("Error updating numeric value:", err);
+
       if (err.status === 401) {
         setError("Μη εξουσιοδοτημένη πρόσβαση. Παρακαλώ κάντε login ξανά.");
       } else {

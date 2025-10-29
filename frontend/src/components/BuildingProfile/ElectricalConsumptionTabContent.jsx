@@ -96,13 +96,13 @@ const ElectricalConsumptionTabContent = ({
         "Content-Type": "application/json",
       },
       success: (response) => {
-        console.log("Electrical consumption deleted:", response);
+
         setDeleteDialogOpen(false);
         setDeletingItem(null);
         fetchElectricalConsumptions();
       },
       error: (jqXHR) => {
-        console.error("Error deleting electrical consumption:", jqXHR);
+
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorDelete ||
@@ -133,7 +133,7 @@ const ElectricalConsumptionTabContent = ({
         Authorization: `Token ${token}`,
       },
       success: (data) => {
-        console.log("Fetched electrical consumptions:", data);
+
         const mappedData = Array.isArray(data.data)
           ? data.data.map((item) => ({
               id: item.uuid,
@@ -156,12 +156,12 @@ const ElectricalConsumptionTabContent = ({
             }))
           : [];
 
-        console.log("Mapped data for DataGrid:", mappedData);
+
         setElectricalConsumptions(mappedData);
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error("Error fetching electrical consumptions:", jqXHR);
+
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorFetch ||

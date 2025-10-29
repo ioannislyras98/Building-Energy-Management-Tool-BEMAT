@@ -152,7 +152,7 @@ const ExteriorBlindsTabContent = ({
       }
     } catch (error) {
       if (error.message && !error.message.includes("404")) {
-        console.error("Error fetching exterior blinds data:", error);
+
         setError("Σφάλμα κατά την φόρτωση των δεδομένων");
       }
     } finally {
@@ -227,7 +227,7 @@ const ExteriorBlindsTabContent = ({
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
-      console.error("Error saving exterior blinds data:", error);
+
       if (showMessage) {
         setError("Σφάλμα κατά την αποθήκευση των δεδομένων");
         setTimeout(() => {

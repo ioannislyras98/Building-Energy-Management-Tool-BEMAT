@@ -121,7 +121,7 @@ function BuildingModalForm({
         const data = await getAllPrefectures();
         setPrefectures(data);
       } catch (error) {
-        console.error("Error loading prefectures:", error);
+
         // Fallback to empty array if API fails
         setPrefectures([]);
       } finally {
@@ -294,9 +294,9 @@ function BuildingModalForm({
 
     const method = isEdit ? "PUT" : "POST";
 
-    console.log("BuildingModal - URL:", url);
-    console.log("BuildingModal - Method:", method);
-    console.log("BuildingModal - editItem:", editItem);
+
+
+
 
     $.ajax({
       url: url,

@@ -57,7 +57,7 @@ const AdminStats = () => {
           setError("Failed to fetch statistics");
         }
       } catch (error) {
-        console.error("Error fetching stats:", error);
+
         setError(error.message || "Failed to fetch statistics");
       } finally {
         setLoading(false);

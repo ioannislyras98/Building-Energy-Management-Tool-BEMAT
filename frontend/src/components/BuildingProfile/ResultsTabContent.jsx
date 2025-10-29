@@ -180,18 +180,13 @@ const ResultsTabContent = ({
     },
   };
 
-  useEffect(() => {
-    console.log("ResultsTabContent mounted with:", {
-      buildingUuid,
-      projectUuid,
-    });
-    fetchAllScenarios();
+  useEffect(() => {fetchAllScenarios();
   }, [buildingUuid, projectUuid]);
 
   const fetchAllScenarios = async () => {
     if (!buildingUuid || !projectUuid) return;
 
-    console.log("Fetching scenarios for building:", buildingUuid);
+
     setLoading(true);
     setError(null);
 
@@ -200,11 +195,7 @@ const ResultsTabContent = ({
 
       // Fetch data για κάθε σενάριο
       for (const [key, config] of Object.entries(scenarioConfig)) {
-        try {
-          console.log(
-            `Fetching ${config.name} from: ${API_BASE_URL}/${config.endpoint}/building/${buildingUuid}/`
-          );
-          const response = await fetch(
+        try {const response = await fetch(
             `${API_BASE_URL}/${config.endpoint}/building/${buildingUuid}/`,
             {
               method: "GET",
@@ -217,7 +208,7 @@ const ResultsTabContent = ({
 
           if (response.ok) {
             const responseData = await response.json();
-            console.log(`Response for ${config.name}:`, responseData);
+
 
             // Ελέγχουμε αν το response περιέχει data array ή είναι ήδη το object
             let scenarioItems = [];
@@ -231,21 +222,15 @@ const ResultsTabContent = ({
 
             // Προσθέτουμε μόνο τα ολοκληρωμένα σενάρια (με net_present_value)
             scenarioItems.forEach((item) => {
-              console.log(`Processing item for ${config.name}:`, item);
+
               const netPresentValue =
                 parseFloat(item.net_present_value) ||
-                parseFloat(item.calculated_net_present_value);
-              console.log(
-                `Net present value for ${config.name}:`,
-                netPresentValue
-              );
-
-              if (
+                parseFloat(item.calculated_net_present_value);if (
                 netPresentValue &&
                 !isNaN(netPresentValue) &&
                 netPresentValue !== 0
               ) {
-                console.log(`Adding completed scenario ${config.name}:`, item);
+
                 scenarioData.push({
                   type: key,
                   name: config.name,
@@ -283,28 +268,20 @@ const ResultsTabContent = ({
                     parseFloat(item.calculated_investment_return) ||
                     0,
                 });
-              } else {
-                console.log(
-                  `Skipping incomplete scenario ${config.name} - no net_present_value:`,
-                  item
-                );
-              }
+              } else {}
             });
-          } else {
-            console.log(
-              `No data found for ${config.name} (${response.status})`
+          } else {`
             );
           }
         } catch (error) {
-          console.log(`Error fetching ${config.name}:`, error);
         }
       }
 
-      console.log("All completed scenarios found:", scenarioData);
-      console.log(`Total scenarios fetched: ${scenarioData.length}`);
+
+
       setScenarios(scenarioData);
     } catch (error) {
-      console.error("Error fetching scenarios:", error);
+
       setError("Σφάλμα κατά την φόρτωση των δεδομένων σεναρίων");
     } finally {
       setLoading(false);

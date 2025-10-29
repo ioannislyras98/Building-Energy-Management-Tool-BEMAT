@@ -12,7 +12,7 @@ import { useBuildings } from "../hooks/useBuildings";
 import { useModalBlur } from "../hooks/useModals";
 import english_text from "../languages/english.json";
 import greek_text from "../languages/greek.json";
-import API_BASE_URL from "../config/api.js";
+import { submitProject } from "../../services/ApiService";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -60,9 +60,6 @@ export default function ProjectView() {
       const projectFromUrl = projects.find((p) => p.uuid === projectUuid);
       setSelectedProject(projectFromUrl || null);
       if (!projectFromUrl && !projectsLoading) {
-        console.warn(
-          `Project with UUID ${projectUuid} not found. Redirecting to home.`
-        );
         navigate("/");
       }
     } else if (!projectUuid) {
@@ -90,7 +87,7 @@ export default function ProjectView() {
           setDeleteDialogOpen(false);
         })
         .catch((err) => {
-          console.error("Error deleting project from ProjectView:", err);
+
           setDeleteDialogOpen(false);
         });
     }
@@ -123,41 +120,17 @@ export default function ProjectView() {
     if (!selectedProject) return;
 
     try {
-      const token = cookies.get("token");
-      const response = await fetch(
-        `${API_BASE_URL}/projects/submit/${selectedProject.uuid}/`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+      const data = await submitProject(selectedProject.uuid);
+      const updatedProject = { ...selectedProject, is_submitted: true };
+      setSelectedProject(updatedProject);
+      handleProjectUpdated(updatedProject);
+      refreshProjects();
+      alert(
+        paramsText?.projectSubmittedSuccess ||
+          "Project submitted successfully!"
       );
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Project submitted successfully:", data);
-
-        const updatedProject = { ...selectedProject, is_submitted: true };
-        setSelectedProject(updatedProject);
-
-        handleProjectUpdated(updatedProject);
-
-        refreshProjects();
-
-        alert(
-          paramsText?.projectSubmittedSuccess ||
-            "Project submitted successfully!"
-        );
-      } else {
-        const errorData = await response.json();
-        console.error("Failed to submit project:", errorData);
-        alert(errorData.error || "Failed to submit project");
-      }
     } catch (error) {
-      console.error("Error submitting project:", error);
-      alert("An error occurred while submitting the project");
+      alert(error.response?.data?.error || "An error occurred while submitting the project");
     }
   };
 

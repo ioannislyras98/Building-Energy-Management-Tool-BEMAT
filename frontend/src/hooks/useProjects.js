@@ -29,7 +29,7 @@ export const useProjects = () => {
 
     $.ajax(settings)
       .done(function (response) {
-        console.log("Projects fetched successfully:", response);
+
         const projectsArray = Array.isArray(response)
           ? response
           : response.projects || response.data.projects || [];
@@ -37,7 +37,7 @@ export const useProjects = () => {
         setLoading(false);
       })
       .fail(function (error) {
-        console.error(error);
+
         setError(error);
         setLoading(false);
       });
@@ -78,7 +78,7 @@ export const useProjects = () => {
           resolve(response);
         })
         .fail(function (error) {
-          console.error("Failed to delete project:", error);
+
           alert(params.deleteError);
           reject(error);
         });

@@ -88,7 +88,7 @@ const WindowReplacementTabContent = ({
       },
       error: (jqXHR) => {
         // Silently fail - it's okay if no data exists yet
-        console.log("No existing window replacement data found");
+
       },
     });
   };
@@ -149,14 +149,14 @@ const WindowReplacementTabContent = ({
       },
       data: JSON.stringify(submitData),
       success: (response) => {
-        console.log("Window replacement data auto-saved:", response);
+
         setSuccess(
           translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
         );
         setTimeout(() => setSuccess(null), 3000);
       },
       error: (jqXHR) => {
-        console.error("Error auto-saving window replacement data:", jqXHR);
+
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
@@ -353,14 +353,14 @@ const WindowReplacementTabContent = ({
       },
       data: JSON.stringify(submitData),
       success: (response) => {
-        console.log("Window replacement data saved:", response);
+
         setSuccess(
           translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
         );
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error("Error saving window replacement data:", jqXHR);
+
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||

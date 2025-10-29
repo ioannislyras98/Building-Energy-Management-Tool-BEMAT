@@ -202,7 +202,7 @@ function ElectricalConsumptionModalForm({
         setThermalZones(zones);
       },
       error: (jqXHR) => {
-        console.error("Error fetching thermal zones:", jqXHR);
+
       },
     });
   };
@@ -221,7 +221,7 @@ function ElectricalConsumptionModalForm({
         setEnergyConsumptions(consumptions);
       },
       error: (jqXHR) => {
-        console.error("Error fetching energy consumptions:", jqXHR);
+
       },
     });
   };
@@ -301,7 +301,7 @@ function ElectricalConsumptionModalForm({
         "Content-Type": "application/json",
       },
       success: (response) => {
-        console.log("Electrical consumption saved:", response);
+
         setLoading(false);
         resetForm();
         onClose();
@@ -310,7 +310,7 @@ function ElectricalConsumptionModalForm({
         }
       },
       error: (jqXHR) => {
-        console.error("Error saving electrical consumption:", jqXHR);
+
         setErrors({
           general:
             jqXHR.responseJSON?.detail ||

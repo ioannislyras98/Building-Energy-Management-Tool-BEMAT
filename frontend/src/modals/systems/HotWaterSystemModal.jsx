@@ -156,13 +156,13 @@ function HotWaterSystemModalForm({
       },
       data: JSON.stringify(apiData),
       success: (response) => {
-        console.log("Hot water system saved:", response);
+
         onSubmitSuccess(response);
         resetForm();
         onClose();
       },
       error: (jqXHR) => {
-        console.error("Error saving hot water system:", jqXHR);
+
         handleApiError(jqXHR);
       },
     });

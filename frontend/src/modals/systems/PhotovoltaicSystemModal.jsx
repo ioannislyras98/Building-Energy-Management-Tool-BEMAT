@@ -257,11 +257,11 @@ function PhotovoltaicSystemModalForm({
         setErrors({});
       } else {
         const errorData = await response.json();
-        console.error("Server error:", errorData);
+
         setErrors({ general: "Σφάλμα κατά την αποθήκευση" });
       }
     } catch (error) {
-      console.error("Network error:", error);
+
       setErrors({ general: "Σφάλμα δικτύου" });
     } finally {
       setLoading(false);

@@ -51,7 +51,7 @@ const EnergyProfileTabContent = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState(null);
 
-  console.log("EnergyProfileTabContent: Initial render, open state is:", open);
+
 
   const { language } = useLanguage();
   const translations =
@@ -82,18 +82,10 @@ const EnergyProfileTabContent = ({
   };
 
   const handleOpen = () => {
-    setEditItem(null);
-    console.log(
-      "EnergyProfileTabContent: handleOpen called, setting open to true"
-    );
-    setOpen(true);
+    setEditItem(null);setOpen(true);
   };
 
-  const handleClose = () => {
-    console.log(
-      "EnergyProfileTabContent: handleClose called, setting open to false"
-    );
-    setOpen(false);
+  const handleClose = () => {setOpen(false);
     setEditItem(null);
   };
 
@@ -118,13 +110,13 @@ const EnergyProfileTabContent = ({
         "Content-Type": "application/json",
       },
       success: (response) => {
-        console.log("Energy consumption deleted:", response);
+
         setDeleteDialogOpen(false);
         setDeletingItem(null);
         fetchConsumptions();
       },
       error: (jqXHR) => {
-        console.error("Error deleting energy consumption:", jqXHR);
+
         setError(jqXHR.responseJSON?.detail || translations.errorDelete);
         setDeleteDialogOpen(false);
       },
@@ -150,7 +142,7 @@ const EnergyProfileTabContent = ({
         Authorization: `Token ${token}`,
       },
       success: (data) => {
-        console.log("Fetched energy consumptions:", data);
+
         const mappedData = Array.isArray(data)
           ? data.map((item) => ({
               id: item.uuid,
@@ -164,12 +156,12 @@ const EnergyProfileTabContent = ({
             }))
           : [];
 
-        console.log("Mapped data for DataGrid:", mappedData);
+
         setConsumptions(mappedData);
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error("Error fetching energy consumptions:", jqXHR);
+
         setError(jqXHR.responseJSON?.detail || translations.errorFetch);
         setLoading(false);
       },
@@ -376,7 +368,7 @@ const EnergyProfileTabContent = ({
   if (loading) return <p>{translations.loading}</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
-  console.log("EnergyProfileTabContent: Rendering, open state is:", open);
+
 
   return (
     <div className="space-y-8 p-6 bg-gray-50 min-h-screen">

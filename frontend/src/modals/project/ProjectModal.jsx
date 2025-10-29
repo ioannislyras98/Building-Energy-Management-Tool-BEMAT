@@ -67,7 +67,7 @@ function ProjectModalForm({
 
     $.ajax(settings)
       .done(function (response) {
-        console.log(response);
+
         setFormData({
           name: "",
           cost_per_kwh_fuel: "",
@@ -83,10 +83,10 @@ function ProjectModalForm({
       })
       .fail(function (error) {
         if (error.responseJSON) {
-          console.error("Error message:", error.responseJSON);
+
           alert("Error: " + JSON.stringify(error.responseJSON.error));
         } else {
-          console.error(error);
+
         }
       });
   };

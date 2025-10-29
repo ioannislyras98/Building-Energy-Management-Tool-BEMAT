@@ -153,7 +153,7 @@ const AutomaticLightingControlTabContent = ({
       }
     } catch (error) {
       if (error.message && !error.message.includes("404")) {
-        console.error("Error fetching automatic lighting control data:", error);
+
         setError("Σφάλμα κατά την φόρτωση των δεδομένων");
       }
     } finally {
@@ -217,7 +217,7 @@ const AutomaticLightingControlTabContent = ({
         setErrorField(null);
       }
     } catch (error) {
-      console.error("Error saving automatic lighting control data:", error);
+
       if (showMessage) {
         setError("Σφάλμα κατά την αποθήκευση των δεδομένων");
         setTimeout(() => {

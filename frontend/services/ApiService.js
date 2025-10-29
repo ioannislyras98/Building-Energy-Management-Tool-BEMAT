@@ -11,11 +11,10 @@ export function getuser() {
       return response.data;
     })
     .catch((error) => {
-      console.log(error);
+
     });
 }
 
-// Prefecture API functions
 export function getAllPrefectures() {
   const token = cookies.get("token") || "";
   return axios
@@ -28,7 +27,7 @@ export function getAllPrefectures() {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error fetching prefectures:", error);
+
       throw error;
     });
 }
@@ -45,7 +44,7 @@ export function getAllPrefecturesAdmin() {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error fetching all prefectures for admin:", error);
+
       throw error;
     });
 }
@@ -62,7 +61,7 @@ export function getPrefecturesByZone(zone) {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error fetching prefectures by zone:", error);
+
       throw error;
     });
 }
@@ -79,7 +78,7 @@ export function getEnergyZones() {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error fetching energy zones:", error);
+
       throw error;
     });
 }
@@ -98,7 +97,7 @@ export function createPrefecture(data) {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error creating prefecture:", error);
+
       throw error;
     });
 }
@@ -116,7 +115,7 @@ export function updatePrefecture(uuid, data) {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error updating prefecture:", error);
+
       throw error;
     });
 }
@@ -133,7 +132,7 @@ export function deletePrefecture(uuid) {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error deleting prefecture:", error);
+
       throw error;
     });
 }
@@ -151,7 +150,7 @@ export function createOldAirConditioning(data) {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error creating old air conditioning:", error);
+
       throw error;
     });
 }
@@ -171,7 +170,7 @@ export function getOldAirConditioningsByBuilding(buildingUuid) {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error fetching old air conditionings:", error);
+
       throw error;
     });
 }
@@ -193,7 +192,7 @@ export function updateOldAirConditioning(acUuid, data) {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error updating old air conditioning:", error);
+
       throw error;
     });
 }
@@ -213,7 +212,7 @@ export function deleteOldAirConditioning(acUuid) {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error deleting old air conditioning:", error);
+
       throw error;
     });
 }
@@ -232,7 +231,7 @@ export function createNewAirConditioning(data) {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error creating new air conditioning:", error);
+
       throw error;
     });
 }
@@ -252,7 +251,7 @@ export function getNewAirConditioningsByBuilding(buildingUuid) {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error fetching new air conditionings:", error);
+
       throw error;
     });
 }
@@ -274,7 +273,7 @@ export function updateNewAirConditioning(acUuid, data) {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error updating new air conditioning:", error);
+
       throw error;
     });
 }
@@ -294,7 +293,7 @@ export function deleteNewAirConditioning(acUuid) {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error deleting new air conditioning:", error);
+
       throw error;
     });
 }
@@ -316,7 +315,7 @@ export function createAirConditioningAnalysis(data) {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error creating air conditioning analysis:", error);
+
       throw error;
     });
 }
@@ -336,7 +335,7 @@ export function getAirConditioningAnalysisByBuilding(buildingUuid) {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error fetching air conditioning analysis:", error);
+
       throw error;
     });
 }
@@ -358,7 +357,780 @@ export function updateAirConditioningAnalysis(analysisUuid, data) {
       return response.data;
     })
     .catch((error) => {
-      console.log("Error updating air conditioning analysis:", error);
+
+      throw error;
+    });
+}
+
+export function getBuildingsByProject(projectUuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .get(`${API_BASE_URL}/buildings/get/?project=${projectUuid}`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function getBuildingById(buildingUuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .get(`${API_BASE_URL}/buildings/get/${buildingUuid}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function createBuilding(data) {
+  const token = cookies.get("token") || "";
+  return axios
+    .post(`${API_BASE_URL}/buildings/create/`, data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function updateBuilding(buildingUuid, data) {
+  const token = cookies.get("token") || "";
+  return axios
+    .put(`${API_BASE_URL}/buildings/update/${buildingUuid}/`, data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function deleteBuilding(buildingUuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .delete(`${API_BASE_URL}/buildings/delete/${buildingUuid}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+// Systems API functions
+// Boiler Detail
+export function getBoilerDetailsByBuilding(buildingUuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .get(`${API_BASE_URL}/boiler_details/building/${buildingUuid}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function deleteBoilerDetail(uuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .delete(`${API_BASE_URL}/boiler_details/delete/${uuid}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+// Cooling System
+export function getCoolingSystemByBuilding(buildingUuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .get(`${API_BASE_URL}/cooling_systems/building/${buildingUuid}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function deleteCoolingSystem(uuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .delete(`${API_BASE_URL}/cooling_systems/delete/${uuid}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+// Heating System
+export function getHeatingSystemByBuilding(buildingUuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .get(`${API_BASE_URL}/heating_systems/building/${buildingUuid}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function deleteHeatingSystem(uuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .delete(`${API_BASE_URL}/heating_systems/delete/${uuid}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+// Hot Water System
+export function getHotWaterSystemByBuilding(buildingUuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .get(`${API_BASE_URL}/domestic_hot_water_systems/building/${buildingUuid}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function deleteHotWaterSystem(uuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .delete(`${API_BASE_URL}/domestic_hot_water_systems/delete/${uuid}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+// Solar Collectors
+export function getSolarCollectorsByBuilding(buildingUuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .get(`${API_BASE_URL}/solar_collectors/building/${buildingUuid}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function deleteSolarCollectors(uuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .delete(`${API_BASE_URL}/solar_collectors/delete/${uuid}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+// Images API functions
+export function getImagesByBuilding(buildingUuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .get(`${API_BASE_URL}/building-images/building/${buildingUuid}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function createImage(data) {
+  const token = cookies.get("token") || "";
+  return axios
+    .post(`${API_BASE_URL}/building-images/`, data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function updateImage(imageId, data) {
+  const token = cookies.get("token") || "";
+  return axios
+    .put(`${API_BASE_URL}/building-images/${imageId}/`, data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function deleteImage(imageId) {
+  const token = cookies.get("token") || "";
+  return axios
+    .delete(`${API_BASE_URL}/building-images/${imageId}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+// Projects API functions
+export function submitProject(projectUuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .post(`${API_BASE_URL}/projects/${projectUuid}/submit/`, {}, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function createProject(data) {
+  const token = cookies.get("token") || "";
+  return axios
+    .post(`${API_BASE_URL}/projects/create/`, data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function updateProject(projectUuid, data) {
+  const token = cookies.get("token") || "";
+  return axios
+    .put(`${API_BASE_URL}/projects/update/${projectUuid}/`, data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function deleteProject(projectUuid) {
+  const token = cookies.get("token") || "";
+  return axios
+    .delete(`${API_BASE_URL}/projects/delete/${projectUuid}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+// Authentication API functions
+export function login(email, password) {
+  return axios
+    .post(`${API_BASE_URL}/users/login/`, {
+      email,
+      password,
+    }, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function signup(userData) {
+  return axios
+    .post(`${API_BASE_URL}/users/signup/`, userData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function requestPasswordReset(email) {
+  return axios
+    .post(`${API_BASE_URL}/users/password-reset/`, {
+      email,
+    }, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function confirmPasswordReset(uid, token, newPassword, newPasswordConfirm) {
+  return axios
+    .post(`${API_BASE_URL}/users/reset-password-confirm/${uid}/${token}/`, {
+      new_password: newPassword,
+      new_password_confirm: newPasswordConfirm,
+    }, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+// ==================== Admin Prefecture APIs ====================
+export function getAllPrefectures() {
+  const token = cookies.get("token") || "";
+  return axios
+    .get(`${API_BASE_URL}/prefectures/admin/all/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function createPrefecture(data) {
+  const token = cookies.get("token") || "";
+  return axios
+    .post(`${API_BASE_URL}/prefectures/`, data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function updatePrefecture(prefectureId, data) {
+  const token = cookies.get("token") || "";
+  return axios
+    .put(`${API_BASE_URL}/prefectures/${prefectureId}/`, data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function deletePrefecture(prefectureId) {
+  const token = cookies.get("token") || "";
+  return axios
+    .delete(`${API_BASE_URL}/prefectures/${prefectureId}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+// ==================== Admin Material APIs ====================
+export function getMaterialCategories() {
+  const token = cookies.get("token") || "";
+  return axios
+    .get(`${API_BASE_URL}/materials/categories/list/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function getAllMaterials() {
+  const token = cookies.get("token") || "";
+  return axios
+    .get(`${API_BASE_URL}/materials/admin/all/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function createMaterial(data) {
+  const token = cookies.get("token") || "";
+  return axios
+    .post(`${API_BASE_URL}/materials/`, data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function updateMaterial(materialId, data) {
+  const token = cookies.get("token") || "";
+  return axios
+    .put(`${API_BASE_URL}/materials/${materialId}/`, data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function deleteMaterial(materialId) {
+  const token = cookies.get("token") || "";
+  return axios
+    .delete(`${API_BASE_URL}/materials/${materialId}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+// ==================== Admin Numeric Values APIs ====================
+export function getNumericValues() {
+  const token = cookies.get("token") || "";
+  return axios
+    .get(`${API_BASE_URL}/numeric_values/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function updateNumericValue(valueId, value) {
+  const token = cookies.get("token") || "";
+  return axios
+    .patch(`${API_BASE_URL}/numeric_values/${valueId}/`, {
+      value: value,
+    }, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+// ==================== User Profile APIs ====================
+export function getUserProfile() {
+  const token = cookies.get("token") || "";
+  return axios
+    .get(`${API_BASE_URL}/users/me/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function updateUserProfile(data) {
+  const token = cookies.get("token") || "";
+  return axios
+    .patch(`${API_BASE_URL}/users/me/`, data, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function changePassword(currentPassword, newPassword, confirmPassword) {
+  const token = cookies.get("token") || "";
+  return axios
+    .post(`${API_BASE_URL}/users/change-password/`, {
+      current_password: currentPassword,
+      new_password: newPassword,
+      confirm_password: confirmPassword,
+    }, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function getPendingProjectsPercentage() {
+  const token = cookies.get("token") || "";
+  return axios
+    .get(`${API_BASE_URL}/projects/pending-percentage/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
+      throw error;
+    });
+}
+
+export function getProjects() {
+  const token = cookies.get("token") || "";
+  return axios
+    .get(`${API_BASE_URL}/projects/get/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+
       throw error;
     });
 }

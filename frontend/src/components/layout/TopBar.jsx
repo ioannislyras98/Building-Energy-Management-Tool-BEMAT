@@ -41,11 +41,11 @@ export default function TopBar() {
 
       $.ajax(settings)
         .done(function (response) {
-          console.log("User data:", response);
+
           setUserData(response.data);
         })
         .fail(function (error) {
-          console.error("Failed to fetch user data:", error);
+
         });
 
       // Fetch pending projects data
@@ -61,11 +61,11 @@ export default function TopBar() {
 
         $.ajax(pendingSettings)
           .done(function (response) {
-            console.log("Pending projects data:", response);
+
             setPendingProjectsData(response);
           })
           .fail(function (error) {
-            console.error("Failed to fetch pending projects data:", error);
+
           });
       };
 

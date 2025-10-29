@@ -109,7 +109,7 @@ const RoofThermalInsulationMaterialModal = ({
         setAvailableMaterials(response.data || []);
       },
       error: (jqXHR) => {
-        console.error("Error fetching available materials:", jqXHR);
+
         setError(
           translations.errorLoadMaterials || "Σφάλμα κατά τη φόρτωση υλικών"
         );
@@ -221,7 +221,7 @@ const RoofThermalInsulationMaterialModal = ({
         handleClose();
       },
       error: (jqXHR) => {
-        console.error("Error saving material:", jqXHR);
+
         setLoading(false);
 
         if (jqXHR.responseJSON && jqXHR.responseJSON.errors) {

@@ -3,7 +3,7 @@ import Cookies from "universal-cookie";
 import "./../../assets/styles/forms.css";
 import { useLanguage } from "../../context/LanguageContext";
 import { useModalBlur } from "../../hooks/useModals";
-import API_BASE_URL from "../../config/api.js";
+import { deleteImage } from "../../../services/ApiService";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 
@@ -29,24 +29,10 @@ function DeleteImageConfirmationForm({
     setError(null);
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/building-images/${image.id}/`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        onImageDeleted(image.id);
-        onClose();
-      } else {
-        setError(params.deleteError || "Σφάλμα κατά την διαγραφή της εικόνας");
-      }
+      await deleteImage(image.id);
+      onImageDeleted(image.id);
+      onClose();
     } catch (error) {
-      console.error("Error deleting image:", error);
       setError(params.deleteError || "Σφάλμα κατά την διαγραφή της εικόνας");
     } finally {
       setLoading(false);

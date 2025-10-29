@@ -71,7 +71,7 @@ const UsersManagement = () => {
         setError(data.message || "Failed to fetch users");
       }
     } catch (error) {
-      console.error("Error fetching users:", error);
+
       setError(error.message);
     } finally {
       setLoading(false);
@@ -108,7 +108,7 @@ const UsersManagement = () => {
         throw new Error(data.error || "Failed to delete users");
       }
     } catch (error) {
-      console.error("Error deleting users:", error);
+
       alert(`Error: ${error.message}`);
     }
   };
@@ -345,7 +345,7 @@ const UsersManagement = () => {
       setDeleteDialogOpen(false);
       setUserToDelete(null);
     } catch (error) {
-      console.error("Error deleting user:", error);
+
     }
   };
 

@@ -75,13 +75,13 @@ const ThermalZoneTabContent = ({
         "Content-Type": "application/json",
       },
       success: (response) => {
-        console.log("Thermal zone deleted:", response);
+
         setDeleteDialogOpen(false);
         setDeletingItem(null);
         fetchThermalZones();
       },
       error: (jqXHR) => {
-        console.error("Error deleting thermal zone:", jqXHR);
+
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorDelete ||
@@ -112,7 +112,7 @@ const ThermalZoneTabContent = ({
         Authorization: `Token ${token}`,
       },
       success: (data) => {
-        console.log("Fetched thermal zones:", data);
+
         const mappedData = Array.isArray(data.data)
           ? data.data.map((item) => ({
               id: item.uuid,
@@ -127,12 +127,12 @@ const ThermalZoneTabContent = ({
             }))
           : [];
 
-        console.log("Mapped data for DataGrid:", mappedData);
+
         setThermalZones(mappedData);
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error("Error fetching thermal zones:", jqXHR);
+
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorFetch ||

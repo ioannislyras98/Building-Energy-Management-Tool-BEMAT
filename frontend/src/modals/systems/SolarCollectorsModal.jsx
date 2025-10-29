@@ -180,13 +180,13 @@ function SolarCollectorsModalForm({
       },
       data: JSON.stringify(apiData),
       success: (response) => {
-        console.log("Solar collectors saved:", response);
+
         onSubmitSuccess(response);
         resetForm();
         onClose();
       },
       error: (jqXHR) => {
-        console.error("Error saving solar collectors:", jqXHR);
+
         handleApiError(jqXHR);
       },
     });

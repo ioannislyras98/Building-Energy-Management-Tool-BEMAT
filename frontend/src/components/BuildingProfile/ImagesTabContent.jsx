@@ -13,7 +13,7 @@ import greek_text from "../../languages/greek.json";
 import AddImageModal from "../../modals/images/AddImageModal";
 import EditImageModal from "../../modals/images/EditImageModal";
 import ConfirmationDialog from "../dialogs/ConfirmationDialog";
-import API_BASE_URL from "../../config/api.js";
+import { getImagesByBuilding, deleteImage } from "../../../services/ApiService";
 
 const ImagesTabContent = ({
   buildingUuid,
@@ -47,27 +47,10 @@ const ImagesTabContent = ({
 
     setLoading(true);
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/building-images/building/${buildingUuid}/`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Images fetched:", data);
-        setImages(data);
-      } else {
-        console.log("No images found or error fetching images");
-        setImages([]);
-      }
+      const data = await getImagesByBuilding(buildingUuid);
+      setImages(data);
     } catch (error) {
-      console.error("Error fetching images:", error);
+      setImages([]);
       setError(
         translations.fetchError || "Σφάλμα κατά την φόρτωση των εικόνων"
       );
@@ -90,29 +73,11 @@ const ImagesTabContent = ({
     if (!selectedImage) return;
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/building-images/${selectedImage.id}/`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        // Image deletion activity logging removed
-
-        handleImageDeleted(selectedImage.id);
-        setOpenDeleteDialog(false);
-        setSelectedImage(null);
-      } else {
-        setError(
-          translations.deleteError || "Σφάλμα κατά την διαγραφή της εικόνας"
-        );
-      }
+      await deleteImage(selectedImage.id);
+      handleImageDeleted(selectedImage.id);
+      setOpenDeleteDialog(false);
+      setSelectedImage(null);
     } catch (error) {
-      console.error("Error deleting image:", error);
       setError(
         translations.deleteError || "Σφάλμα κατά την διαγραφή της εικόνας"
       );
@@ -235,17 +200,8 @@ const ImagesTabContent = ({
                           src={image.image_url || image.image}
                           alt={image.title}
                           className="w-full h-full object-cover"
-                          onLoad={(e) => {
-                            console.log(
-                              "Image loaded successfully:",
-                              image.image_url || image.image
-                            );
-                          }}
+                          onLoad={(e) => {}}
                           onError={(e) => {
-                            console.error(
-                              "Image failed to load:",
-                              image.image_url || image.image
-                            );
                             e.target.style.display = "none";
                             const fallback = e.target.nextElementSibling;
                             if (fallback) {

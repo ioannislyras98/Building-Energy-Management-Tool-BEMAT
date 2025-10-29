@@ -132,17 +132,12 @@ function ThermalZoneModalForm({
         "Content-Type": "application/json",
       },
       data: JSON.stringify(apiData),
-      success: (response) => {
-        console.log(
-          isEditMode ? "Updated thermal zone:" : "Created thermal zone:",
-          response
-        );
-        onClose();
+      success: (response) => {onClose();
         resetForm();
         onSubmitSuccess(response);
       },
       error: (jqXHR) => {
-        console.error("Error with thermal zone:", jqXHR);
+
         handleApiError(jqXHR);
       },
     });

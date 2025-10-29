@@ -19,7 +19,7 @@ function AddImageModalForm({
   projectUuid,
   params,
 }) {
-  console.log("AddImageModal - isOpen:", isOpen, "params:", params);
+
 
   useModalBlur(isOpen);
 
@@ -108,9 +108,9 @@ function AddImageModalForm({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("AddImageModal - handleSubmit called");
-    console.log("AddImageModal - buildingUuid:", buildingUuid);
-    console.log("AddImageModal - formData:", formData);
+
+
+
 
     if (!validateForm()) return;
 
@@ -128,7 +128,7 @@ function AddImageModalForm({
     };
 
     const submitUrl = `${API_BASE_URL}/building-images/upload/`;
-    console.log("AddImageModal - Submit URL:", submitUrl);
+
 
     $.ajax({
       url: submitUrl,
@@ -147,7 +147,7 @@ function AddImageModalForm({
         setSelectedFile(null);
       },
       error: function (error) {
-        console.error("Error uploading image:", error);
+
         if (error.responseJSON && error.responseJSON.error) {
           const backendErrors = error.responseJSON.error;
           if (typeof backendErrors === "string") {
@@ -181,7 +181,7 @@ function AddImageModalForm({
 
   if (!isOpen) return null;
 
-  console.log("AddImageModal - Rendering modal content");
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">

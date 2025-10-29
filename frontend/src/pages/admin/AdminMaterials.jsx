@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import InputEntryModal from "../../modals/shared/InputEntryModal";
 import ConfirmationDialog from "../../components/dialogs/ConfirmationDialog";
 import "../../assets/styles/forms.css";
-import API_BASE_URL from "../../config/api.js";
+import { getMaterialCategories, getAllMaterials, createMaterial, updateMaterial, deleteMaterial } from "../../../services/ApiService";
 
 const cookies = new Cookies();
 
@@ -132,41 +132,18 @@ const AdminMaterials = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/materials/categories/list/`,
-        {
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setCategories(data.data || []);
-      }
+      const data = await getMaterialCategories();
+      setCategories(data.data || []);
     } catch (err) {
-      console.error("Error loading categories:", err);
+
     }
   };
 
   const fetchMaterials = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/materials/admin/all/`, {
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setMaterials(data);
-      } else {
-        setError("Failed to fetch materials");
-      }
+      const data = await getAllMaterials();
+      setMaterials(data);
     } catch (err) {
       setError("Error loading materials");
     } finally {
@@ -206,39 +183,24 @@ const AdminMaterials = () => {
     }
 
     try {
-      const url = editingMaterial
-        ? `${API_BASE_URL}/materials/${
-            editingMaterial.uuid || editingMaterial.id
-          }/`
-        : `${API_BASE_URL}/materials/`;
-
-      const method = editingMaterial ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        setShowAddModal(false);
-        setEditingMaterial(null);
-        setFormData({
-          name: "",
-          category: "",
-          thermal_conductivity: "",
-          description: "",
-          is_active: true,
-        });
-        setErrors({});
-        setShowValidationErrors(false);
-        fetchMaterials();
+      if (editingMaterial) {
+        await updateMaterial(editingMaterial.uuid || editingMaterial.id, formData);
       } else {
-        setError("Failed to save material");
+        await createMaterial(formData);
       }
+
+      setShowAddModal(false);
+      setEditingMaterial(null);
+      setFormData({
+        name: "",
+        category: "",
+        thermal_conductivity: "",
+        description: "",
+        is_active: true,
+      });
+      setErrors({});
+      setShowValidationErrors(false);
+      fetchMaterials();
     } catch (err) {
       setError("Error saving material");
     }
@@ -265,25 +227,10 @@ const AdminMaterials = () => {
     if (!materialToDelete) return;
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/materials/${
-          materialToDelete.uuid || materialToDelete.id
-        }/`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        fetchMaterials();
-        setDeleteDialogOpen(false);
-        setMaterialToDelete(null);
-      } else {
-        setError("Failed to delete material");
-      }
+      await deleteMaterial(materialToDelete.uuid || materialToDelete.id);
+      fetchMaterials();
+      setDeleteDialogOpen(false);
+      setMaterialToDelete(null);
     } catch (err) {
       setError("Error deleting material");
     }
@@ -316,15 +263,7 @@ const AdminMaterials = () => {
 
   const handleBulkDeleteConfirm = async () => {
     try {
-      const deletePromises = selectedMaterials.map((id) =>
-        fetch(`${API_BASE_URL}/materials/${id}/`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        })
-      );
-
+      const deletePromises = selectedMaterials.map((id) => deleteMaterial(id));
       await Promise.all(deletePromises);
       fetchMaterials();
       setSelectedMaterials([]);

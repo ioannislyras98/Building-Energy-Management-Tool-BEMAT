@@ -107,7 +107,7 @@ const ThermalInsulationMaterialModal = ({
         setAvailableMaterials(response.data || []);
       },
       error: (jqXHR) => {
-        console.error("Error fetching materials:", jqXHR);
+
         setError(
           translations.errorLoadMaterials || "Σφάλμα κατά τη φόρτωση υλικών"
         );
@@ -200,7 +200,7 @@ const ThermalInsulationMaterialModal = ({
       },
       data: JSON.stringify(formData),
       success: (data) => {
-        console.log("Material saved:", data);
+
         setLoading(false);
         if (onSubmitSuccess) {
           onSubmitSuccess(data);
@@ -208,7 +208,7 @@ const ThermalInsulationMaterialModal = ({
         handleClose();
       },
       error: (jqXHR) => {
-        console.error("Error saving material:", jqXHR);
+
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||

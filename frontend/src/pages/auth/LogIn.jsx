@@ -1,4 +1,3 @@
-import $ from "jquery";
 import React, { useState } from "react";
 import "./../../assets/styles/forms.css";
 import InputEntry from "./InputEntry";
@@ -7,7 +6,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import { BiHide, BiShow } from "react-icons/bi";
-import API_BASE_URL from "../../config/api.js";
+import { login, requestPasswordReset } from "../../../services/ApiService";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -20,74 +19,48 @@ function LogInForm({ params }) {
   const [emailMissed, setEmailMissed] = useState(false);
   const [Loading, setLoading] = useState(false);
 
-  function submitData(event) {
+  async function submitData(event) {
     event.preventDefault();
 
-    const payload = {
-      email: $(event.currentTarget).find("#email").val(),
-      password: $(event.currentTarget).find("#password").val(),
-    };
+    const email = event.currentTarget.querySelector("#email").value;
+    const password = event.currentTarget.querySelector("#password").value;
 
-    var settings = {
-      url: `${API_BASE_URL}/users/login/`,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: JSON.stringify(payload),
-    };
-
-    $.ajax(settings)
-      .done(function (response) {
-        console.log(response);
-        setError(false);
-        cookies.set("token", response.token, {
-          path: "/",
-          expires: new Date(Date.now() + 60 * 60 * 24 * 1000),
-        });
-        window.location.href = "/";
-      })
-      .fail((response) => {
-        console.log(response);
-        setError(true);
+    try {
+      const response = await login(email, password);
+      setError(false);
+      cookies.set("token", response.token, {
+        path: "/",
+        expires: new Date(Date.now() + 60 * 60 * 24 * 1000),
       });
+      window.location.href = "/";
+    } catch (error) {
+      setError(true);
+    }
   }
-  const handleForgotPassword = (event) => {
+  const handleForgotPassword = async (event) => {
     event.preventDefault();
     setForgotPasswordMMessage(false);
     setForgotPasswordMessageError(false);
     setEmailMissed(false);
     setLoading(true);
-    const email = $("#email").val();
+    const email = document.getElementById("email").value;
 
     if (!email) {
       setEmailMissed(true);
       setLoading(false);
       return;
     }
-    var settings = {
-      url: `${API_BASE_URL}/users/password-reset/`,
-      method: "POST",
-      timeout: 0,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: JSON.stringify({ email: email }),
-    };
 
-    $.ajax(settings)
-      .done(function (response) {
-        console.log(response);
-        setForgotPasswordMMessage(true);
-        setForgotPasswordMessageError(false);
-        setLoading(false);
-      })
-      .fail(function (error) {
-        console.log(error);
-        setForgotPasswordMessageError(true);
-        setForgotPasswordMMessage(false);
-        setLoading(false);
-      });
+    try {
+      await requestPasswordReset(email);
+      setForgotPasswordMMessage(true);
+      setForgotPasswordMessageError(false);
+      setLoading(false);
+    } catch (error) {
+      setForgotPasswordMessageError(true);
+      setForgotPasswordMMessage(false);
+      setLoading(false);
+    }
   };
 
   return (

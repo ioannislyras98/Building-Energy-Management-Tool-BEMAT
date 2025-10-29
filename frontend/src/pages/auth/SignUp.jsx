@@ -1,4 +1,3 @@
-import $ from "jquery";
 import React, { useState } from "react";
 import "./../../assets/styles/forms.css";
 import InputEntry from "./InputEntry";
@@ -8,16 +7,16 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import { BiHide, BiShow } from "react-icons/bi";
-import API_BASE_URL from "../../config/api.js";
+import { signup } from "../../../services/ApiService";
 
 const cookies = new Cookies(null, { path: "/" });
 
-function submitData(event, params, setErrorMsg) {
+async function submitData(event, params, setErrorMsg) {
   event.preventDefault();
   setErrorMsg(false);
 
-  const firstName = $(event.currentTarget).find("#name").val().trim();
-  const lastName = $(event.currentTarget).find("#surname").val().trim();
+  const firstName = event.currentTarget.querySelector("#name").value.trim();
+  const lastName = event.currentTarget.querySelector("#surname").value.trim();
 
   if (!firstName || !lastName) {
     setErrorMsg("Το όνομα και το επώνυμο είναι υποχρεωτικά πεδία");
@@ -25,36 +24,24 @@ function submitData(event, params, setErrorMsg) {
   }
 
   const payload = {
-    email: $(event.currentTarget).find("#email").val(),
-    password: btoa($(event.currentTarget).find("#password").val()),
+    email: event.currentTarget.querySelector("#email").value,
+    password: btoa(event.currentTarget.querySelector("#password").value),
     first_name: firstName,
     last_name: lastName,
   };
 
-  var settings = {
-    url: `${API_BASE_URL}/users/signup/`,
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    data: JSON.stringify(payload),
-  };
-
-  $.ajax(settings)
-    .done(function (response) {
-      console.log(response);
-      cookies.set("token", response.token, {
-        path: "/",
-        expires: new Date(Date.now() + 60 * 60 * 24 * 1000),
-      });
-      window.location.href = "/";
-    })
-    .fail((response) => {
-      console.log(response);
-      if (response.status === 400) {
-        setErrorMsg(true);
-      }
+  try {
+    const response = await signup(payload);
+    cookies.set("token", response.token, {
+      path: "/",
+      expires: new Date(Date.now() + 60 * 60 * 24 * 1000),
     });
+    window.location.href = "/";
+  } catch (error) {
+    if (error.response?.status === 400) {
+      setErrorMsg(true);
+    }
+  }
 }
 
 function SignUpForm({ params }) {

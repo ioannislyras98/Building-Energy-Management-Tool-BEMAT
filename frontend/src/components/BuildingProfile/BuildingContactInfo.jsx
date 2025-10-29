@@ -71,7 +71,7 @@ export default function BuildingContactInfo({
           onDeleteContact(currentContact);
         })
         .fail(function (error) {
-          console.error("Error deleting contact:", error);
+
           alert("Error deleting contact. Please try again.");
         })
         .always(function () {

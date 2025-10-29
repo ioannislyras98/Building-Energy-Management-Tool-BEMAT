@@ -204,14 +204,14 @@ const PhotovoltaicSystemForm = ({
         },
         data: JSON.stringify(submitData),
         success: (response) => {
-          console.log("Photovoltaic system saved successfully:", response);
+
           onSubmitSuccess(response);
           if (!editItem && onCancel) {
             onCancel();
           }
         },
         error: (xhr, status, error) => {
-          console.error("Error saving photovoltaic system:", error);
+
           const responseText = xhr.responseText;
           try {
             const errorData = JSON.parse(responseText);
@@ -228,7 +228,7 @@ const PhotovoltaicSystemForm = ({
         },
       });
     } catch (error) {
-      console.error("Error:", error);
+
       setErrors({ general: "Σφάλμα κατά την αποθήκευση" });
     } finally {
       setLoading(false);

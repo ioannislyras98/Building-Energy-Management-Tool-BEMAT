@@ -168,7 +168,7 @@ const NaturalGasNetworkTabContent = ({
         }
       },
       error: (jqXHR) => {
-        console.log("Could not fetch energy consumptions for cost calculation");
+
       },
     });
   };
@@ -211,7 +211,7 @@ const NaturalGasNetworkTabContent = ({
       },
       error: (jqXHR) => {
         // Silently fail - it's okay if no data exists yet
-        console.log("No existing natural gas network data found");
+
       },
     });
   };
@@ -252,12 +252,12 @@ const NaturalGasNetworkTabContent = ({
       },
       data: JSON.stringify(submitData),
       success: (response) => {
-        console.log("Natural gas network data auto-saved:", response);
+
         setSuccess(translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς");
         setTimeout(() => setSuccess(null), 3000);
       },
       error: (jqXHR) => {
-        console.error("Error auto-saving natural gas network data:", jqXHR);
+
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
@@ -403,14 +403,14 @@ const NaturalGasNetworkTabContent = ({
       },
       data: JSON.stringify(submitData),
       success: (response) => {
-        console.log("Natural gas network data saved:", response);
+
         setSuccess(
           translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
         );
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error("Error saving natural gas network data:", jqXHR);
+
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||

@@ -29,7 +29,7 @@ const BuildingsView = ({
     if (selectedProject && selectedProject.uuid && buildingUuid) {
       navigate(`/projects/${selectedProject.uuid}/buildings/${buildingUuid}`);
     } else {
-      console.error("Missing project or building UUID for navigation");
+
     }
   };
 

@@ -12,7 +12,7 @@ export const formatDate = (dateString) => {
 
     return `${day}-${month}-${year}`;
   } catch (error) {
-    console.warn("Error formatting date:", error);
+
     return dateString;
   }
 };

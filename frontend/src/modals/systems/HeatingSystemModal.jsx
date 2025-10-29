@@ -156,13 +156,13 @@ function HeatingSystemModalForm({
       },
       data: JSON.stringify(apiData),
       success: (response) => {
-        console.log("Heating system saved:", response);
+
         onSubmitSuccess(response);
         resetForm();
         onClose();
       },
       error: (jqXHR) => {
-        console.error("Error saving heating system:", jqXHR);
+
         handleApiError(jqXHR);
       },
     });

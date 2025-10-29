@@ -94,7 +94,7 @@ const BulbReplacementTabContent = ({
       },
       error: (jqXHR) => {
         // Silently fail - it's okay if no data exists yet
-        console.log("No existing bulb replacement data found");
+
       },
     });
   };
@@ -175,14 +175,14 @@ const BulbReplacementTabContent = ({
       },
       data: JSON.stringify(submitData),
       success: (response) => {
-        console.log("Bulb replacement data auto-saved:", response);
+
         setSuccess(
           translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
         );
         setTimeout(() => setSuccess(null), 3000);
       },
       error: (jqXHR) => {
-        console.error("Error auto-saving bulb replacement data:", jqXHR);
+
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
@@ -344,14 +344,14 @@ const BulbReplacementTabContent = ({
       },
       data: JSON.stringify(submitData),
       success: (response) => {
-        console.log("Bulb replacement data saved:", response);
+
         setSuccess(
           translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
         );
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error("Error saving bulb replacement data:", jqXHR);
+
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||

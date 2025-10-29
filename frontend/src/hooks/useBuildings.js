@@ -1,8 +1,6 @@
 import { useState, useCallback } from "react";
-import $ from "jquery";
-import Cookies from "universal-cookie";
 import { useSidebar } from "../context/SidebarContext";
-import API_BASE_URL from "../config/api.js";
+import { getBuildingsByProject } from "../../services/ApiService";
 
 export const useBuildings = () => {
   const [buildings, setBuildings] = useState([]);
@@ -10,11 +8,8 @@ export const useBuildings = () => {
   const [error, setError] = useState(null);
   const { refreshSidebar } = useSidebar();
 
-  const cookies = new Cookies(null, { path: "/" });
-  const token = cookies.get("token") || "";
-
   const fetchBuildings = useCallback(
-    (projectUuid) => {
+    async (projectUuid) => {
       if (!projectUuid) {
         setBuildings([]);
         return;
@@ -23,54 +18,26 @@ export const useBuildings = () => {
       setLoading(true);
       setError(null);
 
-      const settings = {
-        url: `${API_BASE_URL}/buildings/get/?project=${projectUuid}`,
-        method: "GET",
-        timeout: 0,
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      };
-
-      console.log("Fetching buildings with settings:", settings);
-      $.ajax(settings)
-        .done(function (response) {
-          console.log("Buildings fetched successfully:", response);
-          const buildingsArray = Array.isArray(response)
-            ? response
-            : response.buildings || response.data || [];
-          setBuildings(buildingsArray);
-        })
-        .fail(function (jqXHR, textStatus, errorThrown) {
-          console.error(
-            "Failed to fetch buildings:",
-            textStatus,
-            errorThrown,
-            jqXHR
-          );
-          console.log(
-            "Fetch buildings failed. jqXHR:",
-            jqXHR,
-            "textStatus:",
-            textStatus,
-            "errorThrown:",
-            errorThrown
-          );
-          const errorMessage =
-            jqXHR.responseJSON?.error ||
-            jqXHR.statusText ||
-            "Failed to fetch buildings.";
-          setError(errorMessage);
-          if (jqXHR.responseJSON?.error) {
-            alert(jqXHR.responseJSON.error);
-          }
-        })
-        .always(function () {
-          console.log("Fetch buildings AJAX call finished.");
-          setLoading(false);
-        });
+      try {
+        const response = await getBuildingsByProject(projectUuid);
+        const buildingsArray = Array.isArray(response)
+          ? response
+          : response.buildings || response.data || [];
+        setBuildings(buildingsArray);
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.error ||
+          err.message ||
+          "Failed to fetch buildings.";
+        setError(errorMessage);
+        if (err.response?.data?.error) {
+          alert(err.response.data.error);
+        }
+      } finally {
+        setLoading(false);
+      }
     },
-    [token]
+    []
   );
 
   const handleBuildingCreated = useCallback(

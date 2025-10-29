@@ -8,10 +8,9 @@ import BuildingBasicInfo from "../components/BuildingProfile/BuildingBasicInfo";
 import BuildingContactInfo from "../components/BuildingProfile/BuildingContactInfo";
 import BuildingTabs from "../components/BuildingProfile/BuildingTabs";
 import Cookies from "universal-cookie";
-import $ from "jquery";
 import { useModalBlur } from "../hooks/useModals";
 import { Modals } from "../components/Modals";
-import API_BASE_URL from "../config/api.js";
+import { getBuildingById, deleteBuilding } from "../../services/ApiService";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -45,7 +44,7 @@ export default function BuildingProfilePage() {
 
   const [currentContact, setCurrentContact] = useState(null);
 
-  const fetchBuildingDetails = () => {
+  const fetchBuildingDetails = async () => {
     const token = cookies.get("token");
     if (!token) {
       setError(text?.errors?.auth || "Authentication required.");
@@ -53,27 +52,18 @@ export default function BuildingProfilePage() {
       return;
     }
     setLoading(true);
-    $.ajax({
-      url: `${API_BASE_URL}/buildings/get/${buildingUuid}/`,
-      method: "GET",
-      headers: {
-        Authorization: `Token ${token}`,
-      },
-      success: (data) => {
-        console.log("Building data received from API:", data);
-        setBuilding(data);
-        setLoading(false);
-      },
-      error: (err) => {
-        console.error("Error fetching building details:", err);
-        setError(
-          err.responseJSON?.error ||
-            text?.errors?.generic ||
-            "Failed to fetch building details."
-        );
-        setLoading(false);
-      },
-    });
+    try {
+      const data = await getBuildingById(buildingUuid);
+      setBuilding(data);
+      setLoading(false);
+    } catch (err) {
+      setError(
+        err.response?.data?.error ||
+          text?.errors?.generic ||
+          "Failed to fetch building details."
+      );
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -89,14 +79,14 @@ export default function BuildingProfilePage() {
   };
 
   const handleAddContact = () => {
-    console.log("BuildingProfilePage - handleAddContact called");
-    console.log("Building object:", building);
-    console.log("Building UUID:", building?.uuid);
+
+
+
     if (building) {
-      console.log("Opening AddContactModal...");
+
       openAddContactModal();
     } else {
-      console.log("Building is null/undefined, cannot open modal");
+
     }
   };
 
@@ -123,34 +113,22 @@ export default function BuildingProfilePage() {
     fetchBuildingDetails();
   };
 
-  const handleDeleteBuilding = (buildingToDelete) => {
+  const handleDeleteBuilding = async (buildingToDelete) => {
     const token = cookies.get("token");
     if (!token) {
       alert(text?.errors?.auth || "Authentication required.");
       return;
     }
 
-    const settings = {
-      url: `${API_BASE_URL}/buildings/delete/${buildingToDelete.data.uuid}/`,
-      method: "DELETE",
-      timeout: 0,
-      headers: {
-        Authorization: `Token ${token}`,
-      },
-    };
-
-    $.ajax(settings)
-      .done(function (response) {
-        console.log("Building deleted successfully:", response);
-        navigate(`/projects/${projectUuid}`);
-      })
-      .fail(function (error) {
-        console.error("Error deleting building:", error);
-        alert(
-          text?.errors?.generic ||
-            "An error occurred while deleting the building."
-        );
-      });
+    try {
+      await deleteBuilding(buildingToDelete.data.uuid);
+      navigate(`/projects/${projectUuid}`);
+    } catch (error) {
+      alert(
+        text?.errors?.generic ||
+          "An error occurred while deleting the building."
+      );
+    }
   };
 
   if (loading) {
@@ -184,7 +162,7 @@ export default function BuildingProfilePage() {
                 <div className="flex items-center space-x-6">
                   <button
                     onClick={() => {
-                      console.log("Back to Buildings button clicked");
+
                       navigate(`/projects/${projectUuid}`);
                     }}
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">

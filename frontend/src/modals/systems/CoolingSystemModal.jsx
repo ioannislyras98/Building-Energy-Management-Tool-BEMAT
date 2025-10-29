@@ -147,13 +147,13 @@ function CoolingSystemModalForm({
       },
       data: JSON.stringify(apiData),
       success: (response) => {
-        console.log("Cooling system saved:", response);
+
         onSubmitSuccess(response);
         resetForm();
         onClose();
       },
       error: (jqXHR) => {
-        console.error("Error saving cooling system:", jqXHR);
+
         handleApiError(jqXHR);
       },
     });

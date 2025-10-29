@@ -18,7 +18,7 @@ function AddContactModalForm({
   buildingUuid,
   params,
 }) {
-  console.log("AddContactModal - isOpen:", isOpen, "params:", params);
+
 
   useModalBlur(isOpen);
 
@@ -77,14 +77,14 @@ function AddContactModalForm({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("AddContactModal - handleSubmit called");
-    console.log("AddContactModal - buildingUuid:", buildingUuid);
-    console.log("AddContactModal - formData:", formData);
+
+
+
 
     if (!validateForm()) return;
 
     const submitUrl = `${API_BASE_URL}/buildings/${buildingUuid}/contacts/create/`;
-    console.log("AddContactModal - Submit URL:", submitUrl);
+
 
     $.ajax({
       url: submitUrl,
@@ -120,9 +120,9 @@ function AddContactModalForm({
 
   if (!isOpen) return null;
 
-  console.log("AddContactModal - Rendering modal content");
-  console.log("AddContactModal - params:", params);
-  console.log("AddContactModal - buildingUuid:", buildingUuid);
+
+
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">

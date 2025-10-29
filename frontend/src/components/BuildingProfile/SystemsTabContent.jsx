@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import $ from "jquery";
-import Cookies from "universal-cookie";
 import { useProgress } from "../../context/ProgressContext";
 import BoilerDetailModal from "../../modals/systems/BoilerDetailModal";
 import CoolingSystemModal from "../../modals/systems/CoolingSystemModal";
@@ -8,9 +6,18 @@ import HeatingSystemModal from "../../modals/systems/HeatingSystemModal";
 import HotWaterSystemModal from "../../modals/systems/HotWaterSystemModal";
 import SolarCollectorsModal from "../../modals/systems/SolarCollectorsModal";
 import ConfirmationDialog from "../dialogs/ConfirmationDialog";
-import API_BASE_URL from "../../config/api.js";
-
-const cookies = new Cookies();
+import {
+  getBoilerDetailsByBuilding,
+  getCoolingSystemByBuilding,
+  getHeatingSystemByBuilding,
+  getHotWaterSystemByBuilding,
+  getSolarCollectorsByBuilding,
+  deleteBoilerDetail,
+  deleteCoolingSystem,
+  deleteHeatingSystem,
+  deleteHotWaterSystem,
+  deleteSolarCollectors,
+} from "../../../services/ApiService";
 
 const SystemsTabContent = ({
   buildingUuid,
@@ -43,7 +50,6 @@ const SystemsTabContent = ({
   });
 
   const [loading, setLoading] = useState(true);
-  const token = cookies.get("token") || "";
 
   useEffect(() => {
     if (buildingUuid) {
@@ -64,110 +70,65 @@ const SystemsTabContent = ({
 
       await Promise.all(promises);
     } catch (error) {
-      console.error("Error fetching systems data:", error);
+
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchBoilerData = () => {
-    return new Promise((resolve) => {
-      $.ajax({
-        url: `${API_BASE_URL}/boiler_details/building/${buildingUuid}/`,
-        method: "GET",
-        headers: { Authorization: `Token ${token}` },
-        success: (response) => {
-          const boilerData =
-            response.data && response.data.length > 0 ? response.data[0] : null;
-          setSystems((prev) => ({ ...prev, boiler: boilerData }));
-          resolve();
-        },
-        error: () => {
-          setSystems((prev) => ({ ...prev, boiler: null }));
-          resolve();
-        },
-      });
-    });
+  const fetchBoilerData = async () => {
+    try {
+      const response = await getBoilerDetailsByBuilding(buildingUuid);
+      const boilerData =
+        response.data && response.data.length > 0 ? response.data[0] : null;
+      setSystems((prev) => ({ ...prev, boiler: boilerData }));
+    } catch (error) {
+      setSystems((prev) => ({ ...prev, boiler: null }));
+    }
   };
 
-  const fetchCoolingData = () => {
-    return new Promise((resolve) => {
-      $.ajax({
-        url: `${API_BASE_URL}/cooling_systems/building/${buildingUuid}/`,
-        method: "GET",
-        headers: { Authorization: `Token ${token}` },
-        success: (response) => {
-          const coolingData =
-            response.data && response.data.length > 0 ? response.data[0] : null;
-          setSystems((prev) => ({ ...prev, cooling: coolingData }));
-          resolve();
-        },
-        error: () => {
-          setSystems((prev) => ({ ...prev, cooling: null }));
-          resolve();
-        },
-      });
-    });
+  const fetchCoolingData = async () => {
+    try {
+      const response = await getCoolingSystemByBuilding(buildingUuid);
+      const coolingData =
+        response.data && response.data.length > 0 ? response.data[0] : null;
+      setSystems((prev) => ({ ...prev, cooling: coolingData }));
+    } catch (error) {
+      setSystems((prev) => ({ ...prev, cooling: null }));
+    }
   };
 
-  const fetchHeatingData = () => {
-    return new Promise((resolve) => {
-      $.ajax({
-        url: `${API_BASE_URL}/heating_systems/building/${buildingUuid}/`,
-        method: "GET",
-        headers: { Authorization: `Token ${token}` },
-        success: (response) => {
-          const heatingData =
-            response.data && response.data.length > 0 ? response.data[0] : null;
-          setSystems((prev) => ({ ...prev, heating: heatingData }));
-          resolve();
-        },
-        error: () => {
-          setSystems((prev) => ({ ...prev, heating: null }));
-          resolve();
-        },
-      });
-    });
+  const fetchHeatingData = async () => {
+    try {
+      const response = await getHeatingSystemByBuilding(buildingUuid);
+      const heatingData =
+        response.data && response.data.length > 0 ? response.data[0] : null;
+      setSystems((prev) => ({ ...prev, heating: heatingData }));
+    } catch (error) {
+      setSystems((prev) => ({ ...prev, heating: null }));
+    }
   };
 
-  const fetchHotWaterData = () => {
-    return new Promise((resolve) => {
-      $.ajax({
-        url: `${API_BASE_URL}/domestic_hot_water_systems/building/${buildingUuid}/`,
-        method: "GET",
-        headers: { Authorization: `Token ${token}` },
-        success: (response) => {
-          const hotWaterData =
-            response.data && response.data.length > 0 ? response.data[0] : null;
-          setSystems((prev) => ({ ...prev, hotWater: hotWaterData }));
-          resolve();
-        },
-        error: () => {
-          setSystems((prev) => ({ ...prev, hotWater: null }));
-          resolve();
-        },
-      });
-    });
+  const fetchHotWaterData = async () => {
+    try {
+      const response = await getHotWaterSystemByBuilding(buildingUuid);
+      const hotWaterData =
+        response.data && response.data.length > 0 ? response.data[0] : null;
+      setSystems((prev) => ({ ...prev, hotWater: hotWaterData }));
+    } catch (error) {
+      setSystems((prev) => ({ ...prev, hotWater: null }));
+    }
   };
 
-  const fetchSolarCollectorsData = () => {
-    return new Promise((resolve) => {
-      $.ajax({
-        url: `${API_BASE_URL}/solar_collectors/building/${buildingUuid}/`,
-        method: "GET",
-        headers: { Authorization: `Token ${token}` },
-        success: (response) => {
-          const solarData =
-            response.data && response.data.length > 0 ? response.data[0] : null;
-          setSystems((prev) => ({ ...prev, solarCollectors: solarData }));
-          resolve();
-        },
-        error: () => {
-          setSystems((prev) => ({ ...prev, solarCollectors: null }));
-          resolve();
-        },
-      });
-    });
+  const fetchSolarCollectorsData = async () => {
+    try {
+      const response = await getSolarCollectorsByBuilding(buildingUuid);
+      const solarData =
+        response.data && response.data.length > 0 ? response.data[0] : null;
+      setSystems((prev) => ({ ...prev, solarCollectors: solarData }));
+    } catch (error) {
+      setSystems((prev) => ({ ...prev, solarCollectors: null }));
+    }
   };
 
   const handleOpenModal = (systemType, editItem = null) => {
@@ -198,33 +159,26 @@ const SystemsTabContent = ({
     });
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     const { systemType, systemData } = deleteDialog;
     if (!systemData) return;
 
-    const endpoints = {
-      boiler: `boiler_details/delete/${systemData.uuid}/`,
-      cooling: `cooling_systems/delete/${systemData.uuid}/`,
-      heating: `heating_systems/delete/${systemData.uuid}/`,
-      hotWater: `domestic_hot_water_systems/delete/${systemData.uuid}/`,
-      solarCollectors: `solar_collectors/delete/${systemData.uuid}/`,
+    const deleteFunctions = {
+      boiler: deleteBoilerDetail,
+      cooling: deleteCoolingSystem,
+      heating: deleteHeatingSystem,
+      hotWater: deleteHotWaterSystem,
+      solarCollectors: deleteSolarCollectors,
     };
 
-    $.ajax({
-      url: `${API_BASE_URL}/${endpoints[systemType]}`,
-      method: "DELETE",
-      headers: { Authorization: `Token ${token}` },
-      success: () => {
-        setSystems((prev) => ({ ...prev, [systemType]: null }));
-        setDeleteDialog({ open: false, systemType: null, systemData: null });
-        triggerProgressRefresh(); // Trigger progress refresh when system is deleted
-        console.log(`${systemType} system deleted successfully`);
-      },
-      error: (jqXHR) => {
-        console.error(`Error deleting ${systemType} system:`, jqXHR);
-        setDeleteDialog({ open: false, systemType: null, systemData: null });
-      },
-    });
+    try {
+      await deleteFunctions[systemType](systemData.uuid);
+      setSystems((prev) => ({ ...prev, [systemType]: null }));
+      setDeleteDialog({ open: false, systemType: null, systemData: null });
+      triggerProgressRefresh();
+    } catch (error) {
+      setDeleteDialog({ open: false, systemType: null, systemData: null });
+    }
   };
 
   const translations = params?.systemsContent || {};

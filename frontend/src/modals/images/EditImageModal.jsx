@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import $ from "jquery";
 import Cookies from "universal-cookie";
 import "./../../assets/styles/forms.css";
 import { useLanguage } from "../../context/LanguageContext";
 import { useModalBlur } from "../../hooks/useModals";
-import API_BASE_URL from "../../config/api.js";
+import { updateImage } from "../../../services/ApiService";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import InputEntryModal from "../shared/InputEntryModal";
@@ -18,7 +17,7 @@ function EditImageModalForm({
   image,
   params,
 }) {
-  console.log("EditImageModal - isOpen:", isOpen, "image:", image);
+
 
   useModalBlur(isOpen);
 
@@ -111,11 +110,8 @@ function EditImageModalForm({
     return isValid;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("EditImageModal - handleSubmit called");
-    console.log("EditImageModal - image:", image);
-    console.log("EditImageModal - formData:", formData);
 
     if (!validateForm()) return;
 
@@ -136,40 +132,25 @@ function EditImageModalForm({
       submitData.image_size = selectedFile.size;
     }
 
-    const submitUrl = `${API_BASE_URL}/building-images/${image.id}/`;
-    console.log("EditImageModal - Submit URL:", submitUrl);
-
-    $.ajax({
-      url: submitUrl,
-      method: "PUT",
-      headers: {
-        Authorization: `Token ${token}`,
-        "Content-Type": "application/json",
-      },
-      data: JSON.stringify(submitData),
-      success: function (response) {
-        // Image update activity logging removed
-
-        onImageUpdated(response);
-        onClose();
-        setSelectedFile(null);
-      },
-      error: function (error) {
-        console.error("Error updating image:", error);
-        if (error.responseJSON && error.responseJSON.error) {
-          const backendErrors = error.responseJSON.error;
-          if (typeof backendErrors === "string") {
-            setErrors({ general: backendErrors });
-          } else {
-            setErrors(backendErrors);
-          }
+    try {
+      const response = await updateImage(image.id, submitData);
+      onImageUpdated(response);
+      onClose();
+      setSelectedFile(null);
+    } catch (error) {
+      if (error.response?.data?.error) {
+        const backendErrors = error.response.data.error;
+        if (typeof backendErrors === "string") {
+          setErrors({ general: backendErrors });
         } else {
-          setErrors({
-            general: params.errorGeneral || "Failed to update image.",
-          });
+          setErrors(backendErrors);
         }
-      },
-    });
+      } else {
+        setErrors({
+          general: params.errorGeneral || "Failed to update image.",
+        });
+      }
+    }
   };
 
   const categoryOptions = [
@@ -189,7 +170,7 @@ function EditImageModalForm({
 
   if (!isOpen || !image) return null;
 
-  console.log("EditImageModal - Rendering modal content");
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">

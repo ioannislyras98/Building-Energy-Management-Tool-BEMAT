@@ -16,7 +16,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "../../assets/styles/forms.css";
-import API_BASE_URL from "../../config/api.js";
+import { getAllPrefectures, createPrefecture, updatePrefecture, deletePrefecture } from "../../../services/ApiService";
 
 const cookies = new Cookies();
 
@@ -98,19 +98,8 @@ const AdminPrefectures = () => {
   const fetchPrefectures = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/prefectures/admin/all/`, {
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setPrefectures(data);
-      } else {
-        setError("Failed to fetch prefectures");
-      }
+      const data = await getAllPrefectures();
+      setPrefectures(data);
     } catch (err) {
       setError("Error loading prefectures");
     } finally {
@@ -143,52 +132,36 @@ const AdminPrefectures = () => {
     }
 
     try {
-      const url = editingPrefecture
-        ? `${API_BASE_URL}/prefectures/${
-            editingPrefecture.uuid || editingPrefecture.id
-          }/`
-        : `${API_BASE_URL}/prefectures/`;
-
-      const method = editingPrefecture ? "PUT" : "POST";
-
       const submitData = {
         ...formData,
         temperature_winter: parseFloat(formData.temperature_winter),
         temperature_summer: parseFloat(formData.temperature_summer),
       };
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(submitData),
-      });
-
-      if (response.ok) {
-        setShowAddModal(false);
-        setEditingPrefecture(null);
-        setFormData({
-          name: "",
-          zone: "",
-          temperature_winter: "",
-          temperature_summer: "",
-          is_active: true,
-        });
-        setErrors({});
-        setShowValidationErrors(false);
-        fetchPrefectures();
+      if (editingPrefecture) {
+        await updatePrefecture(editingPrefecture.uuid || editingPrefecture.id, submitData);
       } else {
-        const errorData = await response.json();
-        if (errorData.errors) {
-          setErrors(errorData.errors);
-        } else {
-          setError(text.saveFailed);
-        }
+        await createPrefecture(submitData);
       }
+
+      setShowAddModal(false);
+      setEditingPrefecture(null);
+      setFormData({
+        name: "",
+        zone: "",
+        temperature_winter: "",
+        temperature_summer: "",
+        is_active: true,
+      });
+      setErrors({});
+      setShowValidationErrors(false);
+      fetchPrefectures();
     } catch (err) {
-      setError(text.saveError);
+      if (err.response?.data?.errors) {
+        setErrors(err.response.data.errors);
+      } else {
+        setError(text.saveError);
+      }
     }
   };
 
@@ -214,25 +187,10 @@ const AdminPrefectures = () => {
     if (!prefectureToDelete) return;
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/prefectures/${
-          prefectureToDelete.uuid || prefectureToDelete.id
-        }/`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        fetchPrefectures();
-        setDeleteDialogOpen(false);
-        setPrefectureToDelete(null);
-      } else {
-        setError("Failed to delete prefecture");
-      }
+      await deletePrefecture(prefectureToDelete.uuid || prefectureToDelete.id);
+      fetchPrefectures();
+      setDeleteDialogOpen(false);
+      setPrefectureToDelete(null);
     } catch (err) {
       setError("Error deleting prefecture");
     }
@@ -265,15 +223,7 @@ const AdminPrefectures = () => {
 
   const handleBulkDeleteConfirm = async () => {
     try {
-      const deletePromises = selectedPrefectures.map((id) =>
-        fetch(`${API_BASE_URL}/prefectures/${id}/`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        })
-      );
-
+      const deletePromises = selectedPrefectures.map((id) => deletePrefecture(id));
       await Promise.all(deletePromises);
       fetchPrefectures();
       setSelectedPrefectures([]);

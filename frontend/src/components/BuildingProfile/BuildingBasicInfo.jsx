@@ -16,7 +16,7 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { language } = useLanguage();
 
-  console.log("BuildingBasicInfo received props:", { building, params });
+
 
   const dialogText =
     language === "en"

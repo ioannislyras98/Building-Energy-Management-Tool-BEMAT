@@ -153,7 +153,7 @@ const BoilerReplacementTabContent = ({
       }
     } catch (error) {
       if (error.message && !error.message.includes("404")) {
-        console.error("Error fetching boiler replacement data:", error);
+
         setError("Σφάλμα κατά την φόρτωση των δεδομένων");
       }
     } finally {
@@ -217,7 +217,7 @@ const BoilerReplacementTabContent = ({
         setErrorField(null);
       }
     } catch (error) {
-      console.error("Error saving boiler replacement data:", error);
+
       if (showMessage) {
         setError("Σφάλμα κατά την αποθήκευση των δεδομένων");
         setTimeout(() => {

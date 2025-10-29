@@ -152,12 +152,7 @@ const PhotovoltaicSystemTabContent = ({
   }, [buildingUuid, projectUuid]);
 
   const fetchOrCreatePhotovoltaicSystem = () => {
-    if (!buildingUuid || !token) {
-      console.log("Missing buildingUuid or token:", {
-        buildingUuid,
-        token: !!token,
-      });
-      return;
+    if (!buildingUuid || !token) {return;
     }
 
     setLoading(true);
@@ -169,18 +164,14 @@ const PhotovoltaicSystemTabContent = ({
         Authorization: `Token ${token}`,
       },
       success: (data) => {
-        console.log("Fetched photovoltaic systems data:", data);
+
         if (data && data.length > 0) {
           const existing = data[0];
-          console.log("Found existing photovoltaic system:", existing);
+
           setCurrentPhotovoltaicSystem(existing);
           setPhotovoltaicSystem(existing);
           setHasBackendData(true); // Mark that we have backend data
-        } else {
-          console.log(
-            "No existing photovoltaic system found, setting up for new one"
-          );
-          // No existing system found - set up for creating a new one
+        } else {// No existing system found - set up for creating a new one
           setCurrentPhotovoltaicSystem(null);
           setHasBackendData(false); // No backend data for new system
           setPhotovoltaicSystem({
@@ -225,7 +216,7 @@ const PhotovoltaicSystemTabContent = ({
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error("Error fetching photovoltaic system:", jqXHR);
+
         // On error, set up for creating a new system
         setCurrentPhotovoltaicSystem(null);
         setHasBackendData(false); // No backend data on error
@@ -309,7 +300,7 @@ const PhotovoltaicSystemTabContent = ({
 
   const handleSave = () => {
     if (!token) {
-      console.log("Missing token for saving");
+
       setError(
         translations.errorSave ||
           "Δεν είναι δυνατή η αποθήκευση - λείπει το token πιστοποίησης"
@@ -332,15 +323,7 @@ const PhotovoltaicSystemTabContent = ({
     const method = isUpdate ? "PUT" : "POST";
     const url = isUpdate
       ? `${API_BASE_URL}/photovoltaic_systems/${currentPhotovoltaicSystem.uuid}/`
-      : `${API_BASE_URL}/photovoltaic_systems/`;
-
-    console.log(`${isUpdate ? "Updating" : "Creating"} photovoltaic system:`, {
-      method,
-      url,
-      data: updatedPhotovoltaicSystem,
-    });
-
-    $.ajax({
+      : `${API_BASE_URL}/photovoltaic_systems/`;$.ajax({
       url: url,
       method: method,
       headers: {
@@ -348,20 +331,7 @@ const PhotovoltaicSystemTabContent = ({
         "Content-Type": "application/json",
       },
       data: JSON.stringify(updatedPhotovoltaicSystem),
-      success: (data) => {
-        console.log(
-          `Photovoltaic system ${
-            isUpdate ? "updated" : "created"
-          } successfully:`,
-          data
-        );
-
-        // Backend now returns full data with calculated fields, no need for additional GET request
-        console.log(
-          "Using backend response data with calculated fields:",
-          data
-        );
-        setPhotovoltaicSystem(data);
+      success: (data) => {// Backend now returns full data with calculated fields, no need for additional GET requestsetPhotovoltaicSystem(data);
         setCurrentPhotovoltaicSystem(data);
         setHasBackendData(true); // Mark that we have backend data
 
@@ -375,10 +345,6 @@ const PhotovoltaicSystemTabContent = ({
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error(
-          `Error ${isUpdate ? "updating" : "creating"} photovoltaic system:`,
-          jqXHR
-        );
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||

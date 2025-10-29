@@ -72,7 +72,7 @@ const ProjectsManagement = () => {
         setError(data.message || "Failed to fetch projects");
       }
     } catch (error) {
-      console.error("Error fetching projects:", error);
+
       setError(error.message);
     } finally {
       setLoading(false);
@@ -109,7 +109,7 @@ const ProjectsManagement = () => {
         throw new Error(data.error || "Failed to delete projects");
       }
     } catch (error) {
-      console.error("Error deleting projects:", error);
+
       alert(`Error: ${error.message}`);
     }
   };
@@ -374,7 +374,7 @@ const ProjectsManagement = () => {
       setDeleteDialogOpen(false);
       setProjectToDelete(null);
     } catch (error) {
-      console.error("Error deleting project:", error);
+
     }
   };
 

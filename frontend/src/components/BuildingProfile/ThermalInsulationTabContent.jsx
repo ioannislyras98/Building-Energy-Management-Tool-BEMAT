@@ -118,7 +118,7 @@ const ThermalInsulationTabContent = ({
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error("Error fetching thermal insulation:", jqXHR);
+
         createNewThermalInsulation();
       },
     });
@@ -156,7 +156,7 @@ const ThermalInsulationTabContent = ({
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error("Error creating thermal insulation:", jqXHR);
+
         setError(
           translations.errorLoad ||
             "Σφάλμα κατά τη δημιουργία νέας θερμομόνωσης"
@@ -200,7 +200,7 @@ const ThermalInsulationTabContent = ({
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error("Error saving thermal insulation:", jqXHR);
+
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
@@ -255,7 +255,7 @@ const ThermalInsulationTabContent = ({
         );
       },
       error: (jqXHR) => {
-        console.error("Error deleting material:", jqXHR);
+
         setError(
           translations.errorMaterialDelete ||
             "Σφάλμα κατά τη διαγραφή του υλικού"

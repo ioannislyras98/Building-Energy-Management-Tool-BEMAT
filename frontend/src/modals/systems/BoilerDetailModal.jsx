@@ -184,13 +184,13 @@ function BoilerDetailModalForm({
       },
       data: JSON.stringify(apiData),
       success: (response) => {
-        console.log("Boiler detail saved:", response);
+
         onSubmitSuccess(response);
         resetForm();
         onClose();
       },
       error: (jqXHR) => {
-        console.error("Error saving boiler detail:", jqXHR);
+
         handleApiError(jqXHR);
       },
     });

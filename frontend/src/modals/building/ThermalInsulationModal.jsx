@@ -144,7 +144,7 @@ const ThermalInsulationModal = ({
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error("Error fetching thermal insulation:", jqXHR);
+
         setError("Σφάλμα κατά τη φόρτωση δεδομένων");
         setLoading(false);
       },
@@ -190,7 +190,7 @@ const ThermalInsulationModal = ({
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error("Error saving thermal insulation:", jqXHR);
+
         setError(jqXHR.responseJSON?.detail || "Σφάλμα κατά την αποθήκευση");
         setLoading(false);
       },
@@ -239,7 +239,7 @@ const ThermalInsulationModal = ({
         setSuccess("Το υλικό διαγράφηκε επιτυχώς!");
       },
       error: (jqXHR) => {
-        console.error("Error deleting material:", jqXHR);
+
         setError("Σφάλμα κατά τη διαγραφή του υλικού");
         setDeleteDialogOpen(false);
       },

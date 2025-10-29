@@ -55,7 +55,7 @@ export default function Sidenav() {
           setUserInfo(data.data);
         }
       } catch (error) {
-        console.error("Error fetching user info:", error);
+
       }
     };
 
@@ -71,7 +71,7 @@ export default function Sidenav() {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("Projects API response:", data);
+
           if (Array.isArray(data)) {
             setProjects(data);
           } else if (data.projects && Array.isArray(data.projects)) {
@@ -83,12 +83,12 @@ export default function Sidenav() {
           ) {
             setProjects(data.data.projects);
           } else {
-            console.log("Unexpected projects data structure:", data);
+
             setProjects([]);
           }
         }
       } catch (error) {
-        console.error("Error fetching projects:", error);
+
       }
     };
 

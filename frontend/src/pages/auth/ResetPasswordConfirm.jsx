@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import $ from "jquery";
 import "./../../assets/styles/forms.css";
 import InputEntry from "./InputEntry";
 import Cookies from "universal-cookie";
@@ -8,7 +7,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import { BiHide, BiShow } from "react-icons/bi";
-import API_BASE_URL from "../../config/api.js";
+import { confirmPasswordReset } from "../../../services/ApiService";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -21,13 +20,16 @@ function ResetPasswordConfirmForm({ params }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     setError(false);
     setSucceeded(false);
 
-    if ($("#newPassword").val() !== $("#newPasswordConfirm").val()) {
+    const newPassword = event.target.newPassword.value;
+    const newPasswordConfirm = event.target.newPasswordConfirm.value;
+
+    if (newPassword !== newPasswordConfirm) {
       setPasswordsMatch(true);
       return;
     }
@@ -36,31 +38,15 @@ function ResetPasswordConfirmForm({ params }) {
     setSucceeded(false);
     setPasswordsMatch(false);
 
-    const settings = {
-      url: `${API_BASE_URL}/users/reset-password-confirm/${uid}/${token}/`,
-      method: "POST",
-      timeout: 0,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: JSON.stringify({
-        new_password: $("#newPassword").val(),
-        new_password_confirm: $("#newPasswordConfirm").val(),
-      }),
-    };
-
-    $.ajax(settings)
-      .done(function (response) {
-        console.log(response);
-        setSucceeded(true);
-        setTimeout(() => {
-          navigate("/login");
-        }, 2000);
-      })
-      .fail(function (errorResponse) {
-        console.log(errorResponse);
-        setError(true);
-      });
+    try {
+      await confirmPasswordReset(uid, token, newPassword, newPasswordConfirm);
+      setSucceeded(true);
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+    } catch (error) {
+      setError(true);
+    }
   };
 
   return (

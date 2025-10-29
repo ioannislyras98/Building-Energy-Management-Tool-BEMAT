@@ -28,14 +28,7 @@ export const Modals = ({
   closeEditContactModal,
   currentContact,
   handleContactUpdated,
-}) => {
-  console.log("Modals - AddContact props:", {
-    isAddContactModalOpen,
-    buildingUuid,
-    shouldRenderModal: isAddContactModalOpen && buildingUuid,
-  });
-
-  return (
+}) => {return (
     <>
       {isModalOpen && (
         <ProjectModal
@@ -93,11 +86,7 @@ export const Modals = ({
         />
       )}
 
-      {isAddContactModalOpen &&
-        console.log(
-          "Modals - Rendering AddContactModal with buildingUuid:",
-          buildingUuid
-        )}
+      {isAddContactModalOpen &&}
     </>
   );
 };

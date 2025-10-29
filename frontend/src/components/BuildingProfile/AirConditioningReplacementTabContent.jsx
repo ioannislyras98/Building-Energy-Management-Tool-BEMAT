@@ -149,7 +149,7 @@ const AirConditioningReplacementTabContent = ({
         });
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+
     }
   };
 
@@ -191,7 +191,7 @@ const AirConditioningReplacementTabContent = ({
         fetchData();
       }
     } catch (error) {
-      console.error("Error submitting old AC:", error);
+
       setError(error.responseJSON?.message || "Σφάλμα κατά την αποθήκευση");
       throw error;
     } finally {
@@ -237,7 +237,7 @@ const AirConditioningReplacementTabContent = ({
         fetchData();
       }
     } catch (error) {
-      console.error("Error submitting new AC:", error);
+
       setError(error.responseJSON?.message || "Σφάλμα κατά την αποθήκευση");
       throw error;
     } finally {
@@ -326,7 +326,7 @@ const AirConditioningReplacementTabContent = ({
         setAnalysis(response.data);
       }
     } catch (error) {
-      console.error("Analysis error:", error);
+
       setError(error.responseJSON?.message || "Σφάλμα κατά την αποθήκευση");
     }
     setLoading(false);

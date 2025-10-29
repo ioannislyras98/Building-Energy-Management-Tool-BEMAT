@@ -100,7 +100,7 @@ const HotWaterUpgradeTabContent = ({
       },
       error: (jqXHR) => {
         // Silently fail - it's okay if no data exists yet
-        console.log("No existing hot water upgrade data found");
+
       },
     });
   };
@@ -165,12 +165,12 @@ const HotWaterUpgradeTabContent = ({
       },
       data: JSON.stringify(submitData),
       success: (response) => {
-        console.log("Hot water upgrade data auto-saved:", response);
+
         setSuccess(translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς");
         setTimeout(() => setSuccess(null), 3000);
       },
       error: (jqXHR) => {
-        console.error("Error auto-saving hot water upgrade data:", jqXHR);
+
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
@@ -314,14 +314,14 @@ const HotWaterUpgradeTabContent = ({
       },
       data: JSON.stringify(submitData),
       success: (response) => {
-        console.log("Hot water upgrade data saved:", response);
+
         setSuccess(
           translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
         );
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error("Error saving hot water upgrade data:", jqXHR);
+
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||

@@ -118,7 +118,7 @@ const RoofThermalInsulationTabContent = ({
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error("Error fetching roof thermal insulation:", jqXHR);
+
         createNewRoofThermalInsulation();
       },
     });
@@ -156,7 +156,7 @@ const RoofThermalInsulationTabContent = ({
         setLoading(false);
       },
       error: (jqXHR) => {
-        console.error("Error creating roof thermal insulation:", jqXHR);
+
         setError(
           translations.errorLoad ||
             "Σφάλμα κατά τη δημιουργία νέας θερμομόνωσης οροφής"
@@ -209,10 +209,6 @@ const RoofThermalInsulationTabContent = ({
             setLoading(false);
           },
           error: (jqXHR) => {
-            console.error(
-              "Error recalculating roof thermal insulation:",
-              jqXHR
-            );
             // Still show success for the save, even if recalculation failed
             setRoofThermalInsulation(data);
             setSuccess(
@@ -224,7 +220,7 @@ const RoofThermalInsulationTabContent = ({
         });
       },
       error: (jqXHR) => {
-        console.error("Error saving roof thermal insulation:", jqXHR);
+
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
@@ -279,7 +275,7 @@ const RoofThermalInsulationTabContent = ({
         );
       },
       error: (jqXHR) => {
-        console.error("Error deleting material:", jqXHR);
+
         setError(
           translations.errorMaterialDelete ||
             "Σφάλμα κατά τη διαγραφή του υλικού"
@@ -313,7 +309,7 @@ const RoofThermalInsulationTabContent = ({
               setRoofThermalInsulation(recalculatedData.data);
             },
             error: (jqXHR) => {
-              console.error("Error recalculating after material save:", jqXHR);
+
             },
           });
         },

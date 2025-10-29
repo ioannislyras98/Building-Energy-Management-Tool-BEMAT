@@ -49,7 +49,7 @@ export default function BuildingBtn({
           }
         })
         .catch((error) => {
-          console.error("Error fetching building progress:", error);
+
         });
     }
   };

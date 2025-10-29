@@ -20,7 +20,7 @@ function EnergyConsumptionModalForm({
   editItem,
   params,
 }) {
-  console.log("EnergyConsumptionModalForm: Rendering, open prop is:", open);
+
 
   useModalBlur(open);
 
@@ -147,13 +147,13 @@ function EnergyConsumptionModalForm({
         },
         data: JSON.stringify(apiData),
         success: (response) => {
-          console.log("Updated energy consumption:", response);
+
           onClose();
           resetForm();
           onSubmitSuccess(response);
         },
         error: (jqXHR) => {
-          console.error("Error updating energy consumption:", jqXHR);
+
           handleApiError(jqXHR);
         },
       });
@@ -168,13 +168,13 @@ function EnergyConsumptionModalForm({
         },
         data: JSON.stringify(apiData),
         success: (response) => {
-          console.log("Created energy consumption:", response);
+
           onClose();
           resetForm();
           onSubmitSuccess(response);
         },
         error: (jqXHR) => {
-          console.error("Error creating energy consumption:", jqXHR);
+
           handleApiError(jqXHR);
         },
       });
@@ -218,14 +218,9 @@ function EnergyConsumptionModalForm({
   ];
 
   if (!open) {
-    console.log("EnergyConsumptionModalForm: open is false, returning null.");
-    return null;
-  }
-  console.log(
-    "EnergyConsumptionModalForm: open is true, rendering modal content."
-  );
 
-  const modalTitle = isEditMode
+    return null;
+  }const modalTitle = isEditMode
     ? params.h2_edit || "Edit Energy Consumption"
     : params.h2 || "Add Energy Consumption";
 
@@ -361,10 +356,7 @@ export default function EnergyConsumptionModal({
   const params =
     language === "en"
       ? english_text.EnergyConsumptionModal || {}
-      : greek_text.EnergyConsumptionModal || {};
-
-  console.log(
-    "EnergyConsumptionModal (default export): Rendering, open prop is:",
+      : greek_text.EnergyConsumptionModal || {};: Rendering, open prop is:",
     open
   );
 
