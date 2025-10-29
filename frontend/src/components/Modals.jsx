@@ -28,7 +28,8 @@ export const Modals = ({
   closeEditContactModal,
   currentContact,
   handleContactUpdated,
-}) => {return (
+}) => {
+  return (
     <>
       {isModalOpen && (
         <ProjectModal

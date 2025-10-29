@@ -20,8 +20,6 @@ function EnergyConsumptionModalForm({
   editItem,
   params,
 }) {
-
-
   useModalBlur(open);
 
   const [formData, setFormData] = useState({
@@ -147,13 +145,11 @@ function EnergyConsumptionModalForm({
         },
         data: JSON.stringify(apiData),
         success: (response) => {
-
           onClose();
           resetForm();
           onSubmitSuccess(response);
         },
         error: (jqXHR) => {
-
           handleApiError(jqXHR);
         },
       });
@@ -168,13 +164,11 @@ function EnergyConsumptionModalForm({
         },
         data: JSON.stringify(apiData),
         success: (response) => {
-
           onClose();
           resetForm();
           onSubmitSuccess(response);
         },
         error: (jqXHR) => {
-
           handleApiError(jqXHR);
         },
       });
@@ -218,9 +212,9 @@ function EnergyConsumptionModalForm({
   ];
 
   if (!open) {
-
     return null;
-  }const modalTitle = isEditMode
+  }
+  const modalTitle = isEditMode
     ? params.h2_edit || "Edit Energy Consumption"
     : params.h2 || "Add Energy Consumption";
 
