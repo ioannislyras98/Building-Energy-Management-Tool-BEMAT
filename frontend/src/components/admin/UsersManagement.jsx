@@ -337,9 +337,7 @@ const UsersManagement = () => {
       await handleBulkDelete([userToDelete.id]);
       setDeleteDialogOpen(false);
       setUserToDelete(null);
-    } catch (error) {
-
-    }
+    } catch (error) {}
   };
 
   const handleDeleteDialogClose = () => {

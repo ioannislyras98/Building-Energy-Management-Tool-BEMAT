@@ -28,12 +28,13 @@ export default function BuildingBtn({
   const fetchProgressData = () => {
     if (uuid) {
       const token = cookies.get("token");
-      axios.get(`${API_BASE_URL}/projects/building-progress/${uuid}/`, {
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-      })
+      axios
+        .get(`${API_BASE_URL}/projects/building-progress/${uuid}/`, {
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        })
         .then((response) => {
           const data = response.data;
           const actualData = data?.data || data;
@@ -48,8 +49,7 @@ export default function BuildingBtn({
             setProgressData(null);
           }
         })
-        .catch((error) => {
-        });
+        .catch((error) => {});
     }
   };
 

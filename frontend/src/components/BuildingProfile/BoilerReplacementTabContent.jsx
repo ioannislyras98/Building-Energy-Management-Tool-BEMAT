@@ -208,7 +208,6 @@ const BoilerReplacementTabContent = ({
         setErrorField(null);
       }
     } catch (error) {
-
       if (showMessage) {
         setError("Σφάλμα κατά την αποθήκευση των δεδομένων");
         setTimeout(() => {

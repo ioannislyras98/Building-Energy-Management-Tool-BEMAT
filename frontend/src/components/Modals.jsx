@@ -85,8 +85,6 @@ export const Modals = ({
           onContactUpdated={handleContactUpdated}
         />
       )}
-
-      {isAddContactModalOpen &&}
     </>
   );
 };

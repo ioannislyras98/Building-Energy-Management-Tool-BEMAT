@@ -51,8 +51,7 @@ export default function Sidenav() {
         });
 
         setUserInfo(response.data.data);
-      } catch (error) {
-      }
+      } catch (error) {}
     };
 
     const fetchProjects = async () => {
@@ -79,8 +78,7 @@ export default function Sidenav() {
         } else {
           setProjects([]);
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     };
 
     if (token) {

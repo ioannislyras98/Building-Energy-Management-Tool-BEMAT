@@ -356,9 +356,9 @@ export default function EnergyConsumptionModal({
   const params =
     language === "en"
       ? english_text.EnergyConsumptionModal || {}
-      : greek_text.EnergyConsumptionModal || {};: Rendering, open prop is:",
-    open
-  );
+      : greek_text.EnergyConsumptionModal || {};
+
+  console.log("EnergyConsumptionModal: Rendering, open prop is:", open);
 
   return (
     <EnergyConsumptionModalForm

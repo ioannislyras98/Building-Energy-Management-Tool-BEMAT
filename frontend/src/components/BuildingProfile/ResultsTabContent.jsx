@@ -181,12 +181,12 @@ const ResultsTabContent = ({
     },
   };
 
-  useEffect(() => {fetchAllScenarios();
+  useEffect(() => {
+    fetchAllScenarios();
   }, [buildingUuid, projectUuid]);
 
   const fetchAllScenarios = async () => {
     if (!buildingUuid || !projectUuid) return;
-
 
     setLoading(true);
     setError(null);
@@ -224,7 +224,7 @@ const ResultsTabContent = ({
             const netPresentValue =
               parseFloat(item.net_present_value) ||
               parseFloat(item.calculated_net_present_value);
-            
+
             if (
               netPresentValue &&
               !isNaN(netPresentValue) &&
@@ -269,15 +269,11 @@ const ResultsTabContent = ({
               });
             }
           });
-        } catch (error) {
-        }
+        } catch (error) {}
       }
-
-
 
       setScenarios(scenarioData);
     } catch (error) {
-
       setError("Σφάλμα κατά την φόρτωση των δεδομένων σεναρίων");
     } finally {
       setLoading(false);

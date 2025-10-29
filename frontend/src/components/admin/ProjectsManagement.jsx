@@ -366,9 +366,7 @@ const ProjectsManagement = () => {
       await handleBulkDelete([projectToDelete.id]);
       setDeleteDialogOpen(false);
       setProjectToDelete(null);
-    } catch (error) {
-
-    }
+    } catch (error) {}
   };
 
   const handleDeleteDialogClose = () => {
