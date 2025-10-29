@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import $ from "jquery";
 import Cookies from "universal-cookie";
+import axios from "axios";
 import { useLanguage } from "../../context/LanguageContext";
 import { useModalBlur } from "../../hooks/useModals";
 import API_BASE_URL from "../../config/api.js";
@@ -219,50 +220,41 @@ function PhotovoltaicSystemModalForm({
         ? `${API_BASE_URL}/photovoltaic_systems/${editItem.uuid}/`
         : `${API_BASE_URL}/photovoltaic_systems/`;
 
-      const method = isEditMode ? "PUT" : "POST";
+      const method = isEditMode ? "put" : "post";
 
-      const response = await fetch(url, {
-        method: method,
+      const response = await axios[method](url, requestData, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Token ${token}`,
         },
-        body: JSON.stringify(requestData),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        onSubmitSuccess(data);
-        onClose();
+      const data = response.data;
+      onSubmitSuccess(data);
+      onClose();
 
-        setFormData({
-          pv_panels_quantity: "",
-          pv_panels_unit_price: "",
-          metal_bases_quantity: "",
-          metal_bases_unit_price: "",
-          piping_quantity: "",
-          piping_unit_price: "",
-          wiring_quantity: "",
-          wiring_unit_price: "",
-          inverter_quantity: "",
-          inverter_unit_price: "",
-          installation_quantity: "",
-          installation_unit_price: "",
-          power_per_panel: "",
-          collector_efficiency: "",
-          installation_angle: "",
-          pv_usage: "Για ίδια κατανάλωση",
-          pv_system_type: "Μονοκρυσταλλικό",
-        });
-        setErrors({});
-      } else {
-        const errorData = await response.json();
-
-        setErrors({ general: "Σφάλμα κατά την αποθήκευση" });
-      }
+      setFormData({
+        pv_panels_quantity: "",
+        pv_panels_unit_price: "",
+        metal_bases_quantity: "",
+        metal_bases_unit_price: "",
+        piping_quantity: "",
+        piping_unit_price: "",
+        wiring_quantity: "",
+        wiring_unit_price: "",
+        inverter_quantity: "",
+        inverter_unit_price: "",
+        installation_quantity: "",
+        installation_unit_price: "",
+        power_per_panel: "",
+        collector_efficiency: "",
+        installation_angle: "",
+        pv_usage: "Για ίδια κατανάλωση",
+        pv_system_type: "Μονοκρυσταλλικό",
+      });
+      setErrors({});
     } catch (error) {
-
-      setErrors({ general: "Σφάλμα δικτύου" });
+      setErrors({ general: "Σφάλμα κατά την αποθήκευση" });
     } finally {
       setLoading(false);
     }

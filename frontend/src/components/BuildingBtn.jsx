@@ -5,6 +5,7 @@ import { useProgress } from "../context/ProgressContext";
 import { formatDate } from "../utils/dateUtils";
 import { useState, useEffect } from "react";
 import Cookies from "universal-cookie";
+import axios from "axios";
 import english_text from "../languages/english.json";
 import greek_text from "../languages/greek.json";
 import API_BASE_URL from "../config/api.js";
@@ -27,15 +28,14 @@ export default function BuildingBtn({
   const fetchProgressData = () => {
     if (uuid) {
       const token = cookies.get("token");
-      fetch(`${API_BASE_URL}/projects/building-progress/${uuid}/`, {
-        method: "GET",
+      axios.get(`${API_BASE_URL}/projects/building-progress/${uuid}/`, {
         headers: {
           Authorization: `Token ${token}`,
           "Content-Type": "application/json",
         },
       })
-        .then((response) => response.json())
-        .then((data) => {
+        .then((response) => {
+          const data = response.data;
           const actualData = data?.data || data;
 
           if (
@@ -49,7 +49,6 @@ export default function BuildingBtn({
           }
         })
         .catch((error) => {
-
         });
     }
   };

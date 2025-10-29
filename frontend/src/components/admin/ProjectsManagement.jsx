@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import Cookies from "universal-cookie";
+import axios from "axios";
 import ConfirmationDialog from "../dialogs/ConfirmationDialog";
 import DataTable from "./DataTable";
 import english_text from "../../languages/english.json";
@@ -48,10 +49,9 @@ const ProjectsManagement = () => {
         }
       });
 
-      const response = await fetch(
+      const response = await axios.get(
         `${API_BASE_URL}/admin-api/projects-table/?${queryParams}`,
         {
-          method: "GET",
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
@@ -59,11 +59,7 @@ const ProjectsManagement = () => {
         }
       );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = response.data;
 
       if (data.status === "success") {
         setProjects(data.data.projects);
@@ -72,7 +68,6 @@ const ProjectsManagement = () => {
         setError(data.message || "Failed to fetch projects");
       }
     } catch (error) {
-
       setError(error.message);
     } finally {
       setLoading(false);
@@ -85,19 +80,18 @@ const ProjectsManagement = () => {
 
   const handleBulkDelete = async (projectIds) => {
     try {
-      const response = await fetch(
+      const response = await axios.delete(
         `${API_BASE_URL}/admin-api/projects/bulk-delete/`,
         {
-          method: "DELETE",
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ project_ids: projectIds }),
+          data: { project_ids: projectIds },
         }
       );
 
-      const data = await response.json();
+      const data = response.data;
 
       if (data.status === "success") {
         await fetchProjects();
@@ -109,7 +103,6 @@ const ProjectsManagement = () => {
         throw new Error(data.error || "Failed to delete projects");
       }
     } catch (error) {
-
       alert(`Error: ${error.message}`);
     }
   };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import Cookies from "universal-cookie";
+import axios from "axios";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import API_BASE_URL from "../../config/api.js";
@@ -24,10 +25,9 @@ const AdminStats = () => {
         setError(null);
 
         // Fetch dashboard stats from dedicated endpoint
-        const statsResponse = await fetch(
+        const statsResponse = await axios.get(
           `${API_BASE_URL}/admin-api/dashboard-stats/`,
           {
-            method: "GET",
             headers: {
               Authorization: `Token ${token}`,
               "Content-Type": "application/json",
@@ -35,13 +35,7 @@ const AdminStats = () => {
           }
         );
 
-        if (!statsResponse.ok) {
-          throw new Error(
-            `Failed to fetch dashboard stats: ${statsResponse.status}`
-          );
-        }
-
-        const statsData = await statsResponse.json();
+        const statsData = statsResponse.data;
 
         if (statsData.status === "success") {
           const data = statsData.data;
@@ -57,7 +51,6 @@ const AdminStats = () => {
           setError("Failed to fetch statistics");
         }
       } catch (error) {
-
         setError(error.message || "Failed to fetch statistics");
       } finally {
         setLoading(false);

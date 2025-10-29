@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import $ from "jquery";
 import "./../../assets/styles/sidebar.css";
 import Cookies from "universal-cookie";
+import axios from "axios";
 import { useLanguage } from "../../context/LanguageContext";
 import { useSidebar } from "../../context/SidebarContext";
 import { useNavigate } from "react-router-dom";
@@ -42,53 +43,43 @@ export default function Sidenav() {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/users/me/`, {
-          method: "GET",
+        const response = await axios.get(`${API_BASE_URL}/users/me/`, {
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
           },
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          setUserInfo(data.data);
-        }
+        setUserInfo(response.data.data);
       } catch (error) {
-
       }
     };
 
     const fetchProjects = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/projects/get/`, {
-          method: "GET",
+        const response = await axios.get(`${API_BASE_URL}/projects/get/`, {
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
           },
         });
 
-        if (response.ok) {
-          const data = await response.json();
+        const data = response.data;
 
-          if (Array.isArray(data)) {
-            setProjects(data);
-          } else if (data.projects && Array.isArray(data.projects)) {
-            setProjects(data.projects);
-          } else if (
-            data.data &&
-            data.data.projects &&
-            Array.isArray(data.data.projects)
-          ) {
-            setProjects(data.data.projects);
-          } else {
-
-            setProjects([]);
-          }
+        if (Array.isArray(data)) {
+          setProjects(data);
+        } else if (data.projects && Array.isArray(data.projects)) {
+          setProjects(data.projects);
+        } else if (
+          data.data &&
+          data.data.projects &&
+          Array.isArray(data.data.projects)
+        ) {
+          setProjects(data.data.projects);
+        } else {
+          setProjects([]);
         }
       } catch (error) {
-
       }
     };
 

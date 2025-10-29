@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import Cookies from "universal-cookie";
+import axios from "axios";
 import ConfirmationDialog from "../dialogs/ConfirmationDialog";
 import DataTable from "./DataTable";
 import english_text from "../../languages/english.json";
@@ -47,10 +48,9 @@ const UsersManagement = () => {
         }
       });
 
-      const response = await fetch(
+      const response = await axios.get(
         `${API_BASE_URL}/admin-api/users-table/?${queryParams}`,
         {
-          method: "GET",
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
@@ -58,11 +58,7 @@ const UsersManagement = () => {
         }
       );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = response.data;
 
       if (data.status === "success") {
         setUsers(data.data.users);
@@ -71,7 +67,6 @@ const UsersManagement = () => {
         setError(data.message || "Failed to fetch users");
       }
     } catch (error) {
-
       setError(error.message);
     } finally {
       setLoading(false);
@@ -84,19 +79,18 @@ const UsersManagement = () => {
 
   const handleBulkDelete = async (userIds) => {
     try {
-      const response = await fetch(
+      const response = await axios.delete(
         `${API_BASE_URL}/admin-api/users/bulk-delete/`,
         {
-          method: "DELETE",
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ user_ids: userIds }),
+          data: { user_ids: userIds },
         }
       );
 
-      const data = await response.json();
+      const data = response.data;
 
       if (data.status === "success") {
         await fetchUsers();
@@ -108,7 +102,6 @@ const UsersManagement = () => {
         throw new Error(data.error || "Failed to delete users");
       }
     } catch (error) {
-
       alert(`Error: ${error.message}`);
     }
   };

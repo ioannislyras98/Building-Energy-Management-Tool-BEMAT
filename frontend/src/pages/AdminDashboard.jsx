@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
 import Cookies from "universal-cookie";
+import axios from "axios";
 import AdminStats from "../components/admin/AdminStats";
 import UsersManagement from "../components/admin/UsersManagement";
 import ProjectsManagement from "../components/admin/ProjectsManagement";
@@ -35,19 +36,14 @@ const AdminDashboard = () => {
       }
 
       try {
-        const response = await fetch(`${API_BASE_URL}/users/me/`, {
-          method: "GET",
+        const response = await axios.get(`${API_BASE_URL}/users/me/`, {
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
           },
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch user profile");
-        }
-
-        const data = await response.json();
+        const data = response.data;
 
         let userData;
         if (data.success && data.data && data.data.user) {
@@ -65,7 +61,6 @@ const AdminDashboard = () => {
           return;
         }
       } catch (error) {
-
         navigate("/login");
       } finally {
         setLoading(false);
@@ -120,7 +115,7 @@ const AdminDashboard = () => {
             <FaUserShield className="text-primary text-xl" />
             <h1 className="text-2xl font-bold text-gray-800">
               {text.title ||
-                (language === "en" ? "Admin Dashboard" : "Πίνακας Διαχείρισης")}
+                (language === "en" ? "Admin Dashboard" : "οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½")}
             </h1>
           </div>
         </div>

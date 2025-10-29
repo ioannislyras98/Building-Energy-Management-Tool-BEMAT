@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Cookies from "universal-cookie";
+import axios from "axios";
 import {
   Box,
   Typography,
@@ -195,10 +196,10 @@ const ResultsTabContent = ({
 
       // Fetch data για κάθε σενάριο
       for (const [key, config] of Object.entries(scenarioConfig)) {
-        try {const response = await fetch(
+        try {
+          const response = await axios.get(
             `${API_BASE_URL}/${config.endpoint}/building/${buildingUuid}/`,
             {
-              method: "GET",
               headers: {
                 Authorization: `Token ${token}`,
                 "Content-Type": "application/json",
@@ -206,73 +207,68 @@ const ResultsTabContent = ({
             }
           );
 
-          if (response.ok) {
-            const responseData = await response.json();
+          const responseData = response.data;
 
-
-            // Ελέγχουμε αν το response περιέχει data array ή είναι ήδη το object
-            let scenarioItems = [];
-            if (responseData.data && Array.isArray(responseData.data)) {
-              scenarioItems = responseData.data;
-            } else if (Array.isArray(responseData)) {
-              scenarioItems = responseData;
-            } else if (responseData && typeof responseData === "object") {
-              scenarioItems = [responseData];
-            }
-
-            // Προσθέτουμε μόνο τα ολοκληρωμένα σενάρια (με net_present_value)
-            scenarioItems.forEach((item) => {
-
-              const netPresentValue =
-                parseFloat(item.net_present_value) ||
-                parseFloat(item.calculated_net_present_value);if (
-                netPresentValue &&
-                !isNaN(netPresentValue) &&
-                netPresentValue !== 0
-              ) {
-
-                scenarioData.push({
-                  type: key,
-                  name: config.name,
-                  icon: config.icon,
-                  color: config.color,
-                  ...item,
-                  // Διασφάλιση ότι όλα τα πεδία είναι αριθμοί - προσπάθεια με διαφορετικά field names
-                  total_investment_cost:
-                    parseFloat(item.total_investment_cost) ||
-                    parseFloat(item.total_cost) ||
-                    parseFloat(item.estimated_cost) ||
-                    parseFloat(item.net_cost) ||
-                    0,
-                  annual_energy_savings:
-                    parseFloat(item.annual_energy_savings) ||
-                    parseFloat(item.annual_savings) ||
-                    0,
-                  annual_economic_benefit:
-                    parseFloat(item.annual_economic_benefit) ||
-                    parseFloat(item.annual_benefit) ||
-                    parseFloat(item.annual_savings) ||
-                    parseFloat(item.calculated_annual_savings) ||
-                    0,
-                  payback_period:
-                    parseFloat(item.payback_period) ||
-                    parseFloat(item.calculated_payback_period) ||
-                    0,
-                  net_present_value:
-                    netPresentValue ||
-                    parseFloat(item.calculated_net_present_value) ||
-                    0,
-                  internal_rate_of_return:
-                    parseFloat(item.internal_rate_of_return) ||
-                    parseFloat(item.investment_return) ||
-                    parseFloat(item.calculated_investment_return) ||
-                    0,
-                });
-              } else {}
-            });
-          } else {`
-            );
+          // Ελέγχουμε αν το response περιέχει data array ή είναι ήδη το object
+          let scenarioItems = [];
+          if (responseData.data && Array.isArray(responseData.data)) {
+            scenarioItems = responseData.data;
+          } else if (Array.isArray(responseData)) {
+            scenarioItems = responseData;
+          } else if (responseData && typeof responseData === "object") {
+            scenarioItems = [responseData];
           }
+
+          // Προσθέτουμε μόνο τα ολοκληρωμένα σενάρια (με net_present_value)
+          scenarioItems.forEach((item) => {
+            const netPresentValue =
+              parseFloat(item.net_present_value) ||
+              parseFloat(item.calculated_net_present_value);
+            
+            if (
+              netPresentValue &&
+              !isNaN(netPresentValue) &&
+              netPresentValue !== 0
+            ) {
+              scenarioData.push({
+                type: key,
+                name: config.name,
+                icon: config.icon,
+                color: config.color,
+                ...item,
+                // Διασφάλιση ότι όλα τα πεδία είναι αριθμοί - προσπάθεια με διαφορετικά field names
+                total_investment_cost:
+                  parseFloat(item.total_investment_cost) ||
+                  parseFloat(item.total_cost) ||
+                  parseFloat(item.estimated_cost) ||
+                  parseFloat(item.net_cost) ||
+                  0,
+                annual_energy_savings:
+                  parseFloat(item.annual_energy_savings) ||
+                  parseFloat(item.annual_savings) ||
+                  0,
+                annual_economic_benefit:
+                  parseFloat(item.annual_economic_benefit) ||
+                  parseFloat(item.annual_benefit) ||
+                  parseFloat(item.annual_savings) ||
+                  parseFloat(item.calculated_annual_savings) ||
+                  0,
+                payback_period:
+                  parseFloat(item.payback_period) ||
+                  parseFloat(item.calculated_payback_period) ||
+                  0,
+                net_present_value:
+                  netPresentValue ||
+                  parseFloat(item.calculated_net_present_value) ||
+                  0,
+                internal_rate_of_return:
+                  parseFloat(item.internal_rate_of_return) ||
+                  parseFloat(item.investment_return) ||
+                  parseFloat(item.calculated_investment_return) ||
+                  0,
+              });
+            }
+          });
         } catch (error) {
         }
       }

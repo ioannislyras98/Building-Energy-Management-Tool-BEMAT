@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import $ from "jquery";
 import Cookies from "universal-cookie";
+import axios from "axios";
 import {
   Button,
   Card,
@@ -114,11 +115,9 @@ const AutomaticLightingControlTabContent = ({
 
     setLoading(true);
     try {
-      // Χρήση fetch αντί για jQuery για καλύτερο έλεγχο του error handling
-      const response = await fetch(
+      const response = await axios.get(
         `${API_BASE_URL}/automatic_lighting_control/building/${buildingUuid}/`,
         {
-          method: "GET",
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
@@ -126,34 +125,26 @@ const AutomaticLightingControlTabContent = ({
         }
       );
 
-      if (response.ok) {
-        const data = await response.json();
-        setFormData({
-          lighting_area: data.lighting_area || "",
-          cost_per_m2: data.cost_per_m2 || "",
-          installation_cost: data.installation_cost || "",
-          maintenance_cost: data.maintenance_cost || "",
-          lighting_energy_savings: data.lighting_energy_savings || "",
-          energy_cost_kwh: data.energy_cost_kwh || "0.15",
-          time_period: data.time_period || "20",
-          discount_rate: data.discount_rate || "5.0",
-          // Προσθήκη των υπολογιζόμενων πεδίων
-          total_investment_cost: data.total_investment_cost,
-          annual_energy_savings: data.annual_energy_savings,
-          annual_economic_benefit: data.annual_economic_benefit,
-          payback_period: data.payback_period,
-          net_present_value: data.net_present_value,
-          internal_rate_of_return: data.internal_rate_of_return,
-        });
-      } else if (response.status === 404) {
-        // Αν δεν υπάρχει record, κρατάμε τις default τιμές για νέο record
-        // Δε χρειάζεται να κάνουμε τίποτα - οι default τιμές είναι ήδη στο state
-      } else {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+      const data = response.data;
+      setFormData({
+        lighting_area: data.lighting_area || "",
+        cost_per_m2: data.cost_per_m2 || "",
+        installation_cost: data.installation_cost || "",
+        maintenance_cost: data.maintenance_cost || "",
+        lighting_energy_savings: data.lighting_energy_savings || "",
+        energy_cost_kwh: data.energy_cost_kwh || "0.15",
+        time_period: data.time_period || "20",
+        discount_rate: data.discount_rate || "5.0",
+        // Προσθήκη των υπολογιζόμενων πεδίων
+        total_investment_cost: data.total_investment_cost,
+        annual_energy_savings: data.annual_energy_savings,
+        annual_economic_benefit: data.annual_economic_benefit,
+        payback_period: data.payback_period,
+        net_present_value: data.net_present_value,
+        internal_rate_of_return: data.internal_rate_of_return,
+      });
     } catch (error) {
-      if (error.message && !error.message.includes("404")) {
-
+      if (error.response?.status !== 404) {
         setError("Σφάλμα κατά την φόρτωση των δεδομένων");
       }
     } finally {
