@@ -10,9 +10,7 @@ export function getuser() {
     .then((response) => {
       return response.data;
     })
-    .catch((error) => {
-
-    });
+    .catch((error) => {});
 }
 
 export function getAllPrefectures() {
@@ -27,7 +25,6 @@ export function getAllPrefectures() {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -44,7 +41,6 @@ export function getAllPrefecturesAdmin() {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -61,7 +57,6 @@ export function getPrefecturesByZone(zone) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -78,7 +73,6 @@ export function getEnergyZones() {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -97,7 +91,6 @@ export function createPrefecture(data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -115,7 +108,6 @@ export function updatePrefecture(uuid, data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -132,7 +124,6 @@ export function deletePrefecture(uuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -150,7 +141,6 @@ export function createOldAirConditioning(data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -170,7 +160,6 @@ export function getOldAirConditioningsByBuilding(buildingUuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -192,7 +181,6 @@ export function updateOldAirConditioning(acUuid, data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -212,7 +200,6 @@ export function deleteOldAirConditioning(acUuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -231,7 +218,6 @@ export function createNewAirConditioning(data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -251,7 +237,6 @@ export function getNewAirConditioningsByBuilding(buildingUuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -273,7 +258,6 @@ export function updateNewAirConditioning(acUuid, data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -293,7 +277,6 @@ export function deleteNewAirConditioning(acUuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -315,7 +298,6 @@ export function createAirConditioningAnalysis(data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -335,7 +317,6 @@ export function getAirConditioningAnalysisByBuilding(buildingUuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -357,7 +338,6 @@ export function updateAirConditioningAnalysis(analysisUuid, data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -374,7 +354,6 @@ export function getBuildingsByProject(projectUuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -391,7 +370,6 @@ export function getBuildingById(buildingUuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -409,7 +387,6 @@ export function createBuilding(data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -427,7 +404,6 @@ export function updateBuilding(buildingUuid, data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -444,7 +420,6 @@ export function deleteBuilding(buildingUuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -463,7 +438,6 @@ export function getBoilerDetailsByBuilding(buildingUuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -480,7 +454,6 @@ export function deleteBoilerDetail(uuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -498,7 +471,6 @@ export function getCoolingSystemByBuilding(buildingUuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -515,7 +487,6 @@ export function deleteCoolingSystem(uuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -533,7 +504,6 @@ export function getHeatingSystemByBuilding(buildingUuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -550,7 +520,6 @@ export function deleteHeatingSystem(uuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -559,16 +528,18 @@ export function deleteHeatingSystem(uuid) {
 export function getHotWaterSystemByBuilding(buildingUuid) {
   const token = cookies.get("token") || "";
   return axios
-    .get(`${API_BASE_URL}/domestic_hot_water_systems/building/${buildingUuid}/`, {
-      headers: {
-        Authorization: `Token ${token}`,
-      },
-    })
+    .get(
+      `${API_BASE_URL}/domestic_hot_water_systems/building/${buildingUuid}/`,
+      {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      }
+    )
     .then((response) => {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -585,7 +556,6 @@ export function deleteHotWaterSystem(uuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -603,7 +573,6 @@ export function getSolarCollectorsByBuilding(buildingUuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -620,7 +589,6 @@ export function deleteSolarCollectors(uuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -639,7 +607,6 @@ export function getImagesByBuilding(buildingUuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -657,7 +624,6 @@ export function createImage(data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -675,7 +641,6 @@ export function updateImage(imageId, data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -692,7 +657,6 @@ export function deleteImage(imageId) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -701,17 +665,20 @@ export function deleteImage(imageId) {
 export function submitProject(projectUuid) {
   const token = cookies.get("token") || "";
   return axios
-    .post(`${API_BASE_URL}/projects/${projectUuid}/submit/`, {}, {
-      headers: {
-        Authorization: `Token ${token}`,
-        "Content-Type": "application/json",
-      },
-    })
+    .post(
+      `${API_BASE_URL}/projects/${projectUuid}/submit/`,
+      {},
+      {
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    )
     .then((response) => {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -729,7 +696,6 @@ export function createProject(data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -747,7 +713,6 @@ export function updateProject(projectUuid, data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -764,7 +729,6 @@ export function deleteProject(projectUuid) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -772,19 +736,22 @@ export function deleteProject(projectUuid) {
 // Authentication API functions
 export function login(email, password) {
   return axios
-    .post(`${API_BASE_URL}/users/login/`, {
-      email,
-      password,
-    }, {
-      headers: {
-        "Content-Type": "application/json",
+    .post(
+      `${API_BASE_URL}/users/login/`,
+      {
+        email,
+        password,
       },
-    })
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
     .then((response) => {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -800,44 +767,54 @@ export function signup(userData) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
 
 export function requestPasswordReset(email) {
   return axios
-    .post(`${API_BASE_URL}/users/password-reset/`, {
-      email,
-    }, {
-      headers: {
-        "Content-Type": "application/json",
+    .post(
+      `${API_BASE_URL}/users/password-reset/`,
+      {
+        email,
       },
-    })
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
     .then((response) => {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
 
-export function confirmPasswordReset(uid, token, newPassword, newPasswordConfirm) {
+export function confirmPasswordReset(
+  uid,
+  token,
+  newPassword,
+  newPasswordConfirm
+) {
   return axios
-    .post(`${API_BASE_URL}/users/reset-password-confirm/${uid}/${token}/`, {
-      new_password: newPassword,
-      new_password_confirm: newPasswordConfirm,
-    }, {
-      headers: {
-        "Content-Type": "application/json",
+    .post(
+      `${API_BASE_URL}/users/reset-password-confirm/${uid}/${token}/`,
+      {
+        new_password: newPassword,
+        new_password_confirm: newPasswordConfirm,
       },
-    })
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
     .then((response) => {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -856,7 +833,6 @@ export function getAllPrefectures() {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -874,7 +850,6 @@ export function createPrefecture(data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -892,7 +867,6 @@ export function updatePrefecture(prefectureId, data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -909,7 +883,6 @@ export function deletePrefecture(prefectureId) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -928,7 +901,6 @@ export function getMaterialCategories() {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -946,7 +918,6 @@ export function getAllMaterials() {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -964,7 +935,6 @@ export function createMaterial(data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -982,7 +952,6 @@ export function updateMaterial(materialId, data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -999,7 +968,6 @@ export function deleteMaterial(materialId) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -1017,7 +985,6 @@ export function getNumericValues() {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -1025,19 +992,22 @@ export function getNumericValues() {
 export function updateNumericValue(valueId, value) {
   const token = cookies.get("token") || "";
   return axios
-    .patch(`${API_BASE_URL}/numeric_values/${valueId}/`, {
-      value: value,
-    }, {
-      headers: {
-        Authorization: `Token ${token}`,
-        "Content-Type": "application/json",
+    .patch(
+      `${API_BASE_URL}/numeric_values/${valueId}/`,
+      {
+        value: value,
       },
-    })
+      {
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    )
     .then((response) => {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -1055,7 +1025,6 @@ export function getUserProfile() {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -1073,7 +1042,6 @@ export function updateUserProfile(data) {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -1081,21 +1049,24 @@ export function updateUserProfile(data) {
 export function changePassword(currentPassword, newPassword, confirmPassword) {
   const token = cookies.get("token") || "";
   return axios
-    .post(`${API_BASE_URL}/users/change-password/`, {
-      current_password: currentPassword,
-      new_password: newPassword,
-      confirm_password: confirmPassword,
-    }, {
-      headers: {
-        Authorization: `Token ${token}`,
-        "Content-Type": "application/json",
+    .post(
+      `${API_BASE_URL}/users/change-password/`,
+      {
+        current_password: currentPassword,
+        new_password: newPassword,
+        confirm_password: confirmPassword,
       },
-    })
+      {
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    )
     .then((response) => {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -1112,7 +1083,6 @@ export function getPendingProjectsPercentage() {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }
@@ -1130,7 +1100,6 @@ export function getProjects() {
       return response.data;
     })
     .catch((error) => {
-
       throw error;
     });
 }

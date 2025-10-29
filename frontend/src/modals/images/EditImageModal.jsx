@@ -17,8 +17,6 @@ function EditImageModalForm({
   image,
   params,
 }) {
-
-
   useModalBlur(isOpen);
 
   const [formData, setFormData] = useState({
@@ -169,8 +167,6 @@ function EditImageModalForm({
   ];
 
   if (!isOpen || !image) return null;
-
-
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">

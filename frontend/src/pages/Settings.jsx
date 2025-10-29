@@ -12,7 +12,11 @@ import {
   FaSave,
 } from "react-icons/fa";
 import Cookies from "universal-cookie";
-import { getUserProfile, updateUserProfile, changePassword } from "../../services/ApiService";
+import {
+  getUserProfile,
+  updateUserProfile,
+  changePassword,
+} from "../../services/ApiService";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -73,7 +77,6 @@ export default function Settings() {
         });
       }
     } catch (error) {
-
       setError(
         language === "en"
           ? "Failed to load user data"
@@ -120,7 +123,6 @@ export default function Settings() {
       );
       setUserData((prev) => ({ ...prev, current_password: "" }));
     } catch (error) {
-
       setError(
         language === "en"
           ? "Failed to update profile"
@@ -187,7 +189,6 @@ export default function Settings() {
         confirm_password: "",
       });
     } catch (error) {
-
       setError(
         language === "en"
           ? "Failed to change password"

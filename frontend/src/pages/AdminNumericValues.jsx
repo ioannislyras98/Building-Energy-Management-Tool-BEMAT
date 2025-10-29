@@ -6,7 +6,10 @@ import { useLanguage } from "../context/LanguageContext";
 import { useModalBlur } from "../hooks/useModals";
 import InputEntryModal from "../modals/shared/InputEntryModal";
 import "../assets/styles/forms.css";
-import { getNumericValues, updateNumericValue } from "../../services/ApiService";
+import {
+  getNumericValues,
+  updateNumericValue,
+} from "../../services/ApiService";
 
 const cookies = new Cookies(null, { path: "/" });
 
@@ -58,7 +61,6 @@ function AdminNumericValues() {
       setNumericValues(data);
       setError(null);
     } catch (err) {
-
       if (err.response?.status === 401) {
         setError("Μη εξουσιοδοτημένη πρόσβαση. Παρακαλώ κάντε login ξανά.");
       } else {
@@ -120,7 +122,6 @@ function AdminNumericValues() {
       setErrors({});
       setShowValidationErrors(false);
     } catch (err) {
-
       if (err.status === 401) {
         setError("Μη εξουσιοδοτημένη πρόσβαση. Παρακαλώ κάντε login ξανά.");
       } else {

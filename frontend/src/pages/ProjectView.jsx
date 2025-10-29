@@ -87,7 +87,6 @@ export default function ProjectView() {
           setDeleteDialogOpen(false);
         })
         .catch((err) => {
-
           setDeleteDialogOpen(false);
         });
     }
@@ -126,11 +125,13 @@ export default function ProjectView() {
       handleProjectUpdated(updatedProject);
       refreshProjects();
       alert(
-        paramsText?.projectSubmittedSuccess ||
-          "Project submitted successfully!"
+        paramsText?.projectSubmittedSuccess || "Project submitted successfully!"
       );
     } catch (error) {
-      alert(error.response?.data?.error || "An error occurred while submitting the project");
+      alert(
+        error.response?.data?.error ||
+          "An error occurred while submitting the project"
+      );
     }
   };
 

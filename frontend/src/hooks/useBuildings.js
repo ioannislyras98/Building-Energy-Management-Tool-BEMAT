@@ -8,37 +8,34 @@ export const useBuildings = () => {
   const [error, setError] = useState(null);
   const { refreshSidebar } = useSidebar();
 
-  const fetchBuildings = useCallback(
-    async (projectUuid) => {
-      if (!projectUuid) {
-        setBuildings([]);
-        return;
-      }
+  const fetchBuildings = useCallback(async (projectUuid) => {
+    if (!projectUuid) {
+      setBuildings([]);
+      return;
+    }
 
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
-      try {
-        const response = await getBuildingsByProject(projectUuid);
-        const buildingsArray = Array.isArray(response)
-          ? response
-          : response.buildings || response.data || [];
-        setBuildings(buildingsArray);
-      } catch (err) {
-        const errorMessage =
-          err.response?.data?.error ||
-          err.message ||
-          "Failed to fetch buildings.";
-        setError(errorMessage);
-        if (err.response?.data?.error) {
-          alert(err.response.data.error);
-        }
-      } finally {
-        setLoading(false);
+    try {
+      const response = await getBuildingsByProject(projectUuid);
+      const buildingsArray = Array.isArray(response)
+        ? response
+        : response.buildings || response.data || [];
+      setBuildings(buildingsArray);
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.error ||
+        err.message ||
+        "Failed to fetch buildings.";
+      setError(errorMessage);
+      if (err.response?.data?.error) {
+        alert(err.response.data.error);
       }
-    },
-    []
-  );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const handleBuildingCreated = useCallback(
     (newBuilding) => {

@@ -16,7 +16,12 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "../../assets/styles/forms.css";
-import { getAllPrefectures, createPrefecture, updatePrefecture, deletePrefecture } from "../../../services/ApiService";
+import {
+  getAllPrefectures,
+  createPrefecture,
+  updatePrefecture,
+  deletePrefecture,
+} from "../../../services/ApiService";
 
 const cookies = new Cookies();
 
@@ -139,7 +144,10 @@ const AdminPrefectures = () => {
       };
 
       if (editingPrefecture) {
-        await updatePrefecture(editingPrefecture.uuid || editingPrefecture.id, submitData);
+        await updatePrefecture(
+          editingPrefecture.uuid || editingPrefecture.id,
+          submitData
+        );
       } else {
         await createPrefecture(submitData);
       }
@@ -223,7 +231,9 @@ const AdminPrefectures = () => {
 
   const handleBulkDeleteConfirm = async () => {
     try {
-      const deletePromises = selectedPrefectures.map((id) => deletePrefecture(id));
+      const deletePromises = selectedPrefectures.map((id) =>
+        deletePrefecture(id)
+      );
       await Promise.all(deletePromises);
       fetchPrefectures();
       setSelectedPrefectures([]);

@@ -118,7 +118,6 @@ const RoofThermalInsulationTabContent = ({
         setLoading(false);
       },
       error: (jqXHR) => {
-
         createNewRoofThermalInsulation();
       },
     });
@@ -156,7 +155,6 @@ const RoofThermalInsulationTabContent = ({
         setLoading(false);
       },
       error: (jqXHR) => {
-
         setError(
           translations.errorLoad ||
             "Σφάλμα κατά τη δημιουργία νέας θερμομόνωσης οροφής"
@@ -220,7 +218,6 @@ const RoofThermalInsulationTabContent = ({
         });
       },
       error: (jqXHR) => {
-
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
@@ -275,7 +272,6 @@ const RoofThermalInsulationTabContent = ({
         );
       },
       error: (jqXHR) => {
-
         setError(
           translations.errorMaterialDelete ||
             "Σφάλμα κατά τη διαγραφή του υλικού"
@@ -308,9 +304,7 @@ const RoofThermalInsulationTabContent = ({
             success: (recalculatedData) => {
               setRoofThermalInsulation(recalculatedData.data);
             },
-            error: (jqXHR) => {
-
-            },
+            error: (jqXHR) => {},
           });
         },
       });

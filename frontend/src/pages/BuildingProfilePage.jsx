@@ -79,14 +79,9 @@ export default function BuildingProfilePage() {
   };
 
   const handleAddContact = () => {
-
-
-
     if (building) {
-
       openAddContactModal();
     } else {
-
     }
   };
 
@@ -162,7 +157,6 @@ export default function BuildingProfilePage() {
                 <div className="flex items-center space-x-6">
                   <button
                     onClick={() => {
-
                       navigate(`/projects/${projectUuid}`);
                     }}
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">

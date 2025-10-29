@@ -16,7 +16,13 @@ import { useNavigate } from "react-router-dom";
 import InputEntryModal from "../../modals/shared/InputEntryModal";
 import ConfirmationDialog from "../../components/dialogs/ConfirmationDialog";
 import "../../assets/styles/forms.css";
-import { getMaterialCategories, getAllMaterials, createMaterial, updateMaterial, deleteMaterial } from "../../../services/ApiService";
+import {
+  getMaterialCategories,
+  getAllMaterials,
+  createMaterial,
+  updateMaterial,
+  deleteMaterial,
+} from "../../../services/ApiService";
 
 const cookies = new Cookies();
 
@@ -134,9 +140,7 @@ const AdminMaterials = () => {
     try {
       const data = await getMaterialCategories();
       setCategories(data.data || []);
-    } catch (err) {
-
-    }
+    } catch (err) {}
   };
 
   const fetchMaterials = async () => {
@@ -184,7 +188,10 @@ const AdminMaterials = () => {
 
     try {
       if (editingMaterial) {
-        await updateMaterial(editingMaterial.uuid || editingMaterial.id, formData);
+        await updateMaterial(
+          editingMaterial.uuid || editingMaterial.id,
+          formData
+        );
       } else {
         await createMaterial(formData);
       }

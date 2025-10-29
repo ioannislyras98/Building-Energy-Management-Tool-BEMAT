@@ -70,7 +70,6 @@ const SystemsTabContent = ({
 
       await Promise.all(promises);
     } catch (error) {
-
     } finally {
       setLoading(false);
     }

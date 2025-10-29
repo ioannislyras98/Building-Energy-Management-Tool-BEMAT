@@ -152,7 +152,8 @@ const PhotovoltaicSystemTabContent = ({
   }, [buildingUuid, projectUuid]);
 
   const fetchOrCreatePhotovoltaicSystem = () => {
-    if (!buildingUuid || !token) {return;
+    if (!buildingUuid || !token) {
+      return;
     }
 
     setLoading(true);
@@ -164,14 +165,14 @@ const PhotovoltaicSystemTabContent = ({
         Authorization: `Token ${token}`,
       },
       success: (data) => {
-
         if (data && data.length > 0) {
           const existing = data[0];
 
           setCurrentPhotovoltaicSystem(existing);
           setPhotovoltaicSystem(existing);
           setHasBackendData(true); // Mark that we have backend data
-        } else {// No existing system found - set up for creating a new one
+        } else {
+          // No existing system found - set up for creating a new one
           setCurrentPhotovoltaicSystem(null);
           setHasBackendData(false); // No backend data for new system
           setPhotovoltaicSystem({
@@ -216,7 +217,6 @@ const PhotovoltaicSystemTabContent = ({
         setLoading(false);
       },
       error: (jqXHR) => {
-
         // On error, set up for creating a new system
         setCurrentPhotovoltaicSystem(null);
         setHasBackendData(false); // No backend data on error
@@ -300,7 +300,6 @@ const PhotovoltaicSystemTabContent = ({
 
   const handleSave = () => {
     if (!token) {
-
       setError(
         translations.errorSave ||
           "Δεν είναι δυνατή η αποθήκευση - λείπει το token πιστοποίησης"
@@ -323,7 +322,8 @@ const PhotovoltaicSystemTabContent = ({
     const method = isUpdate ? "PUT" : "POST";
     const url = isUpdate
       ? `${API_BASE_URL}/photovoltaic_systems/${currentPhotovoltaicSystem.uuid}/`
-      : `${API_BASE_URL}/photovoltaic_systems/`;$.ajax({
+      : `${API_BASE_URL}/photovoltaic_systems/`;
+    $.ajax({
       url: url,
       method: method,
       headers: {
@@ -331,7 +331,8 @@ const PhotovoltaicSystemTabContent = ({
         "Content-Type": "application/json",
       },
       data: JSON.stringify(updatedPhotovoltaicSystem),
-      success: (data) => {// Backend now returns full data with calculated fields, no need for additional GET requestsetPhotovoltaicSystem(data);
+      success: (data) => {
+        // Backend now returns full data with calculated fields, no need for additional GET requestsetPhotovoltaicSystem(data);
         setCurrentPhotovoltaicSystem(data);
         setHasBackendData(true); // Mark that we have backend data
 
