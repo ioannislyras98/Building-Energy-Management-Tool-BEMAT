@@ -130,6 +130,7 @@ export default function ProjectView() {
     } catch (error) {
       alert(
         error.response?.data?.error ||
+          paramsText?.projectSubmitError ||
           "An error occurred while submitting the project"
       );
     }

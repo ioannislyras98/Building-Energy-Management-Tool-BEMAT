@@ -16,7 +16,9 @@
     "confirm_password": "Confirm your password",
     "save": "Sign Up",
     "passwords_not_match": "Passwords do not match.",
-    "errorMessage": "A user with this email already exists."
+    "errorMessage": "A user with this email already exists.",
+    "errorNameRequired": "Name and surname are required fields",
+    "errorGeneral": "An error occurred during registration. Please try again."
   },
   "LogIn": {
     "lang": "gr",
@@ -229,7 +231,8 @@
     "deleteError": "An error occurred while trying to delete the project.",
     "deleteButton": "Delete",
     "cancelButton": "Cancel",
-    "projectSubmittedSuccess": "Project submitted successfully!"
+    "projectSubmittedSuccess": "Project submitted successfully!",
+    "projectSubmitError": "An error occurred while submitting the project"
   },
   "BuildingProfile": {
     "backToBuildings": "Back to Buildings List",
@@ -243,7 +246,8 @@
     "errors": {
       "auth": "Authentication is required to view building details.",
       "generic": "An error occurred.",
-      "notFound": "Building data not found."
+      "notFound": "Building data not found.",
+      "deleteFailed": "An error occurred while deleting the building."
     },
     "basicInfo": {
       "title": "Basic Information",

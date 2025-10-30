@@ -231,14 +231,16 @@ def building_post_delete_update_project_buildings_count(sender, instance, **kwar
 @permission_classes([IsAuthenticated])
 def update_building(request, uuid):
     """
-    Endpoint για την ενημέρωση ενός building.
+    Endpoint for updating a building.
     """
     try:
-        print(f"Received data for building update: {request.data}")
+        logger.info(f"Building update request received for UUID: {uuid} by user: {request.user.email}")
+        logger.debug(f"Update data: {request.data}")
         
         building = Building.objects.get(uuid=uuid)
         
         if not has_access_permission(request.user, building):
+            logger.warning(f"Permission denied: User {request.user.email} attempted to update building {uuid} without permission")
             return Response(
                 {"error": "You don't have permission to update this building"},
                 status=status.HTTP_403_FORBIDDEN
@@ -246,14 +248,16 @@ def update_building(request, uuid):
         
         serializer = BuildingSerializer(building, data=request.data, partial=True)
         if serializer.is_valid():
-            print(f"Serializer valid, saving building...") 
+            logger.debug(f"Serializer valid, saving building {uuid}")
             serializer.save()
+            logger.info(f"Building {uuid} updated successfully by user {request.user.email}")
             return Response(serializer.data, status=status.HTTP_200_OK)
         
-        print(f"Serializer errors: {serializer.errors}")
+        logger.warning(f"Building update validation failed for {uuid}: {serializer.errors}")
         return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
     except Building.DoesNotExist:
+        logger.error(f"Building not found: {uuid}")
         return Response(
             {"error": "Building not found"}, 
             status=status.HTTP_404_NOT_FOUND

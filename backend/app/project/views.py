@@ -21,11 +21,14 @@ logger = logging.getLogger(__name__)
 @permission_classes([IsAuthenticated])
 def create_project(request):
     try:
+        logger.info(f"Project creation request by user: {request.user.email}")
         data = request.data
+        logger.debug(f"Project data: {data}")
         
         required_fields = ["name", "cost_per_kwh_fuel", "cost_per_kwh_electricity"]
         missing_fields = [field for field in required_fields if not data.get(field)]
         if missing_fields:
+            logger.warning(f"Missing fields in project creation: {', '.join(missing_fields)}")
             return standard_error_response(
                 f"Missing required fields: {', '.join(missing_fields)}", 
                 status.HTTP_400_BAD_REQUEST
@@ -37,6 +40,7 @@ def create_project(request):
             cost_per_kwh_electricity=data.get("cost_per_kwh_electricity"),
             user=request.user
         )
+        logger.info(f"Project created successfully: {project.uuid} by user: {request.user.email}")
     
         return Response({
             "uuid": project.uuid,
@@ -46,6 +50,7 @@ def create_project(request):
         }, status=status.HTTP_201_CREATED)
         
     except Exception as e:
+        logger.error(f"Error creating project: {str(e)}", exc_info=True)
         return standard_error_response(str(e), status.HTTP_400_BAD_REQUEST)
 
 @api_view(['DELETE'])

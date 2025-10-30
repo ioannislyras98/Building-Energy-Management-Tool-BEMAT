@@ -4,12 +4,15 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+import logging
 
 from .models import BuildingImage
 from .serializers import BuildingImageSerializer, BuildingImageListSerializer, BuildingImageCreateUpdateSerializer
 from building.models import Building
 from project.models import Project
 from common.utils import is_admin_user, has_access_permission
+
+logger = logging.getLogger(__name__)
 
 
 class BuildingImageViewSet(viewsets.ModelViewSet):

@@ -4,6 +4,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404
 import json
+import logging
+
 from numericValues.models import NumericValue
 from .models import RoofThermalInsulation, RoofThermalInsulationMaterialLayer
 from .serializer import (
@@ -14,6 +16,8 @@ from .serializer import (
 from building.models import Building
 from project.models import Project
 from materials.models import Material
+
+logger = logging.getLogger(__name__)
 from materials.serializers import MaterialListSerializer
 from common.utils import is_admin_user, has_access_permission
 
@@ -56,16 +60,18 @@ class RoofThermalInsulationCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
+        logger.debug(f"Performing roof thermal insulation creation by user: {self.request.user.email}")
         serializer.save(created_by=self.request.user)
     
     def create(self, request, *args, **kwargs):
         try:
-            print(f"Roof thermal insulation create request data: {request.data}")
-            return super().create(request, *args, **kwargs)
+            logger.info(f"Roof thermal insulation creation request by user: {request.user.email}")
+            logger.debug(f"Request data: {request.data}")
+            response = super().create(request, *args, **kwargs)
+            logger.info(f"Roof thermal insulation created successfully by user: {request.user.email}")
+            return response
         except Exception as e:
-            print(f"Error creating roof thermal insulation: {e}")
-            import traceback
-            traceback.print_exc()
+            logger.error(f"Error creating roof thermal insulation: {str(e)}", exc_info=True)
             return Response(
                 {"detail": str(e)}, 
                 status=status.HTTP_400_BAD_REQUEST

@@ -4,11 +4,15 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
 from rest_framework.views import APIView
+import logging
+
 from .models import Contact
 from .serializers import ContactSerializer, ContactCreateSerializer
 from building.models import Building
 from django.shortcuts import get_object_or_404
 from common.utils import is_admin_user, has_access_permission
+
+logger = logging.getLogger(__name__)
 
 
 class ContactListCreateView(generics.ListCreateAPIView):

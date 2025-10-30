@@ -120,7 +120,7 @@ export default function BuildingProfilePage() {
       navigate(`/projects/${projectUuid}`);
     } catch (error) {
       alert(
-        text?.errors?.generic ||
+        text?.errors?.deleteFailed ||
           "An error occurred while deleting the building."
       );
     }

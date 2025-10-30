@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+import logging
 
 from .models import HeatingSystem
 from .serializer import HeatingSystemSerializer
@@ -17,32 +18,38 @@ from common.utils import (
     has_access_permission
 )
 
+logger = logging.getLogger(__name__)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_heating_system(request):
     try:
+        logger.info(f"Heating system creation request by user: {request.user.email}")
         data = request.data
-        print(f"Received data: {data}")
-        print(f"User: {request.user}")
+        logger.debug(f"Request data: {data}")
         
         if not data.get("building"):
+            logger.warning("Building is missing in request")
             return standard_error_response("Building is required", status.HTTP_400_BAD_REQUEST)
         
         if not data.get("project"):
+            logger.warning("Project is missing in request")
             return standard_error_response("Project is required", status.HTTP_400_BAD_REQUEST)
         
         if not validate_uuid(data.get("building")):
+            logger.warning(f"Invalid building UUID: {data.get('building')}")
             return standard_error_response("Invalid building UUID", status.HTTP_400_BAD_REQUEST)
         
         if not validate_uuid(data.get("project")):
+            logger.warning(f"Invalid project UUID: {data.get('project')}")
             return standard_error_response("Invalid project UUID", status.HTTP_400_BAD_REQUEST)
         
         try:
             building = Building.objects.get(uuid=data.get("building"))
-            print(f"Found building: {building}, owner: {building.user}")
+            logger.debug(f"Found building: {building.uuid}, owner: {building.user.email if building.user else 'None'}")
         except Building.DoesNotExist:
-            print(f"Building with UUID {data.get('building')} not found")
+            logger.error(f"Building not found with UUID: {data.get('building')}")
             return standard_error_response("Building not found", status.HTTP_404_NOT_FOUND)
         
         if not has_access_permission(request.user, building):

@@ -1,8 +1,12 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+import logging
+
 from .models import NumericValue
 from .serializer import NumericValueSerializer
+
+logger = logging.getLogger(__name__)
 
 
 class NumericValueListView(generics.ListAPIView):

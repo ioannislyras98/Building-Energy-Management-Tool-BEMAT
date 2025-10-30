@@ -77,11 +77,7 @@ export default function Settings() {
         });
       }
     } catch (error) {
-      setError(
-        language === "en"
-          ? "Failed to load user data"
-          : "Αποτυχία φόρτωσης στοιχείων χρήστη"
-      );
+      setError(params.profileUpdateFailed || "Failed to load user data");
     }
   };
 
@@ -92,11 +88,7 @@ export default function Settings() {
     setError("");
 
     if (!userData.current_password.trim()) {
-      setError(
-        language === "en"
-          ? "Current password is required"
-          : "Ο τρέχων κωδικός απαιτείται"
-      );
+      setError(params.currentPasswordRequired || "Current password is required");
       setLoading(false);
       return;
     }
@@ -115,19 +107,10 @@ export default function Settings() {
         data: JSON.stringify(userData),
       });
 
-      setMessage(
-        params.profileUpdated ||
-          (language === "en"
-            ? "Profile updated successfully!"
-            : "Το προφίλ ενημερώθηκε επιτυχώς!")
-      );
+      setMessage(params.profileUpdated || "Profile updated successfully!");
       setUserData((prev) => ({ ...prev, current_password: "" }));
     } catch (error) {
-      setError(
-        language === "en"
-          ? "Failed to update profile"
-          : "Αποτυχία ενημέρωσης προφίλ"
-      );
+      setError(params.profileUpdateFailed || "Failed to update profile");
     } finally {
       setLoading(false);
     }
@@ -140,21 +123,13 @@ export default function Settings() {
     setError("");
 
     if (passwords.new_password !== passwords.confirm_password) {
-      setError(
-        language === "en"
-          ? "New passwords don't match"
-          : "Οι νέοι κωδικοί δεν ταιριάζουν"
-      );
+      setError(params.passwordsDoNotMatch || "New passwords don't match");
       setLoading(false);
       return;
     }
 
     if (passwords.new_password.length < 8) {
-      setError(
-        language === "en"
-          ? "Password must be at least 8 characters"
-          : "Ο κωδικός πρέπει να είναι τουλάχιστον 8 χαρακτήρες"
-      );
+      setError(params.passwordTooShort || "Password must be at least 8 characters");
       setLoading(false);
       return;
     }
@@ -177,23 +152,14 @@ export default function Settings() {
         }),
       });
 
-      setMessage(
-        params.passwordChanged ||
-          (language === "en"
-            ? "Password changed successfully!"
-            : "Ο κωδικός άλλαξε επιτυχώς!")
-      );
+      setMessage(params.passwordChanged || "Password changed successfully!");
       setPasswords({
         current_password: "",
         new_password: "",
         confirm_password: "",
       });
     } catch (error) {
-      setError(
-        language === "en"
-          ? "Failed to change password"
-          : "Αποτυχία αλλαγής κωδικού"
-      );
+      setError(params.passwordChangeFailed || "Failed to change password");
     } finally {
       setLoading(false);
     }

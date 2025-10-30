@@ -19,27 +19,41 @@ async function submitData(event, params, setErrorMsg) {
   const lastName = event.currentTarget.querySelector("#surname").value.trim();
 
   if (!firstName || !lastName) {
-    setErrorMsg("Το όνομα και το επώνυμο είναι υποχρεωτικά πεδία");
+    setErrorMsg(params.errorNameRequired);
     return;
   }
 
   const payload = {
     email: event.currentTarget.querySelector("#email").value,
-    password: btoa(event.currentTarget.querySelector("#password").value),
+    password: event.currentTarget.querySelector("#password").value,
     first_name: firstName,
     last_name: lastName,
   };
 
   try {
     const response = await signup(payload);
+    console.log("Signup successful:", response);
     cookies.set("token", response.token, {
       path: "/",
       expires: new Date(Date.now() + 60 * 60 * 24 * 1000),
     });
     window.location.href = "/";
   } catch (error) {
+    console.error("Signup error:", error);
     if (error.response?.status === 400) {
-      setErrorMsg(true);
+      const backendError = error.response?.data?.error || error.response?.data?.email?.[0];
+      // Check if backend error is "user already exists" message
+      if (backendError && (
+        backendError.includes("already exists") || 
+        backendError.includes("user with this email") ||
+        backendError.includes("This field must be unique")
+      )) {
+        setErrorMsg(params.errorMessage);
+      } else {
+        setErrorMsg(backendError || params.errorMessage);
+      }
+    } else {
+      setErrorMsg(params.errorGeneral);
     }
   }
 }

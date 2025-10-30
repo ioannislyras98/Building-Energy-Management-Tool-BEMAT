@@ -3,8 +3,12 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404
+import logging
+
 from .models import Material
 from .serializers import MaterialSerializer, MaterialListSerializer
+
+logger = logging.getLogger(__name__)
 
 
 class MaterialListCreateView(generics.ListCreateAPIView):

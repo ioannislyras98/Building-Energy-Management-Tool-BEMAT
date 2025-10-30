@@ -6,6 +6,10 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.utils.translation import gettext_lazy as _
+import logging
+
+logger = logging.getLogger(__name__)
+
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
@@ -21,10 +25,13 @@ class UserSerializer(serializers.ModelSerializer):
         }
     
     def create(self, validated_data):
+        logger.debug(f"Creating new user with email: {validated_data.get('email')}")
         password = validated_data.pop('password')
         user = User(**validated_data)
         user.set_password(password)
+        logger.debug(f"Password hashed and set for user: {user.email}")
         user.save()
+        logger.info(f"User created and saved to database: {user.email}")
         return user
 
 class UpdateProfileSerializer(serializers.Serializer):
@@ -119,13 +126,16 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
     def save(self):
         email = self.validated_data['email']
+        logger.info(f"Processing password reset request for email: {email}")
         user = User.objects.get(email=email)
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         reset_url = f"http://localhost:3000/reset-password-confirm/{uid}/{token}/"
+        logger.debug(f"Password reset URL generated for user: {email}")
         subject = "Επαναφορά κωδικού πρόσβασης"
         message = f"Παρακαλώ κάνε κλικ στον παρακάτω σύνδεσμο για να επαναφέρεις τον κωδικό σου:\n\n{reset_url}"
         send_mail(subject, message, None, [email], fail_silently=False)
+        logger.info(f"Password reset email sent successfully to: {email}")
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
     uid = serializers.CharField()
@@ -142,15 +152,23 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         uid = self.validated_data['uid']
         token = self.validated_data['token']
         new_password = self.validated_data['new_password']
+        logger.debug(f"Processing password reset confirmation for UID: {uid}")
+        
         try:
             uid = force_str(urlsafe_base64_decode(uid))
             user = User.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            raise serializers.ValidationError("Μη έγκυρο αναγνωριστικό χρήστη.")
+            logger.debug(f"User found for password reset: {user.email}")
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
+            logger.error(f"Invalid user ID during password reset: {str(e)}")
+            raise serializers.ValidationError("Invalid user identifier.")
+        
         if not default_token_generator.check_token(user, token):
-            raise serializers.ValidationError("Μη έγκυρο ή ληγμένο token.")
+            logger.warning(f"Invalid or expired token for user: {user.email}")
+            raise serializers.ValidationError("Invalid or expired token.")
+        
         user.set_password(new_password)
         user.save()
+        logger.info(f"Password reset successfully for user: {user.email}")
         return user
 
 class CustomAuthTokenSerializer(serializers.Serializer):
@@ -165,14 +183,19 @@ class CustomAuthTokenSerializer(serializers.Serializer):
         email = attrs.get('email')
         password = attrs.get('password')
 
+        logger.debug(f"Validating authentication credentials for email: {email}")
+
         if email and password:
             user = authenticate(request=self.context.get('request'),
                                 username=email, password=password)
             if not user:
-                msg = _('Αδύνατη η σύνδεση με τα δοθέντα διαπιστευτήρια.')
+                logger.warning(f"Authentication validation failed for email: {email}")
+                msg = _('Unable to login with provided credentials.')
                 raise serializers.ValidationError(msg, code='authorization')
+            logger.info(f"Authentication validation successful for email: {email}")
         else:
-            msg = _('Πρέπει να συμπληρώσετε email και κωδικό.')
+            logger.warning("Authentication validation failed: Missing email or password")
+            msg = _('Must include email and password.')
             raise serializers.ValidationError(msg, code='authorization')
 
         attrs['user'] = user

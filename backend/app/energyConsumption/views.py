@@ -3,11 +3,15 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+import logging
+
 from .models import EnergyConsumption
 from .serializers import EnergyConsumptionSerializer
 from common.utils import is_admin_user, has_access_permission
 from building.models import Building
 from project.models import Project
+
+logger = logging.getLogger(__name__)
 
 class CreateEnergyConsumption(generics.CreateAPIView):
     queryset = EnergyConsumption.objects.all()

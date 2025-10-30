@@ -4,6 +4,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404
 import json
+import logging
+
 from .models import (
     ExternalWallThermalInsulation, 
     ThermalInsulationMaterialLayer
@@ -18,6 +20,8 @@ from project.models import Project
 from materials.models import Material
 from materials.serializers import MaterialListSerializer
 from common.utils import is_admin_user, has_access_permission
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(['GET'])
@@ -141,15 +145,18 @@ class ThermalInsulationMaterialLayerCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        print(f"Creating material layer with data: {self.request.data}")
-        print(f"UUID from URL: {self.kwargs['thermal_insulation_uuid']}")
+        logger.info(f"Material layer creation request by user: {self.request.user.email}")
+        logger.debug(f"Material layer data: {self.request.data}")
+        logger.debug(f"Thermal insulation UUID: {self.kwargs['thermal_insulation_uuid']}")
+        
         thermal_insulation = get_object_or_404(
             ExternalWallThermalInsulation,
             uuid=self.kwargs['thermal_insulation_uuid'],
             user=self.request.user
         )
-        print(f"Found thermal insulation: {thermal_insulation}")
+        logger.info(f"Found thermal insulation: {thermal_insulation.uuid}")
         serializer.save(thermal_insulation=thermal_insulation)
+        logger.info(f"Material layer created successfully for thermal insulation: {thermal_insulation.uuid}")
 
 
 class ThermalInsulationMaterialLayerDetailView(generics.RetrieveUpdateDestroyAPIView):

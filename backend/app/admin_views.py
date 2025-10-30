@@ -17,6 +17,9 @@ from user.models import User
 from project.models import Project
 from building.models import Building
 from common.utils import standard_error_response, standard_success_response, is_admin_user
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(['GET'])
@@ -354,18 +357,36 @@ def admin_bulk_delete_users(request):
         if not users_to_delete.exists():
             return standard_error_response('No users found with provided IDs', status.HTTP_404_NOT_FOUND)
         
-        superusers = users_to_delete.filter(is_superuser=True)
-        if superusers.exists():
-            return standard_error_response('Cannot delete superusers', status.HTTP_400_BAD_REQUEST)
-        
+        # Check if trying to delete yourself
         if str(request.user.uuid) in user_ids:
             return standard_error_response('Cannot delete yourself', status.HTTP_400_BAD_REQUEST)
+        
+        # Check if trying to delete superusers - allow but with restrictions
+        superusers_to_delete = users_to_delete.filter(is_superuser=True)
+        if superusers_to_delete.exists():
+            # Count total superusers in system
+            total_superusers = User.objects.filter(is_superuser=True).count()
+            superusers_to_delete_count = superusers_to_delete.count()
+            
+            # Don't allow deleting all superusers (must keep at least one)
+            if total_superusers - superusers_to_delete_count < 1:
+                logger.warning(f"Admin {request.user.email} attempted to delete all superusers")
+                return standard_error_response(
+                    'Cannot delete all superusers. At least one superuser must remain in the system.',
+                    status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Log superuser deletion
+            superuser_emails = list(superusers_to_delete.values_list('email', flat=True))
+            logger.warning(f"Admin {request.user.email} is deleting {superusers_to_delete_count} superuser(s): {superuser_emails}")
         
         with transaction.atomic():
             deleted_count = users_to_delete.count()
             user_emails = list(users_to_delete.values_list('email', flat=True))
             
+            logger.info(f"Admin {request.user.email} deleting {deleted_count} user(s): {user_emails}")
             users_to_delete.delete()
+            logger.info(f"Successfully deleted {deleted_count} user(s)")
         
         return standard_success_response({
             'deleted_count': deleted_count,

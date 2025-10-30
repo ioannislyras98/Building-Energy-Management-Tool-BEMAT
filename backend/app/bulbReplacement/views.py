@@ -4,6 +4,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404
 import json
+import logging
+
 from .models import BulbReplacement
 from .serializer import (
     BulbReplacementSerializer,
@@ -12,6 +14,8 @@ from .serializer import (
 from building.models import Building
 from project.models import Project
 from common.utils import is_admin_user, has_access_permission
+
+logger = logging.getLogger(__name__)
 
 
 class BulbReplacementListView(generics.ListAPIView):
