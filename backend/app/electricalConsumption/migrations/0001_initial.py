@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('consumption_type', models.CharField(choices=[('lighting', 'Φωτισμός'), ('air_conditioning', 'Κλιματισμός'), ('other_electrical_devices', 'Άλλες ηλεκτρικές συσκευές')], max_length=50, verbose_name='Τύπος κατανάλωσης')),
                 ('period', models.CharField(blank=True, max_length=255, null=True, verbose_name='Περίοδος')),
                 ('load_type', models.CharField(blank=True, choices=[('continuous', 'Συνεχής'), ('intermittent', 'Διαλείπων'), ('peak', 'Αιχμής'), ('base', 'Βάσης')], max_length=50, null=True, verbose_name='Τύπος φορτίου')),
-                ('load_power', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='Ισχύς φορτίου (kW)')),
+                ('load_power', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='Ισχύς φορτίου (W)')),
                 ('quantity', models.IntegerField(blank=True, null=True, verbose_name='Πλήθος')),
                 ('operating_hours_per_year', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='Ώρες λειτουργίας ανά έτος')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Ημερομηνία δημιουργίας')),

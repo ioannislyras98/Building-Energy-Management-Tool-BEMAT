@@ -16,31 +16,18 @@ const PhotovoltaicSystemForm = ({
   onCancel,
 }) => {
   const [formData, setFormData] = useState({
-    // Φωτοβολταϊκά πλαίσια
     pv_panels_quantity: "",
     pv_panels_unit_price: "",
-
-    // Μεταλλικές βάσεις στήριξης
     metal_bases_quantity: "",
     metal_bases_unit_price: "",
-
-    // Σωληνώσεις
     piping_quantity: "",
     piping_unit_price: "",
-
-    // Καλωδιώσεις
     wiring_quantity: "",
     wiring_unit_price: "",
-
-    // Μετατροπέας ισχύος
     inverter_quantity: "",
     inverter_unit_price: "",
-
-    // Εγκατάσταση
     installation_quantity: "",
     installation_unit_price: "",
-
-    // Ενεργειακοί δείκτες
     power_per_panel: "",
     collector_efficiency: "",
     installation_angle: "",
@@ -96,8 +83,6 @@ const PhotovoltaicSystemForm = ({
 
   const validateForm = () => {
     const newErrors = {};
-
-    // Required fields validation
     const requiredFields = [
       "pv_panels_quantity",
       "pv_panels_unit_price",
@@ -121,8 +106,6 @@ const PhotovoltaicSystemForm = ({
         newErrors[field] = "Αυτό το πεδίο είναι υποχρεωτικό";
       }
     });
-
-    // Numeric validations
     const numericFields = [
       "pv_panels_quantity",
       "pv_panels_unit_price",
@@ -149,8 +132,6 @@ const PhotovoltaicSystemForm = ({
         newErrors[field] = "Δεν μπορεί να είναι αρνητικός";
       }
     });
-
-    // Specific validations
     if (
       formData.collector_efficiency &&
       (parseFloat(formData.collector_efficiency) < 0 ||

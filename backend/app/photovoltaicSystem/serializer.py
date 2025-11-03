@@ -129,7 +129,6 @@ class PhotovoltaicSystemCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PhotovoltaicSystem
         fields = [
-            'user',
             'building',
             'project',
             

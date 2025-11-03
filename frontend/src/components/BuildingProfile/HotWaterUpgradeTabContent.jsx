@@ -26,8 +26,6 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import API_BASE_URL from "../../config/api.js";
-
-// TabPanel component για τα tabs
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
   return (
@@ -61,8 +59,6 @@ const HotWaterUpgradeTabContent = ({
     language === "en"
       ? english_text.HotWaterUpgradeTabContent || {}
       : greek_text.HotWaterUpgradeTabContent || {};
-
-  // Fetch existing data on component mount
   useEffect(() => {
     if (buildingUuid && token) {
       fetchExistingData();
@@ -78,7 +74,7 @@ const HotWaterUpgradeTabContent = ({
       },
       success: (response) => {
         if (response.success && response.data && response.data.length > 0) {
-          const data = response.data[0]; // Get the first (latest) entry
+          const data = response.data[0];
           setFormData({
             solar_collectors_quantity: data.solar_collectors_quantity || "",
             solar_collectors_unit_price: data.solar_collectors_unit_price || "",
@@ -99,14 +95,12 @@ const HotWaterUpgradeTabContent = ({
         }
       },
       error: (jqXHR) => {
-        // Silently fail - it's okay if no data exists yet
 
       },
     });
   };
 
   const [formData, setFormData] = useState({
-    // System Components
     solar_collectors_quantity: "",
     solar_collectors_unit_price: "",
     metal_support_bases_quantity: "",
@@ -117,8 +111,6 @@ const HotWaterUpgradeTabContent = ({
     insulated_pipes_unit_price: "",
     central_heater_installation_quantity: 1,
     central_heater_installation_unit_price: "",
-    
-    // Economic Data
     electric_heater_power: "",
     operating_hours_per_year: "",
     solar_utilization_percentage: 80,
@@ -140,8 +132,6 @@ const HotWaterUpgradeTabContent = ({
     net_present_value: 0,
     internal_rate_of_return: 0,
   });
-
-  // Auto-save with debouncing
   const [debounceTimeout, setDebounceTimeout] = useState(null);
 
   const autoSave = useCallback(() => {
@@ -185,8 +175,6 @@ const HotWaterUpgradeTabContent = ({
       ...prev,
       [field]: value,
     }));
-
-    // Auto-save with 1 second debouncing
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
@@ -216,35 +204,23 @@ const HotWaterUpgradeTabContent = ({
       energy_cost_kwh,
       lifespan_years,
     } = formData;
-
-    // Calculate subtotals
     const solarCollectorsSubtotal = parseFloat(solar_collectors_quantity || 0) * parseFloat(solar_collectors_unit_price || 0);
     const metalSupportBasesSubtotal = parseFloat(metal_support_bases_quantity || 0) * parseFloat(metal_support_bases_unit_price || 0);
     const solarSystemSubtotal = parseFloat(solar_system_quantity || 0) * parseFloat(solar_system_unit_price || 0);
     const insulatedPipesSubtotal = parseFloat(insulated_pipes_quantity || 0) * parseFloat(insulated_pipes_unit_price || 0);
     const centralHeaterSubtotal = parseFloat(central_heater_installation_quantity || 0) * parseFloat(central_heater_installation_unit_price || 0);
-
-    // Calculate total investment cost
     const totalInvestmentCost = solarCollectorsSubtotal + metalSupportBasesSubtotal + solarSystemSubtotal + insulatedPipesSubtotal + centralHeaterSubtotal;
-
-    // Calculate energy consumption and savings
     const annualEnergyConsumption = electric_heater_power && operating_hours_per_year
       ? (parseFloat(electric_heater_power) * parseFloat(operating_hours_per_year)) / 1000
       : 0;
 
     const annualSolarSavings = annualEnergyConsumption * (parseFloat(solar_utilization_percentage || 0) / 100);
-
-    // Calculate economic benefit
     const annualEconomicBenefit = annualSolarSavings * parseFloat(energy_cost_kwh || 0);
-
-    // Calculate payback period
     let paybackPeriod = 0;
     if (annualEconomicBenefit > 0 && totalInvestmentCost > 0) {
       paybackPeriod = totalInvestmentCost / annualEconomicBenefit;
     }
-
-    // Calculate NPV
-    const discountRate = 0.05; // 5%
+    const discountRate = 0.05;
     const years = parseInt(lifespan_years) || 10;
     let npv = 0;
 
@@ -256,8 +232,6 @@ const HotWaterUpgradeTabContent = ({
     } else {
       npv = -totalInvestmentCost;
     }
-
-    // Calculate IRR (simplified)
     const irr = totalInvestmentCost > 0 ? (annualEconomicBenefit / totalInvestmentCost) * 100 : 0;
 
     setCalculatedResults({
@@ -279,8 +253,6 @@ const HotWaterUpgradeTabContent = ({
   useEffect(() => {
     calculateResults();
   }, [calculateResults]);
-
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (debounceTimeout) {

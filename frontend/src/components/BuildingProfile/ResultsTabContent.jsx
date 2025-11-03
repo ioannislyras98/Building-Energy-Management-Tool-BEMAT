@@ -58,8 +58,6 @@ const ResultsTabContent = ({
 
   const cookies = new Cookies();
   const token = cookies.get("token");
-
-  // Function to get scenario name based on language
   const getScenarioName = (key) => {
     const scenarioNames = {
       thermal_insulation: {
@@ -110,8 +108,6 @@ const ResultsTabContent = ({
 
     return scenarioNames[key]?.[language === "en" ? "en" : "gr"] || key;
   };
-
-  // Mapping των scenario types σε ελληνικά ονόματα και icons
   const scenarioConfig = {
     thermal_insulation: {
       name: getScenarioName("thermal_insulation"),
@@ -193,8 +189,6 @@ const ResultsTabContent = ({
 
     try {
       const scenarioData = [];
-
-      // Fetch data για κάθε σενάριο
       for (const [key, config] of Object.entries(scenarioConfig)) {
         try {
           const response = await axios.get(
@@ -208,8 +202,6 @@ const ResultsTabContent = ({
           );
 
           const responseData = response.data;
-
-          // Ελέγχουμε αν το response περιέχει data array ή είναι ήδη το object
           let scenarioItems = [];
           if (responseData.data && Array.isArray(responseData.data)) {
             scenarioItems = responseData.data;
@@ -218,8 +210,6 @@ const ResultsTabContent = ({
           } else if (responseData && typeof responseData === "object") {
             scenarioItems = [responseData];
           }
-
-          // Προσθέτουμε μόνο τα ολοκληρωμένα σενάρια (με net_present_value)
           scenarioItems.forEach((item) => {
             const netPresentValue =
               parseFloat(item.net_present_value) ||
@@ -236,7 +226,6 @@ const ResultsTabContent = ({
                 icon: config.icon,
                 color: config.color,
                 ...item,
-                // Διασφάλιση ότι όλα τα πεδία είναι αριθμοί - προσπάθεια με διαφορετικά field names
                 total_investment_cost:
                   parseFloat(item.total_investment_cost) ||
                   parseFloat(item.total_cost) ||

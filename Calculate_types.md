@@ -84,20 +84,137 @@
 
 #### Ενεργειακή Παραγωγή
 
-- **Ετήσια παραγωγή**: `Annual_production = Panel_power × Peak_hours × Days × Efficiency`
-- **Εξοικονόμηση CO₂**: `CO2_savings = Annual_production × CO2_factor`
+**Βασικός Τύπος:**
+
+```
+E = P × efficiency × n × H × PR
+```
+
+Όπου:
+
+- **E**: Ετήσια παραγωγή ενέργειας (kWh/έτος)
+- **P**: Ονομαστική ισχύς ανά φωτοβολταϊκό πλαίσιο (kW) - μετατρέπεται από W
+- **efficiency**: Απόδοση συλλέκτη (%) - π.χ. 80% = 0.80
+- **n**: Αριθμός φωτοβολταϊκών πλαισίων
+- **H**: Ηλιακή ακτινοβολία (kWh/m²/έτος) - Ανακτάται από NumericValue με default 1600 για Ελλάδα (admin-editable)
+- **PR**: Performance Ratio (Συντελεστής απόδοσης συστήματος) - Ανακτάται από NumericValue με default 0.80 (admin-editable)
+
+**Performance Ratio (PR):**
+
+Το PR αντιπροσωπεύει τις συνολικές απώλειες του συστήματος. Η τιμή του μπορεί να προσαρμοστεί από τον admin μέσω του πίνακα NumericValue (default: 0.80 = 80%).
+
+Παράγοντες απωλειών που συμπεριλαμβάνονται στο PR:
+
+- Απώλειες μετατροπέα (inverter): ~5%
+- Απώλειες καλωδίωσης: ~2%
+- Απώλειες θερμοκρασίας: ~5-10%
+- Σκίαση και ρύπανση: ~3-5%
+- Απόκλιση από βέλτιστη γωνία: ~5%
+
+**Προσαρμογή με βάση την κλίση εγκατάστασης:**
+
+```
+Βέλτιστη γωνία για Ελλάδα: 32°
+Angle_loss_factor = max(0.90, 1.0 - (|angle - 32| × 0.005))
+PR_adjusted = PR_base × Angle_loss_factor
+```
+
+**Απόδοση Συλλέκτη (collector_efficiency):**
+
+Η απόδοση των φωτοβολταϊκών πλαισίων (π.χ. 80%) εφαρμόζεται πάνω στην ονομαστική ισχύ. Για παράδειγμα:
+- Ονομαστική ισχύς πλαισίου: 400W
+- Απόδοση συλλέκτη: 80%
+- **Πραγματική ισχύς: 400W × 0.80 = 320W**
+
+**Τελικός Υπολογισμός:**
+
+```
+Annual_energy_production = (power_per_panel / 1000) × (efficiency / 100) × pv_panels_quantity × H × PR_adjusted
+```
 
 #### Οικονομικοί Υπολογισμοί
 
-- **Εξοικονόμηση από αυτοκατανάλωση**: `Self_consumption_savings = Self_consumption × Energy_price`
-- **Έσοδα από πώληση**: `Feed_in_revenue = Excess_production × Feed_in_tariff`
-- **Συνολικά ετήσια οφέλη**: `Total_annual_benefits = Self_consumption_savings + Feed_in_revenue`
+**Κόστος Εγκατάστασης:**
+
+```
+Equipment_cost = (pv_panels_quantity × pv_panels_unit_price) +
+                 (metal_bases_quantity × metal_bases_unit_price) +
+                 (piping_quantity × piping_unit_price) +
+                 (wiring_quantity × wiring_unit_price) +
+                 (inverter_quantity × inverter_unit_price) +
+                 (installation_quantity × installation_unit_price)
+
+Unexpected_expenses = Equipment_cost × 0.09
+Value_after_unexpected = Equipment_cost + Unexpected_expenses
+Tax_burden = Value_after_unexpected × 0.24
+Total_cost = Value_after_unexpected + Tax_burden
+Net_cost = Total_cost - Subsidy_amount
+```
+
+**Ετήσια Εξοικονόμηση:**
+
+```
+Annual_savings = Annual_energy_production × Electricity_price
+```
+
+Όπου `Electricity_price` = 0.15 €/kWh (default)
+
+**Περίοδος Απόσβεσης:**
+
+```
+Payback_period = Net_cost / Annual_savings
+```
+
+**Απόδοση Επένδυσης (ROI):**
+
+```
+Investment_return = (Annual_savings / Net_cost) × 100
+```
+
+**Καθαρή Παρούσα Αξία (NPV):**
+
+```
+NPV = Σ[Annual_savings / (1 + r)^t] - Net_cost
+
+Όπου:
+- r = 0.05 (προεξοφλητικός συντελεστής 5%)
+- t = 1 έως 25 (διάρκεια ζωής συστήματος)
+```
+
+#### Εξοικονόμηση CO₂
+
+```
+CO2_savings = Annual_energy_production × CO2_factor
+```
+
+Όπου `CO2_factor` = 0.7 kg CO₂/kWh (μέσος συντελεστής Ελλάδας)
+
+### Παράδειγμα Υπολογισμού
+
+```
+Δεδομένα:
+- Αριθμός πλαισίων (n): 20
+- Ονομαστική ισχύς ανά πλαίσιο (P): 400W = 0.4 kW
+- Απόδοση συλλέκτη: 80%
+- Ηλιακή ακτινοβολία (H): 1600 kWh/m²/έτος
+- Κλίση: 32° (βέλτιστη)
+- Performance Ratio (PR): 0.80
+
+Υπολογισμός:
+- Πραγματική ισχύς = 0.4 kW × 0.80 = 0.32 kW
+- Angle_loss_factor = 1.0 (βέλτιστη γωνία)
+- PR_adjusted = 0.80 × 1.0 = 0.80
+
+E = 0.4 kW × 0.80 × 20 × 1600 kWh/m²/έτος × 0.80
+E = 8,192 kWh/έτος
+```
 
 ### Υλοποίηση
 
 - **Backend**: `photovoltaicSystem/models.py`
 - **Frontend**: `PhotovoltaicSystemTabContent.jsx`
 - **API Endpoints**: `/photovoltaic_systems/`
+- **NumericValue**: `Ηλιακή ακτινοβολία (kWh/m²/έτος)` - Επεξεργάσιμο από admin
 
 ---
 

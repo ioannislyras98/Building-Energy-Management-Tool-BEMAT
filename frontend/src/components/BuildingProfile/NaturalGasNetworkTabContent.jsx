@@ -23,8 +23,6 @@ import { useLanguage } from "../../context/LanguageContext";
 import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import API_BASE_URL from "../../config/api.js";
-
-// TabPanel component για τα tabs
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
   return (
@@ -60,7 +58,6 @@ const NaturalGasNetworkTabContent = ({
       : greek_text.NaturalGasNetworkTabContent || {};
 
   const [formData, setFormData] = useState({
-    // System Components
     burner_replacement_quantity: "",
     burner_replacement_unit_price: "",
     gas_pipes_quantity: "",
@@ -69,8 +66,6 @@ const NaturalGasNetworkTabContent = ({
     gas_detection_systems_unit_price: "",
     boiler_cleaning_quantity: "",
     boiler_cleaning_unit_price: "",
-    
-    // Economic Data
     current_energy_cost_per_year: "",
     natural_gas_cost_per_year: "",
     annual_energy_savings: "",
@@ -78,15 +73,11 @@ const NaturalGasNetworkTabContent = ({
     new_system_efficiency: 0.90,
     natural_gas_price_per_kwh: "",
   });
-
-  // Fetch existing data on component mount
   useEffect(() => {
     if (buildingUuid && token) {
       fetchExistingData();
     }
   }, [buildingUuid, token]);
-
-  // Always calculate energy cost when component mounts or building data changes
   useEffect(() => {
     if (buildingData && buildingData.annual_energy_cost) {
       setFormData(prev => ({
@@ -94,19 +85,14 @@ const NaturalGasNetworkTabContent = ({
         current_energy_cost_per_year: buildingData.annual_energy_cost
       }));
     } else if (buildingUuid && token) {
-      // Always fetch energy consumptions to calculate current energy cost
       fetchEnergyConsumptions();
     }
   }, [buildingData, buildingUuid, token]);
-
-  // Also fetch energy consumptions when existing data is loaded but no energy cost is set
   useEffect(() => {
     if (!formData.current_energy_cost_per_year && buildingUuid && token) {
       fetchEnergyConsumptions();
     }
   }, [formData, buildingUuid, token]);
-
-  // Auto-calculate annual energy savings when current cost and natural gas cost are available
   useEffect(() => {
     const currentCost = parseFloat(formData.current_energy_cost_per_year || 0);
     const gasCost = parseFloat(formData.natural_gas_cost_per_year || 0);
@@ -131,28 +117,23 @@ const NaturalGasNetworkTabContent = ({
       },
       success: (response) => {
         if (response && response.length > 0) {
-          // Calculate total annual energy cost from all energy consumptions
           const totalAnnualCost = response.reduce((sum, consumption) => {
             const kwhEquivalent = consumption.kwh_equivalent || 0;
-            
-            // Get energy cost per kWh based on energy source
-            let energyCostPerKwh = 0.15; // Default fallback
+            let energyCostPerKwh = 0.15;
             
             if (consumption.energy_source === 'electricity') {
-              // Use electricity cost rate
               if (params && params.cost_per_kwh_electricity) {
                 energyCostPerKwh = parseFloat(params.cost_per_kwh_electricity);
               } else if (buildingData && buildingData.project && buildingData.project.cost_per_kwh_electricity) {
                 energyCostPerKwh = parseFloat(buildingData.project.cost_per_kwh_electricity);
               }
             } else {
-              // Use fuel cost rate for natural gas, heating oil, biomass
               if (params && params.cost_per_kwh_fuel) {
                 energyCostPerKwh = parseFloat(params.cost_per_kwh_fuel);
               } else if (buildingData && buildingData.project && buildingData.project.cost_per_kwh_fuel) {
                 energyCostPerKwh = parseFloat(buildingData.project.cost_per_kwh_fuel);
               } else {
-                energyCostPerKwh = 0.10; // Default fuel cost fallback
+                energyCostPerKwh = 0.10;
               }
             }
             
@@ -182,7 +163,7 @@ const NaturalGasNetworkTabContent = ({
       },
       success: (response) => {
         if (response.success && response.data && response.data.length > 0) {
-          const data = response.data[0]; // Get the first (latest) entry
+          const data = response.data[0]; 
           setFormData(prev => ({
             ...prev,
             burner_replacement_quantity: data.burner_replacement_quantity || "",
@@ -193,7 +174,6 @@ const NaturalGasNetworkTabContent = ({
             gas_detection_systems_unit_price: data.gas_detection_systems_unit_price || "",
             boiler_cleaning_quantity: data.boiler_cleaning_quantity || "",
             boiler_cleaning_unit_price: data.boiler_cleaning_unit_price || "",
-            // Use the current_energy_cost_per_year from backend (already calculated with proper logic)
             current_energy_cost_per_year: data.current_energy_cost_per_year || "",
             natural_gas_cost_per_year: data.natural_gas_cost_per_year || "",
             annual_energy_savings: data.annual_energy_savings || "",
@@ -202,7 +182,6 @@ const NaturalGasNetworkTabContent = ({
             natural_gas_price_per_kwh: data.natural_gas_price_per_kwh || "",
           }));
         } else if (response.success && response.current_energy_cost_per_year !== undefined) {
-          // No existing natural gas network data, but we have calculated energy cost from backend
           setFormData(prev => ({
             ...prev,
             current_energy_cost_per_year: response.current_energy_cost_per_year.toString()
@@ -210,7 +189,6 @@ const NaturalGasNetworkTabContent = ({
         }
       },
       error: (jqXHR) => {
-        // Silently fail - it's okay if no data exists yet
 
       },
     });
@@ -227,8 +205,6 @@ const NaturalGasNetworkTabContent = ({
     net_present_value: 0,
     internal_rate_of_return: 0,
   });
-
-  // Auto-save with debouncing
   const [debounceTimeout, setDebounceTimeout] = useState(null);
 
   const autoSave = useCallback(() => {
@@ -266,11 +242,8 @@ const NaturalGasNetworkTabContent = ({
       },
     });
   }, [buildingUuid, projectUuid, token, formData, calculatedResults, translations]);
-
-  // Trigger recalculation when efficiency or gas price changes
   useEffect(() => {
     if (buildingUuid && token && (formData.new_system_efficiency || formData.natural_gas_price_per_kwh)) {
-      // Trigger auto-save to recalculate natural gas cost
       const timeout = setTimeout(() => {
         autoSave();
       }, 500);
@@ -283,8 +256,6 @@ const NaturalGasNetworkTabContent = ({
       ...prev,
       [field]: value,
     }));
-
-    // Auto-save with 1 second debouncing
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
@@ -311,31 +282,21 @@ const NaturalGasNetworkTabContent = ({
       annual_energy_savings,
       lifespan_years,
     } = formData;
-
-    // Calculate subtotals
     const burnerReplacementSubtotal = parseFloat(burner_replacement_quantity || 0) * parseFloat(burner_replacement_unit_price || 0);
     const gasPipesSubtotal = parseFloat(gas_pipes_quantity || 0) * parseFloat(gas_pipes_unit_price || 0);
     const gasDetectionSystemsSubtotal = parseFloat(gas_detection_systems_quantity || 0) * parseFloat(gas_detection_systems_unit_price || 0);
     const boilerCleaningSubtotal = parseFloat(boiler_cleaning_quantity || 0) * parseFloat(boiler_cleaning_unit_price || 0);
-
-    // Calculate total investment cost
     const totalInvestmentCost = burnerReplacementSubtotal + gasPipesSubtotal + gasDetectionSystemsSubtotal + boilerCleaningSubtotal;
-
-    // Calculate economic benefit
     let annualEconomicBenefit = 0;
     if (current_energy_cost_per_year && natural_gas_cost_per_year) {
       annualEconomicBenefit = parseFloat(current_energy_cost_per_year) - parseFloat(natural_gas_cost_per_year);
     } else if (annual_energy_savings) {
       annualEconomicBenefit = parseFloat(annual_energy_savings);
     }
-
-    // Calculate payback period
     let paybackPeriod = 0;
     if (annualEconomicBenefit > 0 && totalInvestmentCost > 0) {
       paybackPeriod = totalInvestmentCost / annualEconomicBenefit;
     }
-
-    // Calculate NPV
     const discountRate = 0.05; // 5%
     const years = parseInt(lifespan_years) || 15;
     let npv = 0;
@@ -348,8 +309,6 @@ const NaturalGasNetworkTabContent = ({
     } else {
       npv = -totalInvestmentCost;
     }
-
-    // Calculate IRR (simplified)
     const irr = totalInvestmentCost > 0 ? (annualEconomicBenefit / totalInvestmentCost) * 100 : 0;
 
     setCalculatedResults({
@@ -368,8 +327,6 @@ const NaturalGasNetworkTabContent = ({
   useEffect(() => {
     calculateResults();
   }, [calculateResults]);
-
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (debounceTimeout) {

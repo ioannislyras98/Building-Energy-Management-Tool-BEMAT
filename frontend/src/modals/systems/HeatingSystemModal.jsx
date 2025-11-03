@@ -86,8 +86,6 @@ function HeatingSystemModalForm({
   const validateForm = () => {
     const newErrors = {};
     let hasErrors = false;
-
-    // Required fields
     if (!formData.heating_system_type) {
       newErrors.heating_system_type =
         params.errorRequired || "Field is required";
@@ -102,8 +100,6 @@ function HeatingSystemModalForm({
         params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
-
-    // Optional field validations
     if (
       formData.cop &&
       formData.cop !== "" &&

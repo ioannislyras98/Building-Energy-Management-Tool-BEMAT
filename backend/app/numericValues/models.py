@@ -52,6 +52,8 @@ class NumericValue(models.Model):
                 'Εσωτερική Οροφής (Rsi)': 0.10,
                 'Εσωτερική Τοίχου (Rsi)': 0.13,
                 'Εξωτερική (Rse)': 0.04,
+                'Ηλιακή ακτινοβολία (kWh/m²/έτος)': 1600.0,
+                'Performance Ratio (PR)': 0.80,
             }
             return defaults.get(name, 0.0)
 
@@ -101,6 +103,16 @@ def create_default_numeric_values():
         {
             'name': 'Εξωτερική (Rse)',
             'value': 0.04,
+            'created_by': admin_user
+        },
+        {
+            'name': 'Ηλιακή ακτινοβολία (kWh/m²/έτος)',
+            'value': 1600.0,
+            'created_by': admin_user
+        },
+        {
+            'name': 'Performance Ratio (PR)',
+            'value': 0.80,
             'created_by': admin_user
         },
     ]

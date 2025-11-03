@@ -57,8 +57,6 @@ const BulbReplacementTabContent = ({
     language === "en"
       ? english_text.BulbReplacementTabContent || {}
       : greek_text.BulbReplacementTabContent || {};
-
-  // Fetch existing data on component mount
   useEffect(() => {
     if (buildingUuid && token) {
       fetchExistingData();
@@ -74,7 +72,7 @@ const BulbReplacementTabContent = ({
       },
       success: (response) => {
         if (response.success && response.data && response.data.length > 0) {
-          const data = response.data[0]; // Get the first (latest) entry
+          const data = response.data[0];
           setFormData({
             old_bulb_type: data.old_bulb_type || "Λαμπτήρας Πυρακτώσεως",
             old_power_per_bulb: data.old_power_per_bulb || "",
@@ -93,7 +91,6 @@ const BulbReplacementTabContent = ({
         }
       },
       error: (jqXHR) => {
-        // Silently fail - it's okay if no data exists yet
 
       },
     });
@@ -108,15 +105,12 @@ const BulbReplacementTabContent = ({
     new_power_per_bulb: "",
     new_bulb_count: "",
     new_operating_hours: "",
-    // Οικονομικά στοιχεία
     cost_per_new_bulb: "",
     installation_cost: "",
     energy_cost_kwh: "",
     maintenance_cost_annual: "",
     lifespan_years: "",
   });
-
-  // Επιλογές τύπων λαμπτήρων
   const oldBulbTypes = [
     "Λαμπτήρας Πυρακτώσεως",
     "Αλογόνος Λαμπτήρας",
@@ -143,8 +137,6 @@ const BulbReplacementTabContent = ({
     net_present_value: 0,
     internal_rate_of_return: 0,
   });
-
-  // Auto-save with debouncing
   const [debounceTimeout, setDebounceTimeout] = useState(null);
 
   const autoSave = useCallback(() => {
@@ -204,8 +196,6 @@ const BulbReplacementTabContent = ({
       ...prev,
       [field]: value,
     }));
-
-    // Auto-save with 1 second debouncing
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
@@ -231,8 +221,6 @@ const BulbReplacementTabContent = ({
       maintenance_cost_annual,
       lifespan_years,
     } = formData;
-
-    // Calculate consumption
     let oldConsumption = 0;
     let newConsumption = 0;
 
@@ -259,26 +247,18 @@ const BulbReplacementTabContent = ({
     let paybackPeriod = 0;
     let npv = 0;
     let irr = 0;
-
-    // Calculate investment cost
     if (new_bulb_count && cost_per_new_bulb) {
       const bulbCost =
         parseFloat(new_bulb_count) * parseFloat(cost_per_new_bulb);
       const instCost = parseFloat(installation_cost || 0);
       totalInvestmentCost = bulbCost + instCost;
     }
-
-    // Calculate annual savings
     if (energySavings > 0 && energy_cost_kwh) {
       annualCostSavings = energySavings * parseFloat(energy_cost_kwh);
     }
-
-    // Calculate payback period
     if (annualCostSavings > 0 && totalInvestmentCost > 0) {
       paybackPeriod = totalInvestmentCost / annualCostSavings;
-
-      // Calculate NPV
-      const discountRate = 0.05; // 5%
+      const discountRate = 0.05; 
       const years = parseFloat(lifespan_years) || 10;
       let pvSavings = 0;
 
@@ -289,8 +269,6 @@ const BulbReplacementTabContent = ({
       }
 
       npv = pvSavings - totalInvestmentCost;
-
-      // Calculate IRR (simplified)
       irr = (annualCostSavings / totalInvestmentCost) * 100;
     }
 
@@ -309,8 +287,6 @@ const BulbReplacementTabContent = ({
   useEffect(() => {
     calculateResults();
   }, [calculateResults]);
-
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (debounceTimeout) {
@@ -879,8 +855,6 @@ const BulbReplacementTabContent = ({
       </Grid>
     </div>
   );
-
-  // Old function removed - content split into separate tab functions
   <div className="space-y-4">
     <Grid container spacing={3}>
       <Grid item xs={12}>
@@ -1576,7 +1550,7 @@ const BulbReplacementTabContent = ({
             fullWidth
             label={(translations.discountRate || "Επιτόκιο αναγωγής") + " (%)"}
             type="number"
-            value={5} // Προεπιλεγμένη τιμή 5%
+            value={5} 
             InputProps={{ readOnly: true }}
             inputProps={{ step: 0.1, min: 0, max: 100 }}
             helperText={

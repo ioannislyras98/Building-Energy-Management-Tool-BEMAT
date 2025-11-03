@@ -83,13 +83,9 @@ const ThermalInsulationModal = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-
-  // Material modal states
   const [materialModalOpen, setMaterialModalOpen] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState(null);
   const [materialType, setMaterialType] = useState("new");
-
-  // Delete dialog states
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingMaterial, setDeletingMaterial] = useState(null);
 
@@ -103,7 +99,6 @@ const ThermalInsulationModal = ({
     if (open && isEdit && editItem) {
       fetchThermalInsulation();
     } else if (open && !isEdit) {
-      // Reset για νέα θερμομόνωση
       setThermalInsulation({
         building: buildingUuid,
         project: projectUuid,
@@ -224,7 +219,6 @@ const ThermalInsulationModal = ({
         Authorization: `Token ${token}`,
       },
       success: () => {
-        // Remove from local state
         if (deletingMaterial.material_type === "old") {
           setOldMaterials((prev) =>
             prev.filter((m) => m.uuid !== deletingMaterial.uuid)
@@ -246,15 +240,12 @@ const ThermalInsulationModal = ({
     });
   };
   const onMaterialSaveSuccess = () => {
-    // Refresh thermal insulation data
     if (isEdit) {
       fetchThermalInsulation();
     }
     setMaterialModalOpen(false);
     setSuccess("Το υλικό αποθηκεύτηκε επιτυχώς!");
   };
-
-  // Calculation functions
   const calculateRTotal = (materials) => {
     if (!materials || materials.length === 0) return 0.17; // R_si + R_se = 0.13 + 0.04
 

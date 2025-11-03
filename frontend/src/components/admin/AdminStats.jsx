@@ -24,7 +24,6 @@ const AdminStats = () => {
         setLoading(true);
         setError(null);
 
-        // Fetch dashboard stats from dedicated endpoint
         const statsResponse = await axios.get(
           `${API_BASE_URL}/admin-api/dashboard-stats/`,
           {
@@ -43,7 +42,7 @@ const AdminStats = () => {
           setStats({
             totalUsers: data.users.total || 0,
             totalProjects: data.projects.total || 0,
-            submittedProjects: 0, // This would need additional endpoint
+            submittedProjects: 0, 
             draftProjects: data.projects.total || 0,
             totalBuildings: data.buildings.total || 0,
           });

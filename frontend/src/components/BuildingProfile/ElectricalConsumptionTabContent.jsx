@@ -21,6 +21,17 @@ import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import ElectricalConsumptionModal from "../../modals/building/ElectricalConsumptionModal";
 import API_BASE_URL from "../../config/api.js";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  Legend,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 
 const ElectricalConsumptionTabContent = ({
   buildingUuid,
@@ -64,6 +75,52 @@ const ElectricalConsumptionTabContent = ({
     };
     return types[type] || type;
   };
+  const prepareChartData = () => {
+    if (!electricalConsumptions.length) return [];
+
+    const groupedData = {};
+
+    electricalConsumptions.forEach((item) => {
+      const energyData = item.energy_consumption_data;
+      let periodKey;
+      let periodLabel;
+
+      if (energyData && energyData.start_date && energyData.end_date) {
+        const fromText = language === "en" ? "From" : "Από";
+        const toText = language === "en" ? "to" : "έως";
+        periodKey = `${energyData.start_date}_${energyData.end_date}`;
+        periodLabel = `${fromText} ${energyData.start_date} ${toText} ${energyData.end_date}`;
+      } else {
+        periodKey = "no_period";
+        periodLabel = translations.noPeriod || "Χωρίς Περίοδο";
+      }
+
+      const consumptionType = item.consumption_type;
+
+      if (!groupedData[periodKey]) {
+        groupedData[periodKey] = {
+          name: periodLabel,
+          lighting: 0,
+          air_conditioning: 0,
+          other_electrical_devices: 0,
+        };
+      }
+
+      const annualConsumption = parseFloat(item.annual_energy_consumption) || 0;
+
+      if (consumptionType === "lighting") {
+        groupedData[periodKey].lighting += annualConsumption;
+      } else if (consumptionType === "air_conditioning") {
+        groupedData[periodKey].air_conditioning += annualConsumption;
+      } else if (consumptionType === "other_electrical_devices") {
+        groupedData[periodKey].other_electrical_devices += annualConsumption;
+      }
+    });
+
+    return Object.values(groupedData);
+  };
+
+  const chartData = prepareChartData();
 
   const handleOpen = () => {
     setEditItem(null);
@@ -214,7 +271,7 @@ const ElectricalConsumptionTabContent = ({
     },
     {
       field: "load_power",
-      headerName: translations.columns?.loadPower || "Ισχύς (kW)",
+      headerName: translations.columns?.loadPower || "Ισχύς (W)",
       type: "number",
       flex: 0.7,
       minWidth: 100,
@@ -222,7 +279,7 @@ const ElectricalConsumptionTabContent = ({
         const value = params.value || 0;
         return (
           <span className="font-medium text-primary">
-            {parseFloat(value).toFixed(2)} kW
+            {parseFloat(value).toFixed(2)} W
           </span>
         );
       },
@@ -370,6 +427,7 @@ const ElectricalConsumptionTabContent = ({
             {translations.addButton || "Προσθήκη Ηλεκτρικής Κατανάλωσης"}
           </Button>
         </Box>
+
         <Card variant="outlined" sx={{ height: 500, width: "100%" }}>
           <DataGrid
             rows={electricalConsumptions}
@@ -399,6 +457,88 @@ const ElectricalConsumptionTabContent = ({
             }}
           />
         </Card>
+
+        {chartData.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
+              {translations.chartTitle ||
+                "Ηλεκτρικές καταναλώσεις ανά περίοδους - Όλες οι θερμικές ζώνες"}
+            </h3>
+            <ResponsiveContainer width="100%" height={500}>
+              <BarChart
+                data={chartData}
+                margin={{ top: 20, right: 50, left: 100, bottom: 120 }}
+                barCategoryGap="20%"
+                barGap={2}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                <XAxis
+                  dataKey="name"
+                  angle={-45}
+                  textAnchor="end"
+                  height={120}
+                  interval={0}
+                  tick={{ fontSize: 13, fontWeight: 500, fill: "#333" }}
+                />
+                <YAxis
+                  tick={{ fontSize: 12, fill: "#333" }}
+                  label={{
+                    value: translations.chartYAxis || "Κατανάλωση (kWh)",
+                    angle: -90,
+                    position: "insideLeft",
+                    offset: -10,
+                    style: { 
+                      fontSize: "14px", 
+                      fontWeight: "bold",
+                      fill: "#333",
+                      textAnchor: "middle"
+                    },
+                  }}
+                />
+                <RechartsTooltip
+                  formatter={(value) => `${parseFloat(value).toFixed(2)} kWh`}
+                  contentStyle={{
+                    backgroundColor: "rgba(255, 255, 255, 0.98)",
+                    border: "2px solid #ccc",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    boxShadow: "0 4px 8px rgba(0,0,0,0.15)"
+                  }}
+                />
+                <Legend
+                  wrapperStyle={{ 
+                    paddingTop: "30px",
+                    fontSize: "14px",
+                    fontWeight: "500"
+                  }}
+                  iconType="rect"
+                  iconSize={16}
+                />
+                <Bar
+                  dataKey="lighting"
+                  name={getConsumptionTypeDisplay("lighting")}
+                  fill="#FFA500"
+                  stackId="a"
+                  radius={[0, 0, 0, 0]}
+                />
+                <Bar
+                  dataKey="air_conditioning"
+                  name={getConsumptionTypeDisplay("air_conditioning")}
+                  fill="#0066FF"
+                  stackId="a"
+                  radius={[0, 0, 0, 0]}
+                />
+                <Bar
+                  dataKey="other_electrical_devices"
+                  name={getConsumptionTypeDisplay("other_electrical_devices")}
+                  fill="#90EE90"
+                  stackId="a"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
 
       <ElectricalConsumptionModal

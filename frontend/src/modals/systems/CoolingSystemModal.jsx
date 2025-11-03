@@ -74,8 +74,6 @@ function CoolingSystemModalForm({
   const validateForm = () => {
     const newErrors = {};
     let hasErrors = false;
-
-    // Required fields
     if (!formData.cooling_system_type) {
       newErrors.cooling_system_type =
         params.errorRequired || "Field is required";
@@ -90,8 +88,6 @@ function CoolingSystemModalForm({
         params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
-
-    // Optional field validations
     if (
       formData.energy_efficiency_ratio &&
       formData.energy_efficiency_ratio !== "" &&

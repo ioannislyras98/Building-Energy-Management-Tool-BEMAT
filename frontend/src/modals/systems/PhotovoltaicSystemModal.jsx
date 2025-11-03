@@ -22,31 +22,18 @@ function PhotovoltaicSystemModalForm({
   params,
 }) {
   const [formData, setFormData] = useState({
-    // Φωτοβολταϊκά πλαίσια
     pv_panels_quantity: "",
     pv_panels_unit_price: "",
-
-    // Μεταλλικές βάσεις στήριξης
     metal_bases_quantity: "",
     metal_bases_unit_price: "",
-
-    // Σωληνώσεις
     piping_quantity: "",
     piping_unit_price: "",
-
-    // Καλωδιώσεις
     wiring_quantity: "",
     wiring_unit_price: "",
-
-    // Μετατροπέας ισχύος
     inverter_quantity: "",
     inverter_unit_price: "",
-
-    // Εγκατάσταση
     installation_quantity: "",
     installation_unit_price: "",
-
-    // Ενεργειακοί δείκτες
     power_per_panel: "",
     collector_efficiency: "",
     installation_angle: "",
@@ -85,7 +72,6 @@ function PhotovoltaicSystemModalForm({
         pv_system_type: editItem.pv_system_type || "",
       });
     } else {
-      // Εισαγωγή προεπιλεγμένων τιμών
       setFormData({
         pv_panels_quantity: "",
         pv_panels_unit_price: "",

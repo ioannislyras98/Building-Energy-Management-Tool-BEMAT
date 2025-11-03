@@ -173,7 +173,6 @@ const ScenariosTabContent = ({
       color: "from-red-500 to-orange-600",
       disabled: false,
     },
-    // Μπορούμε να προσθέσουμε άλλα σενάρια στο μέλλον
   ];
   const handleScenarioSelect = (scenarioId) => {
     setSelectedScenario(scenarioId);
@@ -512,8 +511,6 @@ const ScenariosTabContent = ({
         </div>
       );
     }
-
-    // For future scenarios
     return (
       <div>
         <div className="mb-4">

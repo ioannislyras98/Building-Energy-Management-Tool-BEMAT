@@ -42,13 +42,9 @@ function ElectricalConsumptionModalForm({
   const cookies = new Cookies(null, { path: "/" });
   const token = cookies.get("token");
   const isEditMode = !!editItem;
-
-  // Return null if modal is not open (like EnergyConsumptionModal)
   if (!open) {
     return null;
   }
-
-  // Consumption type choices
   const consumptionTypes = [
     { value: "", label: params.selectOption || "Select an option" },
     { value: "lighting", label: params.lighting || "Φωτισμός" },
@@ -61,8 +57,6 @@ function ElectricalConsumptionModalForm({
       label: params.other_electrical_devices || "Άλλες ηλεκτρικές συσκευές",
     },
   ];
-
-  // Dynamic load type choices based on consumption type
   const getLoadTypeOptions = (consumptionType) => {
     switch (consumptionType) {
       case "lighting":

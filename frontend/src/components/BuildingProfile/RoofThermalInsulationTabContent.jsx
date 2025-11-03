@@ -81,8 +81,6 @@ const RoofThermalInsulationTabContent = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-
-  // Material modal states
   const [materialModalOpen, setMaterialModalOpen] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState(null);
   const [materialType, setMaterialType] = useState("new");
@@ -175,8 +173,6 @@ const RoofThermalInsulationTabContent = ({
     if (!token || !currentRoofThermalInsulation) return;
 
     setLoading(true);
-
-    // Calculate and update total cost before saving
     const updatedRoofThermalInsulation = {
       ...roofThermalInsulation,
       total_cost: calculateTotalCost(newMaterials),
@@ -191,7 +187,6 @@ const RoofThermalInsulationTabContent = ({
       },
       data: JSON.stringify(updatedRoofThermalInsulation),
       success: (data) => {
-        // After successful save, trigger recalculation
         $.ajax({
           url: `${API_BASE_URL}/roof_thermal_insulations/${currentRoofThermalInsulation.uuid}/recalculate/`,
           method: "POST",
@@ -207,7 +202,6 @@ const RoofThermalInsulationTabContent = ({
             setLoading(false);
           },
           error: (jqXHR) => {
-            // Still show success for the save, even if recalculation failed
             setRoofThermalInsulation(data);
             setSuccess(
               translations.saveSuccess ||
@@ -227,8 +221,6 @@ const RoofThermalInsulationTabContent = ({
       },
     });
   };
-
-  // Material management functions
   const handleAddMaterial = (type) => {
     setMaterialType(type);
     setEditingMaterial(null);
@@ -293,8 +285,6 @@ const RoofThermalInsulationTabContent = ({
           setRoofThermalInsulation(data);
           setOldMaterials(data.old_materials || []);
           setNewMaterials(data.new_materials || []);
-
-          // Trigger recalculation after material changes
           $.ajax({
             url: `${API_BASE_URL}/roof_thermal_insulations/${currentRoofThermalInsulation.uuid}/recalculate/`,
             method: "POST",
@@ -314,8 +304,6 @@ const RoofThermalInsulationTabContent = ({
       translations.materialSaveSuccess || "Το υλικό αποθηκεύτηκε επιτυχώς!"
     );
   };
-
-  // Calculation functions (roof-specific with R_si = 0.10)
   const calculateRTotal = (materials) => {
     if (!materials || materials.length === 0) return 0.14;
 
@@ -346,13 +334,13 @@ const RoofThermalInsulationTabContent = ({
   const calculateWinterHourlyLosses = (materials) => {
     const uCoefficient = calculateUCoefficient(materials);
     const totalArea = calculateTotalSurfaceArea(materials);
-    return (uCoefficient * totalArea * 17) / 1000; // kW
+    return (uCoefficient * totalArea * 17) / 1000; 
   };
 
   const calculateSummerHourlyLosses = (materials) => {
     const uCoefficient = calculateUCoefficient(materials);
     const totalArea = calculateTotalSurfaceArea(materials);
-    return (uCoefficient * totalArea * 13) / 1000; // kW
+    return (uCoefficient * totalArea * 13) / 1000; 
   };
 
   const calculateTotalCost = (materials) => {
@@ -362,11 +350,8 @@ const RoofThermalInsulationTabContent = ({
   };
 
   const calculateAnnualBenefit = () => {
-    // Return the calculated annual benefit from backend
     return parseFloat(roofThermalInsulation.annual_benefit || 0);
   };
-
-  // Base columns for all materials
   const baseColumns = [
     {
       field: "material_name",
@@ -414,8 +399,6 @@ const RoofThermalInsulationTabContent = ({
       ),
     },
   ];
-
-  // Actions column
   const actionsColumn = {
     field: "actions",
     headerName: translations.columns?.actions || "Ενέργειες",
@@ -444,8 +427,6 @@ const RoofThermalInsulationTabContent = ({
       </Box>
     ),
   };
-
-  // Cost column
   const costColumn = {
     field: "cost",
     headerName: translations.columns?.cost || "Κόστος (€)",
@@ -457,11 +438,7 @@ const RoofThermalInsulationTabContent = ({
       </span>
     ),
   };
-
-  // Old materials columns (without cost)
   const oldMaterialColumns = [...baseColumns, actionsColumn];
-
-  // New materials columns (with cost)
   const newMaterialColumns = [...baseColumns, costColumn, actionsColumn];
 
   if (loading) {

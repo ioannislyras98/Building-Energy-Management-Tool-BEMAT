@@ -13,7 +13,7 @@ const RoofThermalInsulationMaterialModal = ({
   open,
   handleClose,
   roofThermalInsulationUuid,
-  materialType = "new", // 'old' or 'new'
+  materialType = "new",
   editItem = null,
   onSubmitSuccess,
 }) => {
@@ -126,8 +126,6 @@ const RoofThermalInsulationMaterialModal = ({
       material: materialUuid,
     }));
     setSelectedMaterial(material);
-
-    // Clear validation error for material field
     if (validationErrors.material) {
       setValidationErrors((prev) => ({
         ...prev,
@@ -141,8 +139,6 @@ const RoofThermalInsulationMaterialModal = ({
       ...prev,
       [field]: value,
     }));
-
-    // Clear validation error for this field
     if (validationErrors[field]) {
       setValidationErrors((prev) => ({
         ...prev,

@@ -85,8 +85,6 @@ function SolarCollectorsModalForm({
   const validateForm = () => {
     const newErrors = {};
     let hasErrors = false;
-
-    // Required fields
     if (!formData.solar_collector_usage) {
       newErrors.solar_collector_usage =
         params.errorRequired || "Field is required";
@@ -98,8 +96,6 @@ function SolarCollectorsModalForm({
         params.errorRequired || "Field is required";
       hasErrors = true;
     }
-
-    // Optional field validations
     if (
       formData.collector_surface_area &&
       formData.collector_surface_area !== "" &&

@@ -77,8 +77,6 @@ function BoilerDetailModalForm({
   const validateForm = () => {
     const newErrors = {};
     let hasErrors = false;
-
-    // Required fields
     if (!formData.nominal_power || formData.nominal_power.trim() === "") {
       newErrors.nominal_power = params.errorRequired || "Field is required";
       hasErrors = true;
@@ -109,8 +107,6 @@ function BoilerDetailModalForm({
         params.errorEfficiencyRange || "Must be between 0-100%";
       hasErrors = true;
     }
-
-    // Optional field validations
     if (!formData.fuel_type) {
       newErrors.fuel_type = params.errorRequired || "Field is required";
       hasErrors = true;

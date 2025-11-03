@@ -62,21 +62,19 @@ export default function BuildingBtn({
 
   useEffect(() => {
     fetchProgressData();
-  }, [uuid, refreshTrigger]); // Re-fetch when refreshTrigger changes
+  }, [uuid, refreshTrigger]);
 
-  // Refetch data every 2 minutes to keep it updated (increased frequency for better UX)
   useEffect(() => {
     const interval = setInterval(() => {
       fetchProgressData();
       if (refreshProjects) {
         refreshProjects();
       }
-    }, 120000); // 2 minutes instead of 5 minutes
+    }, 120000); 
 
     return () => clearInterval(interval);
   }, [uuid, refreshProjects]);
 
-  // Get translations
   const translations =
     language === "en"
       ? english_text.ProjectProgress

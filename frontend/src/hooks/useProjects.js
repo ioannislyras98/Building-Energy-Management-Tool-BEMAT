@@ -112,7 +112,7 @@ export const useProjects = () => {
     loading,
     error,
     fetchProjects,
-    refreshProjects: fetchProjects, // Alias for refetching projects
+    refreshProjects: fetchProjects,
     handleProjectCreated,
     handleProjectUpdated,
     handleDeleteProject,

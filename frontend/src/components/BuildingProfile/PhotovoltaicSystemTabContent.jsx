@@ -61,7 +61,6 @@ const PhotovoltaicSystemTabContent = ({
   const [photovoltaicSystem, setPhotovoltaicSystem] = useState({
     building: buildingUuid,
     project: projectUuid,
-    // Installation fields
     pv_panels_quantity: "",
     pv_panels_unit_price: "",
     metal_bases_quantity: "",
@@ -74,7 +73,6 @@ const PhotovoltaicSystemTabContent = ({
     inverter_unit_price: "",
     installation_quantity: "",
     installation_unit_price: "",
-    // Economic fields
     estimated_cost: "",
     total_cost: "",
     unexpected_expenses: "",
@@ -87,7 +85,6 @@ const PhotovoltaicSystemTabContent = ({
     payback_period: "",
     annual_savings: "",
     investment_return: "",
-    // Energy fields
     power_per_panel: "",
     collector_efficiency: "",
     installation_angle: "",
@@ -113,7 +110,6 @@ const PhotovoltaicSystemTabContent = ({
       setPhotovoltaicSystem({
         building: null,
         project: projectUuid || null,
-        // Installation fields
         pv_panels_quantity: "",
         pv_panels_unit_price: "",
         metal_bases_quantity: "",
@@ -126,7 +122,6 @@ const PhotovoltaicSystemTabContent = ({
         inverter_unit_price: "",
         installation_quantity: "",
         installation_unit_price: "",
-        // Economic fields
         estimated_cost: "",
         total_cost: "",
         unexpected_expenses: "",
@@ -139,7 +134,6 @@ const PhotovoltaicSystemTabContent = ({
         payback_period: "",
         annual_savings: "",
         investment_return: "",
-        // Energy fields
         power_per_panel: "",
         collector_efficiency: "",
         installation_angle: "",
@@ -172,13 +166,11 @@ const PhotovoltaicSystemTabContent = ({
           setPhotovoltaicSystem(existing);
           setHasBackendData(true); // Mark that we have backend data
         } else {
-          // No existing system found - set up for creating a new one
           setCurrentPhotovoltaicSystem(null);
           setHasBackendData(false); // No backend data for new system
           setPhotovoltaicSystem({
             building: buildingUuid,
             project: projectUuid,
-            // Installation fields
             pv_panels_quantity: "",
             pv_panels_unit_price: "",
             metal_bases_quantity: "",
@@ -191,7 +183,6 @@ const PhotovoltaicSystemTabContent = ({
             inverter_unit_price: "",
             installation_quantity: "",
             installation_unit_price: "",
-            // Economic fields
             estimated_cost: "",
             total_cost: "",
             unexpected_expenses: "",
@@ -204,7 +195,6 @@ const PhotovoltaicSystemTabContent = ({
             payback_period: "",
             annual_savings: "",
             investment_return: "",
-            // Energy fields
             power_per_panel: "",
             collector_efficiency: "",
             installation_angle: "",
@@ -217,13 +207,11 @@ const PhotovoltaicSystemTabContent = ({
         setLoading(false);
       },
       error: (jqXHR) => {
-        // On error, set up for creating a new system
         setCurrentPhotovoltaicSystem(null);
         setHasBackendData(false); // No backend data on error
         setPhotovoltaicSystem({
           building: buildingUuid,
           project: projectUuid,
-          // Installation fields
           pv_panels_quantity: "",
           pv_panels_unit_price: "",
           metal_bases_quantity: "",
@@ -236,7 +224,6 @@ const PhotovoltaicSystemTabContent = ({
           inverter_unit_price: "",
           installation_quantity: "",
           installation_unit_price: "",
-          // Economic fields
           estimated_cost: "",
           total_cost: "",
           unexpected_expenses: "",
@@ -249,7 +236,6 @@ const PhotovoltaicSystemTabContent = ({
           payback_period: "",
           annual_savings: "",
           investment_return: "",
-          // Energy fields
           power_per_panel: "",
           collector_efficiency: "",
           installation_angle: "",
@@ -264,9 +250,7 @@ const PhotovoltaicSystemTabContent = ({
   };
 
   const handleInputChange = (field, value) => {
-    // For price fields, ensure maximum 2 decimal places
     if (field.includes("unit_price")) {
-      // Allow empty string for deletion
       if (value === "") {
         setPhotovoltaicSystem((prev) => ({
           ...prev,
@@ -274,8 +258,6 @@ const PhotovoltaicSystemTabContent = ({
         }));
         return;
       }
-
-      // Convert to number and limit to 2 decimal places
       const numValue = parseFloat(value);
       if (!isNaN(numValue) && numValue >= 0) {
         const roundedValue = Math.round(numValue * 100) / 100;
@@ -290,9 +272,6 @@ const PhotovoltaicSystemTabContent = ({
         [field]: value,
       }));
     }
-
-    // Reset backend data flag when user manually changes input
-    // This allows frontend calculations to take effect again
     if (hasBackendData) {
       setHasBackendData(false);
     }
@@ -315,8 +294,6 @@ const PhotovoltaicSystemTabContent = ({
       building: buildingUuid || photovoltaicSystem.building,
       project: projectUuid || photovoltaicSystem.project,
     };
-
-    // Determine if this is CREATE or UPDATE
     const isUpdate =
       currentPhotovoltaicSystem && currentPhotovoltaicSystem.uuid;
     const method = isUpdate ? "PUT" : "POST";
@@ -332,9 +309,9 @@ const PhotovoltaicSystemTabContent = ({
       },
       data: JSON.stringify(updatedPhotovoltaicSystem),
       success: (data) => {
-        // Backend now returns full data with calculated fields, no need for additional GET requestsetPhotovoltaicSystem(data);
+        setPhotovoltaicSystem(data);
         setCurrentPhotovoltaicSystem(data);
-        setHasBackendData(true); // Mark that we have backend data
+        setHasBackendData(true);
 
         setSuccess(
           isUpdate
@@ -355,10 +332,7 @@ const PhotovoltaicSystemTabContent = ({
       },
     });
   };
-
-  // Calculate economic indicators automatically
   const calculateEconomicIndicators = () => {
-    // Calculate individual costs
     const pvPanelsCost =
       (parseFloat(photovoltaicSystem.pv_panels_quantity) || 0) *
       (parseFloat(photovoltaicSystem.pv_panels_unit_price) || 0);
@@ -377,8 +351,6 @@ const PhotovoltaicSystemTabContent = ({
     const installationCost =
       (parseFloat(photovoltaicSystem.installation_quantity) || 0) *
       (parseFloat(photovoltaicSystem.installation_unit_price) || 0);
-
-    // Calculate total cost from installation data
     const totalCost =
       pvPanelsCost +
       metalBasesCost +
@@ -386,28 +358,18 @@ const PhotovoltaicSystemTabContent = ({
       wiringCost +
       inverterCost +
       installationCost;
-
-    // Calculate unexpected expenses (9% of total cost)
     const unexpectedExpenses = totalCost * 0.09;
-
-    // Calculate value after unexpected expenses
     const valueAfterUnexpected = totalCost + unexpectedExpenses;
-
-    // Calculate tax (24% of value after unexpected expenses)
     const taxBurden = valueAfterUnexpected * 0.24;
-
-    // Calculate total project cost
     const totalProjectCost = valueAfterUnexpected + taxBurden;
 
     return {
-      // Individual equipment costs
       pv_panels_cost: pvPanelsCost,
       metal_bases_cost: metalBasesCost,
       piping_cost: pipingCost,
       wiring_cost: wiringCost,
       inverter_cost: inverterCost,
       installation_cost: installationCost,
-      // Economic indicators
       estimated_cost: totalCost, // Αυτό είναι το αρχικό κόστος εξοπλισμού
       unexpected_expenses: unexpectedExpenses,
       value_after_unexpected: valueAfterUnexpected,
@@ -415,10 +377,7 @@ const PhotovoltaicSystemTabContent = ({
       total_cost: totalProjectCost, // Αυτό είναι το συνολικό κόστος με ΦΠΑ
     };
   };
-
-  // Update economic indicators when installation data changes
   useEffect(() => {
-    // Only recalculate if we don't have backend-calculated data
     if (!hasBackendData) {
       const economicData = calculateEconomicIndicators();
       setPhotovoltaicSystem((prev) => ({
@@ -1382,25 +1341,32 @@ const PhotovoltaicSystemTabContent = ({
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label={
+                label={`${
                   translations.fields?.annualEnergyProduction ||
                   "Ετήσια παραγωγή ενέργειας (kWh)"
+                } - ${translations.autoCalculated || "Αυτόματος Υπολογισμός"}`}
+                type="text"
+                value={
+                  photovoltaicSystem.annual_energy_production?.toLocaleString("el-GR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }) || "0.00"
                 }
-                type="number"
-                value={photovoltaicSystem.annual_energy_production || ""}
-                onChange={(e) =>
-                  handleInputChange("annual_energy_production", e.target.value)
-                }
-                inputProps={{ step: 1, min: 0 }}
+                InputProps={{ readOnly: true }}
                 sx={{
+                  "& .MuiInputBase-input": {
+                    color: "var(--color-primary)",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "var(--color-primary)",
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
                   "& .MuiOutlinedInput-root": {
                     "&.Mui-focused fieldset": {
                       borderColor: "var(--color-primary)",
-                    },
-                  },
-                  "& .MuiInputLabel-root": {
-                    "&.Mui-focused": {
-                      color: "var(--color-primary)",
                     },
                   },
                 }}

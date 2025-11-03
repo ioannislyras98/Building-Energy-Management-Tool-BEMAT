@@ -91,8 +91,6 @@ function AdminNumericValues() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setShowValidationErrors(true);
-
-    // Validation - only value is required
     const newErrors = {};
     if (!formData.value || formData.value === "") {
       newErrors.value = "Η τιμή είναι υποχρεωτική";

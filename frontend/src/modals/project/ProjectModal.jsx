@@ -78,7 +78,7 @@ function ProjectModalForm({
         } else {
           onProjectCreated(response);
         }
-        refreshSidebar(); // Refresh sidebar after project creation/update
+        refreshSidebar(); 
         onClose();
       })
       .fail(function (error) {

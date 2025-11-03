@@ -47,8 +47,6 @@ export default function TopBar() {
         .fail(function (error) {
 
         });
-
-      // Fetch pending projects data
       const fetchPendingProjects = () => {
         const pendingSettings = {
           url: `${API_BASE_URL}/projects/pending-percentage/`,
@@ -70,8 +68,6 @@ export default function TopBar() {
       };
 
       fetchPendingProjects();
-
-      // Refresh pending projects data every 5 minutes
       const interval = setInterval(fetchPendingProjects, 300000);
 
       return () => clearInterval(interval);

@@ -55,8 +55,6 @@ function BuildingModalForm({
   const [showValidationErrors, setShowValidationErrors] = useState(false);
 
   const token = cookies.get("token") || "";
-
-  // Initialize form data based on edit mode
   useEffect(() => {
     if (isEdit && editItem) {
       const buildingData = editItem.data;
@@ -84,7 +82,6 @@ function BuildingModalForm({
         occupants: buildingData.occupants ?? "",
       });
     } else {
-      // Reset form for create mode
       setFormData({
         name: "",
         usage: "",
@@ -112,8 +109,6 @@ function BuildingModalForm({
     setErrors({});
     setShowValidationErrors(false);
   }, [isEdit, editItem, isOpen]);
-
-  // Load prefectures from API
   useEffect(() => {
     const loadPrefectures = async () => {
       setLoadingPrefectures(true);
@@ -121,8 +116,6 @@ function BuildingModalForm({
         const data = await getAllPrefectures();
         setPrefectures(data);
       } catch (error) {
-
-        // Fallback to empty array if API fails
         setPrefectures([]);
       } finally {
         setLoadingPrefectures(false);

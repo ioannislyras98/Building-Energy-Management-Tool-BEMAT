@@ -139,7 +139,6 @@ function AddImageModalForm({
       },
       data: JSON.stringify(submitData),
       success: function (response) {
-        // Image upload activity logging removed
 
         onImageAdded(response);
         onClose();

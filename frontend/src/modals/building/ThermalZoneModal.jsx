@@ -75,8 +75,6 @@ function ThermalZoneModalForm({
         params.errorRequired || "This field is required";
       hasErrors = true;
     }
-
-    // Required field: Total thermal zone area
     if (
       !formData.total_thermal_zone_area ||
       formData.total_thermal_zone_area === ""

@@ -95,7 +95,6 @@ const ImagesTabContent = ({
   };
 
   const handleDownloadImage = (image) => {
-    // Create a temporary link element
     const link = document.createElement("a");
     link.href = image.image_url || image.image;
     link.download = `${image.title || "image"}.${

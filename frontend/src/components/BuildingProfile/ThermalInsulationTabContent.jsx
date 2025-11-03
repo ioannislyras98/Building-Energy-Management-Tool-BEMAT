@@ -81,8 +81,6 @@ const ThermalInsulationTabContent = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-
-  // Material modal states
   const [materialModalOpen, setMaterialModalOpen] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState(null);
   const [materialType, setMaterialType] = useState("new");
@@ -176,8 +174,6 @@ const ThermalInsulationTabContent = ({
     if (!token || !currentThermalInsulation) return;
 
     setLoading(true);
-
-    // Calculate and update total cost before saving
     const updatedThermalInsulation = {
       ...thermalInsulation,
       total_cost: calculateTotalCost(newMaterials),
@@ -192,7 +188,6 @@ const ThermalInsulationTabContent = ({
       },
       data: JSON.stringify(updatedThermalInsulation),
       success: (data) => {
-        // After successful save, trigger recalculation if available
         setThermalInsulation(data);
         setSuccess(
           translations.saveSuccess || "Η θερμομόνωση αποθηκεύτηκε επιτυχώς!"
@@ -210,8 +205,6 @@ const ThermalInsulationTabContent = ({
       },
     });
   };
-
-  // Material management functions
   const handleAddMaterial = (type) => {
     setMaterialType(type);
     setEditingMaterial(null);
@@ -285,8 +278,6 @@ const ThermalInsulationTabContent = ({
       translations.materialSaveSuccess || "Το υλικό αποθηκεύτηκε επιτυχώς!"
     );
   };
-
-  // Calculation functions
   const calculateRTotal = (materials) => {
     if (!materials || materials.length === 0) return 0.17;
 
@@ -330,10 +321,8 @@ const ThermalInsulationTabContent = ({
   };
 
   const calculateAnnualBenefit = () => {
-    // Return the calculated annual benefit from backend
     return parseFloat(thermalInsulation.annual_benefit || 0);
   };
-  // Base columns for all materials
   const baseColumns = [
     {
       field: "material_name",
@@ -381,7 +370,6 @@ const ThermalInsulationTabContent = ({
       ),
     },
   ];
-  // Actions column
   const actionsColumn = {
     field: "actions",
     headerName: translations.columns?.actions || "Ενέργειες",
@@ -410,8 +398,6 @@ const ThermalInsulationTabContent = ({
       </Box>
     ),
   };
-
-  // Cost column
   const costColumn = {
     field: "cost",
     headerName: translations.columns?.cost || "Κόστος (€)",
@@ -423,11 +409,7 @@ const ThermalInsulationTabContent = ({
       </span>
     ),
   };
-
-  // Old materials columns (without cost)
   const oldMaterialColumns = [...baseColumns, actionsColumn];
-
-  // New materials columns (with cost)
   const newMaterialColumns = [...baseColumns, costColumn, actionsColumn];
 
   if (loading) {

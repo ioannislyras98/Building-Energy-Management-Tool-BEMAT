@@ -13,7 +13,7 @@ const ThermalInsulationMaterialModal = ({
   open,
   handleClose,
   thermalInsulationUuid,
-  materialType = "new", // 'old' or 'new'
+  materialType = "new",
   editItem = null,
   onSubmitSuccess,
 }) => {
@@ -76,8 +76,6 @@ const ThermalInsulationMaterialModal = ({
       }
 
       setFormData(editData);
-
-      // Find and set the selected material for display
       if (editItem.material) {
         setSelectedMaterial({
           uuid: editItem.material,
@@ -119,16 +117,12 @@ const ThermalInsulationMaterialModal = ({
       ...prev,
       [field]: value,
     }));
-
-    // Clear validation error for this field when user starts typing
     if (validationErrors[field]) {
       setValidationErrors((prev) => ({
         ...prev,
         [field]: "",
       }));
     }
-
-    // If material is selected, update the selected material info
     if (field === "material") {
       const material = availableMaterials.find((m) => m.uuid === value);
       setSelectedMaterial(material);
@@ -162,8 +156,6 @@ const ThermalInsulationMaterialModal = ({
       errors.surface_area =
         translations.surfaceAreaRequired || "Παρακαλώ εισάγετε την επιφάνεια";
     }
-
-    // Only validate cost for new materials
     if (materialType === "new" && !formData.cost) {
       errors.cost = translations.costRequired || "Παρακαλώ εισάγετε το κόστος";
     }
@@ -173,7 +165,7 @@ const ThermalInsulationMaterialModal = ({
   };
 
   const handleSubmit = () => {
-    if (!token || !thermalInsulationUuid) return; // Validate form
+    if (!token || !thermalInsulationUuid) return;
     if (!validateForm()) {
       setError(
         translations.errorValidation ||

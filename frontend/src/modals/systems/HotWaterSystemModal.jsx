@@ -80,8 +80,6 @@ function HotWaterSystemModalForm({
   const validateForm = () => {
     const newErrors = {};
     let hasErrors = false;
-
-    // Required fields
     if (!formData.heating_system_type) {
       newErrors.heating_system_type =
         params.errorRequired || "Field is required";
@@ -101,8 +99,6 @@ function HotWaterSystemModalForm({
         params.errorPositiveNumber || "Must be a positive number";
       hasErrors = true;
     }
-
-    // Optional field validations
     if (
       formData.thermal_efficiency &&
       formData.thermal_efficiency !== "" &&

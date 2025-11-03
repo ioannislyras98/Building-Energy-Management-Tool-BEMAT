@@ -20,7 +20,6 @@ import english_text from "../../languages/english.json";
 import greek_text from "../../languages/greek.json";
 import API_BASE_URL from "../../config/api.js";
 
-// TabPanel component για τα tabs
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
   return (
@@ -44,7 +43,7 @@ const AutomaticLightingControlTabContent = ({
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [errorField, setErrorField] = useState(null); // Αποθήκευση του πεδίου που έχει error
+  const [errorField, setErrorField] = useState(null); 
   const [success, setSuccess] = useState(null);
   const [formData, setFormData] = useState({
     lighting_area: "",
@@ -65,8 +64,6 @@ const AutomaticLightingControlTabContent = ({
 
   const cookies = new Cookies();
   const token = cookies.get("token");
-
-  // Validation για υποχρεωτικά πεδία
   const validateRequiredFields = () => {
     const requiredFields = {
       lighting_area: {
@@ -88,7 +85,6 @@ const AutomaticLightingControlTabContent = ({
     for (const [field, config] of Object.entries(requiredFields)) {
       const value = formData[field];
       if (!value || value === "" || parseFloat(value) <= 0) {
-        // Αποθήκευση του πεδίου που έχει error για δυναμική ανανέωση
         setErrorField(config.errorKey);
         const errorMessage = translations[config.errorKey];
         setError(errorMessage);
@@ -97,15 +93,11 @@ const AutomaticLightingControlTabContent = ({
     }
     return true;
   };
-
-  // Δυναμική ανανέωση error message όταν αλλάζει η γλώσσα
   useEffect(() => {
     if (errorField && translations[errorField]) {
       setError(translations[errorField]);
     }
   }, [language, errorField, translations]);
-
-  // Φόρτωση δεδομένων κατά την αρχικοποίηση
   useEffect(() => {
     fetchAutomaticLightingControlData();
   }, [buildingUuid, projectUuid]);
@@ -135,7 +127,6 @@ const AutomaticLightingControlTabContent = ({
         energy_cost_kwh: data.energy_cost_kwh || "0.15",
         time_period: data.time_period || "20",
         discount_rate: data.discount_rate || "5.0",
-        // Προσθήκη των υπολογιζόμενων πεδίων
         total_investment_cost: data.total_investment_cost,
         annual_energy_savings: data.annual_energy_savings,
         annual_economic_benefit: data.annual_economic_benefit,
@@ -164,8 +155,6 @@ const AutomaticLightingControlTabContent = ({
       setError("Λείπουν απαραίτητα δεδομένα κτιρίου ή έργου");
       return;
     }
-
-    // Έλεγχος υποχρεωτικών πεδίων
     if (!validateRequiredFields()) {
       return;
     }
@@ -189,7 +178,6 @@ const AutomaticLightingControlTabContent = ({
       });
 
       if (response) {
-        // Ενημέρωση των υπολογιζόμενων πεδίων
         setFormData((prev) => ({
           ...prev,
           total_investment_cost: response.total_investment_cost,

@@ -53,8 +53,6 @@ const WindowReplacementTabContent = ({
     language === "en"
       ? english_text.WindowReplacementTabContent || {}
       : greek_text.WindowReplacementTabContent || {};
-
-  // Fetch existing data on component mount
   useEffect(() => {
     if (buildingUuid && token) {
       fetchExistingData();
@@ -87,7 +85,6 @@ const WindowReplacementTabContent = ({
         }
       },
       error: (jqXHR) => {
-        // Silently fail - it's okay if no data exists yet
 
       },
     });
@@ -101,7 +98,6 @@ const WindowReplacementTabContent = ({
     old_losses_winter: "",
     new_losses_summer: "",
     new_losses_winter: "",
-    // Οικονομικά στοιχεία
     cost_per_sqm: "",
     energy_cost_kwh: "",
     maintenance_cost_annual: "",
@@ -118,8 +114,6 @@ const WindowReplacementTabContent = ({
     net_present_value: 0,
     internal_rate_of_return: 0,
   });
-
-  // Auto-save with debouncing
   const [debounceTimeout, setDebounceTimeout] = useState(null);
 
   const autoSave = useCallback(() => {
@@ -178,8 +172,6 @@ const WindowReplacementTabContent = ({
       ...prev,
       [field]: value,
     }));
-
-    // Αυτόματος υπολογισμός όταν αλλάζουν τα δεδομένα
     if (
       [
         "old_thermal_conductivity",
@@ -197,8 +189,6 @@ const WindowReplacementTabContent = ({
         field === "window_area" ? value : formData.window_area
       );
     }
-
-    // Auto-save with 1 second debouncing
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
@@ -212,13 +202,9 @@ const WindowReplacementTabContent = ({
 
   const calculateLosses = (oldK, newK, area) => {
     if (oldK && newK && area) {
-      // Υπολογισμός απωλειών βάσει συντελεστών θερμικής αγωγιμότητας
       const oldKValue = parseFloat(oldK);
       const newKValue = parseFloat(newK);
       const areaValue = parseFloat(area);
-
-      // Εκτίμηση απωλειών για θερινούς και χειμερινούς μήνες
-      // Χρησιμοποιούμε τυπικές τιμές διαφοράς θερμοκρασίας
       const summerTempDiff = 10; // °C
       const winterTempDiff = 20; // °C
       const hoursPerSeason = 2190; // 6 μήνες x 365 ημέρες / 2
@@ -284,8 +270,6 @@ const WindowReplacementTabContent = ({
 
       if (annualCostSavings > 0 && totalInvestmentCost > 0) {
         paybackPeriod = totalInvestmentCost / annualCostSavings;
-
-        // Υπολογισμός NPV (απλοποιημένος)
         const discountRate = 0.05; // 5%
         const years = parseFloat(lifespan_years) || 20;
         let pvSavings = 0;
@@ -297,8 +281,6 @@ const WindowReplacementTabContent = ({
         }
 
         npv = pvSavings - totalInvestmentCost;
-
-        // Εκτίμηση IRR (απλοποιημένη)
         irr = (annualCostSavings / totalInvestmentCost) * 100;
       }
 
@@ -318,8 +300,6 @@ const WindowReplacementTabContent = ({
   useEffect(() => {
     calculateResults();
   }, [calculateResults]);
-
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (debounceTimeout) {
@@ -883,7 +863,7 @@ const WindowReplacementTabContent = ({
             fullWidth
             label={(translations.discountRate || "Επιτόκιο αναγωγής") + " (%)"}
             type="number"
-            value={5} // Προεπιλεγμένη τιμή 5%
+            value={5}
             InputProps={{ readOnly: true }}
             inputProps={{ step: 0.1, min: 0, max: 100 }}
             helperText={

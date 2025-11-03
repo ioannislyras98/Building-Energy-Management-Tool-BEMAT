@@ -4,7 +4,6 @@ import API_BASE_URL from "../src/config/api";
 
 const cookies = new Cookies();
 
-// Helper function to get authorization headers
 const getAuthHeaders = () => {
   const token = cookies.get("token") || "";
   return {
@@ -75,7 +74,6 @@ export async function getEnergyZones() {
   }
 }
 
-// Admin Prefecture CRUD operations
 export async function createPrefecture(data) {
   try {
     const response = await axios.post(`${API_BASE_URL}/prefectures/`, data, {
@@ -174,7 +172,6 @@ export async function deleteOldAirConditioning(acUuid) {
   }
 }
 
-// New Air Conditioning Units
 export async function createNewAirConditioning(data) {
   try {
     const response = await axios.post(
@@ -349,8 +346,6 @@ export async function deleteBuilding(buildingUuid) {
   }
 }
 
-// Systems API functions
-// Boiler Detail
 export async function getBoilerDetailsByBuilding(buildingUuid) {
   try {
     const response = await axios.get(
@@ -379,7 +374,6 @@ export async function deleteBoilerDetail(uuid) {
   }
 }
 
-// Cooling System
 export async function getCoolingSystemByBuilding(buildingUuid) {
   try {
     const response = await axios.get(
@@ -408,7 +402,6 @@ export async function deleteCoolingSystem(uuid) {
   }
 }
 
-// Heating System
 export async function getHeatingSystemByBuilding(buildingUuid) {
   try {
     const response = await axios.get(
@@ -437,7 +430,6 @@ export async function deleteHeatingSystem(uuid) {
   }
 }
 
-// Hot Water System
 export async function getHotWaterSystemByBuilding(buildingUuid) {
   try {
     const response = await axios.get(
@@ -466,7 +458,6 @@ export async function deleteHotWaterSystem(uuid) {
   }
 }
 
-// Solar Collectors
 export async function getSolarCollectorsByBuilding(buildingUuid) {
   try {
     const response = await axios.get(
@@ -495,7 +486,6 @@ export async function deleteSolarCollectors(uuid) {
   }
 }
 
-// Images API functions
 export async function getImagesByBuilding(buildingUuid) {
   try {
     const response = await axios.get(
@@ -554,7 +544,6 @@ export async function deleteImage(imageId) {
   }
 }
 
-// Projects API functions
 export async function submitProject(projectUuid) {
   try {
     const response = await axios.post(
@@ -614,7 +603,6 @@ export async function deleteProject(projectUuid) {
   }
 }
 
-// Authentication API functions
 export async function login(email, password) {
   try {
     const response = await axios.post(
@@ -696,7 +684,6 @@ export async function confirmPasswordReset(
   }
 }
 
-// ==================== Admin Material APIs ====================
 export async function getMaterialCategories() {
   try {
     const response = await axios.get(
@@ -762,7 +749,7 @@ export async function deleteMaterial(materialId) {
   }
 }
 
-// ==================== Admin Numeric Values APIs ====================
+
 export async function getNumericValues() {
   try {
     const response = await axios.get(`${API_BASE_URL}/numeric_values/`, {
@@ -791,7 +778,6 @@ export async function updateNumericValue(valueId, value) {
   }
 }
 
-// ==================== User Profile APIs ====================
 export async function getUserProfile() {
   try {
     const response = await axios.get(`${API_BASE_URL}/users/me/`, {

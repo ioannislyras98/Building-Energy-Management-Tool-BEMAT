@@ -68,8 +68,6 @@ const AdminMaterials = () => {
       setErrors({ ...errors, [id]: "" });
     }
   };
-
-  // Sorting logic
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -77,8 +75,6 @@ const AdminMaterials = () => {
     }
     setSortConfig({ key, direction });
   };
-
-  // Filtered and sorted materials
   const filteredAndSortedMaterials = useMemo(() => {
     let filteredMaterials = materials.filter(
       (material) =>
@@ -95,8 +91,6 @@ const AdminMaterials = () => {
       filteredMaterials.sort((a, b) => {
         let aValue = a[sortConfig.key];
         let bValue = b[sortConfig.key];
-
-        // Handle category_display for sorting
         if (sortConfig.key === "category") {
           aValue = a.category_display || a.category || "";
           bValue = b.category_display || b.category || "";
@@ -158,8 +152,6 @@ const AdminMaterials = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setShowValidationErrors(true);
-
-    // Basic validation
     const newErrors = {};
     if (!formData.name.trim()) {
       newErrors.name =

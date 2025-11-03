@@ -25,11 +25,11 @@ const DataTable = ({
 
     let newSort;
     if (isCurrentAsc) {
-      newSort = `-${columnKey}`; // Switch to descending
+      newSort = `-${columnKey}`; 
     } else if (isCurrentDesc) {
-      newSort = columnKey; // Switch to ascending
+      newSort = columnKey; 
     } else {
-      newSort = columnKey; // Default to ascending
+      newSort = columnKey; 
     }
 
     onSort(newSort);

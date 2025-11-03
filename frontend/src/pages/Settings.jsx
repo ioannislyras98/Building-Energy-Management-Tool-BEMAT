@@ -88,7 +88,9 @@ export default function Settings() {
     setError("");
 
     if (!userData.current_password.trim()) {
-      setError(params.currentPasswordRequired || "Current password is required");
+      setError(
+        params.currentPasswordRequired || "Current password is required"
+      );
       setLoading(false);
       return;
     }
@@ -129,7 +131,9 @@ export default function Settings() {
     }
 
     if (passwords.new_password.length < 8) {
-      setError(params.passwordTooShort || "Password must be at least 8 characters");
+      setError(
+        params.passwordTooShort || "Password must be at least 8 characters"
+      );
       setLoading(false);
       return;
     }

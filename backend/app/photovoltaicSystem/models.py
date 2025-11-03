@@ -427,6 +427,50 @@ class PhotovoltaicSystem(models.Model):
         except (TypeError, ValueError, ZeroDivisionError):
             return 0
     
+    def calculate_annual_energy_production(self):
+        """
+        Αυτόματος υπολογισμός της ετήσιας παραγωγής ενέργειας (kWh/έτος)
+        
+        Τύπος: E = P × efficiency × n × H × PR
+        Όπου:
+        - E: Ετήσια παραγωγή ενέργειας (kWh/έτος)
+        - P: Ονομαστική ισχύς ανά πλαίσιο (kW) - μετατροπή από W
+        - efficiency: Απόδοση συλλέκτη (%)
+        - n: Αριθμός πλαισίων
+        - H: Ηλιακή ακτινοβολία (kWh/m²/έτος) - μέση τιμή για Ελλάδα: 1600 kWh/m²/έτος
+        - PR: Performance Ratio (Συντελεστής απόδοσης συστήματος) - τυπική τιμή: 0.8
+        """
+        try:
+            if not self.pv_panels_quantity or not self.power_per_panel or not self.installation_angle or not self.collector_efficiency:
+                return Decimal('0')
+            
+            power_per_panel_kw = float(self.power_per_panel) / 1000.0
+            num_panels = float(self.pv_panels_quantity)
+            collector_efficiency = float(self.collector_efficiency) / 100.0
+            
+            from numericValues.models import NumericValue
+            solar_irradiation = NumericValue.get_value('Ηλιακή ακτινοβολία (kWh/m²/έτος)')
+            performance_ratio = NumericValue.get_value('Performance Ratio (PR)')
+            
+            angle = float(self.installation_angle)
+            optimal_angle = 32.0
+            angle_difference = abs(angle - optimal_angle)
+            angle_loss_factor = max(0.90, 1.0 - (angle_difference * 0.005))
+            performance_ratio *= angle_loss_factor
+            
+            annual_production = (
+                power_per_panel_kw * 
+                collector_efficiency *
+                num_panels * 
+                solar_irradiation * 
+                performance_ratio
+            )
+            
+            return round(Decimal(str(annual_production)), 2)
+            
+        except (TypeError, ValueError, ZeroDivisionError):
+            return Decimal('0')
+    
     def save(self, *args, **kwargs):
         """Αυτόματος υπολογισμός οικονομικών δεικτών κατά την αποθήκευση"""
         if self.pv_panels_quantity and self.pv_panels_unit_price:
@@ -457,6 +501,9 @@ class PhotovoltaicSystem(models.Model):
             self.net_cost = self.total_cost - self.subsidy_amount
         elif self.total_cost:
             self.net_cost = self.total_cost
+        
+        # Αυτόματος υπολογισμός ετήσιας παραγωγής ενέργειας
+        self.annual_energy_production = self.calculate_annual_energy_production()
         
         self.annual_savings = self.calculate_annual_savings()
         

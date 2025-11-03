@@ -213,8 +213,8 @@ export default function BuildingProfilePage() {
         handleBuildingUpdated={handleBuildingUpdated}
         isAddContactModalOpen={isAddContactModalOpen}
         closeAddContactModal={closeAddContactModal}
-        targetBuildingUuidForContact={building?.uuid || buildingUuid}
-        handleContactAdded={handleContactAdded}
+        buildingUuid={building?.uuid || buildingUuid}
+        handleContactCreated={handleContactAdded}
         isEditContactModalOpen={isEditContactModalOpen}
         closeEditContactModal={closeEditContactModal}
         currentContact={currentContact}

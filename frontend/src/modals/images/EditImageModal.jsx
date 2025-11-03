@@ -121,8 +121,6 @@ function EditImageModalForm({
       building: image.building,
       project: image.project,
     };
-
-    // Only add image data if a new file was selected
     if (selectedFile) {
       submitData.image = selectedFile.base64;
       submitData.image_name = selectedFile.name;

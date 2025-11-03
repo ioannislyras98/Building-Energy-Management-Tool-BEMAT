@@ -22,6 +22,8 @@ import API_BASE_URL from "../../config/api.js";
 import {
   AreaChart,
   Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -277,6 +279,19 @@ const EnergyProfileTabContent = ({
 
     return data;
   };
+  const prepareBarChartData = () => {
+    if (!periodsData.length) return [];
+
+    return periodsData.map((period) => ({
+      period: period.periodLabel,
+      [getEnergySourceDisplay("electricity")]: period.electricity,
+      [getEnergySourceDisplay("natural_gas")]: period.natural_gas,
+      [getEnergySourceDisplay("heating_oil")]: period.heating_oil,
+      [getEnergySourceDisplay("biomass")]: period.biomass,
+    }));
+  };
+
+  const barChartData = prepareBarChartData();
 
   const columns = [
     {
@@ -437,6 +452,91 @@ const EnergyProfileTabContent = ({
             }}
           />
         </Card>
+
+        {barChartData.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
+              {translations.chartTitle ||
+                "Ενεργειακές καταναλώσεις ανά περίοδο και πηγή ενέργειας"}
+            </h3>
+            <ResponsiveContainer width="100%" height={500}>
+              <BarChart
+                data={barChartData}
+                margin={{ top: 20, right: 50, left: 100, bottom: 120 }}
+                barCategoryGap="20%"
+                barGap={2}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                <XAxis
+                  dataKey="period"
+                  angle={-45}
+                  textAnchor="end"
+                  height={120}
+                  interval={0}
+                  tick={{ fontSize: 13, fontWeight: 500, fill: "#333" }}
+                />
+                <YAxis
+                  tick={{ fontSize: 12, fill: "#333" }}
+                  label={{
+                    value: translations.chartYAxis || "Ενέργεια (kWh)",
+                    angle: -90,
+                    position: "insideLeft",
+                    offset: -10,
+                    style: { 
+                      fontSize: "14px", 
+                      fontWeight: "bold",
+                      fill: "#333",
+                      textAnchor: "middle"
+                    },
+                  }}
+                />
+                <RechartsTooltip
+                  formatter={(value) => `${parseFloat(value).toFixed(2)} kWh`}
+                  contentStyle={{
+                    backgroundColor: "rgba(255, 255, 255, 0.98)",
+                    border: "2px solid #ccc",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    boxShadow: "0 4px 8px rgba(0,0,0,0.15)"
+                  }}
+                />
+                <Legend 
+                  wrapperStyle={{ 
+                    paddingTop: "30px",
+                    fontSize: "14px",
+                    fontWeight: "500"
+                  }}
+                  iconType="rect" 
+                  iconSize={16}
+                />
+                <Bar
+                  dataKey={getEnergySourceDisplay("electricity")}
+                  fill="#0066CC"
+                  stackId="a"
+                  radius={[0, 0, 0, 0]}
+                />
+                <Bar
+                  dataKey={getEnergySourceDisplay("natural_gas")}
+                  fill="#FFD700"
+                  stackId="a"
+                  radius={[0, 0, 0, 0]}
+                />
+                <Bar
+                  dataKey={getEnergySourceDisplay("heating_oil")}
+                  fill="#DC143C"
+                  stackId="a"
+                  radius={[0, 0, 0, 0]}
+                />
+                <Bar
+                  dataKey={getEnergySourceDisplay("biomass")}
+                  fill="#8B4513"
+                  stackId="a"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
 
       {/*

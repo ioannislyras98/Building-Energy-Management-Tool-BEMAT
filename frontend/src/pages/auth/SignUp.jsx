@@ -41,13 +41,14 @@ async function submitData(event, params, setErrorMsg) {
   } catch (error) {
     console.error("Signup error:", error);
     if (error.response?.status === 400) {
-      const backendError = error.response?.data?.error || error.response?.data?.email?.[0];
-      // Check if backend error is "user already exists" message
-      if (backendError && (
-        backendError.includes("already exists") || 
-        backendError.includes("user with this email") ||
-        backendError.includes("This field must be unique")
-      )) {
+      const backendError =
+        error.response?.data?.error || error.response?.data?.email?.[0];
+      if (
+        backendError &&
+        (backendError.includes("already exists") ||
+          backendError.includes("user with this email") ||
+          backendError.includes("This field must be unique"))
+      ) {
         setErrorMsg(params.errorMessage);
       } else {
         setErrorMsg(backendError || params.errorMessage);

@@ -115,8 +115,6 @@ const AdminPrefectures = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setShowValidationErrors(true);
-
-    // Basic validation - all fields required
     const newErrors = {};
     if (!formData.name.trim()) {
       newErrors.name = text.nameRequired;
@@ -257,15 +255,12 @@ const AdminPrefectures = () => {
   };
 
   const sortedPrefectures = useMemo(() => {
-    // First filter by search term
     let filteredItems = prefectures.filter(
       (prefecture) =>
         prefecture.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (prefecture.zone &&
           prefecture.zone.toLowerCase().includes(searchTerm.toLowerCase()))
     );
-
-    // Then sort
     if (sortConfig.key) {
       filteredItems.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {

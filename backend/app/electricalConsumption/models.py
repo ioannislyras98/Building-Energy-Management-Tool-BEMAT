@@ -78,7 +78,7 @@ class ElectricalConsumption(models.Model):
         decimal_places=2,
         blank=True,
         null=True,
-        verbose_name='Ισχύς φορτίου (kW)'
+        verbose_name='Ισχύς φορτίου (W)'
     )
     quantity = models.IntegerField(
         blank=True,
@@ -115,10 +115,12 @@ class ElectricalConsumption(models.Model):
         """Calculate annual energy consumption in kWh"""
         try:
             if self.load_power and self.quantity and self.operating_hours_per_year:
-                load_power = float(self.load_power) if self.load_power else 0
+                load_power_w = float(self.load_power) if self.load_power else 0
                 quantity = int(self.quantity) if self.quantity else 0
                 hours = float(self.operating_hours_per_year) if self.operating_hours_per_year else 0
-                return load_power * quantity * hours
+                # Convert W to kW by dividing by 1000, then calculate kWh
+                load_power_kw = load_power_w / 1000.0
+                return load_power_kw * quantity * hours
             return 0
         except (ValueError, TypeError):
             return 0
