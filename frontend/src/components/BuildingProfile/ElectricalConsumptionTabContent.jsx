@@ -153,13 +153,11 @@ const ElectricalConsumptionTabContent = ({
         "Content-Type": "application/json",
       },
       success: (response) => {
-
         setDeleteDialogOpen(false);
         setDeletingItem(null);
         fetchElectricalConsumptions();
       },
       error: (jqXHR) => {
-
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorDelete ||
@@ -190,7 +188,6 @@ const ElectricalConsumptionTabContent = ({
         Authorization: `Token ${token}`,
       },
       success: (data) => {
-
         const mappedData = Array.isArray(data.data)
           ? data.data.map((item) => ({
               id: item.uuid,
@@ -213,12 +210,10 @@ const ElectricalConsumptionTabContent = ({
             }))
           : [];
 
-
         setElectricalConsumptions(mappedData);
         setLoading(false);
       },
       error: (jqXHR) => {
-
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorFetch ||
@@ -427,7 +422,6 @@ const ElectricalConsumptionTabContent = ({
             {translations.addButton || "Προσθήκη Ηλεκτρικής Κατανάλωσης"}
           </Button>
         </Box>
-
         <Card variant="outlined" sx={{ height: 500, width: "100%" }}>
           <DataGrid
             rows={electricalConsumptions}
@@ -457,7 +451,6 @@ const ElectricalConsumptionTabContent = ({
             }}
           />
         </Card>
-
         {chartData.length > 0 && (
           <div className="mt-6">
             <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
@@ -486,11 +479,11 @@ const ElectricalConsumptionTabContent = ({
                     angle: -90,
                     position: "insideLeft",
                     offset: -10,
-                    style: { 
-                      fontSize: "14px", 
+                    style: {
+                      fontSize: "14px",
                       fontWeight: "bold",
                       fill: "#333",
-                      textAnchor: "middle"
+                      textAnchor: "middle",
                     },
                   }}
                 />
@@ -502,14 +495,14 @@ const ElectricalConsumptionTabContent = ({
                     borderRadius: "8px",
                     fontSize: "14px",
                     fontWeight: "500",
-                    boxShadow: "0 4px 8px rgba(0,0,0,0.15)"
+                    boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
                   }}
                 />
                 <Legend
-                  wrapperStyle={{ 
+                  wrapperStyle={{
                     paddingTop: "30px",
                     fontSize: "14px",
-                    fontWeight: "500"
+                    fontWeight: "500",
                   }}
                   iconType="rect"
                   iconSize={16}

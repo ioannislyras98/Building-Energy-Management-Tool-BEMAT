@@ -1347,10 +1347,13 @@ const PhotovoltaicSystemTabContent = ({
                 } - ${translations.autoCalculated || "Αυτόματος Υπολογισμός"}`}
                 type="text"
                 value={
-                  photovoltaicSystem.annual_energy_production?.toLocaleString("el-GR", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }) || "0.00"
+                  photovoltaicSystem.annual_energy_production?.toLocaleString(
+                    "el-GR",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }
+                  ) || "0.00"
                 }
                 InputProps={{ readOnly: true }}
                 sx={{

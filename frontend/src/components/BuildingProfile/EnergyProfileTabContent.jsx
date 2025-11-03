@@ -53,8 +53,6 @@ const EnergyProfileTabContent = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState(null);
 
-
-
   const { language } = useLanguage();
   const translations =
     language === "en"
@@ -84,10 +82,12 @@ const EnergyProfileTabContent = ({
   };
 
   const handleOpen = () => {
-    setEditItem(null);setOpen(true);
+    setEditItem(null);
+    setOpen(true);
   };
 
-  const handleClose = () => {setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
     setEditItem(null);
   };
 
@@ -112,13 +112,11 @@ const EnergyProfileTabContent = ({
         "Content-Type": "application/json",
       },
       success: (response) => {
-
         setDeleteDialogOpen(false);
         setDeletingItem(null);
         fetchConsumptions();
       },
       error: (jqXHR) => {
-
         setError(jqXHR.responseJSON?.detail || translations.errorDelete);
         setDeleteDialogOpen(false);
       },
@@ -144,7 +142,6 @@ const EnergyProfileTabContent = ({
         Authorization: `Token ${token}`,
       },
       success: (data) => {
-
         const mappedData = Array.isArray(data)
           ? data.map((item) => ({
               id: item.uuid,
@@ -158,12 +155,10 @@ const EnergyProfileTabContent = ({
             }))
           : [];
 
-
         setConsumptions(mappedData);
         setLoading(false);
       },
       error: (jqXHR) => {
-
         setError(jqXHR.responseJSON?.detail || translations.errorFetch);
         setLoading(false);
       },
@@ -383,8 +378,6 @@ const EnergyProfileTabContent = ({
   if (loading) return <p>{translations.loading}</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
-
-
   return (
     <div className="space-y-8 p-6 bg-gray-50 min-h-screen">
       <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-primary">
@@ -481,11 +474,11 @@ const EnergyProfileTabContent = ({
                     angle: -90,
                     position: "insideLeft",
                     offset: -10,
-                    style: { 
-                      fontSize: "14px", 
+                    style: {
+                      fontSize: "14px",
                       fontWeight: "bold",
                       fill: "#333",
-                      textAnchor: "middle"
+                      textAnchor: "middle",
                     },
                   }}
                 />
@@ -497,16 +490,16 @@ const EnergyProfileTabContent = ({
                     borderRadius: "8px",
                     fontSize: "14px",
                     fontWeight: "500",
-                    boxShadow: "0 4px 8px rgba(0,0,0,0.15)"
+                    boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
                   }}
                 />
-                <Legend 
-                  wrapperStyle={{ 
+                <Legend
+                  wrapperStyle={{
                     paddingTop: "30px",
                     fontSize: "14px",
-                    fontWeight: "500"
+                    fontWeight: "500",
                   }}
-                  iconType="rect" 
+                  iconType="rect"
                   iconSize={16}
                 />
                 <Bar
