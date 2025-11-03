@@ -296,6 +296,7 @@ BEMAT/
 
 1. [Κλιματικές Ζώνες](https://www.monodomiki.gr/ell/blog-details/klimatikes-zones-kai-oria-syntelesti-thermoperatotitas)
 2. [Κλιματικές Ζώνες,τιμες θερμοκρασίας πινακας Α1 για τον υπολογισμο απωλειων σε kw(τωρα εχω βαλει ενδεικτικα διαφορα μεσα εξω ανα εποχη)](https://portal.tee.gr/portal/page/portal/tptee/totee/TOTEE-20701-3-Final-TEE%203nd%20Edition.pdf?utm_source=chatgpt.com)
-3. [Οδηγός θερμομόνωσης κτηρίων (Επιφανειακες αντιστασεις σελ 30 pdf 16)](https://www.kalivis.gr/uploads/20161019article_H_Shmasia_Tis_Thermomonosis_Ton_Ktirion/ODIGOS%20THERMOMONOSIS%20KTIRION_DEC2007.pdf)
-4. [Υλικά και συντελεστής θερμικής αγωγιμότητας λ(Συγκριτικός Πίνακας Συντελεστών Διαφορετικών Δομικών Υλικών
+3. [μέση ηλιακή ακτινοβολία στην Ελλάδα](https://www.helapco.gr/ims/file/installers/totee-klimatika.pdf)
+4. [Οδηγός θερμομόνωσης κτηρίων (Επιφανειακες αντιστασεις σελ 30 pdf 16)](https://www.kalivis.gr/uploads/20161019article_H_Shmasia_Tis_Thermomonosis_Ton_Ktirion/ODIGOS%20THERMOMONOSIS%20KTIRION_DEC2007.pdf)
+5. [Υλικά και συντελεστής θερμικής αγωγιμότητας λ(Συγκριτικός Πίνακας Συντελεστών Διαφορετικών Δομικών Υλικών
    )](https://www.wands.gr/el/faq/oikonomia-apo-tin-thermomonosi)
