@@ -167,7 +167,7 @@ docker volume prune -f
 ```bash
 cd backend
 docker compose up --build -d
-# Automatically uses .env.dev (no setup needed)
+# Automatically uses .env.dev
 ```
 
 #### Backend (Production Mode)
@@ -175,13 +175,13 @@ docker compose up --build -d
 ```bash
 cd backend
 docker compose -f docker-compose.prod.yml up --build -d
-# Automatically uses .env.prod (already configured in the repo)
+# Automatically uses .env.prod
 ```
 
 **Σημαντικό:** Κάθε mode χρησιμοποιεί το δικό του env file:
 
-- Development → `.env.dev` (root directory - already configured, ready to use)
-- Production → `.env.prod` (root directory - already configured, ready to use)
+- Development → `.env.dev` 
+- Production → `.env.prod` 
 
 **Environment Structure:**
 
