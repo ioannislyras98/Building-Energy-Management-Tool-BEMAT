@@ -219,6 +219,20 @@ const NaturalGasNetworkTabContent = ({
       ...calculatedResults,
     };
 
+    // Remove empty string fields to avoid validation errors
+    if (submitData.burner_replacement_unit_price === "") {
+      delete submitData.burner_replacement_unit_price;
+    }
+    if (submitData.gas_pipes_unit_price === "") {
+      delete submitData.gas_pipes_unit_price;
+    }
+    if (submitData.gas_detection_systems_unit_price === "") {
+      delete submitData.gas_detection_systems_unit_price;
+    }
+    if (submitData.boiler_cleaning_unit_price === "") {
+      delete submitData.boiler_cleaning_unit_price;
+    }
+
     $.ajax({
       url: `${API_BASE_URL}/natural_gas_networks/create/`,
       method: "POST",

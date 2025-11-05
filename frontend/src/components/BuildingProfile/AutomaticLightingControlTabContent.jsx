@@ -167,6 +167,14 @@ const AutomaticLightingControlTabContent = ({
         ...formData,
       };
 
+      // Remove empty string fields to avoid validation errors
+      if (dataToSend.installation_cost === "") {
+        delete dataToSend.installation_cost;
+      }
+      if (dataToSend.maintenance_cost === "") {
+        delete dataToSend.maintenance_cost;
+      }
+
       const response = await $.ajax({
         url: `${API_BASE_URL}/automatic_lighting_control/create/`,
         type: "POST",

@@ -134,6 +134,14 @@ const WindowReplacementTabContent = ({
       ...calculatedResults,
     };
 
+    // Remove empty string fields to avoid validation errors
+    if (submitData.cost_per_sqm === "") {
+      delete submitData.cost_per_sqm;
+    }
+    if (submitData.maintenance_cost_annual === "") {
+      delete submitData.maintenance_cost_annual;
+    }
+
     $.ajax({
       url: `${API_BASE_URL}/window_replacements/create/`,
       method: "POST",

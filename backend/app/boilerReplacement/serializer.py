@@ -73,6 +73,18 @@ class BoilerReplacementSerializer(serializers.ModelSerializer):
             'internal_rate_of_return',
         ]
 
+    def validate_installation_cost(self, value):
+        """Handle empty strings for installation_cost"""
+        if value == '' or value is None:
+            return 0
+        return value
+    
+    def validate_maintenance_cost(self, value):
+        """Handle empty strings for maintenance_cost"""
+        if value == '' or value is None:
+            return 0
+        return value
+
     def validate(self, data):
         """Δυναμικά multilingual validations"""
         request = self.context.get('request')

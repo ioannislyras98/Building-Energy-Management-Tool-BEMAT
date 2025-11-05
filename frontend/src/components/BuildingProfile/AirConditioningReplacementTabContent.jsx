@@ -208,6 +208,14 @@ const AirConditioningReplacementTabContent = ({
         ...formData,
       };
 
+      // Remove empty string fields to avoid validation errors
+      if (submitData.cost_per_unit === "") {
+        delete submitData.cost_per_unit;
+      }
+      if (submitData.installation_cost === "") {
+        delete submitData.installation_cost;
+      }
+
       let response;
       if (newACModal.editMode) {
         response = await $.ajax({

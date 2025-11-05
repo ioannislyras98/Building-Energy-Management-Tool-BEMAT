@@ -166,6 +166,14 @@ const BoilerReplacementTabContent = ({
         ...formData,
       };
 
+      // Remove empty string fields to let backend use defaults
+      if (dataToSend.installation_cost === "") {
+        delete dataToSend.installation_cost;
+      }
+      if (dataToSend.maintenance_cost === "") {
+        delete dataToSend.maintenance_cost;
+      }
+
       const response = await $.ajax({
         url: `${API_BASE_URL}/boiler_replacement/create/`,
         type: "POST",
