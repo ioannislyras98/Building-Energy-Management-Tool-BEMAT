@@ -1,0 +1,44 @@
+services:
+  web:
+    build: ./app
+    restart: always
+    volumes:
+      - ./app/:/usr/src/app/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web.rule=Host(`energymanagement.epu.ntua.gr`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.web.entrypoints=https"
+      - "traefik.http.routers.web.tls=true"
+      - "traefik.http.routers.web.tls.certresolver=myresolver"
+      - "traefik.http.services.web.loadbalancer.server.port=8000"
+      # Optional: HTTP to HTTPS redirect
+      - "traefik.http.routers.web-http.rule=Host(`energymanagement.epu.ntua.gr`)"
+      - "traefik.http.routers.web-http.entrypoints=http"
+      - "traefik.http.routers.web-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    env_file:
+      - ../.env
+    networks:
+      - proxy_net
+    depends_on:
+      - db
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ../.env
+        #environment:
+        #  - POSTGRES_USER=backend
+        #  - POSTGRES_PASSWORD=backend
+        #  - POSTGRES_DB=backend_dev
+    networks:
+      - proxy_net
+
+volumes:
+  postgres_data:
+
+
+networks:
+  proxy_net:
+    external: true

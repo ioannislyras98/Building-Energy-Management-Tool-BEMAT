@@ -1,4 +1,4 @@
-# Building Energy Management Tool (BEMAT)
+# Building Energy Management Tool (BEMAT).
 
 Software for Building Energy Management Support - Integrated application with Django Backend & React Frontend
 

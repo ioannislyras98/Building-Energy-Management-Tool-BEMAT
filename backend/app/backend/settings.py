@@ -230,6 +230,9 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'optf etzu yswt esze
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'ioannis.lyras98@gmail.com')
 
 # Logging configuration
+LOG_DIR = BASE_DIR / 'logs'
+os.makedirs(LOG_DIR, exist_ok=True)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -250,7 +253,7 @@ LOGGING = {
         },
         'file': {
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs' / 'django.log',
+            'filename': LOG_DIR / 'django.log',
             'formatter': 'verbose',
         },
     },
