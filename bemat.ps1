@@ -8,10 +8,11 @@ function Show-Menu {
     Write-Host "        BEMAT - Building Energy Management Tool" -ForegroundColor Yellow
     Write-Host "================================================" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "  1. Start BEMAT (Recommended)" -ForegroundColor Green
-    Write-Host "  2. Stop All Services" -ForegroundColor Gray
-    Write-Host "  3. Clean Docker & Rebuild All" -ForegroundColor Magenta
-    Write-Host "  4. System Diagnostics" -ForegroundColor Blue
+    Write-Host "  1. Start BEMAT (Development)" -ForegroundColor Green
+    Write-Host "  2. Start BEMAT (Production)" -ForegroundColor Cyan
+    Write-Host "  3. Stop All Services" -ForegroundColor Gray
+    Write-Host "  4. Clean Docker & Rebuild All" -ForegroundColor Magenta
+    Write-Host "  5. System Diagnostics" -ForegroundColor Blue
     Write-Host "  0. Exit" -ForegroundColor DarkGray
     Write-Host ""
     Write-Host "================================================" -ForegroundColor Cyan
@@ -44,28 +45,46 @@ function Stop-Existing {
     
     Set-Location "$PSScriptRoot\backend"
     docker compose down 2>$null
+    docker compose -f docker-compose.prod.yml down 2>$null
     
     Set-Location "$PSScriptRoot\frontend"
     docker compose -f docker-compose.frontend.yml down 2>$null
+    docker compose -f docker-compose.frontend.prod.yml down 2>$null
     
     Write-Host "OK: Existing containers stopped" -ForegroundColor Green
     Set-Location $PSScriptRoot
 }
 
 function Start-Services {
-    Write-Host "Building and starting services..." -ForegroundColor Yellow
+    param(
+        [string]$Mode = "dev"
+    )
+    
+    Write-Host "Building and starting services ($Mode mode)..." -ForegroundColor Yellow
     
     # Start backend first
-    Write-Host "Starting backend..." -ForegroundColor Yellow
+    Write-Host "Starting backend ($Mode)..." -ForegroundColor Yellow
     Set-Location "$PSScriptRoot\backend"
-    docker compose up -d --build
-    Write-Host "Backend started" -ForegroundColor Green
+    
+    if ($Mode -eq "prod") {
+        docker compose -f docker-compose.prod.yml up -d --build
+        Write-Host "Backend started (PRODUCTION mode with Gunicorn)" -ForegroundColor Green
+    } else {
+        docker compose up -d --build
+        Write-Host "Backend started (DEVELOPMENT mode with runserver)" -ForegroundColor Green
+    }
     
     # Start frontend second
-    Write-Host "Starting frontend..." -ForegroundColor Yellow
+    Write-Host "Starting frontend ($Mode)..." -ForegroundColor Yellow
     Set-Location "$PSScriptRoot\frontend"
-    docker compose -f docker-compose.frontend.yml up -d --build
-    Write-Host "Frontend started" -ForegroundColor Green
+    
+    if ($Mode -eq "prod") {
+        docker compose -f docker-compose.frontend.prod.yml up -d --build
+        Write-Host "Frontend started (PRODUCTION mode with nginx)" -ForegroundColor Green
+    } else {
+        docker compose -f docker-compose.frontend.yml up -d --build
+        Write-Host "Frontend started (DEVELOPMENT mode with hot-reload)" -ForegroundColor Green
+    }
     
     Write-Host "OK: All services started" -ForegroundColor Green
     Set-Location $PSScriptRoot
@@ -81,12 +100,22 @@ function Open-Browsers {
 }
 
 function Start-BEMAT {
+    param(
+        [string]$Mode = "dev"
+    )
+    
     Write-Host ""
-    Write-Host "Starting BEMAT..." -ForegroundColor Green
+    if ($Mode -eq "prod") {
+        Write-Host "Starting BEMAT (PRODUCTION MODE)..." -ForegroundColor Cyan
+        Write-Host "Uses: Optimized build + Nginx server" -ForegroundColor Yellow
+    } else {
+        Write-Host "Starting BEMAT (DEVELOPMENT MODE)..." -ForegroundColor Green
+        Write-Host "Uses: Vite dev server with hot-reload" -ForegroundColor Yellow
+    }
     Write-Host ""
     
     if (!(Test-Docker)) { return }
-    Start-Services
+    Start-Services -Mode $Mode
     Open-Browsers
     Read-Host "Press Enter to return to menu"
 }
@@ -290,13 +319,14 @@ $Host.UI.RawUI.WindowTitle = "BEMAT Control Center"
 
 do {
     Show-Menu
-    $choice = Read-Host "Choose option (0-4)"
+    $choice = Read-Host "Choose option (0-5)"
     
     switch ($choice) {
-        "1" { Start-BEMAT }
-        "2" { Stop-AllServices }
-        "3" { Invoke-CleanDockerAndRebuild }
-        "4" { 
+        "1" { Start-BEMAT -Mode "dev" }
+        "2" { Start-BEMAT -Mode "prod" }
+        "3" { Stop-AllServices }
+        "4" { Invoke-CleanDockerAndRebuild }
+        "5" { 
             Show-Diagnostics
             Read-Host "Press Enter to return to menu"
         }

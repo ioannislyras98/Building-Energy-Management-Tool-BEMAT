@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.prod
+    container_name: bemat-backend-prod
+    volumes:
+      - static_volume:/usr/src/app/staticfiles
+      - media_volume:/usr/src/app/mediafiles
+      - logs_volume:/usr/src/app/logs
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.prod
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - bemat-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/admin/login/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "com.bemat.description=BEMAT Backend Production"
+      - "com.bemat.service=backend"
+      - "com.bemat.environment=production"
+
+  db:
+    image: postgres:15
+    container_name: bemat-db-prod
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${SQL_USER:-backend}
+      - POSTGRES_PASSWORD=${SQL_PASSWORD:-backend_prod_password_change_me}
+      - POSTGRES_DB=${SQL_DATABASE:-backend_prod}
+    restart: unless-stopped
+    networks:
+      - bemat-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SQL_USER:-backend}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "com.bemat.description=BEMAT PostgreSQL Production"
+      - "com.bemat.service=database"
+      - "com.bemat.environment=production"
+
+volumes:
+  postgres_data_prod:
+  static_volume:
+  media_volume:
+  logs_volume:
+
+networks:
+  bemat-network:
+    driver: bridge

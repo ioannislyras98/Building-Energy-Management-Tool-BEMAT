@@ -52,22 +52,44 @@ check_ports() {
 
 # Function to start BEMAT services
 start_bemat() {
-    print_header "🚀 Starting BEMAT Services..."
+    local mode=${1:-dev}
+    
+    if [ "$mode" = "prod" ]; then
+        print_header "🚀 Starting BEMAT Services (PRODUCTION MODE)..."
+        print_status "Backend: Gunicorn | Frontend: Nginx"
+    else
+        print_header "🚀 Starting BEMAT Services (DEVELOPMENT MODE)..."
+        print_status "Backend: Django runserver | Frontend: Vite dev server"
+    fi
     
     check_docker
     check_ports
     
-    print_status "Building and starting Backend (Django + PostgreSQL)..."
-    cd backend
-    docker compose up --build -d
+    # Start backend
+    if [ "$mode" = "prod" ]; then
+        print_status "Building and starting Backend (PRODUCTION - Django + Gunicorn + PostgreSQL)..."
+        cd backend
+        docker compose -f docker-compose.prod.yml up --build -d
+    else
+        print_status "Building and starting Backend (DEVELOPMENT - Django + PostgreSQL)..."
+        cd backend
+        docker compose up --build -d
+    fi
     
     # Wait for backend to be ready
     print_status "Waiting for backend to be ready..."
     sleep 30
     
-    print_status "Building and starting Frontend (React + Vite)..."
-    cd ../frontend
-    docker compose -f docker-compose.frontend.yml up --build -d
+    # Start frontend
+    if [ "$mode" = "prod" ]; then
+        print_status "Building and starting Frontend (PRODUCTION - React + Nginx)..."
+        cd ../frontend
+        docker compose -f docker-compose.frontend.prod.yml up --build -d
+    else
+        print_status "Building and starting Frontend (DEVELOPMENT - React + Vite)..."
+        cd ../frontend
+        docker compose -f docker-compose.frontend.yml up --build -d
+    fi
     
     # Wait a bit for frontend to start
     sleep 10
@@ -78,6 +100,14 @@ start_bemat() {
     echo "   Frontend: http://localhost:3000"
     echo "   Backend API: http://localhost:8000"
     echo "   Admin Panel: http://localhost:8000/admin"
+    echo ""
+    
+    if [ "$mode" = "prod" ]; then
+        print_header "🔧 Production Mode Active:"
+        echo "   Backend: Gunicorn (multi-worker)"
+        echo "   Frontend: Nginx (optimized static files)"
+        echo "   DEBUG: False"
+    fi
     echo ""
     
     # Try to open browsers if available
@@ -104,9 +134,11 @@ stop_services() {
     
     cd backend
     docker compose down
+    docker compose -f docker-compose.prod.yml down
     
     cd ../frontend
     docker compose -f docker-compose.frontend.yml down
+    docker compose -f docker-compose.frontend.prod.yml down
     
     print_status "✅ All services stopped successfully!"
     cd ..
@@ -185,13 +217,14 @@ show_menu() {
     echo ""
     echo "Choose an option:"
     echo ""
-    echo "1️⃣  Start BEMAT (Recommended)"
-    echo "2️⃣  Stop All Services"  
-    echo "3️⃣  Clean Docker & Rebuild All"
-    echo "4️⃣  System Diagnostics"
+    echo "1️⃣  Start BEMAT (Development)"
+    echo "2️⃣  Start BEMAT (Production)"
+    echo "3️⃣  Stop All Services"  
+    echo "4️⃣  Clean Docker & Rebuild All"
+    echo "5️⃣  System Diagnostics"
     echo "0️⃣  Exit"
     echo ""
-    echo -n "Enter your choice (0-4): "
+    echo -n "Enter your choice (0-5): "
 }
 
 # Main script logic
@@ -203,18 +236,22 @@ main() {
         
         case $choice in
             1)
-                start_bemat
+                start_bemat "dev"
                 read -p "Press Enter to continue..."
                 ;;
             2)
-                stop_services
+                start_bemat "prod"
                 read -p "Press Enter to continue..."
                 ;;
             3)
-                clean_rebuild
+                stop_services
                 read -p "Press Enter to continue..."
                 ;;
             4)
+                clean_rebuild
+                read -p "Press Enter to continue..."
+                ;;
+            5)
                 system_diagnostics
                 read -p "Press Enter to continue..."
                 ;;
@@ -223,7 +260,7 @@ main() {
                 exit 0
                 ;;
             *)
-                print_error "Invalid option. Please choose 0-4."
+                print_error "Invalid option. Please choose 0-5."
                 read -p "Press Enter to continue..."
                 ;;
         esac

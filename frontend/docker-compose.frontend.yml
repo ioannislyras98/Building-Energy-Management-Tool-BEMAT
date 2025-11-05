@@ -9,6 +9,6 @@ services:
       - .:/app
       - /app/node_modules
     env_file:
-      - ../.env
+      - ../.env.dev
     stdin_open: true
     tty: true

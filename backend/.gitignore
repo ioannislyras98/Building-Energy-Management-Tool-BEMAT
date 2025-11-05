@@ -16,8 +16,8 @@ db.sqlite3-journal
 # .env
 .env.local
 .env.production
-.env.dev
-.env.prod
+# .env.dev and .env.prod are safe to commit (configured for the project)
+# .env.prod
 
 # ---- Virtual environments ----
 venv/
