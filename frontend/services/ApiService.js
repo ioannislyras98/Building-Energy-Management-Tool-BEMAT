@@ -14,7 +14,7 @@ const getAuthHeaders = () => {
 
 export async function getuser() {
   try {
-    const response = await axios.get(`${API_BASE_URL}/user/`);
+    const response = await axios.get(`${API_BASE_URL}/users/me/`);
     return response.data;
   } catch (error) {
     throw error;
