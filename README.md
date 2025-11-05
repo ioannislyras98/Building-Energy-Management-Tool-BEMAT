@@ -56,19 +56,19 @@ chmod +x bemat.sh
 
 ## 📋 Διαθέσιμες Λειτουργίες
 
-| Επιλογή | Περιγραφή                     | Πότε να χρησιμοποιηθεί                   |
-| ------- | ----------------------------- | ---------------------------------------- |
-| `1`     | Start BEMAT (Development)     | Καθημερινή ανάπτυξη με hot-reload        |
-| `2`     | Start BEMAT (Production)      | Production deployment με nginx           |
-| `3`     | Stop All Services             | Τέλος εργασίας                           |
-| `4`     | Clean Docker & Rebuild All    | Προβλήματα με cache, πλήρης επανεκκίνηση |
-| `5`     | System Diagnostics            | Έλεγχος κατάστασης συστήματος            |
-| `0`     | Exit                          | Έξοδος από το script                     |
+| Επιλογή | Περιγραφή                  | Πότε να χρησιμοποιηθεί                   |
+| ------- | -------------------------- | ---------------------------------------- |
+| `1`     | Start BEMAT (Development)  | Καθημερινή ανάπτυξη με hot-reload        |
+| `2`     | Start BEMAT (Production)   | Production deployment με nginx           |
+| `3`     | Stop All Services          | Τέλος εργασίας                           |
+| `4`     | Clean Docker & Rebuild All | Προβλήματα με cache, πλήρης επανεκκίνηση |
+| `5`     | System Diagnostics         | Έλεγχος κατάστασης συστήματος            |
+| `0`     | Exit                       | Έξοδος από το script                     |
 
 ### 🔧 Επιλογή της κατάλληλης λειτουργίας:
 
 - **Νέος χρήστης / Development**: Επιλογή `1` - Start BEMAT (Development)
-- **Production Deployment**: Επιλογή `2` - Start BEMAT (Production) 
+- **Production Deployment**: Επιλογή `2` - Start BEMAT (Production)
 - **Καθημερινή ανάπτυξη**: Επιλογή `1` - Start BEMAT (Development)
 - **Προβλήματα με imports/cache**: Επιλογή `4` - Clean Docker & Rebuild All
 - **Έλεγχος συστήματος**: Επιλογή `5` - System Diagnostics
@@ -76,19 +76,19 @@ chmod +x bemat.sh
 
 ### 🔥 Development vs Production Mode
 
-| Feature                    | Development (Option 1)           | Production (Option 2)                |
-| -------------------------- | -------------------------------- | ------------------------------------ |
-| **Backend Server**         | Django runserver                 | Gunicorn (multi-worker)              |
-| **Frontend Server**        | Vite Dev Server                  | Nginx                                |
-| **Hot Reload**             | ✅ Enabled                        | ❌ Disabled                           |
-| **Build Optimization**     | ❌ No                             | ✅ Yes (minified, tree-shaken)       |
-| **DEBUG Mode**             | ✅ True (verbose errors)          | ❌ False (secure)                     |
-| **Performance**            | Slower (for development)         | Fast (optimized & multi-threaded)    |
-| **Memory Usage**           | ~300-500 MB                      | ~400-600 MB (but serves more users)  |
-| **Concurrent Users**       | ~10-20                           | ~500-1000+                           |
-| **Use Case**               | Local development                | Production server deployment         |
-| **Backend Command**        | `python manage.py runserver`     | `gunicorn backend.wsgi`              |
-| **Frontend Command**       | `npm run dev`                    | `npm run build` + nginx              |
+| Feature                | Development (Option 1)       | Production (Option 2)               |
+| ---------------------- | ---------------------------- | ----------------------------------- |
+| **Backend Server**     | Django runserver             | Gunicorn (multi-worker)             |
+| **Frontend Server**    | Vite Dev Server              | Nginx                               |
+| **Hot Reload**         | ✅ Enabled                   | ❌ Disabled                         |
+| **Build Optimization** | ❌ No                        | ✅ Yes (minified, tree-shaken)      |
+| **DEBUG Mode**         | ✅ True (verbose errors)     | ❌ False (secure)                   |
+| **Performance**        | Slower (for development)     | Fast (optimized & multi-threaded)   |
+| **Memory Usage**       | ~300-500 MB                  | ~400-600 MB (but serves more users) |
+| **Concurrent Users**   | ~10-20                       | ~500-1000+                          |
+| **Use Case**           | Local development            | Production server deployment        |
+| **Backend Command**    | `python manage.py runserver` | `gunicorn backend.wsgi`             |
+| **Frontend Command**   | `npm run dev`                | `npm run build` + nginx             |
 
 ## URLs μετά την εκκίνηση
 
@@ -179,10 +179,12 @@ docker compose -f docker-compose.prod.yml up --build -d
 ```
 
 **Σημαντικό:** Κάθε mode χρησιμοποιεί το δικό του env file:
+
 - Development → `.env.dev` (root directory - already configured, ready to use)
 - Production → `.env.prod` (root directory - already configured, ready to use)
 
 **Environment Structure:**
+
 ```
 Building-Energy-Management-Tool-BEMAT/
 ├── .env.dev              ← Development config (used by both backend & frontend)
@@ -209,23 +211,24 @@ docker compose -f docker-compose.frontend.prod.yml up --build -d
 
 **Διαφορές Development vs Production:**
 
-| Component      | Development                    | Production                           |
-| -------------- | ------------------------------ | ------------------------------------ |
-| **Backend**    |                                |                                      |
-| Dockerfile     | `Dockerfile`                   | `Dockerfile.prod`                    |
-| Compose File   | `docker-compose.yml`           | `docker-compose.prod.yml`            |
-| Server         | Django runserver               | Gunicorn (multi-worker)              |
-| Workers        | 1 (single-threaded)            | 4+ (multi-process)                   |
-| DEBUG          | True                           | False                                |
-| **Frontend**   |                                |                                      |
-| Dockerfile     | `Dockerfile`                   | `Dockerfile.prod`                    |
-| Compose File   | `docker-compose.frontend.yml`  | `docker-compose.frontend.prod.yml`   |
-| Server         | Vite dev server                | Nginx                                |
-| Port Mapping   | 3000 → 3000                    | 80 → 3000                            |
-| Build          | No build step                  | Multi-stage build with `npm run build` |
-| Performance    | Development speed              | Production optimized                 |
+| Component    | Development                   | Production                             |
+| ------------ | ----------------------------- | -------------------------------------- |
+| **Backend**  |                               |                                        |
+| Dockerfile   | `Dockerfile`                  | `Dockerfile.prod`                      |
+| Compose File | `docker-compose.yml`          | `docker-compose.prod.yml`              |
+| Server       | Django runserver              | Gunicorn (multi-worker)                |
+| Workers      | 1 (single-threaded)           | 4+ (multi-process)                     |
+| DEBUG        | True                          | False                                  |
+| **Frontend** |                               |                                        |
+| Dockerfile   | `Dockerfile`                  | `Dockerfile.prod`                      |
+| Compose File | `docker-compose.frontend.yml` | `docker-compose.frontend.prod.yml`     |
+| Server       | Vite dev server               | Nginx                                  |
+| Port Mapping | 3000 → 3000                   | 80 → 3000                              |
+| Build        | No build step                 | Multi-stage build with `npm run build` |
+| Performance  | Development speed             | Production optimized                   |
 
 📖 **Για αναλυτικές οδηγίες production deployment:**
+
 - Backend: [backend/PRODUCTION-DEPLOYMENT.md](backend/PRODUCTION-DEPLOYMENT.md)
 - Frontend: [frontend/PRODUCTION-DEPLOYMENT.md](frontend/PRODUCTION-DEPLOYMENT.md)
 
