@@ -120,7 +120,65 @@ const ElectricalConsumptionTabContent = ({
     return Object.values(groupedData);
   };
 
+  const prepareLoadTypeChartData = () => {
+    if (!electricalConsumptions.length) return { chartData: [], availableLoadTypes: [] };
+
+    const groupedData = {};
+    const availableLoadTypes = new Set();
+
+    electricalConsumptions.forEach((item) => {
+      const energyData = item.energy_consumption_data;
+      let periodKey;
+      let periodLabel;
+
+      if (energyData && energyData.start_date && energyData.end_date) {
+        const fromText = language === "en" ? "From" : "Από";
+        const toText = language === "en" ? "to" : "έως";
+        periodKey = `${energyData.start_date}_${energyData.end_date}`;
+        periodLabel = `${fromText} ${energyData.start_date} ${toText} ${energyData.end_date}`;
+      } else {
+        periodKey = "no_period";
+        periodLabel = translations.noPeriod || "Χωρίς Περίοδο";
+      }
+
+      const loadType = item.load_type;
+
+      if (loadType) {
+        availableLoadTypes.add(loadType);
+
+        if (!groupedData[periodKey]) {
+          groupedData[periodKey] = {
+            name: periodLabel,
+          };
+        }
+
+        const annualConsumption = parseFloat(item.annual_energy_consumption) || 0;
+
+        // Initialize the load type if it doesn't exist
+        if (!groupedData[periodKey][loadType]) {
+          groupedData[periodKey][loadType] = 0;
+        }
+
+        groupedData[periodKey][loadType] += annualConsumption;
+      }
+    });
+
+    return {
+      chartData: Object.values(groupedData),
+      availableLoadTypes: Array.from(availableLoadTypes)
+    };
+  };
+
   const chartData = prepareChartData();
+  const { chartData: loadTypeChartData, availableLoadTypes } = prepareLoadTypeChartData();
+
+  // Define colors for load types
+  const loadTypeColors = {
+    continuous: "#FF6B35",
+    intermittent: "#4ECDC4", 
+    peak: "#FFD93D",
+    base: "#6BCF7F"
+  };
 
   const handleOpen = () => {
     setEditItem(null);
@@ -528,6 +586,80 @@ const ElectricalConsumptionTabContent = ({
                   stackId="a"
                   radius={[4, 4, 0, 0]}
                 />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {loadTypeChartData.length > 0 && availableLoadTypes.length > 0 && (
+          <div className="mt-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
+              {translations.loadTypeChartTitle ||
+                "Ηλεκτρικές καταναλώσεις ανά τύπο φορτίου - Όλες οι θερμικές ζώνες"}
+            </h3>
+            <ResponsiveContainer width="100%" height={500}>
+              <BarChart
+                data={loadTypeChartData}
+                margin={{ top: 20, right: 50, left: 100, bottom: 120 }}
+                barCategoryGap="20%"
+                barGap={2}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                <XAxis
+                  dataKey="name"
+                  angle={-45}
+                  textAnchor="end"
+                  height={120}
+                  interval={0}
+                  tick={{ fontSize: 13, fontWeight: 500, fill: "#333" }}
+                />
+                <YAxis
+                  tick={{ fontSize: 12, fill: "#333" }}
+                  label={{
+                    value: translations.chartYAxis || "Κατανάλωση (kWh)",
+                    angle: -90,
+                    position: "insideLeft",
+                    offset: -10,
+                    style: {
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      fill: "#333",
+                      textAnchor: "middle",
+                    },
+                  }}
+                />
+                <RechartsTooltip
+                  formatter={(value) => `${parseFloat(value).toFixed(2)} kWh`}
+                  contentStyle={{
+                    backgroundColor: "rgba(255, 255, 255, 0.98)",
+                    border: "2px solid #ccc",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+                  }}
+                />
+                <Legend
+                  wrapperStyle={{
+                    paddingTop: "30px",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                  }}
+                  iconType="rect"
+                  iconSize={16}
+                />
+                {availableLoadTypes.map((loadType, index) => {
+                  const isLast = index === availableLoadTypes.length - 1;
+                  return (
+                    <Bar
+                      key={loadType}
+                      dataKey={loadType}
+                      name={getLoadTypeDisplay(loadType)}
+                      fill={loadTypeColors[loadType] || "#999999"}
+                      stackId="b"
+                      radius={isLast ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                    />
+                  );
+                })}
               </BarChart>
             </ResponsiveContainer>
           </div>

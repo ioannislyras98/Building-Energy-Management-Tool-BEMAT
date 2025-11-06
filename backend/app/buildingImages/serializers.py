@@ -86,11 +86,15 @@ class BuildingImageCreateUpdateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         image_info = validated_data.pop('image')
         
+        # Get user from context (set by the view)
+        user = self.context['request'].user
+        
         instance = BuildingImage.objects.create(
             image_data=image_info['data'],
             image_type=image_info['type'],
             image_size=image_info['size'],
             image_name=f"{validated_data.get('title', 'image')}_{uuid.uuid4().hex[:8]}.{image_info['type'].split('/')[1]}",
+            user=user,
             **validated_data
         )
         

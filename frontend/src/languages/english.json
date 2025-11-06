@@ -921,6 +921,7 @@
     "unknown": "Unknown Zone",
     "noPeriod": "No Period",
     "chartTitle": "Electrical Consumptions by Period - All Thermal Zones",
+    "loadTypeChartTitle": "Electrical Consumptions by Load Type - All Thermal Zones",
     "chartYAxis": "Consumption (kWh)",
     "columns": {
       "consumptionType": "Consumption Type",

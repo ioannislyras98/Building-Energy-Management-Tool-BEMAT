@@ -38,8 +38,10 @@ class BuildingImageViewSet(viewsets.ModelViewSet):
         
         # Apply user filtering unless admin
         if not is_admin_user(self.request.user):
-            # Regular users can only see their own images
-            queryset = queryset.filter(user=self.request.user)
+            # Regular users can only see their own images (including legacy images with null user)
+            queryset = queryset.filter(
+                Q(user=self.request.user) | Q(user__isnull=True)
+            )
         
         return queryset.order_by('-uploaded_at')
     
@@ -106,8 +108,12 @@ class BuildingImageViewSet(viewsets.ModelViewSet):
                 # Admin can see all images for the building
                 images = BuildingImage.objects.filter(building=building).order_by('-uploaded_at')
             else:
-                # Regular users can only see their own images
-                images = BuildingImage.objects.filter(building=building, user=request.user).order_by('-uploaded_at')
+                # Regular users can only see their own images (including legacy images with null user)
+                images = BuildingImage.objects.filter(
+                    building=building
+                ).filter(
+                    Q(user=request.user) | Q(user__isnull=True)
+                ).order_by('-uploaded_at')
             
             # Optional category filter
             category = request.query_params.get('category', None)
@@ -126,7 +132,7 @@ class BuildingImageViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'], url_path='upload')
     def upload_image(self, request):
         """Upload a new image"""
-        serializer = BuildingImageCreateUpdateSerializer(data=request.data)
+        serializer = BuildingImageCreateUpdateSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             # Verify building and project exist and belong to user
             building_uuid = request.data.get('building')

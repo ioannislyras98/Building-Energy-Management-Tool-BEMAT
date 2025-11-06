@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import FileExtensionValidator
+from django.conf import settings
 from building.models import Building
 from project.models import Project
 import base64
@@ -31,6 +32,7 @@ class BuildingImage(models.Model):
     
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='images')
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='building_images')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='building_images', null=True, blank=True)
     
     uploaded_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
