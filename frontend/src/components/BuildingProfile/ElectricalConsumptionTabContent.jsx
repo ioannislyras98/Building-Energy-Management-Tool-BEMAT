@@ -172,12 +172,59 @@ const ElectricalConsumptionTabContent = ({
   const chartData = prepareChartData();
   const { chartData: loadTypeChartData, availableLoadTypes } = prepareLoadTypeChartData();
 
-  // Define colors for load types
   const loadTypeColors = {
     continuous: "#FF6B35",
     intermittent: "#4ECDC4", 
     peak: "#FFD93D",
-    base: "#6BCF7F"
+    base: "#6BCF7F",
+    
+    dishwasher: "#E74C3C",
+    central_ac: "#3498DB",
+    washing_machine: "#9B59B6",
+    refrigerator: "#2ECC71",
+    oven: "#E67E22",
+    microwave: "#F39C12",
+    dryer: "#8E44AD",
+    water_heater: "#34495E",
+    
+    lighting: "#F1C40F",
+    heating: "#E67E22",
+    cooling: "#5DADE2",
+    ventilation: "#58D68D",
+    air_conditioning: "#3498DB",
+    
+    motor: "#34495E",
+    pump: "#17A2B8",
+    compressor: "#6F42C1",
+    fan: "#20C997",
+    electronics: "#1ABC9C",
+    computer: "#6C757D",
+    server: "#495057",
+    
+    appliance: "#9B59B6",
+    industrial: "#795548",
+    commercial: "#607D8B",
+    residential: "#4CAF50",
+    other: "#95A5A6"
+  };
+
+  const getLoadTypeColor = (loadType) => {
+    if (loadTypeColors[loadType]) {
+      return loadTypeColors[loadType];
+    }
+    
+    let hash = 0;
+    for (let i = 0; i < loadType.length; i++) {
+      const char = loadType.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; 
+    }
+    
+    const hue = Math.abs(hash) % 360;
+    const saturation = 65 + (Math.abs(hash) % 25); 
+    const lightness = 45 + (Math.abs(hash) % 15); 
+    
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
   };
 
   const handleOpen = () => {
@@ -654,7 +701,7 @@ const ElectricalConsumptionTabContent = ({
                       key={loadType}
                       dataKey={loadType}
                       name={getLoadTypeDisplay(loadType)}
-                      fill={loadTypeColors[loadType] || "#999999"}
+                      fill={getLoadTypeColor(loadType)}
                       stackId="b"
                       radius={isLast ? [4, 4, 0, 0] : [0, 0, 0, 0]}
                     />
