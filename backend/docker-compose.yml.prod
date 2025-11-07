@@ -1,6 +1,8 @@
 services:
   web:
-    build: ./app
+    build:
+      context: ./app
+      dockerfile: Dockerfile.prod
     restart: always
     volumes:
       - ./app/:/usr/src/app/
@@ -16,8 +18,10 @@ services:
       - "traefik.http.routers.web-http.entrypoints=http"
       - "traefik.http.routers.web-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.docker.network=proxy_net"
+
     env_file:
-      - ../.env
+      - ../.env.prod
     networks:
       - proxy_net
     depends_on:
@@ -27,11 +31,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
-      - ../.env
-        #environment:
-        #  - POSTGRES_USER=backend
-        #  - POSTGRES_PASSWORD=backend
-        #  - POSTGRES_DB=backend_dev
+      - ../.env.prod
     networks:
       - proxy_net
 
