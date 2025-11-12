@@ -4,20 +4,20 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`energymanagement.epu.ntua.gr`)"
+      - "traefik.http.routers.frontend.rule=Host(`energymanagement.epu.ntua.gr`) &&  PathPrefix(`/`)"
       - "traefik.http.routers.frontend.entrypoints=https"
       - "traefik.http.routers.frontend.tls=true"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
       # Optional: HTTP to HTTPS redirect
-      - "traefik.http.routers.frontend-http.rule=Host(`energymanagement.epu.ntua.gr`)"
-      - "traefik.http.routers.frontend-http.entrypoints=http"
-      - "traefik.http.routers.frontend-http.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      #- "traefik.http.routers.frontend-http.rule=Host(`energymanagement.epu.ntua.gr`)"
+      #- "traefik.http.routers.frontend-http.entrypoints=http"
+      #- "traefik.http.routers.frontend-http.middlewares=redirect-to-https"
+      #- "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     volumes:
       - .:/app
       - /app/node_modules
