@@ -68,10 +68,37 @@ const ElectricalConsumptionTabContent = ({
   };
   const getLoadTypeDisplay = (type) => {
     const types = {
+      // Load types
       continuous: translations.continuous || "Συνεχής",
       intermittent: translations.intermittent || "Διαλείπων",
       peak: translations.peak || "Αιχμής",
       base: translations.base || "Βάσης",
+      
+      // Lighting types
+      led: translations.led || "LED",
+      fluorescent: translations.fluorescent || "Φθορισμού",
+      incandescent: translations.incandescent || "Πυρακτώσεως",
+      energy_saving: translations.energy_saving || "Λαμπτήρας Οικονομίας",
+      halogen: translations.halogen || "Αλογόνου",
+      
+      // Air conditioning types
+      split_unit: translations.split_unit || "Split Unit",
+      central_ac: translations.central_ac || "Κεντρικό Κλιματισμό",
+      heat_pump: translations.heat_pump || "Αντλία Θερμότητας",
+      window_unit: translations.window_unit || "Μονάδα Παραθύρου",
+      portable_ac: translations.portable_ac || "Φορητό Κλιματιστικό",
+      evaporative_cooler: translations.evaporative_cooler || "Εξατμιστικό Ψύκτη",
+      
+      // Appliance types
+      refrigerator: translations.refrigerator || "Ψυγείο",
+      washing_machine: translations.washing_machine || "Πλυντήριο",
+      dishwasher: translations.dishwasher || "Πλυντήριο Πιάτων",
+      oven: translations.oven || "Φούρνος",
+      microwave: translations.microwave || "Φούρνος Μικροκυμάτων",
+      water_heater: translations.water_heater || "Θερμοσίφωνας",
+      dryer: translations.dryer || "Στεγνωτήριο",
+      computer: translations.computer || "Υπολογιστής",
+      other: translations.other || "Άλλο",
     };
     return types[type] || type;
   };
