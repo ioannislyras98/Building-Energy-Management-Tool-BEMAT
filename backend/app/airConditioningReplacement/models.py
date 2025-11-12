@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.conf import settings
 from building.models import Building
 from project.models import Project
 
@@ -9,6 +10,7 @@ class OldAirConditioning(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='old_air_conditionings')
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='old_air_conditionings')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Χρήστης", null=True, blank=True)
     
     # Στοιχεία παλαιού κλιματιστικού
     btu_type = models.IntegerField(help_text="Τύπος σε BTU")
@@ -64,6 +66,7 @@ class NewAirConditioning(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='new_air_conditionings')
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='new_air_conditionings')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Χρήστης", null=True, blank=True)
     
     # Στοιχεία νέου κλιματιστικού
     btu_type = models.IntegerField(help_text="Τύπος σε BTU")
@@ -130,6 +133,7 @@ class AirConditioningAnalysis(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='ac_analyses')
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='ac_analyses')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Χρήστης", null=True, blank=True)
     
     # Οικονομικά στοιχεία
     energy_cost_kwh = models.FloatField(default=0, help_text="Κόστος ενέργειας (€/kWh)")
@@ -154,7 +158,7 @@ class AirConditioningAnalysis(models.Model):
         db_table = 'air_conditioning_analysis'
         verbose_name = 'Ανάλυση Κλιματιστικών'
         verbose_name_plural = 'Αναλύσεις Κλιματιστικών'
-        unique_together = [['building', 'project']]
+        unique_together = [['building', 'project', 'user']]
 
     def save(self, *args, **kwargs):
         """Αυτόματος υπολογισμός αποτελεσμάτων"""
@@ -164,8 +168,12 @@ class AirConditioningAnalysis(models.Model):
     def calculate_results(self):
         """Υπολογισμός όλων των αποτελεσμάτων"""
         # Υπολογισμός συνολικών καταναλώσεων
-        old_acs = OldAirConditioning.objects.filter(building=self.building, project=self.project)
-        new_acs = NewAirConditioning.objects.filter(building=self.building, project=self.project)
+        if self.user:
+            old_acs = OldAirConditioning.objects.filter(building=self.building, project=self.project, user=self.user)
+            new_acs = NewAirConditioning.objects.filter(building=self.building, project=self.project, user=self.user)
+        else:
+            old_acs = OldAirConditioning.objects.filter(building=self.building, project=self.project)
+            new_acs = NewAirConditioning.objects.filter(building=self.building, project=self.project)
         
         self.total_old_consumption = sum(ac.total_consumption_kwh for ac in old_acs)
         self.total_new_consumption = sum(ac.total_consumption_kwh for ac in new_acs)
