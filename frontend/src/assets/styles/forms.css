@@ -216,3 +216,15 @@ textarea:focus {
 .modal-form {
   @apply px-6 py-4 space-y-4 max-h-96 overflow-y-auto;
 }
+
+/* Hide number input spinners/arrows */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}

@@ -7,8 +7,9 @@ class BoilerReplacementAdmin(admin.ModelAdmin):
     list_display = [
         'building', 
         'project',
-        'boiler_power',
-        'boiler_cost',
+        'old_boiler_efficiency',
+        'new_boiler_efficiency',
+        'annual_heating_consumption_liters',
         'total_investment_cost',
         'payback_period',
         'created_at'
@@ -23,6 +24,8 @@ class BoilerReplacementAdmin(admin.ModelAdmin):
         'project__name'
     ]
     readonly_fields = [
+        'heating_oil_savings_liters',
+        'oil_price_per_liter',
         'total_investment_cost',
         'annual_energy_savings',
         'annual_economic_benefit',
@@ -37,9 +40,14 @@ class BoilerReplacementAdmin(admin.ModelAdmin):
         ('Βασικά Στοιχεία', {
             'fields': ('building', 'project')
         }),
-        ('Στοιχεία Νέου Λέβητα', {
+        ('Συντελεστές Απόδοσης', {
             'fields': (
-                'boiler_power',
+                'old_boiler_efficiency',
+                'new_boiler_efficiency'
+            )
+        }),
+        ('Κόστη Λέβητα', {
+            'fields': (
                 'boiler_cost',
                 'installation_cost',
                 'maintenance_cost'
@@ -47,8 +55,9 @@ class BoilerReplacementAdmin(admin.ModelAdmin):
         }),
         ('Ενεργειακά Στοιχεία', {
             'fields': (
-                'heating_energy_savings',
-                'energy_cost_kwh'
+                'annual_heating_consumption_liters',
+                'heating_oil_savings_liters',
+                'oil_price_per_liter'
             )
         }),
         ('Παράμετροι Αξιολόγησης', {

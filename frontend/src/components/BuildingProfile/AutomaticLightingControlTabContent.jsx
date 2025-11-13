@@ -743,7 +743,7 @@ const AutomaticLightingControlTabContent = ({
             InputProps={{ readOnly: true }}
             helperText={
               translations.irrHelper ||
-              "Αυτόματος υπολογισμός IRR (απλοποιημένος)"
+              "Αυτόματος υπολογισμός IRR"
             }
             sx={{
               "& .MuiInputBase-input": {

@@ -4,9 +4,11 @@ export default function InputEntry({
   entry,
   id,
   type,
+  step,
   example,
   value,
   onChange,
+  required = true,
 }) {
   const classType = ["Name", "Surname"].includes(entry)
     ? "flex-auto w-1/2"
@@ -18,8 +20,9 @@ export default function InputEntry({
       <input
         type={type}
         id={id}
+        step={step}
         className="input-field"
-        required
+        required={required}
         placeholder={example}
         value={value}
         onChange={onChange}
