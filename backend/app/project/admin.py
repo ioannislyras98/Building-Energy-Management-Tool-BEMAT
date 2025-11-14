@@ -44,7 +44,6 @@ class ProjectAdmin(admin.ModelAdmin):
         "date_created", 
         "is_submitted",
         "buildings_count", 
-        "cost_per_kwh_fuel", 
         "cost_per_kwh_electricity"
     )
     
@@ -74,7 +73,7 @@ class ProjectAdmin(admin.ModelAdmin):
             "fields": ("uuid", "name", "user")
         }),
         ("Costs", {
-            "fields": ("cost_per_kwh_fuel", "cost_per_kwh_electricity"),
+            "fields": ("cost_per_kwh_electricity", "oil_price_per_liter", "natural_gas_price_per_m3", "biomass_price_per_kg"),
             "classes": ("collapse",)
         }),
         ("Status", {

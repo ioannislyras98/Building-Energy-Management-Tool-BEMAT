@@ -165,6 +165,14 @@ const ExteriorBlindsTabContent = ({
         ...formData,
       };
 
+      // Remove empty string fields to avoid validation errors
+      if (dataToSend.installation_cost === "") {
+        delete dataToSend.installation_cost;
+      }
+      if (dataToSend.maintenance_cost === "") {
+        delete dataToSend.maintenance_cost;
+      }
+
       const response = await axios.post(
         `${API_BASE_URL}/exterior_blinds/create/`,
         dataToSend,
@@ -737,7 +745,7 @@ const ExteriorBlindsTabContent = ({
             InputProps={{ readOnly: true }}
             helperText={
               translations.irrHelper ||
-              "Αυτόματος υπολογισμός IRR (απλοποιημένος)"
+              "Αυτόματος υπολογισμός IRR"
             }
             sx={{
               "& .MuiInputBase-input": {

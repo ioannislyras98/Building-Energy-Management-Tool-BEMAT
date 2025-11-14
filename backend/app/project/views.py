@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .serializer import ProjectSerializer
+from django.db import IntegrityError
 from common.utils import (
     get_user_from_token, 
     standard_error_response, 
@@ -25,7 +26,7 @@ def create_project(request):
         data = request.data
         logger.debug(f"Project data: {data}")
         
-        required_fields = ["name", "cost_per_kwh_fuel", "cost_per_kwh_electricity"]
+        required_fields = ["name", "cost_per_kwh_electricity", "oil_price_per_liter"]
         missing_fields = [field for field in required_fields if not data.get(field)]
         if missing_fields:
             logger.warning(f"Missing fields in project creation: {', '.join(missing_fields)}")
@@ -36,8 +37,10 @@ def create_project(request):
         
         project = Project.objects.create(
             name=data.get("name"),
-            cost_per_kwh_fuel=data.get("cost_per_kwh_fuel"),
             cost_per_kwh_electricity=data.get("cost_per_kwh_electricity"),
+            oil_price_per_liter=data.get("oil_price_per_liter"),
+            natural_gas_price_per_m3=data.get("natural_gas_price_per_m3") if data.get("natural_gas_price_per_m3") else None,
+            biomass_price_per_kg=data.get("biomass_price_per_kg") if data.get("biomass_price_per_kg") else None,
             user=request.user
         )
         logger.info(f"Project created successfully: {project.uuid} by user: {request.user.email}")
@@ -49,6 +52,16 @@ def create_project(request):
             "message": "Project created successfully"
         }, status=status.HTTP_201_CREATED)
         
+    except IntegrityError as e:
+        if "project_project_user_id_name" in str(e):
+            logger.warning(f"Duplicate project name '{data.get('name')}' for user {request.user.email}")
+            return standard_error_response(
+                f"A project with the name '{data.get('name')}' already exists. Please choose a different name.", 
+                status.HTTP_400_BAD_REQUEST
+            )
+        else:
+            logger.error(f"Database integrity error creating project: {str(e)}", exc_info=True)
+            return standard_error_response("Database error occurred while creating project", status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         logger.error(f"Error creating project: {str(e)}", exc_info=True)
         return standard_error_response(str(e), status.HTTP_400_BAD_REQUEST)
@@ -114,8 +127,10 @@ def get_project_detail(request, project_uuid):
             "name": project.name,
             "user": str(project.user.email),
             "buildings_count": project.buildings_count,
-            "cost_per_kwh_fuel": str(project.cost_per_kwh_fuel) if project.cost_per_kwh_fuel else None,
             "cost_per_kwh_electricity": str(project.cost_per_kwh_electricity) if project.cost_per_kwh_electricity else None,
+            "oil_price_per_liter": str(project.oil_price_per_liter) if project.oil_price_per_liter else None,
+            "natural_gas_price_per_m3": str(project.natural_gas_price_per_m3) if project.natural_gas_price_per_m3 else None,
+            "biomass_price_per_kg": str(project.biomass_price_per_kg) if project.biomass_price_per_kg else None,
             "date_created": project.date_created.strftime("%d-%m-%Y"),
         }
         

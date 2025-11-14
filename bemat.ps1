@@ -95,7 +95,7 @@ function Open-Browsers {
     Start-Sleep -Seconds 3
     Start-Process "http://localhost:3000"
     Start-Sleep -Seconds 2
-    Start-Process "http://localhost:8000"
+    Start-Process "http://localhost:8000/api"
     Write-Host "OK: Browsers opened" -ForegroundColor Green
 }
 

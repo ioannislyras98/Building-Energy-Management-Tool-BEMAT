@@ -158,6 +158,17 @@ const BulbReplacementTabContent = ({
       ...calculatedResults,
     };
 
+    // Remove empty string fields to avoid validation errors
+    if (submitData.installation_cost === "") {
+      delete submitData.installation_cost;
+    }
+    if (submitData.maintenance_cost_annual === "") {
+      delete submitData.maintenance_cost_annual;
+    }
+    if (submitData.cost_per_new_bulb === "") {
+      delete submitData.cost_per_new_bulb;
+    }
+
     $.ajax({
       url: `${API_BASE_URL}/bulb_replacements/create/`,
       method: "POST",

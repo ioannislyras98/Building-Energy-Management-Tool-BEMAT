@@ -58,7 +58,7 @@ def automatic_lighting_control_create(request):
             )
         
         building = get_object_or_404(Building, uuid=building_id)
-        project = get_object_or_404(Project, id=project_id)
+        project = get_object_or_404(Project, uuid=project_id)
         
         try:
             automatic_lighting_control = AutomaticLightingControl.objects.get(building=building)

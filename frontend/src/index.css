@@ -67,6 +67,12 @@ button:focus-visible {
   }
 }
 
+/* Ensure form elements are not affected by global color scheme */
+input, select, textarea, option {
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
+}
+
 /* Custom animations for enhanced UI */
 @keyframes fadeIn {
   from {

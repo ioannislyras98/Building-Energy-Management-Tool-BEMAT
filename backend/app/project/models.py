@@ -10,10 +10,28 @@ class Project(models.Model):
     )
     name = models.CharField(max_length=100)
     date_created = models.DateField(default=timezone.now)
-    cost_per_kwh_fuel = models.DecimalField(
-        max_digits=6, 
+    oil_price_per_liter = models.DecimalField(
+        max_digits=6,
         decimal_places=3,
-        verbose_name="Κόστος ανά kWh καυσίμου (€)"
+        verbose_name="Τιμή πετρελαίου ανά λίτρο (€)",
+        default=1.200,
+        help_text="Τρέχουσα τιμή πετρελαίου θέρμανσης ανά λίτρο"
+    )
+    natural_gas_price_per_m3 = models.DecimalField(
+        max_digits=6,
+        decimal_places=3,
+        verbose_name="Τιμή φυσικού αερίου ανά m³ (€)",
+        null=True,
+        blank=True,
+        help_text="Τρέχουσα τιμή φυσικού αερίου ανά κυβικό μέτρο"
+    )
+    biomass_price_per_kg = models.DecimalField(
+        max_digits=6,
+        decimal_places=3,
+        verbose_name="Τιμή βιομάζας ανά kg (€)",
+        null=True,
+        blank=True,
+        help_text="Τρέχουσα τιμή βιομάζας ανά κιλό"
     )
     cost_per_kwh_electricity = models.DecimalField(
         max_digits=6, 

@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.conf import settings
 from building.models import Building
 from project.models import Project
 
@@ -9,6 +10,7 @@ class OldAirConditioning(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='old_air_conditionings')
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='old_air_conditionings')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Χρήστης", null=True, blank=True)
     
     # Στοιχεία παλαιού κλιματιστικού
     btu_type = models.IntegerField(help_text="Τύπος σε BTU")
@@ -64,6 +66,7 @@ class NewAirConditioning(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='new_air_conditionings')
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='new_air_conditionings')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Χρήστης", null=True, blank=True)
     
     # Στοιχεία νέου κλιματιστικού
     btu_type = models.IntegerField(help_text="Τύπος σε BTU")
@@ -130,19 +133,20 @@ class AirConditioningAnalysis(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='ac_analyses')
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='ac_analyses')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Χρήστης", null=True, blank=True)
     
-    # Οικονομικά στοιχεία
-    energy_cost_kwh = models.FloatField(default=0, help_text="Κόστος ενέργειας (€/kWh)")
-    maintenance_cost_annual = models.FloatField(default=0, help_text="Ετήσιο κόστος συντήρησης (€)")
-    lifespan_years = models.IntegerField(default=15, help_text="Διάρκεια ζωής (έτη)")
-    discount_rate = models.FloatField(default=5.0, help_text="Επιτόκιο αναγωγής (%)")
+    # Παράμετροι αξιολόγησης
+    energy_cost_kwh = models.FloatField(default=0, null=True, blank=True, help_text="Κόστος ενέργειας (€/kWh) - Λαμβάνεται από το έργο")
+    lifespan_years = models.IntegerField(default=20, help_text="Χρονικό διάστημα αξιολόγησης (έτη)")
+    discount_rate = models.FloatField(default=5.0, help_text="Προεξοφλητικός συντελεστής (%)")
     
     # Υπολογιζόμενα αποτελέσματα
     total_old_consumption = models.FloatField(default=0, help_text="Συνολική παλαιά κατανάλωση kWh")
     total_new_consumption = models.FloatField(default=0, help_text="Συνολική νέα κατανάλωση kWh")
     energy_savings_kwh = models.FloatField(default=0, help_text="Ενεργειακή εξοικονόμηση kWh")
     total_investment_cost = models.FloatField(default=0, help_text="Συνολικό κόστος επένδυσης (€)")
-    annual_cost_savings = models.FloatField(default=0, help_text="Ετήσια οικονομική εξοικονόμηση (€)")
+    annual_energy_savings = models.FloatField(default=0, help_text="Ετήσια ενεργειακή εξοικονόμηση (€)")
+    annual_economic_benefit = models.FloatField(default=0, help_text="Ετήσιο οικονομικό όφελος (€)")
     payback_period = models.FloatField(default=0, help_text="Περίοδος αποπληρωμής (έτη)")
     net_present_value = models.FloatField(default=0, help_text="Καθαρή παρούσα αξία (€)")
     internal_rate_of_return = models.FloatField(default=0, help_text="Εσωτερικός βαθμός απόδοσης (%)")
@@ -154,7 +158,7 @@ class AirConditioningAnalysis(models.Model):
         db_table = 'air_conditioning_analysis'
         verbose_name = 'Ανάλυση Κλιματιστικών'
         verbose_name_plural = 'Αναλύσεις Κλιματιστικών'
-        unique_together = [['building', 'project']]
+        unique_together = [['building', 'project', 'user']]
 
     def save(self, *args, **kwargs):
         """Αυτόματος υπολογισμός αποτελεσμάτων"""
@@ -164,8 +168,12 @@ class AirConditioningAnalysis(models.Model):
     def calculate_results(self):
         """Υπολογισμός όλων των αποτελεσμάτων"""
         # Υπολογισμός συνολικών καταναλώσεων
-        old_acs = OldAirConditioning.objects.filter(building=self.building, project=self.project)
-        new_acs = NewAirConditioning.objects.filter(building=self.building, project=self.project)
+        if self.user:
+            old_acs = OldAirConditioning.objects.filter(building=self.building, project=self.project, user=self.user)
+            new_acs = NewAirConditioning.objects.filter(building=self.building, project=self.project, user=self.user)
+        else:
+            old_acs = OldAirConditioning.objects.filter(building=self.building, project=self.project)
+            new_acs = NewAirConditioning.objects.filter(building=self.building, project=self.project)
         
         self.total_old_consumption = sum(ac.total_consumption_kwh for ac in old_acs)
         self.total_new_consumption = sum(ac.total_consumption_kwh for ac in new_acs)
@@ -174,28 +182,41 @@ class AirConditioningAnalysis(models.Model):
         # Υπολογισμός συνολικού κόστους επένδυσης
         self.total_investment_cost = sum(ac.total_cost for ac in new_acs)
         
-        # Υπολογισμός ετήσιων οικονομικών εξοικονομήσεων
+        # Εάν δεν έχει οριστεί τιμή ενέργειας, πάρτη από το έργο
+        if not self.energy_cost_kwh and self.project:
+            self.energy_cost_kwh = float(self.project.cost_per_kwh_electricity or 0)
+        
+        # Υπολογισμός ετήσιας ενεργειακής εξοικονόμησης
         if self.energy_savings_kwh > 0 and self.energy_cost_kwh > 0:
-            self.annual_cost_savings = self.energy_savings_kwh * self.energy_cost_kwh
+            self.annual_energy_savings = self.energy_savings_kwh * self.energy_cost_kwh
+        
+        # Ετήσιο οικονομικό όφελος = Ετήσια ενεργειακή εξοικονόμηση (χωρίς αφαίρεση συντήρησης)
+        self.annual_economic_benefit = self.annual_energy_savings
         
         # Υπολογισμός περιόδου αποπληρωμής
-        if self.annual_cost_savings > 0 and self.total_investment_cost > 0:
-            self.payback_period = self.total_investment_cost / self.annual_cost_savings
+        if self.annual_economic_benefit > 0 and self.total_investment_cost > 0:
+            self.payback_period = self.total_investment_cost / self.annual_economic_benefit
         
         # Υπολογισμός NPV
-        if self.annual_cost_savings > 0:
+        if self.annual_economic_benefit > 0:
             discount_rate_decimal = self.discount_rate / 100
             pv_savings = 0
             
-            for year in range(1, self.lifespan_years + 1):
-                annual_net_savings = self.annual_cost_savings - self.maintenance_cost_annual
-                pv_savings += annual_net_savings / ((1 + discount_rate_decimal) ** year)
+            if discount_rate_decimal > 0:
+                # NPV = Σ[Annual_Benefit / (1 + r)^t] - Initial_Investment
+                for year in range(1, self.lifespan_years + 1):
+                    pv_savings += self.annual_economic_benefit / ((1 + discount_rate_decimal) ** year)
+            else:
+                # Αν δεν υπάρχει προεξοφλητικός συντελεστής
+                pv_savings = self.annual_economic_benefit * self.lifespan_years
             
             self.net_present_value = pv_savings - self.total_investment_cost
         
         # Υπολογισμός IRR (απλοποιημένος)
-        if self.total_investment_cost > 0:
-            self.internal_rate_of_return = (self.annual_cost_savings / self.total_investment_cost) * 100
+        if self.total_investment_cost > 0 and self.annual_economic_benefit > 0:
+            self.internal_rate_of_return = (self.annual_economic_benefit / self.total_investment_cost) * 100
+        else:
+            self.internal_rate_of_return = 0
 
     def __str__(self):
         return f"Ανάλυση Κλιματιστικών - {self.building.name}"

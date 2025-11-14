@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django.db import models
 import logging
 
 from .models import OldAirConditioning, NewAirConditioning, AirConditioningAnalysis
@@ -25,7 +26,7 @@ def create_old_air_conditioning(request):
     try:
         serializer = OldAirConditioningCreateSerializer(data=request.data)
         if serializer.is_valid():
-            old_ac = serializer.save()
+            old_ac = serializer.save(user=request.user)
             response_serializer = OldAirConditioningSerializer(old_ac)
             return Response({
                 'success': True,
@@ -61,8 +62,12 @@ def get_old_air_conditionings_by_building(request, building_uuid):
             # Admin can see all old air conditionings for the building
             old_acs = OldAirConditioning.objects.filter(building=building).order_by('-created_at')
         else:
-            # Regular users can only see their own old air conditionings
-            old_acs = OldAirConditioning.objects.filter(building=building, user=request.user).order_by('-created_at')
+            # Regular users can only see their own old air conditionings and records without users
+            old_acs = OldAirConditioning.objects.filter(
+                building=building
+            ).filter(
+                models.Q(user=request.user) | models.Q(user__isnull=True)
+            ).order_by('-created_at')
             
         serializer = OldAirConditioningSerializer(old_acs, many=True)
         return Response({
@@ -91,7 +96,7 @@ def update_old_air_conditioning(request, ac_uuid):
             }, status=status.HTTP_403_FORBIDDEN)
         
         # If not admin, check if user owns this record
-        if not is_admin_user(request.user) and old_ac.user != request.user:
+        if not is_admin_user(request.user) and old_ac.user != request.user and old_ac.user is not None:
             return Response({
                 'success': False,
                 'message': 'Access denied - you can only update your own records'
@@ -144,7 +149,7 @@ def create_new_air_conditioning(request):
     try:
         serializer = NewAirConditioningCreateSerializer(data=request.data)
         if serializer.is_valid():
-            new_ac = serializer.save()
+            new_ac = serializer.save(user=request.user)
             response_serializer = NewAirConditioningSerializer(new_ac)
             return Response({
                 'success': True,
@@ -180,8 +185,12 @@ def get_new_air_conditionings_by_building(request, building_uuid):
             # Admin can see all new air conditionings for the building
             new_acs = NewAirConditioning.objects.filter(building=building).order_by('-created_at')
         else:
-            # Regular users can only see their own new air conditionings
-            new_acs = NewAirConditioning.objects.filter(building=building, user=request.user).order_by('-created_at')
+            # Regular users can only see their own new air conditionings and records without users
+            new_acs = NewAirConditioning.objects.filter(
+                building=building
+            ).filter(
+                models.Q(user=request.user) | models.Q(user__isnull=True)
+            ).order_by('-created_at')
             
         serializer = NewAirConditioningSerializer(new_acs, many=True)
         return Response({
@@ -210,7 +219,7 @@ def update_new_air_conditioning(request, ac_uuid):
             }, status=status.HTTP_403_FORBIDDEN)
         
         # If not admin, check if user owns this record
-        if not is_admin_user(request.user) and new_ac.user != request.user:
+        if not is_admin_user(request.user) and new_ac.user != request.user and new_ac.user is not None:
             return Response({
                 'success': False,
                 'message': 'Access denied - you can only update your own records'
@@ -263,7 +272,7 @@ def create_air_conditioning_analysis(request):
     try:
         serializer = AirConditioningAnalysisCreateSerializer(data=request.data)
         if serializer.is_valid():
-            analysis = serializer.save()
+            analysis = serializer.save(user=request.user)
             response_serializer = AirConditioningAnalysisSerializer(analysis)
             return Response({
                 'success': True,
@@ -299,8 +308,12 @@ def get_air_conditioning_analysis_by_building(request, building_uuid):
             # Admin can see any analysis for the building
             analysis = AirConditioningAnalysis.objects.filter(building=building).order_by('-created_at').first()
         else:
-            # Regular users can only see their own analysis
-            analysis = AirConditioningAnalysis.objects.filter(building=building, user=request.user).order_by('-created_at').first()
+            # Regular users can only see their own analysis and records without users
+            analysis = AirConditioningAnalysis.objects.filter(
+                building=building
+            ).filter(
+                models.Q(user=request.user) | models.Q(user__isnull=True)
+            ).order_by('-created_at').first()
             
         if analysis:
             serializer = AirConditioningAnalysisSerializer(analysis)
@@ -335,7 +348,7 @@ def update_air_conditioning_analysis(request, analysis_uuid):
             }, status=status.HTTP_403_FORBIDDEN)
         
         # If not admin, check if user owns this record
-        if not is_admin_user(request.user) and analysis.user != request.user:
+        if not is_admin_user(request.user) and analysis.user != request.user and analysis.user is not None:
             return Response({
                 'success': False,
                 'message': 'Access denied - you can only update your own records'

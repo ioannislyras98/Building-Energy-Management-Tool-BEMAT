@@ -146,6 +146,23 @@ const HotWaterUpgradeTabContent = ({
       ...calculatedResults,
     };
 
+    // Remove empty string fields to avoid validation errors
+    if (submitData.solar_collectors_unit_price === "") {
+      delete submitData.solar_collectors_unit_price;
+    }
+    if (submitData.metal_support_bases_unit_price === "") {
+      delete submitData.metal_support_bases_unit_price;
+    }
+    if (submitData.solar_system_unit_price === "") {
+      delete submitData.solar_system_unit_price;
+    }
+    if (submitData.insulated_pipes_unit_price === "") {
+      delete submitData.insulated_pipes_unit_price;
+    }
+    if (submitData.central_heater_installation_unit_price === "") {
+      delete submitData.central_heater_installation_unit_price;
+    }
+
     $.ajax({
       url: `${API_BASE_URL}/hot_water_upgrades/create/`,
       method: "POST",

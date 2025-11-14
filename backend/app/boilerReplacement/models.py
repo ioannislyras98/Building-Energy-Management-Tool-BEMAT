@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from building.models import Building
 from project.models import Project
 
@@ -16,15 +16,29 @@ class BoilerReplacement(models.Model):
         related_name='boiler_replacements'
     )
     
-    boiler_power = models.FloatField(
-        verbose_name="Ισχύς λέβητα (kW)",
-        validators=[MinValueValidator(0.1)],
-        help_text="Ισχύς του νέου λέβητα σε kW"
+    # Στοιχεία παλιού λέβητα
+    old_boiler_efficiency = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name="Συντελεστής απόδοσης παλιού λέβητα (%)",
+        validators=[MinValueValidator(0.1), MaxValueValidator(100)],
+        default=80.0,
+        help_text="Συντελεστής απόδοσης του υπάρχοντος λέβητα σε %"
+    )
+    
+    # Στοιχεία νέου λέβητα
+    new_boiler_efficiency = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name="Συντελεστής απόδοσης νέου λέβητα (%)",
+        validators=[MinValueValidator(0.1), MaxValueValidator(100)],
+        default=95.0,
+        help_text="Συντελεστής απόδοσης του νέου λέβητα σε %"
     )
     boiler_cost = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        verbose_name="Κόστος λέβητα (€)",
+        verbose_name="Κόστος νέου λέβητα (€)",
         validators=[MinValueValidator(0)],
         help_text="Κόστος αγοράς του νέου λέβητα"
     )
@@ -45,18 +59,27 @@ class BoilerReplacement(models.Model):
         help_text="Ετήσιο κόστος συντήρησης του νέου λέβητα"
     )
     
-    heating_energy_savings = models.FloatField(
-        verbose_name="Εξοικονόμηση ενέργειας θέρμανσης (kWh/έτος)",
+    annual_heating_consumption_liters = models.FloatField(
+        verbose_name="Ετήσια κατανάλωση θέρμανσης (λίτρα/έτος)",
         validators=[MinValueValidator(0)],
-        help_text="Ετήσια εξοικονόμηση ενέργειας από την αντικατάσταση λέβητα"
+        default=1000.0,
+        help_text="Ετήσια κατανάλωση πετρελαίου για θέρμανση του κτιρίου σε λίτρα"
     )
-    energy_cost_kwh = models.DecimalField(
+    heating_oil_savings_liters = models.FloatField(
+        verbose_name="Εξοικονόμηση πετρελαίου θέρμανσης (λίτρα/έτος)",
+        validators=[MinValueValidator(0)],
+        null=True,
+        blank=True,
+        help_text="Αυτόματος υπολογισμός: Εξοικονόμηση πετρελαίου από τη βελτίωση απόδοσης"
+    )
+    oil_price_per_liter = models.DecimalField(
         max_digits=6,
         decimal_places=3,
-        verbose_name="Κόστος ενέργειας (€/kWh)",
-        default=0.150,
+        verbose_name="Τιμή πετρελαίου (€/λίτρο)",
+        null=True,
+        blank=True,
         validators=[MinValueValidator(0)],
-        help_text="Τιμή ενέργειας ανά kWh"
+        help_text="Τιμή πετρελαίου ανά λίτρο (από τα στοιχεία του έργου)"
     )
     
     time_period = models.IntegerField(
@@ -135,20 +158,44 @@ class BoilerReplacement(models.Model):
         return f"Αντικατάσταση λέβητα - {self.building}"
 
     def _calculate_economics(self):
-        """Υπολογισμός οικονομικών δεικτών"""
+        """Υπολογισμός οικονομικών δεικτών με βάση την εξοικονόμηση πετρελαίου"""
         try:
+            # Υπολογισμός συνολικού κόστους επένδυσης
             self.total_investment_cost = (
                 float(self.boiler_cost) + float(self.installation_cost)
             )
             
+            # Εάν δεν έχει οριστεί τιμή πετρελαίου, πάρτη από το έργο
+            if not self.oil_price_per_liter and self.project:
+                self.oil_price_per_liter = self.project.oil_price_per_liter
+            
+            # Υπολογισμός εξοικονόμησης πετρελαίου με βάση τους συντελεστές απόδοσης
+            old_efficiency = float(self.old_boiler_efficiency) / 100
+            new_efficiency = float(self.new_boiler_efficiency) / 100
+            annual_consumption_liters = float(self.annual_heating_consumption_liters)
+            
+            # Η εξοικονόμηση υπολογίζεται από τη διαφορά απόδοσης
+            # Αν ο παλιός λέβητας καταναλώνει X λίτρα με απόδοση 80%
+            # και ο νέος έχει απόδοση 95%, τότε ο νέος θα καταναλώνει:
+            # new_consumption = old_consumption * (old_efficiency / new_efficiency)
+            if old_efficiency > 0 and new_efficiency > 0:
+                new_consumption_liters = annual_consumption_liters * (old_efficiency / new_efficiency)
+                self.heating_oil_savings_liters = annual_consumption_liters - new_consumption_liters
+            else:
+                self.heating_oil_savings_liters = 0
+            
+            # Υπολογισμός ετήσιας οικονομικής εξοικονόμησης σε €
+            oil_price = float(self.oil_price_per_liter or 0)
             self.annual_energy_savings = (
-                float(self.heating_energy_savings) * float(self.energy_cost_kwh)
+                float(self.heating_oil_savings_liters) * oil_price
             )
             
+            # Υπολογισμός ετήσιου οικονομικού οφέλους
             self.annual_economic_benefit = (
                 float(self.annual_energy_savings) - float(self.maintenance_cost)
             )
             
+            # Υπολογισμός περιόδου αποπληρωμής
             if float(self.annual_economic_benefit) > 0:
                 self.payback_period = (
                     float(self.total_investment_cost) / float(self.annual_economic_benefit)
@@ -180,6 +227,7 @@ class BoilerReplacement(models.Model):
         except (ValueError, TypeError, ZeroDivisionError):
             # Σε περίπτωση σφάλματος
             self.total_investment_cost = 0
+            self.heating_oil_savings_liters = 0
             self.annual_energy_savings = 0
             self.annual_economic_benefit = 0
             self.payback_period = None

@@ -66,16 +66,12 @@ const AirConditioningReplacementTabContent = ({
   const [newACs, setNewACs] = useState([]);
   const [analysis, setAnalysis] = useState(null);
   const [analysisData, setAnalysisData] = useState({
-    energy_cost_kwh: "",
-    maintenance_cost_annual: "",
-    lifespan_years: "15",
+    lifespan_years: "20",
     discount_rate: "5",
   });
 
   useEffect(() => {
     if (
-      analysisData.energy_cost_kwh &&
-      analysisData.maintenance_cost_annual &&
       analysisData.lifespan_years &&
       analysisData.discount_rate &&
       oldACs.length > 0 &&
@@ -138,13 +134,7 @@ const AirConditioningReplacementTabContent = ({
       if (analysisResponse.success && analysisResponse.data) {
         setAnalysis(analysisResponse.data);
         setAnalysisData({
-          energy_cost_kwh:
-            analysisResponse.data.project_electricity_cost ||
-            analysisResponse.data.energy_cost_kwh ||
-            "",
-          maintenance_cost_annual:
-            analysisResponse.data.maintenance_cost_annual || "",
-          lifespan_years: analysisResponse.data.lifespan_years || "15",
+          lifespan_years: analysisResponse.data.lifespan_years || "20",
           discount_rate: analysisResponse.data.discount_rate || "5",
         });
       }
@@ -207,6 +197,14 @@ const AirConditioningReplacementTabContent = ({
         project: projectUuid,
         ...formData,
       };
+
+      // Remove empty string fields to avoid validation errors
+      if (submitData.cost_per_unit === "") {
+        delete submitData.cost_per_unit;
+      }
+      if (submitData.installation_cost === "") {
+        delete submitData.installation_cost;
+      }
 
       let response;
       if (newACModal.editMode) {
@@ -577,6 +575,9 @@ const AirConditioningReplacementTabContent = ({
         <Tabs
           value={tabValue}
           onChange={(event, newValue) => setTabValue(newValue)}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
           sx={{
             borderBottom: 1,
             borderColor: "divider",
@@ -595,12 +596,21 @@ const AirConditioningReplacementTabContent = ({
             },
           }}>
           <Tab
-            label={translations.oldAirConditionings || "Παλαιά Κλιματιστικά"}
+            label={translations.oldAirConditioningsTab || "Παλαιά Κλιματιστικά"}
           />
-          <Tab label={translations.newAirConditionings || "Νέα Κλιματιστικά"} />
-          <Tab label={translations.economicAnalysis || "Οικονομική Ανάλυση"} />
+          <Tab
+            label={translations.newAirConditioningsTab || "Νέα Κλιματιστικά"}
+          />
+          <Tab
+            label={translations.energyDataTab || "Ενεργειακά Στοιχεία"}
+          />
+          <Tab
+            label={translations.evaluationParametersTab || "Παράμετροι Αξιολόγησης"}
+          />
+          <Tab label={translations.economicAnalysisTab || "Οικονομική Ανάλυση"} />
         </Tabs>
 
+        {/* Tab 1: Παλαιά Κλιματιστικά */}
         <TabPanel value={tabValue} index={0}>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -652,6 +662,7 @@ const AirConditioningReplacementTabContent = ({
           </div>
         </TabPanel>
 
+        {/* Tab 2: Νέα Κλιματιστικά */}
         <TabPanel value={tabValue} index={1}>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -703,9 +714,185 @@ const AirConditioningReplacementTabContent = ({
           </div>
         </TabPanel>
 
+        {/* Tab 3: Ενεργειακά Στοιχεία */}
         <TabPanel value={tabValue} index={2}>
-          <Typography variant="h6" gutterBottom>
-            {translations.economicAnalysis || "Οικονομική Ανάλυση"}
+          <Typography variant="h6" gutterBottom className="font-semibold text-green-700 mb-4">
+            {translations.energyData || "Ενεργειακά Στοιχεία"}
+          </Typography>
+
+          <Grid container spacing={3}>
+            {/* Συνολική Παλαιά Κατανάλωση */}
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.totalOldConsumption ||
+                  "Συνολική παλαιά κατανάλωση (kWh)"
+                }
+                type="text"
+                value={
+                  analysis?.total_old_consumption
+                    ? parseFloat(analysis.total_old_consumption).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                    : ""
+                }
+                variant="outlined"
+                InputProps={{ readOnly: true }}
+                helperText={
+                  translations.totalOldConsumptionHelper ||
+                  "Αυτόματος υπολογισμός: Άθροισμα κατανάλωσης παλαιών κλιματιστικών"
+                }
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "red",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+
+            {/* Συνολική Νέα Κατανάλωση */}
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.totalNewConsumption ||
+                  "Συνολική νέα κατανάλωση (kWh)"
+                }
+                type="text"
+                value={
+                  analysis?.total_new_consumption
+                    ? parseFloat(analysis.total_new_consumption).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                    : ""
+                }
+                variant="outlined"
+                InputProps={{ readOnly: true }}
+                helperText={
+                  translations.totalNewConsumptionHelper ||
+                  "Αυτόματος υπολογισμός: Άθροισμα κατανάλωσης νέων κλιματιστικών"
+                }
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "green",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+
+            {/* Ενεργειακή Εξοικονόμηση */}
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.energySavingsKwh ||
+                  "Ενεργειακή εξοικονόμηση (kWh)"
+                }
+                type="text"
+                value={
+                  analysis?.energy_savings_kwh
+                    ? parseFloat(analysis.energy_savings_kwh).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                    : ""
+                }
+                variant="outlined"
+                InputProps={{ readOnly: true }}
+                helperText={
+                  translations.energySavingsKwhHelper ||
+                  "Αυτόματος υπολογισμός: Παλαιά κατανάλωση - Νέα κατανάλωση"
+                }
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "var(--color-primary)",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+
+            {/* Κόστος Ενέργειας */}
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.energyCostKwh || "Κόστος ενέργειας (€/kWh)"
+                }
+                type="text"
+                value={
+                  analysis?.energy_cost_kwh
+                    ? parseFloat(analysis.energy_cost_kwh).toFixed(3)
+                    : ""
+                }
+                variant="outlined"
+                InputProps={{ readOnly: true }}
+                helperText={
+                  translations.energyCostFromProject ||
+                  "Αυτόματη ανάκτηση από τα στοιχεία του έργου"
+                }
+                sx={{
+                  "& .MuiInputBase-input": {
+                    fontWeight: "bold",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+          </Grid>
+        </TabPanel>
+
+        {/* Tab 4: Παράμετροι Αξιολόγησης */}
+        <TabPanel value={tabValue} index={3}>
+          <Typography variant="h6" gutterBottom className="font-semibold text-primary mb-4">
+            {translations.evaluationParameters || "Παράμετροι Αξιολόγησης"}
           </Typography>
 
           <Grid container spacing={3}>
@@ -713,77 +900,7 @@ const AirConditioningReplacementTabContent = ({
               <TextField
                 fullWidth
                 label={
-                  (translations.energyCostKwh || "Κόστος ενέργειας") +
-                  " (€/kWh)"
-                }
-                type="number"
-                value={analysisData.energy_cost_kwh}
-                onChange={(e) =>
-                  setAnalysisData((prev) => ({
-                    ...prev,
-                    energy_cost_kwh: e.target.value,
-                  }))
-                }
-                variant="outlined"
-                helperText={
-                  analysis?.project_electricity_cost
-                    ? "Αυτόματη τιμή από το έργο"
-                    : ""
-                }
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    "&:hover fieldset": {
-                      borderColor: "var(--color-primary)",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "var(--color-primary)",
-                    },
-                  },
-                  "& .MuiInputLabel-root.Mui-focused": {
-                    color: "var(--color-primary)",
-                  },
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label={
-                  (translations.maintenanceCostAnnual ||
-                    "Ετήσιο κόστος συντήρησης") + " (€)"
-                }
-                type="number"
-                value={analysisData.maintenance_cost_annual}
-                onChange={(e) =>
-                  setAnalysisData((prev) => ({
-                    ...prev,
-                    maintenance_cost_annual: e.target.value,
-                  }))
-                }
-                variant="outlined"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    "&:hover fieldset": {
-                      borderColor: "var(--color-primary)",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "var(--color-primary)",
-                    },
-                  },
-                  "& .MuiInputLabel-root.Mui-focused": {
-                    color: "var(--color-primary)",
-                  },
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label={
-                  (translations.lifespanYears || "Διάρκεια ζωής") +
-                  " (" +
-                  (translations.years || "έτη") +
-                  ")"
+                  translations.lifespanYears || "Χρονικό διάστημα αξιολόγησης (έτη)"
                 }
                 type="number"
                 value={analysisData.lifespan_years}
@@ -794,6 +911,7 @@ const AirConditioningReplacementTabContent = ({
                   }))
                 }
                 variant="outlined"
+                inputProps={{ step: 1, min: 1, max: 50 }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     "&:hover fieldset": {
@@ -813,7 +931,7 @@ const AirConditioningReplacementTabContent = ({
               <TextField
                 fullWidth
                 label={
-                  (translations.discountRate || "Επιτόκιο αναγωγής") + " (%)"
+                  translations.discountRate || "Προεξοφλητικός συντελεστής (%)"
                 }
                 type="number"
                 value={analysisData.discount_rate}
@@ -824,6 +942,7 @@ const AirConditioningReplacementTabContent = ({
                   }))
                 }
                 variant="outlined"
+                inputProps={{ step: 0.1, min: 0, max: 100 }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     "&:hover fieldset": {
@@ -840,57 +959,266 @@ const AirConditioningReplacementTabContent = ({
               />
             </Grid>
           </Grid>
+        </TabPanel>
 
-          {analysis && (
-            <Card sx={{ mt: 3, backgroundColor: "#f8f9fa" }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  {translations.analysisResults || "Αποτελέσματα Ανάλυσης"}
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={4}>
-                    <Typography variant="body2" color="text.secondary">
-                      {translations.annualSavings || "Ετήσια Εξοικονόμηση"}
-                    </Typography>
-                    <Typography variant="h6" color="success.main">
-                      €{analysis.annual_cost_savings?.toFixed(2) || "0.00"}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <Typography variant="body2" color="text.secondary">
-                      {translations.paybackPeriod || "Περίοδος Αποπληρωμής"}
-                    </Typography>
-                    <Typography variant="h6" color="success.main">
-                      {analysis.payback_period?.toFixed(1) || "0.0"}{" "}
-                      {translations.years || "έτη"}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <Typography variant="body2" color="text.secondary">
-                      {translations.npv || "Καθαρή Παρούσα Αξία"}
-                    </Typography>
-                    <Typography
-                      variant="h6"
-                      color={
-                        analysis.net_present_value >= 0
-                          ? "success.main"
-                          : "error.main"
-                      }>
-                      €{analysis.net_present_value?.toFixed(2) || "0.00"}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <Typography variant="body2" color="text.secondary">
-                      {translations.irr || "Εσωτερικός Βαθμός Απόδοσης"}
-                    </Typography>
-                    <Typography variant="h6" color="success.main">
-                      {analysis.internal_rate_of_return?.toFixed(2) || "0.00"}%
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          )}
+        {/* Tab 5: Οικονομική Ανάλυση */}
+        <TabPanel value={tabValue} index={4}>
+          <Typography variant="h6" gutterBottom className="font-semibold text-gray-800 mb-4">
+            {translations.economicAnalysisTab || "Οικονομική Ανάλυση"}
+          </Typography>
+
+          <Grid container spacing={3}>
+            {/* Συνολικό Κόστος Επένδυσης */}
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.totalInvestmentCost ||
+                  "Συνολικό κόστος επένδυσης (€)"
+                }
+                type="text"
+                value={
+                  analysis?.total_investment_cost
+                    ? parseFloat(analysis.total_investment_cost).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+                    : ""
+                }
+                variant="outlined"
+                InputProps={{ readOnly: true }}
+                helperText={
+                  translations.totalInvestmentCostHelper ||
+                  "Αυτόματος υπολογισμός: Άθροισμα κόστους όλων των νέων κλιματιστικών"
+                }
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "var(--color-primary)",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+
+            {/* Ετήσια Ενεργειακή Εξοικονόμηση */}
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.annualEnergySavings ||
+                  "Ετήσια ενεργειακή εξοικονόμηση (€)"
+                }
+                type="text"
+                value={
+                  analysis?.annual_energy_savings
+                    ? parseFloat(analysis.annual_energy_savings).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+                    : ""
+                }
+                variant="outlined"
+                InputProps={{ readOnly: true }}
+                helperText={
+                  translations.annualEnergySavingsHelper ||
+                  "Αυτόματος υπολογισμός: Εξοικονόμηση kWh × Κόστος ενέργειας"
+                }
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "green",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+
+            {/* Ετήσιο Οικονομικό Όφελος */}
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.annualEconomicBenefit ||
+                  "Ετήσιο οικονομικό όφελος (€)"
+                }
+                type="text"
+                value={
+                  analysis?.annual_economic_benefit
+                    ? parseFloat(analysis.annual_economic_benefit).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+                    : ""
+                }
+                variant="outlined"
+                InputProps={{ readOnly: true }}
+                helperText={
+                  translations.annualEconomicBenefitHelper ||
+                  "Αυτόματος υπολογισμός: Ετήσια ενεργειακή εξοικονόμηση"
+                }
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "green",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+
+            {/* Περίοδος Αποπληρωμής */}
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.paybackPeriod || "Περίοδος αποπληρωμής (έτη)"
+                }
+                type="text"
+                value={
+                  analysis?.payback_period
+                    ? parseFloat(analysis.payback_period).toFixed(1)
+                    : ""
+                }
+                variant="outlined"
+                InputProps={{ readOnly: true }}
+                helperText={
+                  translations.paybackPeriodHelper ||
+                  "Αυτόματος υπολογισμός: Κόστος επένδυσης ÷ Ετήσιο όφελος"
+                }
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "var(--color-primary)",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+
+            {/* NPV */}
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.netPresentValue ||
+                  "Καθαρή παρούσα αξία - NPV (€)"
+                }
+                type="text"
+                value={
+                  analysis?.net_present_value
+                    ? parseFloat(analysis.net_present_value).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+                    : ""
+                }
+                variant="outlined"
+                InputProps={{ readOnly: true }}
+                helperText={
+                  translations.npvHelper ||
+                  "Αυτόματος υπολογισμός NPV με προεξοφλητικό συντελεστή"
+                }
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color:
+                      analysis?.net_present_value >= 0 ? "green" : "red",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+
+            {/* IRR */}
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.internalRateOfReturn ||
+                  "Εσωτερικός βαθμός απόδοσης - IRR (%)"
+                }
+                type="text"
+                value={
+                  analysis?.internal_rate_of_return
+                    ? parseFloat(analysis.internal_rate_of_return).toFixed(2)
+                    : ""
+                }
+                variant="outlined"
+                InputProps={{ readOnly: true }}
+                helperText={
+                  translations.irrHelper || "Αυτόματος υπολογισμός IRR"
+                }
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "var(--color-primary)",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&:hover fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+          </Grid>
         </TabPanel>
       </div>
 
