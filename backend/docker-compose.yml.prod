@@ -21,7 +21,7 @@ services:
       #- "traefik.docker.network=proxy_net"
 
     env_file:
-      - ../.env.prod
+      - .env.prod
     networks:
       - proxy_net
     depends_on:
@@ -31,7 +31,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
-      - ../.env.prod
+      - .env.prod
     networks:
       - proxy_net
 

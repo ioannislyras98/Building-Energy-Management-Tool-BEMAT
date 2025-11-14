@@ -14,6 +14,9 @@ RUN npm ci --only=production=false
 # Copy source code
 COPY . .
 
+# Copy .env.prod into the image for build
+COPY .env.prod .env
+
 # Build the production bundle with environment variables from .env.prod
 RUN npm run build
 
