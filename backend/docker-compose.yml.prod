@@ -14,11 +14,11 @@ services:
       - "traefik.http.routers.web.tls.certresolver=myresolver"
       - "traefik.http.services.web.loadbalancer.server.port=8000"
       # Optional: HTTP to HTTPS redirect
-      - "traefik.http.routers.web-http.rule=Host(`energymanagement.epu.ntua.gr`)"
-      - "traefik.http.routers.web-http.entrypoints=http"
-      - "traefik.http.routers.web-http.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.docker.network=proxy_net"
+      #- "traefik.http.routers.web-http.rule=Host(`energymanagement.epu.ntua.gr`)"
+      #- "traefik.http.routers.web-http.entrypoints=http"
+      #- "traefik.http.routers.web-http.middlewares=redirect-to-https"
+      #- "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      #- "traefik.docker.network=proxy_net"
 
     env_file:
       - ../.env.prod
