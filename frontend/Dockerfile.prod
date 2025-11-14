@@ -14,10 +14,7 @@ RUN npm ci --only=production=false
 # Copy source code
 COPY . .
 
-# Copy production environment file
-COPY ../.env.prod .env
-
-# Build the production bundle with environment variables
+# Build the production bundle with environment variables from .env.prod
 RUN npm run build
 
 # Stage 2: Serve with nginx
