@@ -24,10 +24,10 @@ class AirConditioningAnalysisSerializer(serializers.ModelSerializer):
     class Meta:
         model = AirConditioningAnalysis
         fields = '__all__'
-        read_only_fields = ('id', 'total_old_consumption', 'total_new_consumption', 
-                           'energy_savings_kwh', 'total_investment_cost', 'annual_cost_savings',
-                           'payback_period', 'net_present_value', 'internal_rate_of_return',
-                           'created_at', 'updated_at')
+        read_only_fields = ('id', 'energy_cost_kwh', 'total_old_consumption', 'total_new_consumption', 
+                           'energy_savings_kwh', 'total_investment_cost', 'annual_energy_savings',
+                           'annual_economic_benefit', 'payback_period', 'net_present_value', 
+                           'internal_rate_of_return', 'created_at', 'updated_at')
 
 
 class OldAirConditioningCreateSerializer(serializers.ModelSerializer):
@@ -47,7 +47,7 @@ class NewAirConditioningCreateSerializer(serializers.ModelSerializer):
 class AirConditioningAnalysisCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = AirConditioningAnalysis
-        exclude = ('id', 'total_old_consumption', 'total_new_consumption', 
-                  'energy_savings_kwh', 'total_investment_cost', 'annual_cost_savings',
-                  'payback_period', 'net_present_value', 'internal_rate_of_return',
-                  'created_at', 'updated_at')
+        exclude = ('id', 'user', 'energy_cost_kwh', 'total_old_consumption', 'total_new_consumption', 
+                  'energy_savings_kwh', 'total_investment_cost', 'annual_energy_savings',
+                  'annual_economic_benefit', 'payback_period', 'net_present_value', 
+                  'internal_rate_of_return', 'created_at', 'updated_at')
