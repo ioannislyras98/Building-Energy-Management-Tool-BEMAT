@@ -12,8 +12,8 @@ services:
       - /app/node_modules
     env_file:
       - ../.env.prod
-    environment:
-      - NODE_ENV=production
+        #environment:
+        #- NODE_ENV=production
     labels:
       - "com.bemat.description=BEMAT Frontend Production"
       - "com.bemat.service=frontend"
