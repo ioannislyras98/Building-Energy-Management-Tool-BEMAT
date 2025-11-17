@@ -90,10 +90,10 @@ class RoofThermalInsulationDetailView(generics.RetrieveUpdateDestroyAPIView):
         return RoofThermalInsulation.objects.filter(created_by=self.request.user)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def get_roof_thermal_insulations_by_building(request, building_uuid):
-    """Get all roof thermal insulations for a specific building"""
+    """Get or create roof thermal insulation for a specific building"""
     try:
         building = get_object_or_404(Building, uuid=building_uuid)
         
@@ -103,19 +103,61 @@ def get_roof_thermal_insulations_by_building(request, building_uuid):
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        if is_admin_user(request.user):
-            roof_thermal_insulations = RoofThermalInsulation.objects.filter(building=building)
-        else:
-            roof_thermal_insulations = RoofThermalInsulation.objects.filter(
-                building=building, 
-                created_by=request.user
+        # GET: Retrieve existing records
+        if request.method == 'GET':
+            if is_admin_user(request.user):
+                roof_thermal_insulations = RoofThermalInsulation.objects.filter(building=building)
+            else:
+                roof_thermal_insulations = RoofThermalInsulation.objects.filter(
+                    building=building, 
+                    created_by=request.user
+                )
+            serializer = RoofThermalInsulationSerializer(roof_thermal_insulations, many=True)
+            return Response({
+                "success": True,
+                "data": serializer.data
+            })
+        
+        # POST: Get or create record
+        elif request.method == 'POST':
+            project_uuid = request.data.get('project')
+            if not project_uuid:
+                return Response({
+                    "success": False,
+                    "error": "Project UUID is required"
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            project = get_object_or_404(Project, uuid=project_uuid)
+            
+            # Try to get existing record first
+            roof_thermal_insulation, created = RoofThermalInsulation.objects.get_or_create(
+                building=building,
+                created_by=request.user,
+                defaults={
+                    'project': project,
+                    'u_coefficient': 0,
+                    'winter_hourly_losses': 0,
+                    'summer_hourly_losses': 0,
+                    'heating_hours_per_year': 0,
+                    'cooling_hours_per_year': 0,
+                    'total_cost': 0,
+                    'annual_benefit': 0,
+                    'time_period_years': 20,
+                    'annual_operating_costs': 0,
+                    'discount_rate': 5.0,
+                    'net_present_value': 0,
+                }
             )
-        serializer = RoofThermalInsulationSerializer(roof_thermal_insulations, many=True)
-        return Response({
-            "success": True,
-            "data": serializer.data
-        })
+            
+            serializer = RoofThermalInsulationSerializer(roof_thermal_insulation)
+            return Response({
+                "success": True,
+                "data": serializer.data,
+                "created": created
+            }, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+            
     except Exception as e:
+        logger.error(f"Error in get_roof_thermal_insulations_by_building: {str(e)}", exc_info=True)
         return Response({
             "success": False,
             "error": str(e)

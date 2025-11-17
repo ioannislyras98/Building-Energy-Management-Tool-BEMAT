@@ -110,10 +110,10 @@ const RoofThermalInsulationTabContent = ({
           setRoofThermalInsulation(existing);
           setOldMaterials(existing.old_materials || []);
           setNewMaterials(existing.new_materials || []);
+          setLoading(false);
         } else {
           createNewRoofThermalInsulation();
         }
-        setLoading(false);
       },
       error: (jqXHR) => {
         createNewRoofThermalInsulation();
@@ -123,22 +123,11 @@ const RoofThermalInsulationTabContent = ({
 
   const createNewRoofThermalInsulation = () => {
     const newData = {
-      building: buildingUuid,
       project: projectUuid,
-      u_coefficient: 0,
-      winter_hourly_losses: 0,
-      summer_hourly_losses: 0,
-      heating_hours_per_year: 0,
-      cooling_hours_per_year: 0,
-      total_cost: 0,
-      annual_benefit: 0,
-      time_period_years: 20,
-      annual_operating_costs: 0,
-      discount_rate: 5,
-      net_present_value: 0,
     };
+    
     $.ajax({
-      url: `${API_BASE_URL}/roof_thermal_insulations/create/`,
+      url: `${API_BASE_URL}/roof_thermal_insulations/building/${buildingUuid}/`,
       method: "POST",
       headers: {
         Authorization: `Token ${token}`,
@@ -146,8 +135,8 @@ const RoofThermalInsulationTabContent = ({
       },
       data: JSON.stringify(newData),
       success: (data) => {
-        setCurrentRoofThermalInsulation(data);
-        setRoofThermalInsulation(data);
+        setCurrentRoofThermalInsulation(data.data);
+        setRoofThermalInsulation(data.data);
         setOldMaterials([]);
         setNewMaterials([]);
         setLoading(false);
@@ -163,9 +152,16 @@ const RoofThermalInsulationTabContent = ({
   };
 
   const handleInputChange = (field, value) => {
+    let processedValue = value;
+    
+    // Convert empty discount_rate to 0
+    if (field === 'discount_rate' && (value === '' || value === null || value === undefined)) {
+      processedValue = 0;
+    }
+    
     setRoofThermalInsulation((prev) => ({
       ...prev,
-      [field]: value,
+      [field]: processedValue,
     }));
   };
 
@@ -305,7 +301,7 @@ const RoofThermalInsulationTabContent = ({
     );
   };
   const calculateRTotal = (materials) => {
-    if (!materials || materials.length === 0) return 0.14;
+    if (!materials || materials.length === 0) return 0;
 
     const R_si = 0.1; // Roof-specific internal surface resistance
     const R_se = 0.04;
@@ -321,6 +317,7 @@ const RoofThermalInsulationTabContent = ({
   };
 
   const calculateUCoefficient = (materials) => {
+    if (!materials || materials.length === 0) return 0;
     const rTotal = calculateRTotal(materials);
     return rTotal > 0 ? 1 / rTotal : 0;
   };
@@ -947,7 +944,7 @@ const RoofThermalInsulationTabContent = ({
                   translations.fields?.discountRate || "Επιτόκιο αναγωγής (%)"
                 }
                 type="number"
-                value={roofThermalInsulation.discount_rate || 5}
+                value={roofThermalInsulation.discount_rate ?? ""}
                 onChange={(e) =>
                   handleInputChange("discount_rate", e.target.value)
                 }

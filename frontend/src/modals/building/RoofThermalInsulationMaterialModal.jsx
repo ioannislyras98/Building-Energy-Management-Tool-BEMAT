@@ -312,6 +312,7 @@ const RoofThermalInsulationMaterialModal = ({
               min="0"
               value={formData.thickness}
               onChange={(e) => handleInputChange("thickness", e.target.value)}
+              example={translations.thicknessPlaceholder || "π.χ. 0.050"}
               error={validationErrors.thickness}
               required
             />
@@ -327,6 +328,7 @@ const RoofThermalInsulationMaterialModal = ({
               onChange={(e) =>
                 handleInputChange("surface_area", e.target.value)
               }
+              example={translations.surfaceAreaPlaceholder || "π.χ. 25.50"}
               error={validationErrors.surface_area}
               required
             />

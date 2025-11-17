@@ -110,13 +110,12 @@ const ThermalInsulationTabContent = ({
           setThermalInsulation(existing);
           setOldMaterials(existing.old_materials || []);
           setNewMaterials(existing.new_materials || []);
+          setLoading(false);
         } else {
           createNewThermalInsulation();
         }
-        setLoading(false);
       },
       error: (jqXHR) => {
-
         createNewThermalInsulation();
       },
     });
@@ -124,22 +123,11 @@ const ThermalInsulationTabContent = ({
 
   const createNewThermalInsulation = () => {
     const newData = {
-      building: buildingUuid,
       project: projectUuid,
-      u_coefficient: 0,
-      winter_hourly_losses: 0,
-      summer_hourly_losses: 0,
-      heating_hours_per_year: 0,
-      cooling_hours_per_year: 0,
-      total_cost: 0,
-      annual_benefit: 0,
-      time_period_years: 20,
-      annual_operating_costs: 0,
-      discount_rate: 5,
-      net_present_value: 0,
     };
+    
     $.ajax({
-      url: `${API_BASE_URL}/thermal_insulations/create/`,
+      url: `${API_BASE_URL}/thermal_insulations/building/${buildingUuid}/`,
       method: "POST",
       headers: {
         Authorization: `Token ${token}`,
@@ -147,14 +135,13 @@ const ThermalInsulationTabContent = ({
       },
       data: JSON.stringify(newData),
       success: (data) => {
-        setCurrentThermalInsulation(data);
-        setThermalInsulation(data);
+        setCurrentThermalInsulation(data.data);
+        setThermalInsulation(data.data);
         setOldMaterials([]);
         setNewMaterials([]);
         setLoading(false);
       },
       error: (jqXHR) => {
-
         setError(
           translations.errorLoad ||
             "Σφάλμα κατά τη δημιουργία νέας θερμομόνωσης"
@@ -165,9 +152,16 @@ const ThermalInsulationTabContent = ({
   };
 
   const handleInputChange = (field, value) => {
+    let processedValue = value;
+    
+    // Convert empty discount_rate to 0
+    if (field === 'discount_rate' && (value === '' || value === null || value === undefined)) {
+      processedValue = 0;
+    }
+    
     setThermalInsulation((prev) => ({
       ...prev,
-      [field]: value,
+      [field]: processedValue,
     }));
   };
   const handleSave = () => {
@@ -279,7 +273,7 @@ const ThermalInsulationTabContent = ({
     );
   };
   const calculateRTotal = (materials) => {
-    if (!materials || materials.length === 0) return 0.17;
+    if (!materials || materials.length === 0) return 0;
 
     const R_si = 0.13;
     const R_se = 0.04;
@@ -294,6 +288,7 @@ const ThermalInsulationTabContent = ({
     return R_si + R_se + R_materials;
   };
   const calculateUCoefficient = (materials) => {
+    if (!materials || materials.length === 0) return 0;
     const rTotal = calculateRTotal(materials);
     return rTotal > 0 ? 1 / rTotal : 0;
   };
@@ -933,7 +928,7 @@ const ThermalInsulationTabContent = ({
                   translations.fields?.discountRate || "Επιτόκιο αναγωγής (%)"
                 }
                 type="number"
-                value={thermalInsulation.discount_rate || 5}
+                value={thermalInsulation.discount_rate ?? ""}
                 onChange={(e) =>
                   handleInputChange("discount_rate", e.target.value)
                 }
