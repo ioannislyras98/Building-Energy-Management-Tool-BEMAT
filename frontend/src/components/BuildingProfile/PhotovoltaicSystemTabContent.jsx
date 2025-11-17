@@ -469,6 +469,9 @@ const PhotovoltaicSystemTabContent = ({
         <Tabs
           value={tabValue}
           onChange={(event, newValue) => setTabValue(newValue)}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
           sx={{
             borderBottom: 1,
             borderColor: "divider",

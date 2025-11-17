@@ -1025,6 +1025,9 @@ const WindowReplacementTabContent = ({
         <Tabs
           value={activeTab}
           onChange={(event, newValue) => setActiveTab(newValue)}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
           sx={{
             borderBottom: 1,
             borderColor: "divider",
@@ -1040,6 +1043,9 @@ const WindowReplacementTabContent = ({
             },
             "& .MuiTabs-indicator": {
               backgroundColor: "var(--color-primary)",
+            },
+            "& .MuiTabs-scrollButtons": {
+              color: "var(--color-primary)",
             },
           }}>
           <Tab label={translations.inputData || "Στοιχεία Εισόδου"} />

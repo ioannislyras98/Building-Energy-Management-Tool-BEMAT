@@ -578,6 +578,9 @@ const AirConditioningReplacementTabContent = ({
           variant="scrollable"
           scrollButtons="auto"
           allowScrollButtonsMobile
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
           sx={{
             borderBottom: 1,
             borderColor: "divider",

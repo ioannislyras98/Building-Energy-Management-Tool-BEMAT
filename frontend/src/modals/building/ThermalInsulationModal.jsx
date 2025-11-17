@@ -402,7 +402,20 @@ const ThermalInsulationModal = ({
           <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
             <Tabs
               value={tabValue}
-              onChange={(e, newValue) => setTabValue(newValue)}>
+              onChange={(e, newValue) => setTabValue(newValue)}
+              variant="scrollable"
+              scrollButtons="auto"
+              allowScrollButtonsMobile
+              sx={{
+                "& .MuiTab-root": { textTransform: "none" },
+                "& .Mui-selected": { color: "var(--color-primary)" },
+                "& .MuiTabs-indicator": {
+                  backgroundColor: "var(--color-primary)",
+                },
+                "& .MuiTabs-scrollButtons": {
+                  color: "var(--color-primary)",
+                },
+              }}>
               <Tab label="Παλιά Υλικά" />
               <Tab label="Νέα Υλικά" />
               <Tab label="Θέρμανση & Ψύξη" />

@@ -1715,6 +1715,9 @@ const BulbReplacementTabContent = ({
         <Tabs
           value={activeTab}
           onChange={(event, newValue) => setActiveTab(newValue)}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
           sx={{
             borderBottom: 1,
             borderColor: "divider",
@@ -1730,6 +1733,9 @@ const BulbReplacementTabContent = ({
             },
             "& .MuiTabs-indicator": {
               backgroundColor: "var(--color-primary)",
+            },
+            "& .MuiTabs-scrollButtons": {
+              color: "var(--color-primary)",
             },
           }}>
           <Tab

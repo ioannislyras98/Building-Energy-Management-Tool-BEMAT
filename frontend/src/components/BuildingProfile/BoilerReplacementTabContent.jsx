@@ -144,7 +144,7 @@ const BoilerReplacementTabContent = ({
         // Ενεργειακά στοιχεία
         annual_heating_consumption_liters: data.annual_heating_consumption_liters || "",
         heating_oil_savings_liters: data.heating_oil_savings_liters || "",
-        oil_price_per_liter: data.oil_price_per_liter || "",
+        oil_price_per_liter: data.oil_price_per_liter || params?.oil_price_per_liter || "",
         time_period: data.time_period || "20",
         discount_rate: data.discount_rate || "5.0",
         // Υπολογιζόμενα πεδία
@@ -158,6 +158,12 @@ const BoilerReplacementTabContent = ({
     } catch (error) {
       if (error.response?.status !== 404) {
         setError("Σφάλμα κατά την φόρτωση των δεδομένων");
+      } else {
+        // Αν δεν υπάρχουν αποθηκευμένα δεδομένα, συμπλήρωσε την τιμή πετρελαίου από το project
+        setFormData(prev => ({
+          ...prev,
+          oil_price_per_liter: params?.oil_price_per_liter || ""
+        }));
       }
     } finally {
       setLoading(false);
@@ -566,7 +572,7 @@ const BoilerReplacementTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.discountRate || "Προεξοφλητικός συντελεστής") +
+              (translations.discountRate || "Επιτόκιο αναγωγής") +
               " (%)"
             }
             type="number"
@@ -576,7 +582,7 @@ const BoilerReplacementTabContent = ({
             inputProps={{ step: 0.1, min: 0, max: 30 }}
             helperText={
               translations.discountRateHelper ||
-              "Σταθερή τιμή 5% για τους υπολογισμούς NPV"
+              "Επιτόκιο αναγωγής για τους υπολογισμούς NPV (προτεινόμενη τιμή: 5%)"
             }
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -948,6 +954,9 @@ const BoilerReplacementTabContent = ({
         <Tabs
           value={tabValue}
           onChange={(event, newValue) => setTabValue(newValue)}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
           sx={{
             borderBottom: 1,
             borderColor: "divider",

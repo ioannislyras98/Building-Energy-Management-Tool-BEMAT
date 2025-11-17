@@ -137,7 +137,8 @@ class ExternalWallThermalInsulation(models.Model):
     def calculate_npv(self):
         """Calculate Net Present Value"""
         try:
-            if (not self.annual_benefit or not self.annual_operating_costs or 
+            # Check only required fields (annual_operating_costs can be None or 0)
+            if (not self.annual_benefit or 
                 not self.discount_rate or not self.time_period_years or not self.total_cost):
                 return 0
             

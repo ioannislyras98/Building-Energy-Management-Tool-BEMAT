@@ -477,6 +477,9 @@ const ThermalInsulationTabContent = ({
         <Tabs
           value={tabValue}
           onChange={(event, newValue) => setTabValue(newValue)}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
           sx={{
             borderBottom: 1,
             borderColor: "divider",
@@ -492,6 +495,9 @@ const ThermalInsulationTabContent = ({
             },
             "& .MuiTabs-indicator": {
               backgroundColor: "var(--color-primary)",
+            },
+            "& .MuiTabs-scrollButtons": {
+              color: "var(--color-primary)",
             },
           }}>
           {" "}
