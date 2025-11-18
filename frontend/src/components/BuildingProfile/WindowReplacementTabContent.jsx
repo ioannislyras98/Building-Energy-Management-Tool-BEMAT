@@ -45,6 +45,7 @@ const WindowReplacementTabContent = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [existingUuid, setExistingUuid] = useState(null);
   const cookies = new Cookies(null, { path: "/" });
   const token = cookies.get("token");
 
@@ -59,6 +60,33 @@ const WindowReplacementTabContent = ({
     }
   }, [buildingUuid, token]);
 
+  useEffect(() => {
+    if (projectUuid && token) {
+      fetchProjectData();
+    }
+  }, [projectUuid, token]);
+
+  const fetchProjectData = () => {
+    $.ajax({
+      url: `${API_BASE_URL}/projects/get/${projectUuid}/`,
+      method: "GET",
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+      success: (response) => {
+        if (response.data) {
+          setFormData((prev) => ({
+            ...prev,
+            energy_cost_kwh: response.data.cost_per_kwh_electricity || "",
+          }));
+        }
+      },
+      error: (jqXHR) => {
+        console.error("Error fetching project data:", jqXHR);
+      },
+    });
+  };
+
   const fetchExistingData = () => {
     $.ajax({
       url: `${API_BASE_URL}/window_replacements/building/${buildingUuid}/`,
@@ -69,7 +97,10 @@ const WindowReplacementTabContent = ({
       success: (response) => {
         if (response.success && response.data && response.data.length > 0) {
           const data = response.data[0]; // Get the first (latest) entry
-          setFormData({
+          console.log("Fetched existing data with UUID:", data.uuid);
+          setExistingUuid(data.uuid); // Store the UUID for updates
+          setFormData((prev) => ({
+            ...prev,
             old_thermal_conductivity: data.old_thermal_conductivity || "",
             new_thermal_conductivity: data.new_thermal_conductivity || "",
             window_area: data.window_area || "",
@@ -78,10 +109,10 @@ const WindowReplacementTabContent = ({
             new_losses_summer: data.new_losses_summer || "",
             new_losses_winter: data.new_losses_winter || "",
             cost_per_sqm: data.cost_per_sqm || "",
-            energy_cost_kwh: data.energy_cost_kwh || "",
             maintenance_cost_annual: data.maintenance_cost_annual || "",
             lifespan_years: data.lifespan_years || "",
-          });
+            discount_rate: data.discount_rate || "5",
+          }));
         }
       },
       error: (jqXHR) => {
@@ -99,9 +130,10 @@ const WindowReplacementTabContent = ({
     new_losses_summer: "",
     new_losses_winter: "",
     cost_per_sqm: "",
-    energy_cost_kwh: "",
+    energy_cost_kwh: params?.projectElectricityCost || "",
     maintenance_cost_annual: "",
     lifespan_years: "",
+    discount_rate: "5",
   });
 
   const [calculatedResults, setCalculatedResults] = useState({
@@ -115,6 +147,12 @@ const WindowReplacementTabContent = ({
     internal_rate_of_return: 0,
   });
   const [debounceTimeout, setDebounceTimeout] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({
+    old_thermal_conductivity: false,
+    new_thermal_conductivity: false,
+    window_area: false,
+    cost_per_sqm: false,
+  });
 
   const autoSave = useCallback(() => {
     if (
@@ -122,7 +160,8 @@ const WindowReplacementTabContent = ({
       !token ||
       !formData.old_thermal_conductivity ||
       !formData.new_thermal_conductivity ||
-      !formData.window_area
+      !formData.window_area ||
+      !formData.cost_per_sqm
     ) {
       return;
     }
@@ -130,35 +169,50 @@ const WindowReplacementTabContent = ({
     const submitData = {
       building: buildingUuid,
       project: projectUuid,
-      ...formData,
+      old_thermal_conductivity: formData.old_thermal_conductivity,
+      new_thermal_conductivity: formData.new_thermal_conductivity,
+      window_area: formData.window_area,
+      old_losses_summer: formData.old_losses_summer || null,
+      old_losses_winter: formData.old_losses_winter || null,
+      new_losses_summer: formData.new_losses_summer || null,
+      new_losses_winter: formData.new_losses_winter || null,
+      cost_per_sqm: formData.cost_per_sqm || null,
+      energy_cost_kwh: formData.energy_cost_kwh || null,
+      maintenance_cost_annual: formData.maintenance_cost_annual || null,
+      lifespan_years: formData.lifespan_years || null,
+      discount_rate: formData.discount_rate || null,
       ...calculatedResults,
     };
 
-    // Remove empty string fields to avoid validation errors
-    if (submitData.cost_per_sqm === "") {
-      delete submitData.cost_per_sqm;
-    }
-    if (submitData.maintenance_cost_annual === "") {
-      delete submitData.maintenance_cost_annual;
-    }
+    const url = existingUuid
+      ? `${API_BASE_URL}/window_replacements/${existingUuid}/update/`
+      : `${API_BASE_URL}/window_replacements/create/`;
+    const method = existingUuid ? "PUT" : "POST";
+
+    console.log("🔵 AutoSave called - existingUuid:", existingUuid, "| Method:", method);
 
     $.ajax({
-      url: `${API_BASE_URL}/window_replacements/create/`,
-      method: "POST",
+      url: url,
+      method: method,
       headers: {
         Authorization: `Token ${token}`,
         "Content-Type": "application/json",
       },
       data: JSON.stringify(submitData),
       success: (response) => {
-
+        if (response.data && response.data.uuid && !existingUuid) {
+          console.log("✅ AutoSave - Created new record, UUID:", response.data.uuid);
+          setExistingUuid(response.data.uuid);
+        } else {
+          console.log("✅ AutoSave - Updated existing record");
+        }
         setSuccess(
           translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
         );
         setTimeout(() => setSuccess(null), 3000);
       },
       error: (jqXHR) => {
-
+        console.error("❌ AutoSave error:", jqXHR.responseJSON);
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
@@ -173,6 +227,7 @@ const WindowReplacementTabContent = ({
     formData,
     calculatedResults,
     translations,
+    existingUuid,
   ]);
 
   const handleInputChange = (field, value) => {
@@ -180,6 +235,15 @@ const WindowReplacementTabContent = ({
       ...prev,
       [field]: value,
     }));
+    
+    // Clear validation error when user starts typing
+    if (validationErrors[field] !== undefined) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        [field]: false,
+      }));
+    }
+    
     if (
       [
         "old_thermal_conductivity",
@@ -247,6 +311,7 @@ const WindowReplacementTabContent = ({
       energy_cost_kwh,
       maintenance_cost_annual,
       lifespan_years,
+      discount_rate,
     } = formData;
 
     if (
@@ -278,14 +343,14 @@ const WindowReplacementTabContent = ({
 
       if (annualCostSavings > 0 && totalInvestmentCost > 0) {
         paybackPeriod = totalInvestmentCost / annualCostSavings;
-        const discountRate = 0.05; // 5%
+        const discountRateValue = parseFloat(discount_rate || 5) / 100;
         const years = parseFloat(lifespan_years) || 20;
         let pvSavings = 0;
 
         for (let year = 1; year <= years; year++) {
           pvSavings +=
             (annualCostSavings - parseFloat(maintenance_cost_annual || 0)) /
-            Math.pow(1 + discountRate, year);
+            Math.pow(1 + discountRateValue, year);
         }
 
         npv = pvSavings - totalInvestmentCost;
@@ -322,33 +387,72 @@ const WindowReplacementTabContent = ({
       return;
     }
 
+    // Validate required fields
+    const newValidationErrors = {
+      old_thermal_conductivity: !formData.old_thermal_conductivity,
+      new_thermal_conductivity: !formData.new_thermal_conductivity,
+      window_area: !formData.window_area,
+      cost_per_sqm: !formData.cost_per_sqm,
+    };
+    
+    setValidationErrors(newValidationErrors);
+    
+    // Check if there are any validation errors
+    if (Object.values(newValidationErrors).some(error => error)) {
+      setError(translations.requiredFieldsError || "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     const submitData = {
       building: buildingUuid,
       project: projectUuid,
-      ...formData,
+      old_thermal_conductivity: formData.old_thermal_conductivity,
+      new_thermal_conductivity: formData.new_thermal_conductivity,
+      window_area: formData.window_area,
+      old_losses_summer: formData.old_losses_summer || null,
+      old_losses_winter: formData.old_losses_winter || null,
+      new_losses_summer: formData.new_losses_summer || null,
+      new_losses_winter: formData.new_losses_winter || null,
+      cost_per_sqm: formData.cost_per_sqm || null,
+      energy_cost_kwh: formData.energy_cost_kwh || null,
+      maintenance_cost_annual: formData.maintenance_cost_annual || null,
+      lifespan_years: formData.lifespan_years || null,
+      discount_rate: formData.discount_rate || null,
       ...calculatedResults,
     };
 
+    const url = existingUuid
+      ? `${API_BASE_URL}/window_replacements/${existingUuid}/update/`
+      : `${API_BASE_URL}/window_replacements/create/`;
+    const method = existingUuid ? "PUT" : "POST";
+
+    console.log("🟢 HandleSubmit called - existingUuid:", existingUuid, "| Method:", method);
+
     $.ajax({
-      url: `${API_BASE_URL}/window_replacements/create/`,
-      method: "POST",
+      url: url,
+      method: method,
       headers: {
         Authorization: `Token ${token}`,
         "Content-Type": "application/json",
       },
       data: JSON.stringify(submitData),
       success: (response) => {
-
+        if (response.data && response.data.uuid && !existingUuid) {
+          console.log("✅ HandleSubmit - Created new record, UUID:", response.data.uuid);
+          setExistingUuid(response.data.uuid);
+        } else {
+          console.log("✅ HandleSubmit - Updated existing record");
+        }
         setSuccess(
           translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
         );
         setLoading(false);
       },
       error: (jqXHR) => {
-
+        console.error("❌ HandleSubmit error:", jqXHR.responseJSON);
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
@@ -373,8 +477,11 @@ const WindowReplacementTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.oldThermalConductivity ||
-                "Παλαιός συντελεστής θερμικής αγωγιμότητας") + " (W/m²K) *"
+              <span>
+                {translations.oldThermalConductivity ||
+                  "Παλαιός συντελεστής θερμικής αγωγιμότητας"}{" "}
+                (W/m²K) <span style={{ color: "red" }}>*</span>
+              </span>
             }
             type="number"
             value={formData.old_thermal_conductivity}
@@ -382,19 +489,30 @@ const WindowReplacementTabContent = ({
               handleInputChange("old_thermal_conductivity", e.target.value)
             }
             variant="outlined"
-            required
+            error={validationErrors.old_thermal_conductivity}
+            helperText={
+              validationErrors.old_thermal_conductivity
+                ? translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
+                  borderColor: validationErrors.old_thermal_conductivity
+                    ? "#d32f2f"
+                    : "var(--color-primary)",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
+                  borderColor: validationErrors.old_thermal_conductivity
+                    ? "#d32f2f"
+                    : "var(--color-primary)",
                 },
               },
               "& .MuiInputLabel-root": {
                 "&.Mui-focused": {
-                  color: "var(--color-primary)",
+                  color: validationErrors.old_thermal_conductivity
+                    ? "#d32f2f"
+                    : "var(--color-primary)",
                 },
               },
             }}
@@ -405,8 +523,11 @@ const WindowReplacementTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.newThermalConductivity ||
-                "Νέος συντελεστής θερμικής αγωγιμότητας") + " (W/m²K) *"
+              <span>
+                {translations.newThermalConductivity ||
+                  "Νέος συντελεστής θερμικής αγωγιμότητας"}{" "}
+                (W/m²K) <span style={{ color: "red" }}>*</span>
+              </span>
             }
             type="number"
             value={formData.new_thermal_conductivity}
@@ -414,19 +535,30 @@ const WindowReplacementTabContent = ({
               handleInputChange("new_thermal_conductivity", e.target.value)
             }
             variant="outlined"
-            required
+            error={validationErrors.new_thermal_conductivity}
+            helperText={
+              validationErrors.new_thermal_conductivity
+                ? translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
+                  borderColor: validationErrors.new_thermal_conductivity
+                    ? "#d32f2f"
+                    : "var(--color-primary)",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
+                  borderColor: validationErrors.new_thermal_conductivity
+                    ? "#d32f2f"
+                    : "var(--color-primary)",
                 },
               },
               "& .MuiInputLabel-root": {
                 "&.Mui-focused": {
-                  color: "var(--color-primary)",
+                  color: validationErrors.new_thermal_conductivity
+                    ? "#d32f2f"
+                    : "var(--color-primary)",
                 },
               },
             }}
@@ -437,25 +569,39 @@ const WindowReplacementTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.windowArea || "Επιφάνεια υαλοπινάκων") + " (m²) *"
+              <span>
+                {translations.windowArea || "Επιφάνεια υαλοπινάκων"} (m²){" "}
+                <span style={{ color: "red" }}>*</span>
+              </span>
             }
             type="number"
             value={formData.window_area}
             onChange={(e) => handleInputChange("window_area", e.target.value)}
             variant="outlined"
-            required
+            error={validationErrors.window_area}
+            helperText={
+              validationErrors.window_area
+                ? translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
+                  borderColor: validationErrors.window_area
+                    ? "#d32f2f"
+                    : "var(--color-primary)",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
+                  borderColor: validationErrors.window_area
+                    ? "#d32f2f"
+                    : "var(--color-primary)",
                 },
               },
               "& .MuiInputLabel-root": {
                 "&.Mui-focused": {
-                  color: "var(--color-primary)",
+                  color: validationErrors.window_area
+                    ? "#d32f2f"
+                    : "var(--color-primary)",
                 },
               },
             }}
@@ -470,22 +616,25 @@ const WindowReplacementTabContent = ({
             }
             type="number"
             value={formData.energy_cost_kwh}
-            onChange={(e) =>
-              handleInputChange("energy_cost_kwh", e.target.value)
-            }
             variant="outlined"
+            InputProps={{ readOnly: true }}
+            helperText={
+              translations.energyCostFromProject ||
+              "Η τιμή προέρχεται από το έργο"
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
+                backgroundColor: "#f5f5f5",
                 "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
+                  borderColor: "rgba(0, 0, 0, 0.23)",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
+                  borderColor: "rgba(0, 0, 0, 0.23)",
                 },
               },
               "& .MuiInputLabel-root": {
                 "&.Mui-focused": {
-                  color: "var(--color-primary)",
+                  color: "rgba(0, 0, 0, 0.6)",
                 },
               },
             }}
@@ -495,23 +644,40 @@ const WindowReplacementTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={(translations.costPerSqm || "Κόστος ανά m²") + " (€/m²)"}
+            label={
+              <span>
+                {translations.costPerSqm || "Κόστος ανά m²"} (€/m²){" "}
+                <span style={{ color: "red" }}>*</span>
+              </span>
+            }
             type="number"
             value={formData.cost_per_sqm}
             onChange={(e) => handleInputChange("cost_per_sqm", e.target.value)}
             variant="outlined"
+            error={validationErrors.cost_per_sqm}
+            helperText={
+              validationErrors.cost_per_sqm
+                ? translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
+                  borderColor: validationErrors.cost_per_sqm
+                    ? "#d32f2f"
+                    : "var(--color-primary)",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
+                  borderColor: validationErrors.cost_per_sqm
+                    ? "#d32f2f"
+                    : "var(--color-primary)",
                 },
               },
               "& .MuiInputLabel-root": {
                 "&.Mui-focused": {
-                  color: "var(--color-primary)",
+                  color: validationErrors.cost_per_sqm
+                    ? "#d32f2f"
+                    : "var(--color-primary)",
                 },
               },
             }}
@@ -838,45 +1004,14 @@ const WindowReplacementTabContent = ({
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
-            label={
-              (translations.annualOperatingCosts ||
-                "Λειτουργικά έξοδα ανά έτος") + " (€)"
-            }
-            type="number"
-            value={formData.maintenance_cost_annual || ""}
-            onChange={(e) =>
-              handleInputChange("maintenance_cost_annual", e.target.value)
-            }
-            inputProps={{ step: 0.01, min: 0 }}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&:hover fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "var(--color-primary)",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                "&.Mui-focused": {
-                  color: "var(--color-primary)",
-                },
-              },
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <TextField
-            fullWidth
             label={(translations.discountRate || "Επιτόκιο αναγωγής") + " (%)"}
             type="number"
-            value={5}
-            InputProps={{ readOnly: true }}
+            value={formData.discount_rate}
+            onChange={(e) => handleInputChange("discount_rate", e.target.value)}
             inputProps={{ step: 0.1, min: 0, max: 100 }}
             helperText={
               translations.discountRateHelper ||
-              "Σταθερή τιμή 5% για τους υπολογισμούς NPV"
+              "Επιτόκιο αναγωγής για τους υπολογισμούς NPV"
             }
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -912,6 +1047,17 @@ const WindowReplacementTabContent = ({
                   calculatedResults.net_present_value >= 0 ? "green" : "red",
                 fontWeight: "bold",
               },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "rgba(0, 0, 0, 0.23)",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                "&.Mui-focused": {
+                  color:
+                    calculatedResults.net_present_value >= 0 ? "green" : "red",
+                },
+              },
             }}
             helperText={
               translations.npvHelperText ||
@@ -932,8 +1078,16 @@ const WindowReplacementTabContent = ({
                 color: "var(--color-primary)",
                 fontWeight: "bold",
               },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "rgba(0, 0, 0, 0.23)",
+                },
+              },
               "& .MuiInputLabel-root": {
                 color: "var(--color-primary)",
+                "&.Mui-focused": {
+                  color: "var(--color-primary)",
+                },
               },
             }}
             helperText={
@@ -955,8 +1109,16 @@ const WindowReplacementTabContent = ({
                 color: "var(--color-success)",
                 fontWeight: "bold",
               },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "rgba(0, 0, 0, 0.23)",
+                },
+              },
               "& .MuiInputLabel-root": {
                 color: "var(--color-success)",
+                "&.Mui-focused": {
+                  color: "var(--color-success)",
+                },
               },
             }}
             helperText={

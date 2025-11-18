@@ -64,8 +64,7 @@ class WindowReplacement(models.Model):
     cost_per_sqm = models.FloatField(
         verbose_name="Κόστος ανά m² (€/m²)",
         help_text="Κόστος αντικατάστασης ανά τετραγωνικό μέτρο",
-        null=True,
-        blank=True
+        default=0
     )
     energy_cost_kwh = models.FloatField(
         verbose_name="Κόστος ενέργειας (€/kWh)",
@@ -86,6 +85,13 @@ class WindowReplacement(models.Model):
         null=True,
         blank=True,
         default=20
+    )
+    discount_rate = models.FloatField(
+        verbose_name="Επιτόκιο αναγωγής (%)",
+        help_text="Επιτόκιο αναγωγής για υπολογισμούς NPV",
+        null=True,
+        blank=True,
+        default=5.0
     )
     
     energy_savings_summer = models.FloatField(
@@ -182,7 +188,7 @@ class WindowReplacement(models.Model):
         if self.annual_cost_savings and self.total_investment_cost and self.annual_cost_savings > 0:
             self.payback_period = self.total_investment_cost / self.annual_cost_savings
             
-            discount_rate = 0.05
+            discount_rate = (self.discount_rate or 5.0) / 100
             years = self.lifespan_years or 20
             annual_net_savings = self.annual_cost_savings - (self.maintenance_cost_annual or 0)
             
