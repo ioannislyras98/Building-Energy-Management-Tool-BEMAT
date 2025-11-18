@@ -39,6 +39,8 @@ function PhotovoltaicSystemModalForm({
     installation_angle: "",
     pv_usage: "",
     pv_system_type: "",
+    discount_rate: "5.00",
+    annual_operational_costs: "0.00",
   });
 
   const [errors, setErrors] = useState({});
@@ -70,6 +72,8 @@ function PhotovoltaicSystemModalForm({
         installation_angle: editItem.installation_angle || "",
         pv_usage: editItem.pv_usage || "",
         pv_system_type: editItem.pv_system_type || "",
+        discount_rate: editItem.discount_rate || "5.00",
+        annual_operational_costs: editItem.annual_operational_costs || "0.00",
       });
     } else {
       setFormData({
@@ -90,6 +94,8 @@ function PhotovoltaicSystemModalForm({
         installation_angle: "",
         pv_usage: "Για ίδια κατανάλωση",
         pv_system_type: "Μονοκρυσταλλικό",
+        discount_rate: "5.00",
+        annual_operational_costs: "0.00",
       });
     }
   }, [editItem, open]);
@@ -201,6 +207,14 @@ function PhotovoltaicSystemModalForm({
       }
     });
 
+    // Επεξεργασία discount_rate και annual_operational_costs
+    if (requestData.discount_rate !== null) {
+      requestData.discount_rate = parseFloat(requestData.discount_rate) || 5.0;
+    }
+    if (requestData.annual_operational_costs !== null) {
+      requestData.annual_operational_costs = parseFloat(requestData.annual_operational_costs) || 0.0;
+    }
+
     try {
       const url = isEditMode
         ? `${API_BASE_URL}/photovoltaic_systems/${editItem.uuid}/`
@@ -237,6 +251,8 @@ function PhotovoltaicSystemModalForm({
         installation_angle: "",
         pv_usage: "Για ίδια κατανάλωση",
         pv_system_type: "Μονοκρυσταλλικό",
+        discount_rate: "5.00",
+        annual_operational_costs: "0.00",
       });
       setErrors({});
     } catch (error) {
@@ -265,6 +281,8 @@ function PhotovoltaicSystemModalForm({
       installation_angle: "",
       pv_usage: "Για ίδια κατανάλωση",
       pv_system_type: "Μονοκρυσταλλικό",
+      discount_rate: "5.00",
+      annual_operational_costs: "0.00",
     });
     setErrors({});
   };
@@ -530,6 +548,48 @@ function PhotovoltaicSystemModalForm({
             </div>
           </div>
 
+          {/* Οικονομικά πεδία */}
+          <div className="form-section">
+            <h3>Οικονομικά Στοιχεία</h3>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="discount_rate">Επιτόκιο Προεξόφλησης (%)</label>
+                <input
+                  type="number"
+                  id="discount_rate"
+                  value={formData.discount_rate}
+                  onChange={handleChange}
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  className={errors.discount_rate ? "error" : ""}
+                />
+                {errors.discount_rate && (
+                  <span className="error-text">{errors.discount_rate}</span>
+                )}
+              </div>
+              <div className="form-group">
+                <label htmlFor="annual_operational_costs">
+                  Ετήσια Λειτουργικά Κόστη (€)
+                </label>
+                <input
+                  type="number"
+                  id="annual_operational_costs"
+                  value={formData.annual_operational_costs}
+                  onChange={handleChange}
+                  step="0.01"
+                  min="0"
+                  className={errors.annual_operational_costs ? "error" : ""}
+                />
+                {errors.annual_operational_costs && (
+                  <span className="error-text">
+                    {errors.annual_operational_costs}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Ενεργειακοί δείκτες */}
           <div className="form-section">
             <h3>Ενεργειακοί Δείκτες & Χαρακτηριστικά</h3>
@@ -588,6 +648,11 @@ function PhotovoltaicSystemModalForm({
                 {errors.installation_angle && (
                   <span className="error-text">
                     {errors.installation_angle}
+                  </span>
+                )}
+                {!errors.installation_angle && (
+                  <span className="helper-text" style={{ fontSize: '0.875rem', color: '#666', marginTop: '4px', display: 'block' }}>
+                    Βέλτιστη γωνία για Ελλάδα: 32°
                   </span>
                 )}
               </div>

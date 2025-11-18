@@ -255,6 +255,24 @@ class PhotovoltaicSystem(models.Model):
         verbose_name='Καθαρή παρούσα αξία - NPV (€)',
         help_text='Αυτόματος υπολογισμός NPV με προεξοφλητικό συντελεστή'
     )
+    discount_rate = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        blank=True, 
+        null=True,
+        verbose_name='Επιτόκιο προεξόφλησης (%)',
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        help_text='Επιτόκιο προεξόφλησης για τον υπολογισμό NPV'
+    )
+    annual_operational_costs = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        blank=True, 
+        null=True,
+        verbose_name='Ετήσια λειτουργικά κόστη (€)',
+        validators=[MinValueValidator(0)],
+        help_text='Ετήσια κόστη συντήρησης και λειτουργίας'
+    )
     
     power_per_panel = models.DecimalField(
         max_digits=10, 
@@ -357,7 +375,7 @@ class PhotovoltaicSystem(models.Model):
         return value_after_unexpected + tax_burden
     
     def calculate_annual_savings(self):
-        """Υπολογισμός ετήσιων εξοικονομήσεων βάσει της ετήσιας παραγωγής ενέργειας"""
+        """Υπολογισμός ετήσιων εξοικονομήσεων βάσει της ετήσιας παραγωγής ενέργειας μείον τα λειτουργικά κόστη"""
         try:
             electricity_cost_per_kwh = Decimal('0.15')
             
@@ -366,9 +384,14 @@ class PhotovoltaicSystem(models.Model):
             if annual_energy_kwh <= 0:
                 return Decimal('0')
             
-            annual_savings = Decimal(str(annual_energy_kwh)) * electricity_cost_per_kwh
+            gross_savings = Decimal(str(annual_energy_kwh)) * electricity_cost_per_kwh
             
-            return round(annual_savings, 2)
+            # Αφαίρεση ετήσιων λειτουργικών κοστών
+            operational_costs = self.annual_operational_costs or Decimal('0')
+            annual_savings = gross_savings - operational_costs
+            
+            # Τα καθαρά savings δεν μπορούν να είναι αρνητικά
+            return round(max(annual_savings, Decimal('0')), 2)
         except (TypeError, ValueError, ZeroDivisionError):
             return Decimal('0')
     
@@ -414,7 +437,10 @@ class PhotovoltaicSystem(models.Model):
             initial_investment = float(self.net_cost or self.total_cost or 0)
             annual_savings = float(self.annual_savings or 0)
             project_lifetime_years = 25
-            discount_rate = 0.05
+            
+            # Χρήση του επιτοκίου προεξόφλησης από το πεδίο
+            discount_rate_pct = float(self.discount_rate or 5.0)
+            discount_rate = discount_rate_pct / 100.0
             
             if initial_investment <= 0 or annual_savings <= 0:
                 return 0

@@ -33,6 +33,8 @@ const PhotovoltaicSystemForm = ({
     installation_angle: "",
     pv_usage: "electricity",
     pv_system_type: "grid_connected",
+    discount_rate: "5.00",
+    annual_operational_costs: "0.00",
   });
 
   const [errors, setErrors] = useState({});
@@ -62,6 +64,8 @@ const PhotovoltaicSystemForm = ({
         installation_angle: editItem.installation_angle || "",
         pv_usage: editItem.pv_usage || "electricity",
         pv_system_type: editItem.pv_system_type || "grid_connected",
+        discount_rate: editItem.discount_rate || "5.00",
+        annual_operational_costs: editItem.annual_operational_costs || "0.00",
       });
     }
   }, [editItem]);
@@ -99,6 +103,8 @@ const PhotovoltaicSystemForm = ({
       "installation_unit_price",
       "collector_efficiency",
       "installation_angle",
+      "discount_rate",
+      "annual_operational_costs",
     ];
 
     requiredFields.forEach((field) => {
@@ -122,6 +128,8 @@ const PhotovoltaicSystemForm = ({
       "installation_unit_price",
       "collector_efficiency",
       "installation_angle",
+      "discount_rate",
+      "annual_operational_costs",
     ];
 
     numericFields.forEach((field) => {
@@ -464,6 +472,29 @@ const PhotovoltaicSystemForm = ({
           </div>
         </div>
 
+        {/* Οικονομικά Στοιχεία */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+            Οικονομικά Στοιχεία
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <InputField
+              label="Επιτόκιο Προεξόφλησης"
+              name="discount_rate"
+              type="number"
+              unit="%"
+              required
+            />
+            <InputField
+              label="Ετήσια Λειτουργικά Κόστη"
+              name="annual_operational_costs"
+              type="number"
+              unit="€"
+              required
+            />
+          </div>
+        </div>
+
         {/* Τεχνικές Παράμετροι */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
@@ -482,6 +513,7 @@ const PhotovoltaicSystemForm = ({
               name="installation_angle"
               type="number"
               unit="μοίρες"
+              helperText="Βέλτιστη γωνία για Ελλάδα: 32°"
               required
             />
           </div>

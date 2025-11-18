@@ -72,7 +72,21 @@ class PhotovoltaicSystemAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
         ('Οικονομικοί Δείκτες', {
-            'fields': ('estimated_cost', 'unexpected_expenses', 'value_after_unexpected', 'tax_burden', 'total_cost'),
+            'fields': (
+                'estimated_cost', 
+                'unexpected_expenses', 
+                'value_after_unexpected', 
+                'tax_burden', 
+                'total_cost',
+                'subsidy_amount',
+                'net_cost',
+                'discount_rate',
+                'annual_operational_costs',
+                'annual_savings',
+                'payback_period',
+                'investment_return',
+                'net_present_value',
+            ),
             'classes': ('collapse',)
         }),
         ('Ενεργειακοί Δείκτες', {

@@ -60,6 +60,8 @@ class PhotovoltaicSystemSerializer(serializers.ModelSerializer):
             'subsidy_amount',
             'net_cost',
             'net_present_value',
+            'discount_rate',
+            'annual_operational_costs',
             'payback_period',
             'annual_savings',
             'investment_return',
@@ -151,6 +153,8 @@ class PhotovoltaicSystemCreateSerializer(serializers.ModelSerializer):
             'installation_unit_price',
             
             'subsidy_amount',
+            'discount_rate',
+            'annual_operational_costs',
             
             'power_per_panel',
             'collector_efficiency',

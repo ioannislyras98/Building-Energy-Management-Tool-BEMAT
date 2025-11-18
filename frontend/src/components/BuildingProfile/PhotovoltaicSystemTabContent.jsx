@@ -81,6 +81,8 @@ const PhotovoltaicSystemTabContent = ({
     total_project_cost: "",
     subsidy_amount: "",
     net_cost: "",
+    discount_rate: "",
+    annual_operational_costs: "",
     net_present_value: "",
     payback_period: "",
     annual_savings: "",
@@ -98,9 +100,33 @@ const PhotovoltaicSystemTabContent = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [projectData, setProjectData] = useState(null);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingSystem, setDeletingSystem] = useState(null);
+
+  // Fetch project data
+  useEffect(() => {
+    if (projectUuid && token) {
+      $.ajax({
+        url: `${API_BASE_URL}/projects/get/${projectUuid}/`,
+        method: "GET",
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+        success: (response) => {
+          console.log("Project data fetched:", response);
+          // Extract data from standard_success_response format
+          const projectData = response.data || response;
+          setProjectData(projectData);
+        },
+        error: (xhr, status, error) => {
+          console.error("Error fetching project data:", error);
+          console.error("Response:", xhr.responseText);
+        },
+      });
+    }
+  }, [projectUuid, token]);
 
   useEffect(() => {
     if (buildingUuid) {
@@ -130,6 +156,8 @@ const PhotovoltaicSystemTabContent = ({
         total_project_cost: "",
         subsidy_amount: "",
         net_cost: "",
+        discount_rate: "",
+        annual_operational_costs: "",
         net_present_value: "",
         payback_period: "",
         annual_savings: "",
@@ -191,6 +219,8 @@ const PhotovoltaicSystemTabContent = ({
             total_project_cost: "",
             subsidy_amount: "",
             net_cost: "",
+            discount_rate: "",
+            annual_operational_costs: "",
             net_present_value: "",
             payback_period: "",
             annual_savings: "",
@@ -375,14 +405,21 @@ const PhotovoltaicSystemTabContent = ({
       value_after_unexpected: valueAfterUnexpected,
       tax_burden: taxBurden,
       total_cost: totalProjectCost, // Αυτό είναι το συνολικό κόστος με ΦΠΑ
+      discount_rate: photovoltaicSystem.discount_rate,
+      annual_operational_costs: photovoltaicSystem.annual_operational_costs,
     };
   };
   useEffect(() => {
     if (!hasBackendData) {
       const economicData = calculateEconomicIndicators();
+      // Διατηρούμε τις τρέχουσες τιμές discount_rate και annual_operational_costs
+      const { discount_rate, annual_operational_costs, ...calculatedFields } = economicData;
       setPhotovoltaicSystem((prev) => ({
         ...prev,
-        ...economicData,
+        ...calculatedFields,
+        // Διατηρούμε τα υπάρχοντα πεδία - δεν βάζουμε defaults
+        discount_rate: prev.discount_rate !== undefined ? prev.discount_rate : "",
+        annual_operational_costs: prev.annual_operational_costs !== undefined ? prev.annual_operational_costs : "",
       }));
     }
   }, [
@@ -1035,6 +1072,64 @@ const PhotovoltaicSystemTabContent = ({
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
+                label={
+                  translations.fields?.discountRate ||
+                  "Επιτόκιο προεξόφλησης (%)"
+                }
+                type="number"
+                value={photovoltaicSystem.discount_rate || ""}
+                onChange={(e) =>
+                  handleInputChange("discount_rate", e.target.value)
+                }
+                inputProps={{ step: 0.01, min: 0, max: 100 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
+                helperText="Χρησιμοποιείται για τον υπολογισμό NPV"
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.fields?.annualOperationalCosts ||
+                  "Ετήσια λειτουργικά κόστη (€)"
+                }
+                type="number"
+                value={photovoltaicSystem.annual_operational_costs || ""}
+                onChange={(e) =>
+                  handleInputChange("annual_operational_costs", e.target.value)
+                }
+                inputProps={{ step: 0.01, min: 0 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "var(--color-primary)",
+                    },
+                  },
+                }}
+                helperText="Κόστη συντήρησης και λειτουργίας"
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
                 label={translations.fields?.netCost || "Καθαρό κόστος (€)"}
                 type="number"
                 value={photovoltaicSystem.net_cost || 0}
@@ -1256,6 +1351,7 @@ const PhotovoltaicSystemTabContent = ({
                   handleInputChange("installation_angle", e.target.value)
                 }
                 inputProps={{ step: 1, min: 0, max: 90 }}
+                helperText="Βέλτιστη γωνία για Ελλάδα: 32°"
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     "&.Mui-focused fieldset": {
@@ -1376,6 +1472,45 @@ const PhotovoltaicSystemTabContent = ({
                     },
                   },
                 }}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label={
+                  translations.fields?.costPerKwh ||
+                  "Κόστος ανά kWh (€)"
+                }
+                type="text"
+                value={
+                  projectData?.cost_per_kwh_electricity
+                    ? parseFloat(projectData.cost_per_kwh_electricity).toLocaleString(
+                        "el-GR",
+                        {
+                          minimumFractionDigits: 3,
+                          maximumFractionDigits: 3,
+                        }
+                      )
+                    : "0.000"
+                }
+                InputProps={{ readOnly: true }}
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "#666",
+                    backgroundColor: "#f5f5f5",
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "#666",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "#f5f5f5",
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--color-primary)",
+                    },
+                  },
+                }}
+                helperText="Από τα στοιχεία του έργου"
               />
             </Grid>
 
