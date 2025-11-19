@@ -224,18 +224,53 @@ class RoofThermalInsulation(models.Model):
 
     def calculate_internal_rate_of_return(self):
         """
-        Calculate internal rate of return as a percentage
-        Formula: (Annual Economic Benefit / Total Investment Cost) × 100
+        Calculate internal rate of return using Newton-Raphson method
+        IRR is the discount rate where NPV = 0
         """
         try:
             total_cost = float(self.total_cost or 0)
             annual_benefit = float(self.annual_benefit or 0)
+            annual_operating_costs = float(self.annual_operating_costs or 0)
+            time_period_years = int(self.time_period_years or 20)
             
-            if total_cost <= 0:
+            if total_cost <= 0 or annual_benefit <= 0:
                 return None
             
-            irr_percentage = (annual_benefit / total_cost) * 100
-            return round(irr_percentage, 2)
+            annual_net_benefit = annual_benefit - annual_operating_costs
+            
+            if annual_net_benefit <= 0:
+                return None
+            
+            # Αρχική εκτίμηση IRR
+            irr = 0.1  # 10%
+            tolerance = 0.00001
+            max_iterations = 1000
+            
+            for _ in range(max_iterations):
+                # Υπολογισμός NPV με το τρέχον IRR
+                npv = -total_cost
+                npv_derivative = 0
+                
+                for year in range(1, time_period_years + 1):
+                    factor = (1 + irr) ** year
+                    npv += annual_net_benefit / factor
+                    npv_derivative -= year * annual_net_benefit / (factor * (1 + irr))
+                
+                # Έλεγχος σύγκλισης
+                if abs(npv) < tolerance:
+                    break
+                
+                # Newton-Raphson update
+                if npv_derivative != 0:
+                    irr = irr - npv / npv_derivative
+                else:
+                    break
+                
+                # Αποφυγή αρνητικών IRR
+                if irr < -0.99:
+                    irr = -0.99
+            
+            return round(irr * 100, 2)
         except (TypeError, ValueError, ZeroDivisionError):
             return None
 

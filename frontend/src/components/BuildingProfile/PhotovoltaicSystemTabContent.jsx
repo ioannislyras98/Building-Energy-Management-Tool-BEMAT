@@ -86,7 +86,7 @@ const PhotovoltaicSystemTabContent = ({
     net_present_value: "",
     payback_period: "",
     annual_savings: "",
-    investment_return: "",
+    internal_rate_of_return: "",
     power_per_panel: "",
     collector_efficiency: "",
     installation_angle: "",
@@ -161,7 +161,7 @@ const PhotovoltaicSystemTabContent = ({
         net_present_value: "",
         payback_period: "",
         annual_savings: "",
-        investment_return: "",
+        internal_rate_of_return: "",
         power_per_panel: "",
         collector_efficiency: "",
         installation_angle: "",
@@ -224,7 +224,7 @@ const PhotovoltaicSystemTabContent = ({
             net_present_value: "",
             payback_period: "",
             annual_savings: "",
-            investment_return: "",
+            internal_rate_of_return: "",
             power_per_panel: "",
             collector_efficiency: "",
             installation_angle: "",
@@ -265,7 +265,7 @@ const PhotovoltaicSystemTabContent = ({
           net_present_value: "",
           payback_period: "",
           annual_savings: "",
-          investment_return: "",
+          internal_rate_of_return: "",
           power_per_panel: "",
           collector_efficiency: "",
           installation_angle: "",
@@ -1094,7 +1094,10 @@ const PhotovoltaicSystemTabContent = ({
                     },
                   },
                 }}
-                helperText="Χρησιμοποιείται για τον υπολογισμό NPV"
+                helperText={
+                  translations.discountRateHelp ||
+                  "Χρησιμοποιείται για τον υπολογισμό NPV (συνήθως 5%)"
+                }
               />
             </Grid>
 
@@ -1123,7 +1126,10 @@ const PhotovoltaicSystemTabContent = ({
                     },
                   },
                 }}
-                helperText="Κόστη συντήρησης και λειτουργίας"
+                helperText={
+                  translations.annualOperationalCostsHelp ||
+                  "Κόστη συντήρησης και λειτουργίας ανά έτος (χρησιμοποιείται για τον υπολογισμό IRR)"
+                }
               />
             </Grid>
 
@@ -1250,11 +1256,11 @@ const PhotovoltaicSystemTabContent = ({
               <TextField
                 fullWidth
                 label={
-                  translations.fields?.investmentReturn ||
-                  "Απόδοση επένδυσης (%)"
+                  translations.fields?.internalRateOfReturn ||
+                  "Εσωτερικός Βαθμός Απόδοσης - IRR (%)"
                 }
                 type="number"
-                value={photovoltaicSystem.investment_return || 0}
+                value={photovoltaicSystem.internal_rate_of_return || 0}
                 InputProps={{ readOnly: true }}
                 sx={{
                   "& .MuiInputBase-input": {

@@ -218,9 +218,41 @@ class BoilerReplacement(models.Model):
                 # Αν δεν υπάρχει προεξοφλητικός συντελεστής
                 self.net_present_value = (annual_benefit * years) - float(self.total_investment_cost)
             
-            # IRR υπολογισμός (απλοποιημένος)
+            # IRR υπολογισμός με Newton-Raphson
             if float(self.total_investment_cost) > 0 and annual_benefit > 0:
-                self.internal_rate_of_return = (annual_benefit / float(self.total_investment_cost)) * 100
+                # Υπολογισμός IRR: βρίσκουμε το επιτόκιο όπου NPV = 0
+                initial_investment = float(self.total_investment_cost)
+                
+                # Αρχική εκτίμηση IRR
+                irr = 0.1  # 10%
+                tolerance = 0.00001
+                max_iterations = 1000
+                
+                for _ in range(max_iterations):
+                    # Υπολογισμός NPV με το τρέχον IRR
+                    npv = -initial_investment
+                    npv_derivative = 0
+                    
+                    for year in range(1, years + 1):
+                        factor = (1 + irr) ** year
+                        npv += annual_benefit / factor
+                        npv_derivative -= year * annual_benefit / (factor * (1 + irr))
+                    
+                    # Έλεγχος σύγκλισης
+                    if abs(npv) < tolerance:
+                        break
+                    
+                    # Newton-Raphson update
+                    if npv_derivative != 0:
+                        irr = irr - npv / npv_derivative
+                    else:
+                        break
+                    
+                    # Αποφυγή αρνητικών IRR
+                    if irr < -0.99:
+                        irr = -0.99
+                
+                self.internal_rate_of_return = irr * 100
             else:
                 self.internal_rate_of_return = 0
                 

@@ -70,21 +70,6 @@ const AirConditioningReplacementTabContent = ({
     discount_rate: "5",
   });
 
-  useEffect(() => {
-    if (
-      analysisData.lifespan_years &&
-      analysisData.discount_rate &&
-      oldACs.length > 0 &&
-      newACs.length > 0
-    ) {
-      const timer = setTimeout(() => {
-        handleAnalysisSubmit();
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [analysisData, oldACs, newACs]);
-
   const [oldACModal, setOldACModal] = useState({
     open: false,
     data: null,
@@ -554,6 +539,21 @@ const AirConditioningReplacementTabContent = ({
               </p>
             </div>
           </div>
+          <Button
+            variant="contained"
+            startIcon={<SaveIcon />}
+            onClick={handleAnalysisSubmit}
+            disabled={loading || oldACs.length === 0 || newACs.length === 0}
+            sx={{
+              backgroundColor: "var(--color-primary)",
+              "&:hover": {
+                backgroundColor: "var(--color-primary-dark)",
+              },
+            }}>
+            {loading
+              ? translations.saving || "Αποθήκευση..."
+              : translations.save || "Αποθήκευση"}
+          </Button>
         </div>
       </div>
 

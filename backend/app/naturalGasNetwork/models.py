@@ -135,8 +135,43 @@ class NaturalGasNetwork(models.Model):
         
         self.net_present_value = npv
         
-        if self.total_investment_cost > 0:
-            self.internal_rate_of_return = (self.annual_economic_benefit / self.total_investment_cost) * 100
+        # IRR υπολογισμός με Newton-Raphson
+        if self.total_investment_cost > 0 and self.annual_economic_benefit > 0:
+            # Υπολογισμός IRR: βρίσκουμε το επιτόκιο όπου NPV = 0
+            initial_investment = float(self.total_investment_cost)
+            annual_benefit = float(self.annual_economic_benefit)
+            years = int(self.lifespan_years)
+            
+            # Αρχική εκτίμηση IRR
+            irr = 0.1  # 10%
+            tolerance = 0.00001
+            max_iterations = 1000
+            
+            for _ in range(max_iterations):
+                # Υπολογισμός NPV με το τρέχον IRR
+                npv_calc = -initial_investment
+                npv_derivative = 0
+                
+                for year in range(1, years + 1):
+                    factor = (1 + irr) ** year
+                    npv_calc += annual_benefit / factor
+                    npv_derivative -= year * annual_benefit / (factor * (1 + irr))
+                
+                # Έλεγχος σύγκλισης
+                if abs(npv_calc) < tolerance:
+                    break
+                
+                # Newton-Raphson update
+                if npv_derivative != 0:
+                    irr = irr - npv_calc / npv_derivative
+                else:
+                    break
+                
+                # Αποφυγή αρνητικών IRR
+                if irr < -0.99:
+                    irr = -0.99
+            
+            self.internal_rate_of_return = irr * 100
         else:
             self.internal_rate_of_return = 0.0
         

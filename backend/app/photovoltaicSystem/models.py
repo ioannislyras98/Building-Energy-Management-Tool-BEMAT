@@ -239,13 +239,13 @@ class PhotovoltaicSystem(models.Model):
         verbose_name='Ετήσια εξοικονόμηση (€)',
         validators=[MinValueValidator(0)]
     )
-    investment_return = models.DecimalField(
-        max_digits=10, 
-        decimal_places=2, 
-        blank=True, 
+    internal_rate_of_return = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        verbose_name="Εσωτερικός βαθμός απόδοσης - IRR (%)",
         null=True,
-        verbose_name='Απόδοση επένδυσης (%)',
-        validators=[MinValueValidator(0)]
+        blank=True,
+        help_text="Αυτόματος υπολογισμός IRR με Newton-Raphson"
     )
     net_present_value = models.DecimalField(
         max_digits=12, 
@@ -413,21 +413,55 @@ class PhotovoltaicSystem(models.Model):
         except (TypeError, ValueError, ZeroDivisionError):
             return Decimal('0')
     
-    def calculate_investment_return(self):
-        """Υπολογισμός απόδοσης επένδυσης (ROI) ως ποσοστό"""
+    def calculate_internal_rate_of_return(self):
+        """
+        Υπολογισμός IRR με Newton-Raphson method
+        IRR είναι το επιτόκιο όπου NPV = 0
+        """
         try:
-            initial_investment = float(self.net_cost or 0)
-            if initial_investment <= 0:
-                initial_investment = float(self.total_cost or 0)
-                
+            initial_investment = float(self.net_cost or self.total_cost or 0)
             annual_savings = float(self.annual_savings or 0)
+            annual_operational_costs = float(self.annual_operational_costs or 0)
+            project_lifetime_years = 25  # Τυπική διάρκεια ζωής φωτοβολταϊκού συστήματος
             
-            if initial_investment <= 0:
+            if initial_investment <= 0 or annual_savings <= 0:
                 return Decimal('0')
             
-            roi_percentage = (annual_savings / initial_investment) * 100
+            annual_net_benefit = annual_savings - annual_operational_costs
             
-            return round(Decimal(str(roi_percentage)), 2)
+            if annual_net_benefit <= 0:
+                return Decimal('0')
+            
+            # Αρχική εκτίμηση IRR
+            irr = 0.1  # 10%
+            tolerance = 0.00001
+            max_iterations = 1000
+            
+            for _ in range(max_iterations):
+                # Υπολογισμός NPV με το τρέχον IRR
+                npv = -initial_investment
+                npv_derivative = 0
+                
+                for year in range(1, project_lifetime_years + 1):
+                    factor = (1 + irr) ** year
+                    npv += annual_net_benefit / factor
+                    npv_derivative -= year * annual_net_benefit / (factor * (1 + irr))
+                
+                # Έλεγχος σύγκλισης
+                if abs(npv) < tolerance:
+                    break
+                
+                # Newton-Raphson update
+                if npv_derivative != 0:
+                    irr = irr - npv / npv_derivative
+                else:
+                    break
+                
+                # Αποφυγή αρνητικών IRR
+                if irr < -0.99:
+                    irr = -0.99
+            
+            return round(Decimal(str(irr * 100)), 2)
         except (TypeError, ValueError, ZeroDivisionError):
             return Decimal('0')
 
@@ -535,7 +569,7 @@ class PhotovoltaicSystem(models.Model):
         
         self.payback_period = self.calculate_payback_period()
         
-        self.investment_return = self.calculate_investment_return()
+        self.internal_rate_of_return = self.calculate_internal_rate_of_return()
         
         self.net_present_value = self.calculate_net_present_value()
         

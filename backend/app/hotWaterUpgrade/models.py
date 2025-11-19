@@ -28,6 +28,8 @@ class HotWaterUpgrade(models.Model):
     solar_utilization_percentage = models.FloatField(default=80.0)
     energy_cost_kwh = models.FloatField(default=0.0)
     lifespan_years = models.IntegerField(default=10)
+    discount_rate = models.FloatField(default=5.0)
+    annual_operating_expenses = models.FloatField(default=0.0)
     
     solar_collectors_subtotal = models.FloatField(default=0.0)
     metal_support_bases_subtotal = models.FloatField(default=0.0)
@@ -75,17 +77,53 @@ class HotWaterUpgrade(models.Model):
         else:
             self.payback_period = 0
             
-        discount_rate = 0.05
+        discount_rate_decimal = self.discount_rate / 100.0
         if self.lifespan_years > 0 and self.annual_economic_benefit > 0:
             npv = 0
             for year in range(1, self.lifespan_years + 1):
-                npv += self.annual_economic_benefit / ((1 + discount_rate) ** year)
+                # Subtract annual operating expenses from the benefit
+                net_annual_benefit = self.annual_economic_benefit - self.annual_operating_expenses
+                npv += net_annual_benefit / ((1 + discount_rate_decimal) ** year)
             self.net_present_value = npv - self.total_investment_cost
         else:
             self.net_present_value = -self.total_investment_cost
             
-        if self.total_investment_cost > 0:
-            self.internal_rate_of_return = (self.annual_economic_benefit / self.total_investment_cost) * 100
+        # Calculate IRR using Newton-Raphson method
+        net_annual_benefit = self.annual_economic_benefit - self.annual_operating_expenses
+        
+        if self.total_investment_cost > 0 and net_annual_benefit > 0 and self.lifespan_years > 0:
+            guess = 0.1  # Initial guess 10%
+            max_iterations = 1000
+            tolerance = 0.00001
+            
+            for i in range(max_iterations):
+                npv_at_guess = -self.total_investment_cost
+                derivative_npv = 0
+                
+                for year in range(1, self.lifespan_years + 1):
+                    discount_factor = (1 + guess) ** year
+                    npv_at_guess += net_annual_benefit / discount_factor
+                    derivative_npv -= (year * net_annual_benefit) / ((1 + guess) ** (year + 1))
+                
+                # Check for convergence
+                if abs(npv_at_guess) < tolerance:
+                    self.internal_rate_of_return = guess * 100
+                    break
+                
+                # Newton-Raphson update
+                if abs(derivative_npv) > 0.000001:
+                    guess = guess - npv_at_guess / derivative_npv
+                else:
+                    self.internal_rate_of_return = 0
+                    break
+                
+                # Keep guess within reasonable bounds
+                if guess < -0.99:
+                    guess = -0.99
+                if guess > 10:
+                    guess = 10
+            else:
+                self.internal_rate_of_return = guess * 100 if guess > -0.99 else 0
         else:
             self.internal_rate_of_return = 0
         

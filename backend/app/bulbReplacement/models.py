@@ -212,9 +212,39 @@ class BulbReplacement(models.Model):
                 
             self.net_present_value = pv_savings - self.total_investment_cost
             
-            # Calculate IRR (simplified estimate)
-            if self.total_investment_cost > 0:
-                self.internal_rate_of_return = (annual_net_savings / self.total_investment_cost) * 100
+            # Calculate IRR using Newton-Raphson method
+            if self.total_investment_cost > 0 and annual_net_savings > 0 and years > 0:
+                guess = 0.1  # Initial guess 10%
+                max_iterations = 1000
+                tolerance = 0.00001
+                
+                for i in range(max_iterations):
+                    npv_at_guess = -self.total_investment_cost
+                    derivative_npv = 0
+                    
+                    for year in range(1, int(years) + 1):
+                        discount_factor = (1 + guess) ** year
+                        npv_at_guess += annual_net_savings / discount_factor
+                        derivative_npv -= (year * annual_net_savings) / ((1 + guess) ** (year + 1))
+                    
+                    if abs(npv_at_guess) < tolerance:
+                        self.internal_rate_of_return = guess * 100
+                        break
+                    
+                    if abs(derivative_npv) > 0.000001:
+                        guess = guess - npv_at_guess / derivative_npv
+                    else:
+                        self.internal_rate_of_return = 0
+                        break
+                    
+                    if guess < -0.99:
+                        guess = -0.99
+                    if guess > 10:
+                        guess = 10
+                else:
+                    self.internal_rate_of_return = guess * 100 if guess > -0.99 else 0
+            else:
+                self.internal_rate_of_return = 0
 
     def get_efficiency_improvement(self):
         """

@@ -248,7 +248,39 @@ const BulbReplacementTabContent = ({
       }
 
       npv = pvSavings - totalInvestmentCost;
-      irr = (annualCostSavings / totalInvestmentCost) * 100;
+      
+      // Calculate IRR using Newton-Raphson method
+      const netAnnualSavings = annualCostSavings - parseFloat(maintenance_cost_annual || 0);
+      if (netAnnualSavings > 0 && totalInvestmentCost > 0 && years > 0) {
+        let guess = 0.1;
+        const maxIterations = 1000;
+        const tolerance = 0.00001;
+        
+        for (let i = 0; i < maxIterations; i++) {
+          let npvAtGuess = -totalInvestmentCost;
+          let derivativeNpv = 0;
+          
+          for (let year = 1; year <= years; year++) {
+            const discountFactor = Math.pow(1 + guess, year);
+            npvAtGuess += netAnnualSavings / discountFactor;
+            derivativeNpv -= (year * netAnnualSavings) / Math.pow(1 + guess, year + 1);
+          }
+          
+          if (Math.abs(npvAtGuess) < tolerance) {
+            irr = guess * 100;
+            break;
+          }
+          
+          if (Math.abs(derivativeNpv) > 0.000001) {
+            guess = guess - npvAtGuess / derivativeNpv;
+          } else {
+            break;
+          }
+          
+          if (guess < -0.99) guess = -0.99;
+          if (guess > 10) guess = 10;
+        }
+      }
     }
 
     setCalculatedResults({
