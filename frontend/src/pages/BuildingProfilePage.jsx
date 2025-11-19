@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
 import english_text from "../languages/english.json";
 import greek_text from "../languages/greek.json";
@@ -17,7 +17,12 @@ const cookies = new Cookies(null, { path: "/" });
 export default function BuildingProfilePage() {
   const { projectUuid, buildingUuid } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { language } = useLanguage();
+  
+  // Extract scenario ID from URL path
+  const pathParts = location.pathname.split('/');
+  const scenarioId = pathParts.length > 5 ? pathParts[5] : null;
   const text =
     language === "en"
       ? english_text.BuildingProfile
@@ -200,6 +205,7 @@ export default function BuildingProfilePage() {
                   buildingUuid={buildingUuid}
                   projectUuid={projectUuid}
                   buildingData={building}
+                  scenarioId={scenarioId}
                 />
               </div>
             </div>

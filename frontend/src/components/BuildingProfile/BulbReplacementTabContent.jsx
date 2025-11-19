@@ -49,6 +49,8 @@ const BulbReplacementTabContent = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
+  const [existingUuid, setExistingUuid] = useState(null);
   const cookies = new Cookies(null, { path: "/" });
   const token = cookies.get("token");
 
@@ -57,11 +59,39 @@ const BulbReplacementTabContent = ({
     language === "en"
       ? english_text.BulbReplacementTabContent || {}
       : greek_text.BulbReplacementTabContent || {};
+  
   useEffect(() => {
     if (buildingUuid && token) {
       fetchExistingData();
     }
   }, [buildingUuid, token]);
+
+  useEffect(() => {
+    if (projectUuid && token) {
+      fetchProjectData();
+    }
+  }, [projectUuid, token]);
+
+  const fetchProjectData = () => {
+    $.ajax({
+      url: `${API_BASE_URL}/projects/get/${projectUuid}/`,
+      method: "GET",
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+      success: (response) => {
+        if (response.data) {
+          setFormData((prev) => ({
+            ...prev,
+            energy_cost_kwh: response.data.cost_per_kwh_electricity || "",
+          }));
+        }
+      },
+      error: (jqXHR) => {
+        console.error("Error fetching project data:", jqXHR);
+      },
+    });
+  };
 
   const fetchExistingData = () => {
     $.ajax({
@@ -73,6 +103,7 @@ const BulbReplacementTabContent = ({
       success: (response) => {
         if (response.success && response.data && response.data.length > 0) {
           const data = response.data[0];
+          setExistingUuid(data.uuid);
           setFormData({
             old_bulb_type: data.old_bulb_type || "Λαμπτήρας Πυρακτώσεως",
             old_power_per_bulb: data.old_power_per_bulb || "",
@@ -87,6 +118,7 @@ const BulbReplacementTabContent = ({
             energy_cost_kwh: data.energy_cost_kwh || "",
             maintenance_cost_annual: data.maintenance_cost_annual || "",
             lifespan_years: data.lifespan_years || "",
+            discount_rate: data.discount_rate || "",
           });
         }
       },
@@ -110,6 +142,7 @@ const BulbReplacementTabContent = ({
     energy_cost_kwh: "",
     maintenance_cost_annual: "",
     lifespan_years: "",
+    discount_rate: "",
   });
   const oldBulbTypes = [
     "Λαμπτήρας Πυρακτώσεως",
@@ -137,85 +170,20 @@ const BulbReplacementTabContent = ({
     net_present_value: 0,
     internal_rate_of_return: 0,
   });
-  const [debounceTimeout, setDebounceTimeout] = useState(null);
-
-  const autoSave = useCallback(() => {
-    if (
-      !buildingUuid ||
-      !token ||
-      !formData.old_power_per_bulb ||
-      !formData.old_bulb_count ||
-      !formData.new_power_per_bulb ||
-      !formData.new_bulb_count
-    ) {
-      return;
-    }
-
-    const submitData = {
-      building: buildingUuid,
-      project: projectUuid,
-      ...formData,
-      ...calculatedResults,
-    };
-
-    // Remove empty string fields to avoid validation errors
-    if (submitData.installation_cost === "") {
-      delete submitData.installation_cost;
-    }
-    if (submitData.maintenance_cost_annual === "") {
-      delete submitData.maintenance_cost_annual;
-    }
-    if (submitData.cost_per_new_bulb === "") {
-      delete submitData.cost_per_new_bulb;
-    }
-
-    $.ajax({
-      url: `${API_BASE_URL}/bulb_replacements/create/`,
-      method: "POST",
-      headers: {
-        Authorization: `Token ${token}`,
-        "Content-Type": "application/json",
-      },
-      data: JSON.stringify(submitData),
-      success: (response) => {
-
-        setSuccess(
-          translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
-        );
-        setTimeout(() => setSuccess(null), 3000);
-      },
-      error: (jqXHR) => {
-
-        setError(
-          jqXHR.responseJSON?.detail ||
-            translations.errorSave ||
-            "Σφάλμα κατά την αποθήκευση"
-        );
-      },
-    });
-  }, [
-    buildingUuid,
-    projectUuid,
-    token,
-    formData,
-    calculatedResults,
-    translations,
-  ]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
-    if (debounceTimeout) {
-      clearTimeout(debounceTimeout);
+    
+    // Clear validation error when user starts typing
+    if (validationErrors[field]) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        [field]: false,
+      }));
     }
-
-    const newTimeout = setTimeout(() => {
-      autoSave();
-    }, 1000);
-
-    setDebounceTimeout(newTimeout);
   };
 
   const calculateResults = useCallback(() => {
@@ -269,7 +237,7 @@ const BulbReplacementTabContent = ({
     }
     if (annualCostSavings > 0 && totalInvestmentCost > 0) {
       paybackPeriod = totalInvestmentCost / annualCostSavings;
-      const discountRate = 0.05; 
+      const discountRate = parseFloat(formData.discount_rate || 5) / 100;
       const years = parseFloat(lifespan_years) || 10;
       let pvSavings = 0;
 
@@ -298,17 +266,28 @@ const BulbReplacementTabContent = ({
   useEffect(() => {
     calculateResults();
   }, [calculateResults]);
-  useEffect(() => {
-    return () => {
-      if (debounceTimeout) {
-        clearTimeout(debounceTimeout);
-      }
-    };
-  }, [debounceTimeout]);
 
   const handleSubmit = () => {
     if (!buildingUuid || !token) {
       setError(translations.errorAuth || "Authentication required");
+      return;
+    }
+
+    // Validate required fields
+    const errors = {};
+    if (!formData.old_power_per_bulb) errors.old_power_per_bulb = true;
+    if (!formData.old_bulb_count) errors.old_bulb_count = true;
+    if (!formData.old_operating_hours) errors.old_operating_hours = true;
+    if (!formData.new_power_per_bulb) errors.new_power_per_bulb = true;
+    if (!formData.new_bulb_count) errors.new_bulb_count = true;
+    if (!formData.new_operating_hours) errors.new_operating_hours = true;
+    if (!formData.cost_per_new_bulb) errors.cost_per_new_bulb = true;
+    if (!formData.installation_cost) errors.installation_cost = true;
+    if (!formData.maintenance_cost_annual) errors.maintenance_cost_annual = true;
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      setError("Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία");
       return;
     }
 
@@ -322,23 +301,29 @@ const BulbReplacementTabContent = ({
       ...calculatedResults,
     };
 
+    const url = existingUuid
+      ? `${API_BASE_URL}/bulb_replacements/update/${existingUuid}/`
+      : `${API_BASE_URL}/bulb_replacements/create/`;
+    const method = existingUuid ? "PUT" : "POST";
+
     $.ajax({
-      url: `${API_BASE_URL}/bulb_replacements/create/`,
-      method: "POST",
+      url: url,
+      method: method,
       headers: {
         Authorization: `Token ${token}`,
         "Content-Type": "application/json",
       },
       data: JSON.stringify(submitData),
       success: (response) => {
-
+        if (!existingUuid && response.data?.uuid) {
+          setExistingUuid(response.data.uuid);
+        }
         setSuccess(
           translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
         );
         setLoading(false);
       },
       error: (jqXHR) => {
-
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
@@ -394,8 +379,10 @@ const BulbReplacementTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.oldPowerPerBulb || "Ισχύς παλαιού φορτίου") +
-              " (W) *"
+              <>
+                {translations.oldPowerPerBulb || "Ισχύς παλαιού φορτίου"} (W){" "}
+                <span style={{ color: "red" }}>*</span>
+              </>
             }
             type="number"
             value={formData.old_power_per_bulb}
@@ -403,7 +390,8 @@ const BulbReplacementTabContent = ({
               handleInputChange("old_power_per_bulb", e.target.value)
             }
             variant="outlined"
-            required
+            error={validationErrors.old_power_per_bulb}
+            helperText={validationErrors.old_power_per_bulb ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -426,7 +414,10 @@ const BulbReplacementTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.oldBulbCount || "Πλήθος παλαιών λαμπτήρων") + " *"
+              <>
+                {translations.oldBulbCount || "Πλήθος παλαιών λαμπτήρων"}{" "}
+                <span style={{ color: "red" }}>*</span>
+              </>
             }
             type="number"
             value={formData.old_bulb_count}
@@ -434,7 +425,8 @@ const BulbReplacementTabContent = ({
               handleInputChange("old_bulb_count", e.target.value)
             }
             variant="outlined"
-            required
+            error={validationErrors.old_bulb_count}
+            helperText={validationErrors.old_bulb_count ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -457,8 +449,10 @@ const BulbReplacementTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.oldOperatingHours || "Ώρες λειτουργίας ανά έτος") +
-              " *"
+              <>
+                {translations.oldOperatingHours || "Ώρες λειτουργίας ανά έτος"}{" "}
+                <span style={{ color: "red" }}>*</span>
+              </>
             }
             type="number"
             value={formData.old_operating_hours}
@@ -466,7 +460,8 @@ const BulbReplacementTabContent = ({
               handleInputChange("old_operating_hours", e.target.value)
             }
             variant="outlined"
-            required
+            error={validationErrors.old_operating_hours}
+            helperText={validationErrors.old_operating_hours ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -567,7 +562,10 @@ const BulbReplacementTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.newPowerPerBulb || "Ισχύς νέου φορτίου") + " (W) *"
+              <>
+                {translations.newPowerPerBulb || "Ισχύς νέου φορτίου"} (W){" "}
+                <span style={{ color: "red" }}>*</span>
+              </>
             }
             type="number"
             value={formData.new_power_per_bulb}
@@ -575,7 +573,8 @@ const BulbReplacementTabContent = ({
               handleInputChange("new_power_per_bulb", e.target.value)
             }
             variant="outlined"
-            required
+            error={validationErrors.new_power_per_bulb}
+            helperText={validationErrors.new_power_per_bulb ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -598,7 +597,10 @@ const BulbReplacementTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.newBulbCount || "Πλήθος νέων λαμπτήρων") + " *"
+              <>
+                {translations.newBulbCount || "Πλήθος νέων λαμπτήρων"}{" "}
+                <span style={{ color: "red" }}>*</span>
+              </>
             }
             type="number"
             value={formData.new_bulb_count}
@@ -606,7 +608,8 @@ const BulbReplacementTabContent = ({
               handleInputChange("new_bulb_count", e.target.value)
             }
             variant="outlined"
-            required
+            error={validationErrors.new_bulb_count}
+            helperText={validationErrors.new_bulb_count ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -629,8 +632,10 @@ const BulbReplacementTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.newOperatingHours || "Ώρες λειτουργίας ανά έτος") +
-              " *"
+              <>
+                {translations.newOperatingHours || "Ώρες λειτουργίας ανά έτος"}{" "}
+                <span style={{ color: "red" }}>*</span>
+              </>
             }
             type="number"
             value={formData.new_operating_hours}
@@ -638,7 +643,8 @@ const BulbReplacementTabContent = ({
               handleInputChange("new_operating_hours", e.target.value)
             }
             variant="outlined"
-            required
+            error={validationErrors.new_operating_hours}
+            helperText={validationErrors.new_operating_hours ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -704,7 +710,7 @@ const BulbReplacementTabContent = ({
     <div className="space-y-4">
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Typography variant="h6" className="font-semibold text-blue-700 mb-4">
+          <Typography variant="h6" className="font-semibold mb-4" style={{ color: "var(--color-primary)" }}>
             {translations.economicData || "Οικονομικά Στοιχεία"}
           </Typography>
         </Grid>
@@ -713,8 +719,10 @@ const BulbReplacementTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.costPerNewBulb || "Κόστος ανά νέο λαμπτήρα") +
-              " (€)"
+              <>
+                {translations.costPerNewBulb || "Κόστος ανά νέο λαμπτήρα"} (€){" "}
+                <span style={{ color: "red" }}>*</span>
+              </>
             }
             type="number"
             value={formData.cost_per_new_bulb}
@@ -722,6 +730,8 @@ const BulbReplacementTabContent = ({
               handleInputChange("cost_per_new_bulb", e.target.value)
             }
             variant="outlined"
+            error={validationErrors.cost_per_new_bulb}
+            helperText={validationErrors.cost_per_new_bulb ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -744,7 +754,10 @@ const BulbReplacementTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.installationCost || "Κόστος εγκατάστασης") + " (€)"
+              <>
+                {translations.installationCost || "Κόστος εγκατάστασης"} (€){" "}
+                <span style={{ color: "red" }}>*</span>
+              </>
             }
             type="number"
             value={formData.installation_cost}
@@ -752,6 +765,8 @@ const BulbReplacementTabContent = ({
               handleInputChange("installation_cost", e.target.value)
             }
             variant="outlined"
+            error={validationErrors.installation_cost}
+            helperText={validationErrors.installation_cost ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -778,12 +793,11 @@ const BulbReplacementTabContent = ({
             }
             type="number"
             value={formData.energy_cost_kwh}
-            onChange={(e) =>
-              handleInputChange("energy_cost_kwh", e.target.value)
-            }
             variant="outlined"
+            InputProps={{ readOnly: true }}
             sx={{
               "& .MuiOutlinedInput-root": {
+                backgroundColor: "#f5f5f5",
                 "&:hover fieldset": {
                   borderColor: "var(--color-primary)",
                 },
@@ -797,6 +811,10 @@ const BulbReplacementTabContent = ({
                 },
               },
             }}
+            helperText={
+              translations.energyCostFromProject ||
+              "Η τιμή προέρχεται από το έργο"
+            }
           />
         </Grid>
 
@@ -837,8 +855,11 @@ const BulbReplacementTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.maintenanceCostAnnual ||
-                "Ετήσιο κόστος συντήρησης") + " (€)"
+              <>
+                {translations.maintenanceCostAnnual ||
+                  "Ετήσιο κόστος συντήρησης"}{" "}
+                (€) <span style={{ color: "red" }}>*</span>
+              </>
             }
             type="number"
             value={formData.maintenance_cost_annual}
@@ -846,6 +867,8 @@ const BulbReplacementTabContent = ({
               handleInputChange("maintenance_cost_annual", e.target.value)
             }
             variant="outlined"
+            error={validationErrors.maintenance_cost_annual}
+            helperText={validationErrors.maintenance_cost_annual ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -916,7 +939,10 @@ const BulbReplacementTabContent = ({
         <TextField
           fullWidth
           label={
-            (translations.oldPowerPerBulb || "Ισχύς παλαιού φορτίου") + " (W) *"
+            <>
+              {translations.oldPowerPerBulb || "Ισχύς παλαιού φορτίου"} (W){" "}
+              <span style={{ color: "red" }}>*</span>
+            </>
           }
           type="number"
           value={formData.old_power_per_bulb}
@@ -924,7 +950,8 @@ const BulbReplacementTabContent = ({
             handleInputChange("old_power_per_bulb", e.target.value)
           }
           variant="outlined"
-          required
+          error={validationErrors.old_power_per_bulb}
+          helperText={validationErrors.old_power_per_bulb ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -947,13 +974,17 @@ const BulbReplacementTabContent = ({
         <TextField
           fullWidth
           label={
-            (translations.oldBulbCount || "Πλήθος παλαιών λαμπτήρων") + " *"
+            <>
+              {translations.oldBulbCount || "Πλήθος παλαιών λαμπτήρων"}{" "}
+              <span style={{ color: "red" }}>*</span>
+            </>
           }
           type="number"
           value={formData.old_bulb_count}
           onChange={(e) => handleInputChange("old_bulb_count", e.target.value)}
           variant="outlined"
-          required
+          error={validationErrors.old_bulb_count}
+          helperText={validationErrors.old_bulb_count ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -976,8 +1007,10 @@ const BulbReplacementTabContent = ({
         <TextField
           fullWidth
           label={
-            (translations.oldOperatingHours || "Ώρες λειτουργίας ανά έτος") +
-            " *"
+            <>
+              {translations.oldOperatingHours || "Ώρες λειτουργίας ανά έτος"}{" "}
+              <span style={{ color: "red" }}>*</span>
+            </>
           }
           type="number"
           value={formData.old_operating_hours}
@@ -985,7 +1018,8 @@ const BulbReplacementTabContent = ({
             handleInputChange("old_operating_hours", e.target.value)
           }
           variant="outlined"
-          required
+          error={validationErrors.old_operating_hours}
+          helperText={validationErrors.old_operating_hours ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -1047,7 +1081,10 @@ const BulbReplacementTabContent = ({
         <TextField
           fullWidth
           label={
-            (translations.newPowerPerBulb || "Ισχύς νέου φορτίου") + " (W) *"
+            <>
+              {translations.newPowerPerBulb || "Ισχύς νέου φορτίου"} (W){" "}
+              <span style={{ color: "red" }}>*</span>
+            </>
           }
           type="number"
           value={formData.new_power_per_bulb}
@@ -1055,34 +1092,8 @@ const BulbReplacementTabContent = ({
             handleInputChange("new_power_per_bulb", e.target.value)
           }
           variant="outlined"
-          required
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              "&:hover fieldset": {
-                borderColor: "var(--color-primary)",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "var(--color-primary)",
-              },
-            },
-            "& .MuiInputLabel-root": {
-              "&.Mui-focused": {
-                color: "var(--color-primary)",
-              },
-            },
-          }}
-        />
-      </Grid>
-
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label={(translations.newBulbCount || "Πλήθος νέων λαμπτήρων") + " *"}
-          type="number"
-          value={formData.new_bulb_count}
-          onChange={(e) => handleInputChange("new_bulb_count", e.target.value)}
-          variant="outlined"
-          required
+          error={validationErrors.new_power_per_bulb}
+          helperText={validationErrors.new_power_per_bulb ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -1105,8 +1116,43 @@ const BulbReplacementTabContent = ({
         <TextField
           fullWidth
           label={
-            (translations.newOperatingHours || "Ώρες λειτουργίας ανά έτος") +
-            " *"
+            <>
+              {translations.newBulbCount || "Πλήθος νέων λαμπτήρων"}{" "}
+              <span style={{ color: "red" }}>*</span>
+            </>
+          }
+          type="number"
+          value={formData.new_bulb_count}
+          onChange={(e) => handleInputChange("new_bulb_count", e.target.value)}
+          variant="outlined"
+          error={validationErrors.new_bulb_count}
+          helperText={validationErrors.new_bulb_count ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&:hover fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "var(--color-primary)",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              "&.Mui-focused": {
+                color: "var(--color-primary)",
+              },
+            },
+          }}
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label={
+            <>
+              {translations.newOperatingHours || "Ώρες λειτουργίας ανά έτος"}{" "}
+              <span style={{ color: "red" }}>*</span>
+            </>
           }
           type="number"
           value={formData.new_operating_hours}
@@ -1114,7 +1160,8 @@ const BulbReplacementTabContent = ({
             handleInputChange("new_operating_hours", e.target.value)
           }
           variant="outlined"
-          required
+          error={validationErrors.new_operating_hours}
+          helperText={validationErrors.new_operating_hours ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -1146,7 +1193,10 @@ const BulbReplacementTabContent = ({
         <TextField
           fullWidth
           label={
-            (translations.costPerNewBulb || "Κόστος ανά νέο λαμπτήρα") + " (€)"
+            <>
+              {translations.costPerNewBulb || "Κόστος ανά νέο λαμπτήρα"} (€){" "}
+              <span style={{ color: "red" }}>*</span>
+            </>
           }
           type="number"
           value={formData.cost_per_new_bulb}
@@ -1154,6 +1204,8 @@ const BulbReplacementTabContent = ({
             handleInputChange("cost_per_new_bulb", e.target.value)
           }
           variant="outlined"
+          error={validationErrors.cost_per_new_bulb}
+          helperText={validationErrors.cost_per_new_bulb ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -1176,7 +1228,10 @@ const BulbReplacementTabContent = ({
         <TextField
           fullWidth
           label={
-            (translations.installationCost || "Κόστος εγκατάστασης") + " (€)"
+            <>
+              {translations.installationCost || "Κόστος εγκατάστασης"} (€){" "}
+              <span style={{ color: "red" }}>*</span>
+            </>
           }
           type="number"
           value={formData.installation_cost}
@@ -1184,6 +1239,8 @@ const BulbReplacementTabContent = ({
             handleInputChange("installation_cost", e.target.value)
           }
           variant="outlined"
+          error={validationErrors.installation_cost}
+          helperText={validationErrors.installation_cost ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -1210,23 +1267,28 @@ const BulbReplacementTabContent = ({
           }
           type="number"
           value={formData.energy_cost_kwh}
-          onChange={(e) => handleInputChange("energy_cost_kwh", e.target.value)}
           variant="outlined"
+          InputProps={{ readOnly: true }}
           sx={{
             "& .MuiOutlinedInput-root": {
+              backgroundColor: "#f5f5f5",
               "&:hover fieldset": {
-                borderColor: "var(--color-primary)",
+                borderColor: "rgba(0, 0, 0, 0.23)",
               },
               "&.Mui-focused fieldset": {
-                borderColor: "var(--color-primary)",
+                borderColor: "rgba(0, 0, 0, 0.23)",
               },
             },
             "& .MuiInputLabel-root": {
               "&.Mui-focused": {
-                color: "var(--color-primary)",
+                color: "rgba(0, 0, 0, 0.6)",
               },
             },
           }}
+          helperText={
+            translations.energyCostFromProject ||
+            "Η τιμή προέρχεται από το έργο"
+          }
         />
       </Grid>
 
@@ -1265,8 +1327,10 @@ const BulbReplacementTabContent = ({
         <TextField
           fullWidth
           label={
-            (translations.maintenanceCostAnnual || "Ετήσιο κόστος συντήρησης") +
-            " (€)"
+            <>
+              {translations.maintenanceCostAnnual || "Ετήσιο κόστος συντήρησης"}{" "}
+              (€) <span style={{ color: "red" }}>*</span>
+            </>
           }
           type="number"
           value={formData.maintenance_cost_annual}
@@ -1274,6 +1338,8 @@ const BulbReplacementTabContent = ({
             handleInputChange("maintenance_cost_annual", e.target.value)
           }
           variant="outlined"
+          error={validationErrors.maintenance_cost_annual}
+          helperText={validationErrors.maintenance_cost_annual ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -1452,6 +1518,17 @@ const BulbReplacementTabContent = ({
               },
               "& .MuiInputLabel-root": {
                 color: "var(--color-primary)",
+                "&.Mui-focused": {
+                  color: "var(--color-primary)",
+                },
+              },
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
               },
             }}
             helperText={
@@ -1483,6 +1560,17 @@ const BulbReplacementTabContent = ({
               },
               "& .MuiInputLabel-root": {
                 color: "var(--color-success)",
+                "&.Mui-focused": {
+                  color: "var(--color-success)",
+                },
+              },
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
               },
             }}
             helperText={
@@ -1561,13 +1649,9 @@ const BulbReplacementTabContent = ({
             fullWidth
             label={(translations.discountRate || "Επιτόκιο αναγωγής") + " (%)"}
             type="number"
-            value={5} 
-            InputProps={{ readOnly: true }}
+            value={formData.discount_rate || ""}
+            onChange={(e) => handleInputChange("discount_rate", e.target.value)}
             inputProps={{ step: 0.1, min: 0, max: 100 }}
-            helperText={
-              translations.discountRateHelper ||
-              "Σταθερή τιμή 5% για τους υπολογισμούς NPV"
-            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -1602,6 +1686,20 @@ const BulbReplacementTabContent = ({
                   calculatedResults.net_present_value >= 0 ? "green" : "red",
                 fontWeight: "bold",
               },
+              "& .MuiInputLabel-root": {
+                "&.Mui-focused": {
+                  color:
+                    calculatedResults.net_present_value >= 0 ? "green" : "red",
+                },
+              },
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
             }}
             helperText={
               translations.npvHelperText ||
@@ -1625,6 +1723,14 @@ const BulbReplacementTabContent = ({
               "& .MuiInputLabel-root": {
                 color: "var(--color-primary)",
               },
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
             }}
             helperText={
               translations.paybackHelperText ||
@@ -1647,6 +1753,14 @@ const BulbReplacementTabContent = ({
               },
               "& .MuiInputLabel-root": {
                 color: "var(--color-success)",
+              },
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
               },
             }}
             helperText={
@@ -1744,8 +1858,8 @@ const BulbReplacementTabContent = ({
           <Tab
             label={translations.newLightingSystem || "Νέο Σύστημα Φωτισμού"}
           />
-          <Tab label={translations.economicData || "Οικονομικά Στοιχεία"} />
           <Tab label={translations.energyBenefits || "Ενεργειακά Οφέλη"} />
+          <Tab label={translations.economicData || "Οικονομικά Στοιχεία"} />
           <Tab label={translations.economicBenefits || "Οικονομικά Οφέλη"} />
         </Tabs>
 
@@ -1759,14 +1873,14 @@ const BulbReplacementTabContent = ({
           {renderNewLightingSystem()}
         </TabPanel>
 
-        {/* Tab 3: Οικονομικά Στοιχεία */}
+        {/* Tab 3: Ενεργειακά Οφέλη */}
         <TabPanel value={activeTab} index={2}>
-          {renderEconomicData()}
+          {renderEnergyBenefits()}
         </TabPanel>
 
-        {/* Tab 4: Ενεργειακά Οφέλη */}
+        {/* Tab 4: Οικονομικά Στοιχεία */}
         <TabPanel value={activeTab} index={3}>
-          {renderEnergyBenefits()}
+          {renderEconomicData()}
         </TabPanel>
 
         {/* Tab 5: Οικονομικά Οφέλη */}

@@ -26,8 +26,9 @@ const dataProvider = {
   deleteMany: () => Promise.resolve({ data: [] }),
 };
 
-const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData }) => {
-  const [activeTab, setActiveTab] = useState(0);
+const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData, scenarioId }) => {
+  // If scenarioId exists, set active tab to Scenarios tab (index 4)
+  const [activeTab, setActiveTab] = useState(scenarioId ? 4 : 0);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
   const scrollContainerRef = useRef(null);
@@ -171,6 +172,7 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData }) => {
                 projectUuid={projectUuid}
                 buildingData={buildingData}
                 params={params}
+                scenarioId={scenarioId}
               />
             </div>
           )}

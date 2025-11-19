@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -40,13 +41,21 @@ const ScenariosTabContent = ({
   projectUuid,
   buildingData,
   params,
+  scenarioId,
 }) => {
-  const [selectedScenario, setSelectedScenario] = useState(null);
+  const navigate = useNavigate();
+  const { projectUuid: paramProjectUuid, buildingUuid: paramBuildingUuid } = useParams();
+  const [selectedScenario, setSelectedScenario] = useState(scenarioId || null);
   const { language } = useLanguage();
   const translations =
     language === "en"
       ? english_text.ScenariosTabContent || {}
       : greek_text.ScenariosTabContent || {};
+  
+  // Update selected scenario when scenarioId prop changes
+  useEffect(() => {
+    setSelectedScenario(scenarioId || null);
+  }, [scenarioId]);
   const scenarioTypes = [
     {
       id: "thermal-insulation",
@@ -175,11 +184,15 @@ const ScenariosTabContent = ({
     },
   ];
   const handleScenarioSelect = (scenarioId) => {
-    setSelectedScenario(scenarioId);
+    const actualProjectUuid = projectUuid || paramProjectUuid;
+    const actualBuildingUuid = buildingUuid || paramBuildingUuid;
+    navigate(`/projects/${actualProjectUuid}/buildings/${actualBuildingUuid}/${scenarioId}`);
   };
 
   const handleBackToScenarios = () => {
-    setSelectedScenario(null);
+    const actualProjectUuid = projectUuid || paramProjectUuid;
+    const actualBuildingUuid = buildingUuid || paramBuildingUuid;
+    navigate(`/projects/${actualProjectUuid}/buildings/${actualBuildingUuid}`);
   };
   if (selectedScenario) {
     if (selectedScenario === "thermal-insulation") {

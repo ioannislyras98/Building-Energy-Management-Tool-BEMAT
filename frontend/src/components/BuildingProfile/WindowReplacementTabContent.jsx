@@ -626,15 +626,15 @@ const WindowReplacementTabContent = ({
               "& .MuiOutlinedInput-root": {
                 backgroundColor: "#f5f5f5",
                 "&:hover fieldset": {
-                  borderColor: "rgba(0, 0, 0, 0.23)",
+                  borderColor: "var (--color-primary)",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "rgba(0, 0, 0, 0.23)",
+                  borderColor: "var(--color-primary)",
                 },
               },
               "& .MuiInputLabel-root": {
                 "&.Mui-focused": {
-                  color: "rgba(0, 0, 0, 0.6)",
+                  color: "var(--color-primary)",
                 },
               },
             }}

@@ -43,6 +43,50 @@ function App() {
                 path="/projects/:projectUuid/buildings/:buildingUuid"
                 element={<BuildingProfilePage />}
               />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/thermal-insulation"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/roof-thermal-insulation"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/photovoltaic-systems"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/window-replacement"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/bulb-replacement"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/air-conditioning-replacement"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/hot-water-upgrade"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/natural-gas-network"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/exterior-blinds"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/automatic-lighting-control"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/boiler-replacement"
+                element={<BuildingProfilePage />}
+              />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/materials" element={<AdminMaterials />} />
               <Route path="/admin/prefectures" element={<AdminPrefectures />} />
