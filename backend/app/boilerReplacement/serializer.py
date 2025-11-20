@@ -42,7 +42,7 @@ class BoilerReplacementSerializer(serializers.ModelSerializer):
     class Meta:
         model = BoilerReplacement
         fields = [
-            'id',
+            'uuid',
             'building',
             'project',
             # Στοιχεία Λέβητα
@@ -69,7 +69,7 @@ class BoilerReplacementSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
         read_only_fields = [
-            'id',
+            'uuid',
             'created_at',
             'updated_at',
             'heating_oil_savings_liters',

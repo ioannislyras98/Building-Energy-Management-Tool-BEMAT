@@ -21,6 +21,7 @@ class NaturalGasNetworkSerializer(serializers.ModelSerializer):
             'gas_detection_systems_unit_price',
             'boiler_cleaning_quantity',
             'boiler_cleaning_unit_price',
+            'annual_operating_expenses',
         ]
         
         none_default_fields = [
@@ -32,6 +33,7 @@ class NaturalGasNetworkSerializer(serializers.ModelSerializer):
         
         specific_default_fields = {
             'new_system_efficiency': 0.90,
+            'discount_rate': 5.0,
         }
         
         for field in zero_default_fields:
@@ -51,7 +53,7 @@ class NaturalGasNetworkSerializer(serializers.ModelSerializer):
     class Meta:
         model = NaturalGasNetwork
         fields = [
-            'id',
+            'uuid',
             'building',
             'building_name',
             'project',
@@ -68,6 +70,8 @@ class NaturalGasNetworkSerializer(serializers.ModelSerializer):
             'natural_gas_cost_per_year',
             'annual_energy_savings',
             'lifespan_years',
+            'discount_rate',
+            'annual_operating_expenses',
             'new_system_efficiency',
             'natural_gas_price_per_kwh',
             'burner_replacement_subtotal',
@@ -83,7 +87,7 @@ class NaturalGasNetworkSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
         read_only_fields = [
-            'id',
+            'uuid',
             'building_name',
             'project_name',
             'burner_replacement_subtotal',
@@ -136,6 +140,12 @@ class NaturalGasNetworkSerializer(serializers.ModelSerializer):
         
         if 'lifespan_years' in data and data['lifespan_years'] is not None and data['lifespan_years'] <= 0:
             raise serializers.ValidationError("lifespan_years must be a positive number")
+        
+        if 'discount_rate' in data and data['discount_rate'] is not None and data['discount_rate'] <= 0:
+            raise serializers.ValidationError("discount_rate must be a positive number")
+        
+        if 'annual_operating_expenses' in data and data['annual_operating_expenses'] is not None and data['annual_operating_expenses'] < 0:
+            raise serializers.ValidationError("annual_operating_expenses must be a non-negative number")
         
         if 'new_system_efficiency' in data and data['new_system_efficiency'] is not None:
             if data['new_system_efficiency'] < 0.1 or data['new_system_efficiency'] > 1.0:

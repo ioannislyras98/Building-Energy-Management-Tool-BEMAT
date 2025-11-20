@@ -1424,7 +1424,12 @@
     "successSave": "Data saved successfully",
     "errorSave": "Error saving data",
     "errorAuth": "Authentication required",
-    "autoCalculatedHelperText": "Automatically calculated from building energy consumptions"
+    "autoCalculatedHelperText": "Automatically calculated from building energy consumptions",
+    "requiredFieldsError": "Please fill in all required fields in the System Components with values greater than 0",
+    "requiredFieldsErrorEconomic": "Please fill in all required fields in the Economic Data",
+    "requiredFieldsErrorBoth": "Please fill in all required fields in the System Components and Economic Data",
+    "discountRate": "Discount rate",
+    "annualOperatingExpenses": "Annual operating expenses"
   },
   "ExteriorBlindsTabContent": {
     "title": "Exterior Blinds Installation",

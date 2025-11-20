@@ -48,13 +48,13 @@ def create_natural_gas_network(request):
                 if project:
                     if project.cost_per_kwh_electricity:
                         electricity_cost_per_kwh = float(project.cost_per_kwh_electricity)
-                    if project.cost_per_kwh_fuel:
-                        fuel_cost_per_kwh = float(project.cost_per_kwh_fuel)
+                    if project.natural_gas_price_per_m3:
+                        fuel_cost_per_kwh = float(project.natural_gas_price_per_m3)
                 elif building.project:
                     if building.project.cost_per_kwh_electricity:
                         electricity_cost_per_kwh = float(building.project.cost_per_kwh_electricity)
-                    if building.project.cost_per_kwh_fuel:
-                        fuel_cost_per_kwh = float(building.project.cost_per_kwh_fuel)
+                    if building.project.natural_gas_price_per_m3:
+                        fuel_cost_per_kwh = float(building.project.natural_gas_price_per_m3)
                 
                 for consumption in energy_consumptions:
                     kwh_equivalent = float(consumption.kwh_equivalent or 0)
@@ -132,10 +132,7 @@ def get_natural_gas_networks_by_building(request, building_uuid):
                 'message': 'Access denied'
             }, status=status.HTTP_403_FORBIDDEN)
         
-        if is_admin_user(request.user):
-            networks = NaturalGasNetwork.objects.filter(building=building).order_by('-created_at')
-        else:
-            networks = NaturalGasNetwork.objects.filter(building=building, user=request.user).order_by('-created_at')
+        networks = NaturalGasNetwork.objects.filter(building=building).order_by('-created_at')
         
         if networks.exists():
             serializer = NaturalGasNetworkSerializer(networks, many=True)
@@ -151,8 +148,8 @@ def get_natural_gas_networks_by_building(request, building_uuid):
                 if project:
                     if project.cost_per_kwh_electricity:
                         electricity_cost_per_kwh = float(project.cost_per_kwh_electricity)
-                    if project.cost_per_kwh_fuel:
-                        fuel_cost_per_kwh = float(project.cost_per_kwh_fuel)
+                    if project.natural_gas_price_per_m3:
+                        fuel_cost_per_kwh = float(project.natural_gas_price_per_m3)
                 
                 for consumption in energy_consumptions:
                     kwh_equivalent = float(consumption.kwh_equivalent or 0)
@@ -167,7 +164,7 @@ def get_natural_gas_networks_by_building(request, building_uuid):
                 for item in data:
                     item['current_energy_cost_per_year'] = round(total_annual_cost, 2)
                     if not item.get('natural_gas_cost_per_year'):
-                        network_obj = networks.filter(id=item['id']).first()
+                        network_obj = networks.filter(uuid=item['uuid']).first()
                         if network_obj:
                             network_obj._calculate_natural_gas_cost()
                             item['natural_gas_cost_per_year'] = network_obj.natural_gas_cost_per_year
@@ -188,8 +185,8 @@ def get_natural_gas_networks_by_building(request, building_uuid):
                 if project:
                     if project.cost_per_kwh_electricity:
                         electricity_cost_per_kwh = float(project.cost_per_kwh_electricity)
-                    if project.cost_per_kwh_fuel:
-                        fuel_cost_per_kwh = float(project.cost_per_kwh_fuel)
+                    if project.natural_gas_price_per_m3:
+                        fuel_cost_per_kwh = float(project.natural_gas_price_per_m3)
                 
                 for consumption in energy_consumptions:
                     kwh_equivalent = float(consumption.kwh_equivalent or 0)
@@ -220,12 +217,12 @@ def get_natural_gas_networks_by_building(request, building_uuid):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_natural_gas_network_detail(request, network_id):
+def get_natural_gas_network_detail(request, network_uuid):
     """
     Get detailed information about a specific natural gas network
     """
     try:
-        network = get_object_or_404(NaturalGasNetwork, id=network_id)
+        network = get_object_or_404(NaturalGasNetwork, uuid=network_uuid)
         serializer = NaturalGasNetworkSerializer(network)
         
         return Response({
@@ -234,7 +231,7 @@ def get_natural_gas_network_detail(request, network_id):
         }, status=status.HTTP_200_OK)
     
     except Exception as e:
-        logger.error(f"Error retrieving natural gas network {network_id}: {str(e)}")
+        logger.error(f"Error retrieving natural gas network {network_uuid}: {str(e)}")
         return Response({
             'success': False,
             'error': 'Internal server error',
@@ -244,18 +241,18 @@ def get_natural_gas_network_detail(request, network_id):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update_natural_gas_network(request, network_id):
+def update_natural_gas_network(request, network_uuid):
     """
     Update a specific natural gas network
     """
     try:
-        network = get_object_or_404(NaturalGasNetwork, id=network_id)
+        network = get_object_or_404(NaturalGasNetwork, uuid=network_uuid)
         
         with transaction.atomic():
             serializer = NaturalGasNetworkSerializer(network, data=request.data, partial=True)
             if serializer.is_valid():
                 updated_network = serializer.save()
-                logger.info(f"Natural gas network {network_id} updated successfully")
+                logger.info(f"Natural gas network {network_uuid} updated successfully")
                 return Response({
                     'success': True,
                     'message': 'Natural gas network updated successfully',
@@ -269,7 +266,7 @@ def update_natural_gas_network(request, network_id):
                 }, status=status.HTTP_400_BAD_REQUEST)
     
     except Exception as e:
-        logger.error(f"Error updating natural gas network {network_id}: {str(e)}")
+        logger.error(f"Error updating natural gas network {network_uuid}: {str(e)}")
         return Response({
             'success': False,
             'error': 'Internal server error',
@@ -279,24 +276,24 @@ def update_natural_gas_network(request, network_id):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def delete_natural_gas_network(request, network_id):
+def delete_natural_gas_network(request, network_uuid):
     """
     Delete a specific natural gas network
     """
     try:
-        network = get_object_or_404(NaturalGasNetwork, id=network_id)
+        network = get_object_or_404(NaturalGasNetwork, uuid=network_uuid)
         building_name = network.building.name if network.building else 'Unknown'
         
         with transaction.atomic():
             network.delete()
-            logger.info(f"Natural gas network {network_id} deleted successfully")
+            logger.info(f"Natural gas network {network_uuid} deleted successfully")
             return Response({
                 'success': True,
                 'message': f'Natural gas network for {building_name} deleted successfully'
             }, status=status.HTTP_200_OK)
     
     except Exception as e:
-        logger.error(f"Error deleting natural gas network {network_id}: {str(e)}")
+        logger.error(f"Error deleting natural gas network {network_uuid}: {str(e)}")
         return Response({
             'success': False,
             'error': 'Internal server error',

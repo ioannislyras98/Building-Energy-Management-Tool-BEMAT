@@ -8,7 +8,7 @@ urlpatterns = [
     
     path('all/', views.get_all_natural_gas_networks, name='get_all_natural_gas_networks'),
     
-    path('<int:network_id>/', views.get_natural_gas_network_detail, name='get_natural_gas_network_detail'),
-    path('<int:network_id>/update/', views.update_natural_gas_network, name='update_natural_gas_network'),
-    path('<int:network_id>/delete/', views.delete_natural_gas_network, name='delete_natural_gas_network'),
+    path('<uuid:network_uuid>/', views.get_natural_gas_network_detail, name='get_natural_gas_network_detail'),
+    path('<uuid:network_uuid>/update/', views.update_natural_gas_network, name='update_natural_gas_network'),
+    path('<uuid:network_uuid>/delete/', views.delete_natural_gas_network, name='delete_natural_gas_network'),
 ]

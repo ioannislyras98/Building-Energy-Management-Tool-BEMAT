@@ -68,7 +68,7 @@ function ProjectModalForm({
         name: formData.name,
         cost_per_kwh_electricity: formData.cost_per_kwh_electricity,
         oil_price_per_liter: formData.oil_price_per_liter || null,
-        natural_gas_price_per_m3: formData.natural_gas_price_per_m3 || null,
+        natural_gas_price_per_m3: formData.natural_gas_price_per_m3,
         biomass_price_per_kg: formData.biomass_price_per_kg || null,
       }),
     };
@@ -170,7 +170,7 @@ function ProjectModalForm({
                 setFormData({ ...formData, natural_gas_price_per_m3: e.target.value })
               }
               example={params.naturalGasPricePerM3_example || "0.800"}
-              required={false}
+              required
             />
             <InputEntry
               entry={params.biomassPricePerKg || "Τιμή βιομάζας (€/kg)"}

@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.conf import settings
@@ -7,6 +8,8 @@ import base64
 
 
 class BuildingImage(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
     CATEGORY_CHOICES = [
         ('exterior', 'Exterior Views'),
         ('interior', 'Interior Views'),

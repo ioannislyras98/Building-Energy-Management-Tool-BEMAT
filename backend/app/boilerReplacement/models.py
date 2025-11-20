@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from building.models import Building
@@ -5,6 +6,7 @@ from project.models import Project
 
 
 class BoilerReplacement(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     building = models.OneToOneField(
         Building,
         on_delete=models.CASCADE,

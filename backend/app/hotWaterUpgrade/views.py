@@ -76,10 +76,10 @@ def get_hot_water_upgrade_by_building(request, building_uuid):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_hot_water_upgrade_detail(request, pk):
-    """Get detailed hot water upgrade data by ID"""
+def get_hot_water_upgrade_detail(request, uuid):
+    """Get detailed hot water upgrade data by UUID"""
     try:
-        hot_water_upgrade = get_object_or_404(HotWaterUpgrade, pk=pk)
+        hot_water_upgrade = get_object_or_404(HotWaterUpgrade, uuid=uuid)
         serializer = HotWaterUpgradeSerializer(hot_water_upgrade)
         
         return Response({
@@ -96,10 +96,10 @@ def get_hot_water_upgrade_detail(request, pk):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update_hot_water_upgrade(request, pk):
+def update_hot_water_upgrade(request, uuid):
     """Update hot water upgrade data"""
     try:
-        hot_water_upgrade = get_object_or_404(HotWaterUpgrade, pk=pk)
+        hot_water_upgrade = get_object_or_404(HotWaterUpgrade, uuid=uuid)
         serializer = HotWaterUpgradeSerializer(hot_water_upgrade, data=request.data, partial=True)
         
         if serializer.is_valid():
@@ -125,10 +125,10 @@ def update_hot_water_upgrade(request, pk):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def delete_hot_water_upgrade(request, pk):
+def delete_hot_water_upgrade(request, uuid):
     """Delete hot water upgrade data"""
     try:
-        hot_water_upgrade = get_object_or_404(HotWaterUpgrade, pk=pk)
+        hot_water_upgrade = get_object_or_404(HotWaterUpgrade, uuid=uuid)
         hot_water_upgrade.delete()
         
         return Response({

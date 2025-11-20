@@ -46,8 +46,8 @@ const NaturalGasNetworkTabContent = ({
 }) => {
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
+  const [errorKey, setErrorKey] = useState(null);
+  const [successKey, setSuccessKey] = useState(null);
   const cookies = new Cookies(null, { path: "/" });
   const token = cookies.get("token");
 
@@ -70,6 +70,8 @@ const NaturalGasNetworkTabContent = ({
     natural_gas_cost_per_year: "",
     annual_energy_savings: "",
     lifespan_years: 15,
+    discount_rate: 5,
+    annual_operating_expenses: "",
     new_system_efficiency: 0.90,
     natural_gas_price_per_kwh: "",
   });
@@ -78,6 +80,34 @@ const NaturalGasNetworkTabContent = ({
       fetchExistingData();
     }
   }, [buildingUuid, token]);
+
+  useEffect(() => {
+    if (projectUuid && token) {
+      fetchProjectData();
+    }
+  }, [projectUuid, token]);
+
+  const fetchProjectData = () => {
+    $.ajax({
+      url: `${API_BASE_URL}/projects/get/${projectUuid}/`,
+      method: "GET",
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+      success: (response) => {
+        if (response.data && response.data.natural_gas_price_per_m3) {
+          setFormData((prev) => ({
+            ...prev,
+            natural_gas_price_per_kwh: response.data.natural_gas_price_per_m3 || "",
+          }));
+        }
+      },
+      error: (jqXHR) => {
+        console.error("Error fetching project data:", jqXHR);
+      },
+    });
+  };
+
   useEffect(() => {
     if (buildingData && buildingData.annual_energy_cost) {
       setFormData(prev => ({
@@ -178,6 +208,8 @@ const NaturalGasNetworkTabContent = ({
             natural_gas_cost_per_year: data.natural_gas_cost_per_year || "",
             annual_energy_savings: data.annual_energy_savings || "",
             lifespan_years: data.lifespan_years || 15,
+            discount_rate: data.discount_rate || 5,
+            annual_operating_expenses: data.annual_operating_expenses || "",
             new_system_efficiency: data.new_system_efficiency || 0.90,
             natural_gas_price_per_kwh: data.natural_gas_price_per_kwh || "",
           }));
@@ -205,80 +237,13 @@ const NaturalGasNetworkTabContent = ({
     net_present_value: 0,
     internal_rate_of_return: 0,
   });
-  const [debounceTimeout, setDebounceTimeout] = useState(null);
-
-  const autoSave = useCallback(() => {
-    if (!buildingUuid || !token) {
-      return;
-    }
-
-    const submitData = {
-      building: buildingUuid,
-      project: projectUuid,
-      ...formData,
-      ...calculatedResults,
-    };
-
-    // Remove empty string fields to avoid validation errors
-    if (submitData.burner_replacement_unit_price === "") {
-      delete submitData.burner_replacement_unit_price;
-    }
-    if (submitData.gas_pipes_unit_price === "") {
-      delete submitData.gas_pipes_unit_price;
-    }
-    if (submitData.gas_detection_systems_unit_price === "") {
-      delete submitData.gas_detection_systems_unit_price;
-    }
-    if (submitData.boiler_cleaning_unit_price === "") {
-      delete submitData.boiler_cleaning_unit_price;
-    }
-
-    $.ajax({
-      url: `${API_BASE_URL}/natural_gas_networks/create/`,
-      method: "POST",
-      headers: {
-        Authorization: `Token ${token}`,
-        "Content-Type": "application/json",
-      },
-      data: JSON.stringify(submitData),
-      success: (response) => {
-
-        setSuccess(translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς");
-        setTimeout(() => setSuccess(null), 3000);
-      },
-      error: (jqXHR) => {
-
-        setError(
-          jqXHR.responseJSON?.detail ||
-            translations.errorSave ||
-            "Σφάλμα κατά την αποθήκευση"
-        );
-      },
-    });
-  }, [buildingUuid, projectUuid, token, formData, calculatedResults, translations]);
-  useEffect(() => {
-    if (buildingUuid && token && (formData.new_system_efficiency || formData.natural_gas_price_per_kwh)) {
-      const timeout = setTimeout(() => {
-        autoSave();
-      }, 500);
-      return () => clearTimeout(timeout);
-    }
-  }, [formData.new_system_efficiency, formData.natural_gas_price_per_kwh, buildingUuid, token, autoSave]);
+  const [validationErrors, setValidationErrors] = useState({});
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
-    if (debounceTimeout) {
-      clearTimeout(debounceTimeout);
-    }
-    
-    const newTimeout = setTimeout(() => {
-      autoSave();
-    }, 1000);
-    
-    setDebounceTimeout(newTimeout);
   };
 
   const calculateResults = useCallback(() => {
@@ -341,22 +306,75 @@ const NaturalGasNetworkTabContent = ({
   useEffect(() => {
     calculateResults();
   }, [calculateResults]);
-  useEffect(() => {
-    return () => {
-      if (debounceTimeout) {
-        clearTimeout(debounceTimeout);
-      }
-    };
-  }, [debounceTimeout]);
 
   const handleSubmit = () => {
     if (!buildingUuid || !token) {
-      setError(translations.errorAuth || "Authentication required");
+      setErrorKey("errorAuth");
+      return;
+    }
+
+    // Validation for System Components
+    const systemComponentsErrors = {};
+    if (!formData.burner_replacement_quantity || parseFloat(formData.burner_replacement_quantity) <= 0) {
+      systemComponentsErrors.burner_replacement_quantity = true;
+    }
+    if (!formData.burner_replacement_unit_price || parseFloat(formData.burner_replacement_unit_price) <= 0) {
+      systemComponentsErrors.burner_replacement_unit_price = true;
+    }
+    if (!formData.gas_pipes_quantity || parseFloat(formData.gas_pipes_quantity) <= 0) {
+      systemComponentsErrors.gas_pipes_quantity = true;
+    }
+    if (!formData.gas_pipes_unit_price || parseFloat(formData.gas_pipes_unit_price) <= 0) {
+      systemComponentsErrors.gas_pipes_unit_price = true;
+    }
+    if (!formData.gas_detection_systems_quantity || parseFloat(formData.gas_detection_systems_quantity) <= 0) {
+      systemComponentsErrors.gas_detection_systems_quantity = true;
+    }
+    if (!formData.gas_detection_systems_unit_price || parseFloat(formData.gas_detection_systems_unit_price) <= 0) {
+      systemComponentsErrors.gas_detection_systems_unit_price = true;
+    }
+    if (!formData.boiler_cleaning_quantity || parseFloat(formData.boiler_cleaning_quantity) <= 0) {
+      systemComponentsErrors.boiler_cleaning_quantity = true;
+    }
+    if (!formData.boiler_cleaning_unit_price || parseFloat(formData.boiler_cleaning_unit_price) <= 0) {
+      systemComponentsErrors.boiler_cleaning_unit_price = true;
+    }
+
+    // Validation for Economic Data
+    const economicDataErrors = {};
+    if (!formData.lifespan_years || parseFloat(formData.lifespan_years) <= 0) {
+      economicDataErrors.lifespan_years = true;
+    }
+    if (!formData.discount_rate || parseFloat(formData.discount_rate) <= 0) {
+      economicDataErrors.discount_rate = true;
+    }
+    if (!formData.annual_operating_expenses || parseFloat(formData.annual_operating_expenses) < 0) {
+      economicDataErrors.annual_operating_expenses = true;
+    }
+    if (!formData.new_system_efficiency || parseFloat(formData.new_system_efficiency) <= 0) {
+      economicDataErrors.new_system_efficiency = true;
+    }
+
+    const hasSystemComponentsErrors = Object.keys(systemComponentsErrors).length > 0;
+    const hasEconomicDataErrors = Object.keys(economicDataErrors).length > 0;
+
+    if (hasSystemComponentsErrors || hasEconomicDataErrors) {
+      setValidationErrors({ ...systemComponentsErrors, ...economicDataErrors });
+      if (hasSystemComponentsErrors && hasEconomicDataErrors) {
+        setErrorKey("requiredFieldsErrorBoth");
+        setTabValue(0);
+      } else if (hasSystemComponentsErrors) {
+        setErrorKey("requiredFieldsError");
+        setTabValue(0);
+      } else if (hasEconomicDataErrors) {
+        setErrorKey("requiredFieldsErrorEconomic");
+        setTabValue(1);
+      }
       return;
     }
 
     setLoading(true);
-    setError(null);
+    setErrorKey(null);
 
     const submitData = {
       building: buildingUuid,
@@ -375,18 +393,12 @@ const NaturalGasNetworkTabContent = ({
       data: JSON.stringify(submitData),
       success: (response) => {
 
-        setSuccess(
-          translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
-        );
+        setSuccessKey("successSave");
         setLoading(false);
       },
       error: (jqXHR) => {
 
-        setError(
-          jqXHR.responseJSON?.detail ||
-            translations.errorSave ||
-            "Σφάλμα κατά την αποθήκευση"
-        );
+        setErrorKey("errorSave");
         setLoading(false);
       },
     });
@@ -406,10 +418,10 @@ const NaturalGasNetworkTabContent = ({
                 {translations.itemType || "Είδος"}
               </TableCell>
               <TableCell sx={{ fontWeight: "bold", color: "white" }} align="center">
-                {translations.quantity || "Ποσότητα"}
+                {translations.quantity || "Ποσότητα"} <span style={{ color: "#ff4444" }}>*</span>
               </TableCell>
               <TableCell sx={{ fontWeight: "bold", color: "white" }} align="center">
-                {translations.unitPrice || "Τιμή Μονάδας (€)"}
+                {translations.unitPrice || "Τιμή Μονάδας (€)"} <span style={{ color: "#ff4444" }}>*</span>
               </TableCell>
               <TableCell sx={{ fontWeight: "bold", color: "white" }} align="center">
                 {translations.expense || "Δαπάνη (€)"}
@@ -430,6 +442,8 @@ const NaturalGasNetworkTabContent = ({
                   onChange={(e) =>
                     handleInputChange("burner_replacement_quantity", e.target.value)
                   }
+                  required
+                  error={validationErrors.burner_replacement_quantity}
                   sx={{ 
                     width: "80px",
                     "& .MuiOutlinedInput-root": {
@@ -451,6 +465,8 @@ const NaturalGasNetworkTabContent = ({
                   onChange={(e) =>
                     handleInputChange("burner_replacement_unit_price", e.target.value)
                   }
+                  required
+                  error={validationErrors.burner_replacement_unit_price}
                   sx={{ 
                     width: "100px",
                     "& .MuiOutlinedInput-root": {
@@ -482,6 +498,8 @@ const NaturalGasNetworkTabContent = ({
                   onChange={(e) =>
                     handleInputChange("gas_pipes_quantity", e.target.value)
                   }
+                  required
+                  error={validationErrors.gas_pipes_quantity}
                   sx={{ 
                     width: "80px",
                     "& .MuiOutlinedInput-root": {
@@ -503,6 +521,8 @@ const NaturalGasNetworkTabContent = ({
                   onChange={(e) =>
                     handleInputChange("gas_pipes_unit_price", e.target.value)
                   }
+                  required
+                  error={validationErrors.gas_pipes_unit_price}
                   sx={{ 
                     width: "100px",
                     "& .MuiOutlinedInput-root": {
@@ -534,6 +554,8 @@ const NaturalGasNetworkTabContent = ({
                   onChange={(e) =>
                     handleInputChange("gas_detection_systems_quantity", e.target.value)
                   }
+                  required
+                  error={validationErrors.gas_detection_systems_quantity}
                   sx={{ 
                     width: "80px",
                     "& .MuiOutlinedInput-root": {
@@ -555,6 +577,8 @@ const NaturalGasNetworkTabContent = ({
                   onChange={(e) =>
                     handleInputChange("gas_detection_systems_unit_price", e.target.value)
                   }
+                  required
+                  error={validationErrors.gas_detection_systems_unit_price}
                   sx={{ 
                     width: "100px",
                     "& .MuiOutlinedInput-root": {
@@ -586,6 +610,8 @@ const NaturalGasNetworkTabContent = ({
                   onChange={(e) =>
                     handleInputChange("boiler_cleaning_quantity", e.target.value)
                   }
+                  required
+                  error={validationErrors.boiler_cleaning_quantity}
                   sx={{ 
                     width: "80px",
                     "& .MuiOutlinedInput-root": {
@@ -607,6 +633,8 @@ const NaturalGasNetworkTabContent = ({
                   onChange={(e) =>
                     handleInputChange("boiler_cleaning_unit_price", e.target.value)
                   }
+                  required
+                  error={validationErrors.boiler_cleaning_unit_price}
                   sx={{ 
                     width: "100px",
                     "& .MuiOutlinedInput-root": {
@@ -713,22 +741,26 @@ const NaturalGasNetworkTabContent = ({
             }
             type="number"
             value={formData.annual_energy_savings}
-            onChange={(e) =>
-              handleInputChange("annual_energy_savings", e.target.value)
-            }
+            InputProps={{ readOnly: true }}
             variant="outlined"
+            helperText={translations.autoCalculatedHelperText || "Υπολογίζεται αυτόματα από τη διαφορά κόστους"}
             sx={{
+              "& .MuiInputBase-input": {
+                color: "var(--color-primary)",
+                fontWeight: "bold",
+              },
+              "& .MuiInputLabel-root": {
+                color: "var(--color-primary)",
+                "&.Mui-focused": {
+                  color: "var(--color-primary)",
+                },
+              },
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
                   borderColor: "var(--color-primary)",
                 },
                 "&.Mui-focused fieldset": {
                   borderColor: "var(--color-primary)",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                "&.Mui-focused": {
-                  color: "var(--color-primary)",
                 },
               },
             }}
@@ -739,13 +771,16 @@ const NaturalGasNetworkTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.lifespanYears || "Χρονικό διάστημα") + " (έτη)"
+              <>
+                {translations.lifespanYears || "Χρονικό διάστημα"} (έτη) <span style={{ color: "red" }}>*</span>
+              </>
             }
             type="number"
             value={formData.lifespan_years}
             onChange={(e) =>
               handleInputChange("lifespan_years", e.target.value)
             }
+            error={validationErrors.lifespan_years}
             variant="outlined"
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -769,13 +804,82 @@ const NaturalGasNetworkTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.newSystemEfficiency || "Απόδοση νέου συστήματος") + " (%)"
+              <>
+                {translations.discountRate || "Επιτόκιο αναγωγής"} (%) <span style={{ color: "red" }}>*</span>
+              </>
+            }
+            type="number"
+            value={formData.discount_rate}
+            onChange={(e) =>
+              handleInputChange("discount_rate", e.target.value)
+            }
+            error={validationErrors.discount_rate}
+            variant="outlined"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                "&.Mui-focused": {
+                  color: "var(--color-primary)",
+                },
+              },
+            }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={
+              <>
+                {translations.annualOperatingExpenses || "Λειτουργικά έξοδα ανά έτος"} (€) <span style={{ color: "red" }}>*</span>
+              </>
+            }
+            type="number"
+            value={formData.annual_operating_expenses}
+            onChange={(e) =>
+              handleInputChange("annual_operating_expenses", e.target.value)
+            }
+            error={validationErrors.annual_operating_expenses}
+            variant="outlined"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                "&.Mui-focused": {
+                  color: "var(--color-primary)",
+                },
+              },
+            }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={
+              <>
+                {translations.newSystemEfficiency || "Απόδοση νέου συστήματος"} (%) <span style={{ color: "red" }}>*</span>
+              </>
             }
             type="number"
             value={formData.new_system_efficiency * 100}
             onChange={(e) =>
               handleInputChange("new_system_efficiency", e.target.value / 100)
             }
+            error={validationErrors.new_system_efficiency}
             variant="outlined"
             inputProps={{ min: 10, max: 100, step: 1 }}
             helperText="Απόδοση του νέου συστήματος φυσικού αερίου (10%-100%)"
@@ -801,15 +905,13 @@ const NaturalGasNetworkTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.naturalGasPricePerKwh || "Τιμή φυσικού αερίου") + " (€/kWh)"
+              (translations.naturalGasPricePerKwh || "Τιμή φυσικού αερίου") + " (€/m³)"
             }
             type="number"
             value={formData.natural_gas_price_per_kwh}
-            onChange={(e) =>
-              handleInputChange("natural_gas_price_per_kwh", e.target.value)
-            }
+            InputProps={{ readOnly: true }}
             variant="outlined"
-            helperText="Εάν δεν συμπληρωθεί, θα χρησιμοποιηθεί η τιμή καυσίμου από το έργο"
+            helperText="Φορτώνεται αυτόματα από το έργο"
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -999,14 +1101,14 @@ const NaturalGasNetworkTabContent = ({
       </div>
 
       {/* Error and Success Messages */}
-      {error && (
-        <Alert severity="error" className="mb-4" onClose={() => setError(null)}>
-          {error}
+      {errorKey && (
+        <Alert severity="error" className="mb-4" onClose={() => setErrorKey(null)}>
+          {translations[errorKey] || "Error"}
         </Alert>
       )}
-      {success && (
-        <Alert severity="success" className="mb-4" onClose={() => setSuccess(null)}>
-          {success}
+      {successKey && (
+        <Alert severity="success" className="mb-4" onClose={() => setSuccessKey(null)}>
+          {translations[successKey] || "Success"}
         </Alert>
       )}
 

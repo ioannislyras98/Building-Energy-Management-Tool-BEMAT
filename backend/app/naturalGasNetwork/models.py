@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from building.models import Building
@@ -5,6 +6,7 @@ from project.models import Project
 
 
 class NaturalGasNetwork(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='natural_gas_networks')
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='natural_gas_networks', null=True, blank=True)
     
@@ -24,6 +26,8 @@ class NaturalGasNetwork(models.Model):
     natural_gas_cost_per_year = models.FloatField(null=True, blank=True, help_text="Annual natural gas cost (€)")
     annual_energy_savings = models.FloatField(null=True, blank=True, help_text="Annual energy savings (€)")
     lifespan_years = models.IntegerField(default=15, help_text="Project lifespan in years")
+    discount_rate = models.FloatField(default=5.0, help_text="Discount rate (%)")
+    annual_operating_expenses = models.FloatField(default=0.0, help_text="Annual operating expenses (€)")
     
     new_system_efficiency = models.FloatField(default=0.90, help_text="Efficiency of new natural gas system (0.0-1.0)", validators=[MinValueValidator(0.1), MaxValueValidator(1.0)])
     natural_gas_price_per_kwh = models.FloatField(null=True, blank=True, help_text="Natural gas price per kWh (€/kWh)")
@@ -79,10 +83,10 @@ class NaturalGasNetwork(models.Model):
             
             gas_price_per_kwh = self.natural_gas_price_per_kwh
             if not gas_price_per_kwh:
-                if self.project and self.project.cost_per_kwh_fuel:
-                    gas_price_per_kwh = float(self.project.cost_per_kwh_fuel)
-                elif self.building.project and self.building.project.cost_per_kwh_fuel:
-                    gas_price_per_kwh = float(self.building.project.cost_per_kwh_fuel)
+                if self.project and self.project.natural_gas_price_per_m3:
+                    gas_price_per_kwh = float(self.project.natural_gas_price_per_m3)
+                elif self.building.project and self.building.project.natural_gas_price_per_m3:
+                    gas_price_per_kwh = float(self.building.project.natural_gas_price_per_m3)
                 else:
                     gas_price_per_kwh = 0.10  
 
@@ -111,24 +115,27 @@ class NaturalGasNetwork(models.Model):
         )
         
         if self.current_energy_cost_per_year and self.natural_gas_cost_per_year:
-            self.annual_economic_benefit = self.current_energy_cost_per_year - self.natural_gas_cost_per_year
+            savings = self.current_energy_cost_per_year - self.natural_gas_cost_per_year
         elif self.annual_energy_savings:
-            self.annual_economic_benefit = self.annual_energy_savings
+            savings = self.annual_energy_savings
         else:
-            self.annual_economic_benefit = 0.0
+            savings = 0.0
+        
+        operating_expenses = float(self.annual_operating_expenses or 0)
+        self.annual_economic_benefit = savings - operating_expenses
         
         if self.annual_economic_benefit > 0 and self.total_investment_cost > 0:
             self.payback_period = self.total_investment_cost / self.annual_economic_benefit
         else:
             self.payback_period = 0.0
         
-        discount_rate = 0.05
+        discount_rate_decimal = float(self.discount_rate or 5) / 100.0
         years = self.lifespan_years
         npv = 0.0
         
         if self.annual_economic_benefit > 0:
             for year in range(1, years + 1):
-                npv += self.annual_economic_benefit / ((1 + discount_rate) ** year)
+                npv += self.annual_economic_benefit / ((1 + discount_rate_decimal) ** year)
             npv -= self.total_investment_cost
         else:
             npv = -self.total_investment_cost

@@ -38,7 +38,7 @@ class AutomaticLightingControlSerializer(serializers.ModelSerializer):
     class Meta:
         model = AutomaticLightingControl
         fields = [
-            'id',
+            'uuid',
             'building',
             'project',
             # Στοιχεία Συστήματος
@@ -63,7 +63,7 @@ class AutomaticLightingControlSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
         read_only_fields = [
-            'id',
+            'uuid',
             'created_at',
             'updated_at',
             'total_investment_cost',

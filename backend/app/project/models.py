@@ -21,8 +21,7 @@ class Project(models.Model):
         max_digits=6,
         decimal_places=3,
         verbose_name="Τιμή φυσικού αερίου ανά m³ (€)",
-        null=True,
-        blank=True,
+        default=0.800,
         help_text="Τρέχουσα τιμή φυσικού αερίου ανά κυβικό μέτρο"
     )
     biomass_price_per_kg = models.DecimalField(

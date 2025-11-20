@@ -11,7 +11,7 @@ class BuildingImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = BuildingImage
         fields = [
-            'id',
+            'uuid',
             'title',
             'description',
             'category',
@@ -25,7 +25,7 @@ class BuildingImageSerializer(serializers.ModelSerializer):
             'uploaded_at',
             'updated_at'
         ]
-        read_only_fields = ['id', 'uploaded_at', 'updated_at', 'image_name', 'image_type', 'image_size']
+        read_only_fields = ['uuid', 'uploaded_at', 'updated_at', 'image_name', 'image_type', 'image_size']
 
     def get_image(self, obj):
         """Return data URL for the image"""
@@ -38,7 +38,7 @@ class BuildingImageCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BuildingImage
         fields = [
-            'id',
+            'uuid',
             'title',
             'description',
             'category',
@@ -49,7 +49,7 @@ class BuildingImageCreateUpdateSerializer(serializers.ModelSerializer):
             'uploaded_at',
             'updated_at'
         ]
-        read_only_fields = ['id', 'uploaded_at', 'updated_at']
+        read_only_fields = ['uuid', 'uploaded_at', 'updated_at']
 
     def validate_image(self, value):
         """Validate base64 image data"""
@@ -122,7 +122,7 @@ class BuildingImageListSerializer(serializers.ModelSerializer):
     class Meta:
         model = BuildingImage
         fields = [
-            'id',
+            'uuid',
             'title',
             'category',
             'image',

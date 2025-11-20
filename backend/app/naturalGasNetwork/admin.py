@@ -5,7 +5,7 @@ from .models import NaturalGasNetwork
 @admin.register(NaturalGasNetwork)
 class NaturalGasNetworkAdmin(admin.ModelAdmin):
     list_display = [
-        'id',
+        'uuid',
         'building',
         'project',
         'total_investment_cost',
