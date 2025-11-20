@@ -11,4 +11,5 @@ urlpatterns = [
     path('<uuid:network_uuid>/', views.get_natural_gas_network_detail, name='get_natural_gas_network_detail'),
     path('<uuid:network_uuid>/update/', views.update_natural_gas_network, name='update_natural_gas_network'),
     path('<uuid:network_uuid>/delete/', views.delete_natural_gas_network, name='delete_natural_gas_network'),
+    path('<uuid:network_uuid>/refresh-prices/', views.refresh_prices, name='refresh_natural_gas_prices'),
 ]

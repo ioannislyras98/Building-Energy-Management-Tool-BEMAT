@@ -22,7 +22,7 @@ class NaturalGasNetwork(models.Model):
     boiler_cleaning_quantity = models.FloatField(default=1, help_text="Quantity of boiler cleaning services")
     boiler_cleaning_unit_price = models.FloatField(default=364.0, help_text="Unit price for boiler cleaning (€)")
     
-    current_energy_cost_per_year = models.FloatField(null=True, blank=True, help_text="Current annual energy cost (€)")
+    current_energy_cost_per_year = models.FloatField(null=True, blank=True, help_text="Annual heating oil energy cost (€)")
     natural_gas_cost_per_year = models.FloatField(null=True, blank=True, help_text="Annual natural gas cost (€)")
     annual_energy_savings = models.FloatField(null=True, blank=True, help_text="Annual energy savings (€)")
     lifespan_years = models.IntegerField(default=15, help_text="Project lifespan in years")
@@ -60,14 +60,18 @@ class NaturalGasNetwork(models.Model):
     def _calculate_natural_gas_cost(self):
         """
         Calculate natural gas cost per year using formula:
-        Natural Gas Cost = (Thermal Requirement ÷ New System Efficiency) × Natural Gas Price per kWh
+        1. Get kWh from heating oil only
+        2. Apply new system efficiency
+        3. Convert kWh to m³ (1 m³ = 10 kWh)
+        4. Multiply by natural gas price per m³
         """
         try:
             from energyConsumption.models import EnergyConsumption
             
+            # Παίρνουμε μόνο το πετρέλαιο θέρμανσης
             heating_consumptions = EnergyConsumption.objects.filter(
                 building=self.building,
-                energy_source__in=['heating_oil', 'natural_gas', 'biomass']
+                energy_source='heating_oil'
             )
             
             if not heating_consumptions.exists():
@@ -81,25 +85,59 @@ class NaturalGasNetwork(models.Model):
             if total_thermal_kwh == 0:
                 return
             
-            gas_price_per_kwh = self.natural_gas_price_per_kwh
-            if not gas_price_per_kwh:
+            # Τιμή φυσικού αερίου ανά m³
+            gas_price_per_m3 = self.natural_gas_price_per_kwh
+            if not gas_price_per_m3:
                 if self.project and self.project.natural_gas_price_per_m3:
-                    gas_price_per_kwh = float(self.project.natural_gas_price_per_m3)
+                    gas_price_per_m3 = float(self.project.natural_gas_price_per_m3)
                 elif self.building.project and self.building.project.natural_gas_price_per_m3:
-                    gas_price_per_kwh = float(self.building.project.natural_gas_price_per_m3)
+                    gas_price_per_m3 = float(self.building.project.natural_gas_price_per_m3)
                 else:
-                    gas_price_per_kwh = 0.10  
+                    gas_price_per_m3 = 1.0  # Προεπιλογή σε €/m³
 
+            # Εφαρμογή απόδοσης νέου συστήματος
             efficiency = self.new_system_efficiency or 0.90
             natural_gas_consumption_kwh = total_thermal_kwh / efficiency
             
-            self.natural_gas_cost_per_year = natural_gas_consumption_kwh * gas_price_per_kwh
+            # Μετατροπή kWh σε m³ (1 m³ = 10 kWh)
+            natural_gas_consumption_m3 = natural_gas_consumption_kwh / 10.0
+            
+            # Υπολογισμός κόστους: m³ × τιμή/m³ (στρογγυλοποιημένο σε 2 δεκαδικά)
+            self.natural_gas_cost_per_year = round(natural_gas_consumption_m3 * gas_price_per_m3, 2)
             
         except Exception as e:
             pass
     
     def save(self, *args, **kwargs):
-        if not self.natural_gas_cost_per_year and self.building:
+        # Ενημέρωση τιμής φυσικού αερίου από το Project
+        project = self.project or (self.building.project if self.building else None)
+        if project and project.natural_gas_price_per_m3:
+            self.natural_gas_price_per_kwh = float(project.natural_gas_price_per_m3)
+        
+        # Επαναϋπολογισμός τρέχοντος κόστους πετρελαίου
+        if self.building:
+            from energyConsumption.models import EnergyConsumption
+            
+            energy_consumptions = EnergyConsumption.objects.filter(
+                building=self.building,
+                energy_source='heating_oil'
+            )
+            
+            if energy_consumptions.exists():
+                total_annual_cost = 0
+                oil_price_per_liter = 1.0
+                
+                if project and project.oil_price_per_liter:
+                    oil_price_per_liter = float(project.oil_price_per_liter)
+                
+                for consumption in energy_consumptions:
+                    liters = float(consumption.quantity or 0)
+                    total_annual_cost += liters * oil_price_per_liter
+                
+                self.current_energy_cost_per_year = round(total_annual_cost, 2)
+        
+        # Επαναϋπολογισμός κόστους φυσικού αερίου (πάντα)
+        if self.building:
             self._calculate_natural_gas_cost()
         
         self.burner_replacement_subtotal = self.burner_replacement_quantity * self.burner_replacement_unit_price
@@ -114,18 +152,20 @@ class NaturalGasNetwork(models.Model):
             self.boiler_cleaning_subtotal
         )
         
+        # Υπολογισμός εξοικονόμησης
         if self.current_energy_cost_per_year and self.natural_gas_cost_per_year:
             savings = self.current_energy_cost_per_year - self.natural_gas_cost_per_year
+            self.annual_energy_savings = round(savings, 2)
         elif self.annual_energy_savings:
             savings = self.annual_energy_savings
         else:
             savings = 0.0
         
         operating_expenses = float(self.annual_operating_expenses or 0)
-        self.annual_economic_benefit = savings - operating_expenses
+        self.annual_economic_benefit = round(savings - operating_expenses, 2)
         
         if self.annual_economic_benefit > 0 and self.total_investment_cost > 0:
-            self.payback_period = self.total_investment_cost / self.annual_economic_benefit
+            self.payback_period = round(self.total_investment_cost / self.annual_economic_benefit, 2)
         else:
             self.payback_period = 0.0
         
@@ -140,45 +180,55 @@ class NaturalGasNetwork(models.Model):
         else:
             npv = -self.total_investment_cost
         
-        self.net_present_value = npv
+        self.net_present_value = round(npv, 2)
         
         # IRR υπολογισμός με Newton-Raphson
         if self.total_investment_cost > 0 and self.annual_economic_benefit > 0:
-            # Υπολογισμός IRR: βρίσκουμε το επιτόκιο όπου NPV = 0
             initial_investment = float(self.total_investment_cost)
             annual_benefit = float(self.annual_economic_benefit)
             years = int(self.lifespan_years)
             
-            # Αρχική εκτίμηση IRR
-            irr = 0.1  # 10%
-            tolerance = 0.00001
-            max_iterations = 1000
-            
-            for _ in range(max_iterations):
-                # Υπολογισμός NPV με το τρέχον IRR
-                npv_calc = -initial_investment
-                npv_derivative = 0
+            # Έλεγχος αν το συνολικό όφελος υπερβαίνει την επένδυση
+            total_benefit = annual_benefit * years
+            if total_benefit <= initial_investment:
+                # Αν το συνολικό όφελος δεν καλύπτει την επένδυση, IRR είναι αρνητικό
+                self.internal_rate_of_return = -100.0
+            else:
+                # Αρχική εκτίμηση IRR βασισμένη στο απλό ROI
+                simple_roi = annual_benefit / initial_investment
+                irr = simple_roi * 0.8  # Πιο συντηρητική αρχική εκτίμηση
                 
-                for year in range(1, years + 1):
-                    factor = (1 + irr) ** year
-                    npv_calc += annual_benefit / factor
-                    npv_derivative -= year * annual_benefit / (factor * (1 + irr))
+                tolerance = 0.00001
+                max_iterations = 1000
                 
-                # Έλεγχος σύγκλισης
-                if abs(npv_calc) < tolerance:
-                    break
+                for iteration in range(max_iterations):
+                    # Υπολογισμός NPV με το τρέχον IRR
+                    npv_calc = -initial_investment
+                    npv_derivative = 0
+                    
+                    for year in range(1, years + 1):
+                        factor = (1 + irr) ** year
+                        npv_calc += annual_benefit / factor
+                        npv_derivative -= year * annual_benefit / (factor * (1 + irr))
+                    
+                    # Έλεγχος σύγκλισης
+                    if abs(npv_calc) < tolerance:
+                        break
+                    
+                    # Newton-Raphson update
+                    if abs(npv_derivative) > 0.000001:
+                        delta = npv_calc / npv_derivative
+                        irr = irr - delta
+                        
+                        # Όρια για σταθερότητα
+                        if irr < -0.99:
+                            irr = -0.99
+                        elif irr > 10.0:  # 1000% ως ανώτατο όριο
+                            irr = 10.0
+                    else:
+                        break
                 
-                # Newton-Raphson update
-                if npv_derivative != 0:
-                    irr = irr - npv_calc / npv_derivative
-                else:
-                    break
-                
-                # Αποφυγή αρνητικών IRR
-                if irr < -0.99:
-                    irr = -0.99
-            
-            self.internal_rate_of_return = irr * 100
+                self.internal_rate_of_return = round(irr * 100, 2)
         else:
             self.internal_rate_of_return = 0.0
         

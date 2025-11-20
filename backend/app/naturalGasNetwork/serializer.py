@@ -5,6 +5,21 @@ from .models import NaturalGasNetwork
 class NaturalGasNetworkSerializer(serializers.ModelSerializer):
     building_name = serializers.CharField(source='building.name', read_only=True)
     project_name = serializers.CharField(source='project.name', read_only=True)
+    oil_price_per_liter = serializers.SerializerMethodField(read_only=True)
+    natural_gas_price_per_m3 = serializers.SerializerMethodField(read_only=True)
+    
+    def get_oil_price_per_liter(self, obj):
+        """Επιστρέφει την τιμή πετρελαίου από το Project"""
+        project = obj.project or (obj.building.project if obj.building else None)
+        if project and project.oil_price_per_liter:
+            return float(project.oil_price_per_liter)
+        return None
+    
+    def get_natural_gas_price_per_m3(self, obj):
+        """Επιστρέφει την τιμή φυσικού αερίου που χρησιμοποιήθηκε (από το μοντέλο)"""
+        if obj.natural_gas_price_per_kwh:
+            return float(obj.natural_gas_price_per_kwh)
+        return None
     
     def to_internal_value(self, data):
         """
@@ -58,6 +73,8 @@ class NaturalGasNetworkSerializer(serializers.ModelSerializer):
             'building_name',
             'project',
             'project_name',
+            'oil_price_per_liter',
+            'natural_gas_price_per_m3',
             'burner_replacement_quantity',
             'burner_replacement_unit_price',
             'gas_pipes_quantity',

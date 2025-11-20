@@ -66,6 +66,8 @@ const NaturalGasNetworkTabContent = ({
     gas_detection_systems_unit_price: "",
     boiler_cleaning_quantity: "",
     boiler_cleaning_unit_price: "",
+    oil_price_per_liter: "",
+    natural_gas_price_per_m3: "",
     current_energy_cost_per_year: "",
     natural_gas_cost_per_year: "",
     annual_energy_savings: "",
@@ -75,6 +77,8 @@ const NaturalGasNetworkTabContent = ({
     new_system_efficiency: 0.90,
     natural_gas_price_per_kwh: "",
   });
+  
+  const [networkUuid, setNetworkUuid] = useState(null);
   useEffect(() => {
     if (buildingUuid && token) {
       fetchExistingData();
@@ -95,10 +99,11 @@ const NaturalGasNetworkTabContent = ({
         Authorization: `Token ${token}`,
       },
       success: (response) => {
-        if (response.data && response.data.natural_gas_price_per_m3) {
+        if (response.data) {
           setFormData((prev) => ({
             ...prev,
             natural_gas_price_per_kwh: response.data.natural_gas_price_per_m3 || "",
+            oil_price_per_liter: response.data.oil_price_per_liter || "",
           }));
         }
       },
@@ -123,6 +128,14 @@ const NaturalGasNetworkTabContent = ({
       fetchEnergyConsumptions();
     }
   }, [formData, buildingUuid, token]);
+  
+  // Επαναϋπολογισμός κόστους πετρελαίου όταν αλλάζει η τιμή
+  useEffect(() => {
+    if (formData.oil_price_per_liter && buildingUuid && token) {
+      fetchEnergyConsumptions();
+    }
+  }, [formData.oil_price_per_liter]);
+  
   useEffect(() => {
     const currentCost = parseFloat(formData.current_energy_cost_per_year || 0);
     const gasCost = parseFloat(formData.natural_gas_cost_per_year || 0);
@@ -147,27 +160,26 @@ const NaturalGasNetworkTabContent = ({
       },
       success: (response) => {
         if (response && response.length > 0) {
+          // Υπολογίζουμε λίτρα πετρελαίου × τιμή ανά λίτρο
           const totalAnnualCost = response.reduce((sum, consumption) => {
-            const kwhEquivalent = consumption.kwh_equivalent || 0;
-            let energyCostPerKwh = 0.15;
-            
-            if (consumption.energy_source === 'electricity') {
-              if (params && params.cost_per_kwh_electricity) {
-                energyCostPerKwh = parseFloat(params.cost_per_kwh_electricity);
-              } else if (buildingData && buildingData.project && buildingData.project.cost_per_kwh_electricity) {
-                energyCostPerKwh = parseFloat(buildingData.project.cost_per_kwh_electricity);
-              }
-            } else {
-              if (params && params.cost_per_kwh_fuel) {
-                energyCostPerKwh = parseFloat(params.cost_per_kwh_fuel);
-              } else if (buildingData && buildingData.project && buildingData.project.cost_per_kwh_fuel) {
-                energyCostPerKwh = parseFloat(buildingData.project.cost_per_kwh_fuel);
-              } else {
-                energyCostPerKwh = 0.10;
-              }
+            // Φιλτράρουμε μόνο το πετρέλαιο θέρμανσης
+            if (consumption.energy_source !== 'heating_oil') {
+              return sum;
             }
             
-            return sum + (kwhEquivalent * energyCostPerKwh);
+            const liters = consumption.quantity || 0;
+            let oilPricePerLiter = 1.0;
+            
+            // Χρησιμοποιούμε την τιμή από το formData αν υπάρχει
+            if (formData.oil_price_per_liter) {
+              oilPricePerLiter = parseFloat(formData.oil_price_per_liter);
+            } else if (params && params.oil_price_per_liter) {
+              oilPricePerLiter = parseFloat(params.oil_price_per_liter);
+            } else if (buildingData && buildingData.project && buildingData.project.oil_price_per_liter) {
+              oilPricePerLiter = parseFloat(buildingData.project.oil_price_per_liter);
+            }
+            
+            return sum + (liters * oilPricePerLiter);
           }, 0);
 
           if (totalAnnualCost > 0) {
@@ -193,7 +205,9 @@ const NaturalGasNetworkTabContent = ({
       },
       success: (response) => {
         if (response.success && response.data && response.data.length > 0) {
-          const data = response.data[0]; 
+          const data = response.data[0];
+          setNetworkUuid(data.uuid); // Αποθήκευση του UUID για το refresh
+          
           setFormData(prev => ({
             ...prev,
             burner_replacement_quantity: data.burner_replacement_quantity || "",
@@ -211,8 +225,22 @@ const NaturalGasNetworkTabContent = ({
             discount_rate: data.discount_rate || 5,
             annual_operating_expenses: data.annual_operating_expenses || "",
             new_system_efficiency: data.new_system_efficiency || 0.90,
-            natural_gas_price_per_kwh: data.natural_gas_price_per_kwh || "",
+            natural_gas_price_per_kwh: data.natural_gas_price_per_m3 || "",
+            oil_price_per_liter: data.oil_price_per_liter || "",
           }));
+          
+          // Φόρτωση υπολογισμένων αποτελεσμάτων από το backend
+          setCalculatedResults({
+            burner_replacement_subtotal: parseFloat(data.burner_replacement_subtotal || 0),
+            gas_pipes_subtotal: parseFloat(data.gas_pipes_subtotal || 0),
+            gas_detection_systems_subtotal: parseFloat(data.gas_detection_systems_subtotal || 0),
+            boiler_cleaning_subtotal: parseFloat(data.boiler_cleaning_subtotal || 0),
+            total_investment_cost: parseFloat(data.total_investment_cost || 0),
+            annual_economic_benefit: parseFloat(data.annual_economic_benefit || 0),
+            payback_period: parseFloat(data.payback_period || 0),
+            net_present_value: parseFloat(data.net_present_value || 0),
+            internal_rate_of_return: parseFloat(data.internal_rate_of_return || 0),
+          });
         } else if (response.success && response.current_energy_cost_per_year !== undefined) {
           setFormData(prev => ({
             ...prev,
@@ -259,36 +287,81 @@ const NaturalGasNetworkTabContent = ({
       current_energy_cost_per_year,
       natural_gas_cost_per_year,
       annual_energy_savings,
+      annual_operating_expenses,
       lifespan_years,
+      discount_rate,
     } = formData;
+    
     const burnerReplacementSubtotal = parseFloat(burner_replacement_quantity || 0) * parseFloat(burner_replacement_unit_price || 0);
     const gasPipesSubtotal = parseFloat(gas_pipes_quantity || 0) * parseFloat(gas_pipes_unit_price || 0);
     const gasDetectionSystemsSubtotal = parseFloat(gas_detection_systems_quantity || 0) * parseFloat(gas_detection_systems_unit_price || 0);
     const boilerCleaningSubtotal = parseFloat(boiler_cleaning_quantity || 0) * parseFloat(boiler_cleaning_unit_price || 0);
     const totalInvestmentCost = burnerReplacementSubtotal + gasPipesSubtotal + gasDetectionSystemsSubtotal + boilerCleaningSubtotal;
-    let annualEconomicBenefit = 0;
+    
+    // Υπολογισμός εξοικονόμησης
+    let savings = 0;
     if (current_energy_cost_per_year && natural_gas_cost_per_year) {
-      annualEconomicBenefit = parseFloat(current_energy_cost_per_year) - parseFloat(natural_gas_cost_per_year);
+      savings = parseFloat(current_energy_cost_per_year) - parseFloat(natural_gas_cost_per_year);
     } else if (annual_energy_savings) {
-      annualEconomicBenefit = parseFloat(annual_energy_savings);
+      savings = parseFloat(annual_energy_savings);
     }
+    
+    // Ετήσιο οικονομικό όφελος = εξοικονόμηση - λειτουργικά έξοδα
+    const operatingExpenses = parseFloat(annual_operating_expenses || 0);
+    const annualEconomicBenefit = savings - operatingExpenses;
+    
+    // Περίοδος απόσβεσης
     let paybackPeriod = 0;
     if (annualEconomicBenefit > 0 && totalInvestmentCost > 0) {
       paybackPeriod = totalInvestmentCost / annualEconomicBenefit;
     }
-    const discountRate = 0.05; // 5%
+    
+    // NPV με το discount_rate από τη φόρμα
+    const discountRateDecimal = parseFloat(discount_rate || 5) / 100.0;
     const years = parseInt(lifespan_years) || 15;
     let npv = 0;
 
     if (annualEconomicBenefit > 0) {
       for (let year = 1; year <= years; year++) {
-        npv += annualEconomicBenefit / Math.pow(1 + discountRate, year);
+        npv += annualEconomicBenefit / Math.pow(1 + discountRateDecimal, year);
       }
       npv -= totalInvestmentCost;
     } else {
       npv = -totalInvestmentCost;
     }
-    const irr = totalInvestmentCost > 0 ? (annualEconomicBenefit / totalInvestmentCost) * 100 : 0;
+    
+    // IRR υπολογισμός με Newton-Raphson (απλοποιημένος)
+    let irr = 0;
+    if (totalInvestmentCost > 0 && annualEconomicBenefit > 0) {
+      const totalBenefit = annualEconomicBenefit * years;
+      if (totalBenefit > totalInvestmentCost) {
+        // Αρχική εκτίμηση
+        irr = (annualEconomicBenefit / totalInvestmentCost) * 0.8;
+        
+        // Newton-Raphson για 20 επαναλήψεις
+        for (let i = 0; i < 20; i++) {
+          let npvCalc = -totalInvestmentCost;
+          let derivative = 0;
+          
+          for (let year = 1; year <= years; year++) {
+            const factor = Math.pow(1 + irr, year);
+            npvCalc += annualEconomicBenefit / factor;
+            derivative -= year * annualEconomicBenefit / (factor * (1 + irr));
+          }
+          
+          if (Math.abs(npvCalc) < 0.001) break;
+          
+          if (Math.abs(derivative) > 0.000001) {
+            irr = irr - npvCalc / derivative;
+            if (irr < -0.99) irr = -0.99;
+            if (irr > 10.0) irr = 10.0;
+          }
+        }
+        irr = irr * 100; // Μετατροπή σε ποσοστό
+      } else {
+        irr = -100;
+      }
+    }
 
     setCalculatedResults({
       burner_replacement_subtotal: burnerReplacementSubtotal,
@@ -303,9 +376,43 @@ const NaturalGasNetworkTabContent = ({
     });
   }, [formData]);
 
+  // Υπολογισμός μόνο των subtotals για τον πίνακα (όχι NPV/IRR)
   useEffect(() => {
-    calculateResults();
-  }, [calculateResults]);
+    const {
+      burner_replacement_quantity,
+      burner_replacement_unit_price,
+      gas_pipes_quantity,
+      gas_pipes_unit_price,
+      gas_detection_systems_quantity,
+      gas_detection_systems_unit_price,
+      boiler_cleaning_quantity,
+      boiler_cleaning_unit_price,
+    } = formData;
+    
+    const burnerReplacementSubtotal = parseFloat(burner_replacement_quantity || 0) * parseFloat(burner_replacement_unit_price || 0);
+    const gasPipesSubtotal = parseFloat(gas_pipes_quantity || 0) * parseFloat(gas_pipes_unit_price || 0);
+    const gasDetectionSystemsSubtotal = parseFloat(gas_detection_systems_quantity || 0) * parseFloat(gas_detection_systems_unit_price || 0);
+    const boilerCleaningSubtotal = parseFloat(boiler_cleaning_quantity || 0) * parseFloat(boiler_cleaning_unit_price || 0);
+    const totalInvestmentCost = burnerReplacementSubtotal + gasPipesSubtotal + gasDetectionSystemsSubtotal + boilerCleaningSubtotal;
+    
+    setCalculatedResults(prev => ({
+      ...prev,
+      burner_replacement_subtotal: burnerReplacementSubtotal,
+      gas_pipes_subtotal: gasPipesSubtotal,
+      gas_detection_systems_subtotal: gasDetectionSystemsSubtotal,
+      boiler_cleaning_subtotal: boilerCleaningSubtotal,
+      total_investment_cost: totalInvestmentCost,
+    }));
+  }, [
+    formData.burner_replacement_quantity,
+    formData.burner_replacement_unit_price,
+    formData.gas_pipes_quantity,
+    formData.gas_pipes_unit_price,
+    formData.gas_detection_systems_quantity,
+    formData.gas_detection_systems_unit_price,
+    formData.boiler_cleaning_quantity,
+    formData.boiler_cleaning_unit_price,
+  ]);
 
   const handleSubmit = () => {
     if (!buildingUuid || !token) {
@@ -392,12 +499,42 @@ const NaturalGasNetworkTabContent = ({
       },
       data: JSON.stringify(submitData),
       success: (response) => {
-
+        if (response.success && response.data) {
+          const data = response.data;
+          
+          // Ενημέρωση του UUID αν είναι νέα εγγραφή
+          if (data.uuid && !networkUuid) {
+            setNetworkUuid(data.uuid);
+          }
+          
+          // Ενημέρωση formData με τα αποθηκευμένα δεδομένα
+          setFormData(prev => ({
+            ...prev,
+            current_energy_cost_per_year: data.current_energy_cost_per_year || prev.current_energy_cost_per_year,
+            natural_gas_cost_per_year: data.natural_gas_cost_per_year || prev.natural_gas_cost_per_year,
+            annual_energy_savings: data.annual_energy_savings || prev.annual_energy_savings,
+            lifespan_years: data.lifespan_years || prev.lifespan_years,
+            discount_rate: data.discount_rate || prev.discount_rate,
+          }));
+          
+          // Ενημέρωση calculatedResults με τα επαναϋπολογισμένα αποτελέσματα από το backend
+          setCalculatedResults({
+            burner_replacement_subtotal: parseFloat(data.burner_replacement_subtotal || 0),
+            gas_pipes_subtotal: parseFloat(data.gas_pipes_subtotal || 0),
+            gas_detection_systems_subtotal: parseFloat(data.gas_detection_systems_subtotal || 0),
+            boiler_cleaning_subtotal: parseFloat(data.boiler_cleaning_subtotal || 0),
+            total_investment_cost: parseFloat(data.total_investment_cost || 0),
+            annual_economic_benefit: parseFloat(data.annual_economic_benefit || 0),
+            payback_period: parseFloat(data.payback_period || 0),
+            net_present_value: parseFloat(data.net_present_value || 0),
+            internal_rate_of_return: parseFloat(data.internal_rate_of_return || 0),
+          });
+        }
+        
         setSuccessKey("successSave");
         setLoading(false);
       },
       error: (jqXHR) => {
-
         setErrorKey("errorSave");
         setLoading(false);
       },
@@ -669,13 +806,13 @@ const NaturalGasNetworkTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.currentEnergyCostPerYear || "Τρέχον ετήσιο κόστος ενέργειας") + " (€)"
+              (translations.currentEnergyCostPerYear || "Ετήσιο κόστος ενέργειας πετρελαίου") + " (€)"
             }
             type="number"
             value={formData.current_energy_cost_per_year}
             InputProps={{ readOnly: true }}
             variant="outlined"
-            helperText={translations.autoCalculatedHelperText || "Υπολογίζεται αυτόματα από τις ενεργειακές καταναλώσεις του κτιρίου"}
+            helperText="Υπολογίζεται: Λίτρα × Τιμή πετρελαίου"
             sx={{
               "& .MuiInputBase-input": {
                 color: "var(--color-primary)",
@@ -883,6 +1020,33 @@ const NaturalGasNetworkTabContent = ({
             variant="outlined"
             inputProps={{ min: 10, max: 100, step: 1 }}
             helperText="Απόδοση του νέου συστήματος φυσικού αερίου (10%-100%)"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                "&.Mui-focused": {
+                  color: "var(--color-primary)",
+                },
+              },
+            }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="Τιμή πετρελαίου (€/λίτρο)"
+            type="number"
+            value={formData.oil_price_per_liter}
+            InputProps={{ readOnly: true }}
+            variant="outlined"
+            helperText="Φορτώνεται αυτόματα από το έργο"
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {

@@ -40,31 +40,24 @@ def create_natural_gas_network(request):
         
         with transaction.atomic():
             total_annual_cost = 0
-            energy_consumptions = EnergyConsumption.objects.filter(building=building)
+            # Υπολογίζουμε λίτρα πετρελαίου χ τιμή ανά λίτρο
+            energy_consumptions = EnergyConsumption.objects.filter(
+                building=building,
+                energy_source='heating_oil'
+            )
             if energy_consumptions.exists():
-                electricity_cost_per_kwh = 0.15
-                fuel_cost_per_kwh = 0.10
+                oil_price_per_liter = 1.0  # Προεπιλογή
                 
                 if project:
-                    if project.cost_per_kwh_electricity:
-                        electricity_cost_per_kwh = float(project.cost_per_kwh_electricity)
-                    if project.natural_gas_price_per_m3:
-                        fuel_cost_per_kwh = float(project.natural_gas_price_per_m3)
+                    if project.oil_price_per_liter:
+                        oil_price_per_liter = float(project.oil_price_per_liter)
                 elif building.project:
-                    if building.project.cost_per_kwh_electricity:
-                        electricity_cost_per_kwh = float(building.project.cost_per_kwh_electricity)
-                    if building.project.natural_gas_price_per_m3:
-                        fuel_cost_per_kwh = float(building.project.natural_gas_price_per_m3)
+                    if building.project.oil_price_per_liter:
+                        oil_price_per_liter = float(building.project.oil_price_per_liter)
                 
                 for consumption in energy_consumptions:
-                    kwh_equivalent = float(consumption.kwh_equivalent or 0)
-                    
-                    if consumption.energy_source == 'electricity':
-                        cost_per_kwh = electricity_cost_per_kwh
-                    else:
-                        cost_per_kwh = fuel_cost_per_kwh
-                    
-                    total_annual_cost += kwh_equivalent * cost_per_kwh
+                    liters = float(consumption.quantity or 0)
+                    total_annual_cost += liters * oil_price_per_liter
             
             if 'current_energy_cost_per_year' not in data or not data['current_energy_cost_per_year']:
                 data['current_energy_cost_per_year'] = round(total_annual_cost, 2)
@@ -138,36 +131,39 @@ def get_natural_gas_networks_by_building(request, building_uuid):
             serializer = NaturalGasNetworkSerializer(networks, many=True)
             data = serializer.data
             
-            energy_consumptions = EnergyConsumption.objects.filter(building=building)
+            # Υπολογίζουμε λίτρα πετρελαίου χ τιμή ανά λίτρο
+            energy_consumptions = EnergyConsumption.objects.filter(
+                building=building,
+                energy_source='heating_oil'
+            )
             if energy_consumptions.exists():
                 total_annual_cost = 0
                 project = building.project
-                electricity_cost_per_kwh = 0.15
-                fuel_cost_per_kwh = 0.10
+                oil_price_per_liter = 1.0
                 
                 if project:
-                    if project.cost_per_kwh_electricity:
-                        electricity_cost_per_kwh = float(project.cost_per_kwh_electricity)
-                    if project.natural_gas_price_per_m3:
-                        fuel_cost_per_kwh = float(project.natural_gas_price_per_m3)
+                    if project.oil_price_per_liter:
+                        oil_price_per_liter = float(project.oil_price_per_liter)
                 
                 for consumption in energy_consumptions:
-                    kwh_equivalent = float(consumption.kwh_equivalent or 0)
-                    
-                    if consumption.energy_source == 'electricity':
-                        cost_per_kwh = electricity_cost_per_kwh
-                    else:
-                        cost_per_kwh = fuel_cost_per_kwh
-                    
-                    total_annual_cost += kwh_equivalent * cost_per_kwh
+                    liters = float(consumption.quantity or 0)
+                    total_annual_cost += liters * oil_price_per_liter
                 
                 for item in data:
-                    item['current_energy_cost_per_year'] = round(total_annual_cost, 2)
-                    if not item.get('natural_gas_cost_per_year'):
-                        network_obj = networks.filter(uuid=item['uuid']).first()
-                        if network_obj:
-                            network_obj._calculate_natural_gas_cost()
-                            item['natural_gas_cost_per_year'] = network_obj.natural_gas_cost_per_year
+                    # Επαναϋπολογίζουμε πάντα με τις τρέχουσες τιμές του Project
+                    network_obj = networks.filter(uuid=item['uuid']).first()
+                    if network_obj:
+                        # Το save() επαναϋπολογίζει ΟΛΑ τα πεδία με τις τρέχουσες τιμές
+                        network_obj.save()
+                        
+                        # Ενημερώνουμε τα δεδομένα που επιστρέφουμε
+                        item['current_energy_cost_per_year'] = network_obj.current_energy_cost_per_year
+                        item['natural_gas_cost_per_year'] = network_obj.natural_gas_cost_per_year
+                        item['annual_energy_savings'] = network_obj.annual_energy_savings
+                        item['annual_economic_benefit'] = network_obj.annual_economic_benefit
+                        item['payback_period'] = network_obj.payback_period
+                        item['net_present_value'] = network_obj.net_present_value
+                        item['internal_rate_of_return'] = network_obj.internal_rate_of_return
             
             return Response({
                 'success': True,
@@ -176,27 +172,22 @@ def get_natural_gas_networks_by_building(request, building_uuid):
             }, status=status.HTTP_200_OK)
         else:
             total_annual_cost = 0
-            energy_consumptions = EnergyConsumption.objects.filter(building=building)
+            # Υπολογίζουμε λίτρα πετρελαίου χ τιμή ανά λίτρο
+            energy_consumptions = EnergyConsumption.objects.filter(
+                building=building,
+                energy_source='heating_oil'
+            )
             if energy_consumptions.exists():
                 project = building.project
-                electricity_cost_per_kwh = 0.15
-                fuel_cost_per_kwh = 0.10 
+                oil_price_per_liter = 1.0 
                 
                 if project:
-                    if project.cost_per_kwh_electricity:
-                        electricity_cost_per_kwh = float(project.cost_per_kwh_electricity)
-                    if project.natural_gas_price_per_m3:
-                        fuel_cost_per_kwh = float(project.natural_gas_price_per_m3)
+                    if project.oil_price_per_liter:
+                        oil_price_per_liter = float(project.oil_price_per_liter)
                 
                 for consumption in energy_consumptions:
-                    kwh_equivalent = float(consumption.kwh_equivalent or 0)
-                    
-                    if consumption.energy_source == 'electricity':
-                        cost_per_kwh = electricity_cost_per_kwh
-                    else:
-                        cost_per_kwh = fuel_cost_per_kwh
-                    
-                    total_annual_cost += kwh_equivalent * cost_per_kwh
+                    liters = float(consumption.quantity or 0)
+                    total_annual_cost += liters * oil_price_per_liter
             
             return Response({
                 'success': True,
@@ -297,6 +288,55 @@ def delete_natural_gas_network(request, network_uuid):
         return Response({
             'success': False,
             'error': 'Internal server error',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def refresh_prices(request, network_uuid):
+    """
+    Ενημερώνει τις τιμές του Natural Gas Network με τις τρέχουσες τιμές από το Project:
+    - Τιμή πετρελαίου (oil_price_per_liter)
+    - Τιμή φυσικού αερίου (natural_gas_price_per_m3)
+    Και επαναϋπολογίζει όλα τα οικονομικά στοιχεία
+    """
+    try:
+        network = get_object_or_404(NaturalGasNetwork, uuid=network_uuid)
+        
+        if not has_access_permission(request.user, network.building):
+            return Response({
+                'success': False,
+                'message': 'Access denied'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        project = network.project or network.building.project
+        
+        # Επαναϋπολογισμός όλων των πεδίων (ενημερώνει και τις τιμές από το Project)
+        network.save()
+        
+        # Πληροφορίες τιμών (από το μοντέλο μετά το save)
+        price_info = {
+            'oil_price_per_liter': float(project.oil_price_per_liter) if project and project.oil_price_per_liter else None,
+            'natural_gas_price_per_m3': float(network.natural_gas_price_per_kwh) if network.natural_gas_price_per_kwh else None,
+        }
+        
+        serializer = NaturalGasNetworkSerializer(network)
+        
+        logger.info(f"Prices refreshed for Natural Gas Network {network_uuid}")
+        
+        return Response({
+            'success': True,
+            'message': 'Οι τιμές ενημερώθηκαν επιτυχώς',
+            'price_info': price_info,
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        logger.error(f"Error refreshing prices for network {network_uuid}: {str(e)}")
+        return Response({
+            'success': False,
+            'error': 'Σφάλμα κατά την ενημέρωση τιμών',
             'details': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
