@@ -18,6 +18,34 @@ class ExteriorBlinds(models.Model):
         help_text="Συνολική επιφάνεια παραθύρων σε τετραγωνικά μέτρα"
     )
     
+    shading_coefficient = models.FloatField(
+        verbose_name="Συντελεστής σκίασης περσίδων (%)",
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        default=70.0,
+        help_text="Ποσοστό μείωσης ηλιακών κερδών από τις περσίδες (συνήθως 60-80%)"
+    )
+    
+    solar_radiation = models.FloatField(
+        verbose_name="Μέση ημερήσια ηλιακή ακτινοβολία (kWh/m²/ημέρα)",
+        validators=[MinValueValidator(0)],
+        default=5.0,
+        help_text="Μέση ημερήσια ηλιακή ακτινοβολία για τους μήνες ψύξης"
+    )
+    
+    cooling_months = models.IntegerField(
+        verbose_name="Μήνες λειτουργίας ψύξης",
+        validators=[MinValueValidator(1), MaxValueValidator(12)],
+        default=5,
+        help_text="Αριθμός μηνών που λειτουργεί το σύστημα ψύξης (συνήθως 4-6)"
+    )
+    
+    cooling_system_eer = models.FloatField(
+        verbose_name="Απόδοση συστήματος ψύξης (EER)",
+        validators=[MinValueValidator(1.0), MaxValueValidator(5.0)],
+        default=2.5,
+        help_text="Energy Efficiency Ratio του συστήματος ψύξης (συνήθως 2.0-3.5)"
+    )
+    
     cost_per_m2 = models.FloatField(
         verbose_name="Κόστος ανά m² (€)",
         validators=[MinValueValidator(0)],
@@ -37,10 +65,14 @@ class ExteriorBlinds(models.Model):
         default=0,
         help_text="Ετήσιο κόστος συντήρησης των περσίδων"
     )
-    cooling_energy_savings = models.FloatField(
+    cooling_energy_savings = models.DecimalField(
         verbose_name="Εξοικονόμηση ενέργειας ψύξης (kWh/έτος)",
+        max_digits=10,
+        decimal_places=3,
         validators=[MinValueValidator(0)],
-        help_text="Ετήσια εξοικονόμηση ενέργειας λόγω μείωσης φόρτου ψύξης"
+        blank=True,
+        null=True,
+        help_text="Αυτόματος υπολογισμός ετήσιας εξοικονόμησης ενέργειας ψύξης"
     )
     
     energy_cost_kwh = models.FloatField(
@@ -58,10 +90,10 @@ class ExteriorBlinds(models.Model):
     )
     
     discount_rate = models.FloatField(
-        verbose_name="Προεξοφλητικός συντελεστής (%)",
+        verbose_name="Επιτόκιο αναγωγής (%)",
         validators=[MinValueValidator(0), MaxValueValidator(30)],
         default=5.0,
-        help_text="Προεξοφλητικός συντελεστής για τον υπολογισμό NPV"
+        help_text="Επιτόκιο αναγωγής για τον υπολογισμό NPV"
     )
     
     total_investment_cost = models.FloatField(
@@ -92,8 +124,10 @@ class ExteriorBlinds(models.Model):
         help_text="Αυτόματος υπολογισμός περιόδου αποπληρωμής"
     )
     
-    net_present_value = models.FloatField(
+    net_present_value = models.DecimalField(
         verbose_name="Καθαρή παρούσα αξία - NPV (€)",
+        max_digits=12,
+        decimal_places=2,
         blank=True,
         null=True,
         help_text="Αυτόματος υπολογισμός NPV"
@@ -117,12 +151,38 @@ class ExteriorBlinds(models.Model):
     def __str__(self):
         return f"Εξωτερικές Περσίδες - {self.building.name}"
     
+    def _calculate_cooling_savings(self):
+        """Υπολογισμός εξοικονόμησης ενέργειας ψύξης"""
+        try:
+            # Υπολογισμός ηλιακών κερδών μέσω παραθύρων
+            # Ηλιακά κέρδη (kWh/έτος) = Επιφάνεια × Ηλιακή ακτινοβολία × Ημέρες × Μήνες
+            days_per_month = 30
+            solar_gains_kwh = (self.window_area * self.solar_radiation * 
+                              days_per_month * self.cooling_months)
+            
+            # Μείωση ηλιακών κερδών από περσίδες
+            reduced_solar_gains = solar_gains_kwh * (self.shading_coefficient / 100.0)
+            
+            # Εξοικονόμηση ηλεκτρικής ενέργειας = Μειωμένα ηλιακά κέρδη / EER
+            # (Η μείωση του φορτίου ψύξης μετατρέπεται σε μείωση κατανάλωσης ρεύματος)
+            from decimal import Decimal, ROUND_HALF_UP
+            savings = reduced_solar_gains / self.cooling_system_eer
+            self.cooling_energy_savings = Decimal(str(savings)).quantize(Decimal('0.001'), rounding=ROUND_HALF_UP)
+            
+        except (ValueError, TypeError, ZeroDivisionError):
+            self.cooling_energy_savings = Decimal('0.000')
+    
     def _calculate_economics(self):
         """Υπολογισμός οικονομικών δεικτών"""
         try:
+            # Πρώτα υπολογίζουμε την εξοικονόμηση ψύξης
+            self._calculate_cooling_savings()
+            
             self.total_investment_cost = (self.window_area * self.cost_per_m2) + self.installation_cost
             
-            self.annual_energy_savings = self.cooling_energy_savings * self.energy_cost_kwh
+            # Μετατροπή Decimal σε float για τους υπολογισμούς
+            cooling_savings_value = float(self.cooling_energy_savings) if self.cooling_energy_savings else 0
+            self.annual_energy_savings = cooling_savings_value * self.energy_cost_kwh
             
             self.annual_economic_benefit = self.annual_energy_savings - self.maintenance_cost
             
@@ -136,9 +196,13 @@ class ExteriorBlinds(models.Model):
                 npv = 0
                 for year in range(1, self.time_period + 1):
                     npv += self.annual_economic_benefit / ((1 + discount_factor) ** year)
-                self.net_present_value = npv - self.total_investment_cost
+                npv_value = npv - self.total_investment_cost
             else:
-                self.net_present_value = -self.total_investment_cost
+                npv_value = -self.total_investment_cost
+            
+            # Μετατροπή σε Decimal με 2 δεκαδικά
+            from decimal import Decimal, ROUND_HALF_UP
+            self.net_present_value = Decimal(str(npv_value)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
             
             # IRR υπολογισμός με Newton-Raphson
             if self.total_investment_cost > 0 and self.annual_economic_benefit > 0:

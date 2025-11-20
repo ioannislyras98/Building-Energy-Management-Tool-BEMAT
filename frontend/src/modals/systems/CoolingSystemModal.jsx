@@ -89,10 +89,15 @@ function CoolingSystemModalForm({
       hasErrors = true;
     }
     if (
-      formData.energy_efficiency_ratio &&
-      formData.energy_efficiency_ratio !== "" &&
-      (isNaN(formData.energy_efficiency_ratio) ||
-        parseFloat(formData.energy_efficiency_ratio) <= 0)
+      !formData.energy_efficiency_ratio ||
+      formData.energy_efficiency_ratio === ""
+    ) {
+      newErrors.energy_efficiency_ratio =
+        params.fieldRequired || "Το πεδίο είναι υποχρεωτικό";
+      hasErrors = true;
+    } else if (
+      isNaN(formData.energy_efficiency_ratio) ||
+      parseFloat(formData.energy_efficiency_ratio) <= 0
     ) {
       newErrors.energy_efficiency_ratio =
         params.errorPositiveNumber || "Must be a positive number";
@@ -307,6 +312,7 @@ function CoolingSystemModalForm({
               error={showValidationErrors ? errors.energy_efficiency_ratio : ""}
               step="0.01"
               min="0"
+              required
             />
             <InputEntryModal
               entry={params.maintenancePeriod || "Περίοδος Συντήρησης"}

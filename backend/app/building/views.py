@@ -166,6 +166,7 @@ def get_building_detail(request, uuid):
                 "zone_display": f"Ζώνη {building.prefecture.zone}",
                 "temperature_winter": building.prefecture.temperature_winter,
                 "temperature_summer": building.prefecture.temperature_summer,
+                "solar_radiation": building.prefecture.solar_radiation,
             },
             "energy_zone": building.energy_zone,
             }

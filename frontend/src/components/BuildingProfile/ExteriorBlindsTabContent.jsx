@@ -44,8 +44,14 @@ const ExteriorBlindsTabContent = ({
   const [error, setError] = useState(null);
   const [errorField, setErrorField] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
+  const [eerFromCoolingSystem, setEerFromCoolingSystem] = useState(false);
   const [formData, setFormData] = useState({
     window_area: "",
+    shading_coefficient: "70",
+    solar_radiation: "",
+    cooling_months: "5",
+    cooling_system_eer: "2.5",
     cost_per_m2: "",
     installation_cost: "",
     maintenance_cost: "",
@@ -73,22 +79,64 @@ const ExteriorBlindsTabContent = ({
         label: translations.costPerM2 || "Κόστος ανά m²",
         errorKey: "costPerM2Required",
       },
-      cooling_energy_savings: {
-        label:
-          translations.coolingEnergySavings || "Εξοικονόμηση ενέργειας ψύξης",
-        errorKey: "coolingEnergySavingsRequired",
+      installation_cost: {
+        label: translations.installationCost || "Κόστος εγκατάστασης",
+        errorKey: "installationCostRequired",
+      },
+      maintenance_cost: {
+        label: translations.maintenanceCost || "Ετήσιο κόστος συντήρησης",
+        errorKey: "maintenanceCostRequired",
+      },
+      shading_coefficient: {
+        label: translations.shadingCoefficient || "Συντελεστής σκίασης",
+        errorKey: "shadingCoefficientRequired",
+      },
+      solar_radiation: {
+        label: translations.solarRadiation || "Ηλιακή ακτινοβολία",
+        errorKey: "solarRadiationRequired",
+      },
+      cooling_months: {
+        label: translations.coolingMonths || "Μήνες ψύξης",
+        errorKey: "coolingMonthsRequired",
+      },
+      cooling_system_eer: {
+        label: translations.coolingSystemEER || "Απόδοση ψύξης (EER)",
+        errorKey: "coolingSystemEERRequired",
+      },
+      time_period: {
+        label: translations.timePeriod || "Χρονικό διάστημα",
+        errorKey: "timePeriodRequired",
+      },
+      discount_rate: {
+        label: translations.discountRate || "Επιτόκιο αναγωγής",
+        errorKey: "discountRateRequired",
       },
     };
+
+    const errors = {};
+    let hasErrors = false;
+    let firstErrorTab = 0;
 
     for (const [field, config] of Object.entries(requiredFields)) {
       const value = formData[field];
       if (!value || value === "" || parseFloat(value) <= 0) {
-        setErrorField(config.errorKey);
-        const errorMessage = translations[config.errorKey];
-        setError(errorMessage);
-        return false;
+        errors[field] = true;
+        hasErrors = true;
+        // Determine which tab has the error
+        if ((field === 'time_period' || field === 'discount_rate') && firstErrorTab === 0) {
+          firstErrorTab = 2;
+        }
       }
     }
+
+    setValidationErrors(errors);
+
+    if (hasErrors) {
+      setError(translations.requiredFieldsError || "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία");
+      setTabValue(firstErrorTab);
+      return false;
+    }
+
     return true;
   };
   useEffect(() => {
@@ -97,8 +145,122 @@ const ExteriorBlindsTabContent = ({
     }
   }, [language, errorField, translations]);
   useEffect(() => {
-    fetchExteriorBlindsData();
+    const loadData = async () => {
+      await fetchExteriorBlindsData();
+      // Μετά τη φόρτωση των δεδομένων, φορτώνουμε το EER από το cooling system
+      if (buildingUuid && token) {
+        await fetchCoolingSystemEER();
+      }
+    };
+    loadData();
   }, [buildingUuid, projectUuid]);
+
+  useEffect(() => {
+    if (projectUuid && token) {
+      fetchProjectData();
+    }
+  }, [projectUuid, token]);
+
+  // Ξεχωριστό useEffect για την ηλιακή ακτινοβολία που εξαρτάται από το buildingData
+  useEffect(() => {
+    const solarRadiation = buildingData?.data?.prefecture_data?.solar_radiation || buildingData?.prefecture_data?.solar_radiation;
+    if (solarRadiation) {
+      setFormData((prev) => ({
+        ...prev,
+        solar_radiation: solarRadiation.toString(),
+      }));
+    }
+  }, [buildingData?.data?.prefecture_data?.solar_radiation, buildingData?.prefecture_data?.solar_radiation]);
+
+  const fetchPrefectureSolarRadiation = async () => {
+    try {
+      // Πρώτα προσπαθούμε να πάρουμε από τα buildingData.prefecture_data
+      if (buildingData && buildingData.prefecture_data && buildingData.prefecture_data.solar_radiation) {
+        setFormData((prev) => ({
+          ...prev,
+          solar_radiation: buildingData.prefecture_data.solar_radiation.toString(),
+        }));
+        return;
+      }
+
+      // Αν δεν υπάρχει, φορτώνουμε από το API
+      const prefectureUuid = typeof buildingData.prefecture === 'object' 
+        ? buildingData.prefecture.uuid 
+        : buildingData.prefecture;
+      
+      const response = await axios.get(
+        `${API_BASE_URL}/prefectures/get/${prefectureUuid}/`,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data && response.data.data && response.data.data.solar_radiation) {
+        setFormData((prev) => ({
+          ...prev,
+          solar_radiation: response.data.data.solar_radiation.toString(),
+        }));
+      }
+    } catch (error) {
+      console.log("Error fetching prefecture solar radiation:", error);
+    }
+  };
+
+  const fetchCoolingSystemEER = async () => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/cooling_systems/building/${buildingUuid}/`,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // Το API επιστρέφει { status: "success", data: [...] }
+      if (response.data && response.data.data && response.data.data.length > 0) {
+        const coolingSystem = response.data.data[0]; // Παίρνουμε το πρώτο cooling system
+        if (coolingSystem.energy_efficiency_ratio) {
+          setFormData((prev) => ({
+            ...prev,
+            cooling_system_eer: coolingSystem.energy_efficiency_ratio.toString(),
+          }));
+          setEerFromCoolingSystem(true);
+        }
+      }
+    } catch (error) {
+      // Αν δεν υπάρχει cooling system, χρησιμοποιούμε την default τιμή
+      console.log("No cooling system found, using default EER");
+      setEerFromCoolingSystem(false);
+    }
+  };
+
+  const fetchProjectData = async () => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/projects/get/${projectUuid}/`,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data && response.data.data) {
+        setFormData((prev) => ({
+          ...prev,
+          energy_cost_kwh: response.data.data.cost_per_kwh_electricity || "0.15",
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching project data:", error);
+    }
+  };
 
   const fetchExteriorBlindsData = async () => {
     if (!buildingUuid || !projectUuid) return;
@@ -116,8 +278,12 @@ const ExteriorBlindsTabContent = ({
       );
 
       const data = response.data;
-      setFormData({
+      setFormData((prev) => ({
         window_area: data.window_area || "",
+        shading_coefficient: data.shading_coefficient || "70",
+        solar_radiation: prev.solar_radiation || "",
+        cooling_months: data.cooling_months || "5",
+        cooling_system_eer: data.cooling_system_eer || "2.5",
         cost_per_m2: data.cost_per_m2 || "",
         installation_cost: data.installation_cost || "",
         maintenance_cost: data.maintenance_cost || "",
@@ -131,7 +297,7 @@ const ExteriorBlindsTabContent = ({
         payback_period: data.payback_period,
         net_present_value: data.net_present_value,
         internal_rate_of_return: data.internal_rate_of_return,
-      });
+      }));
     } catch (error) {
       if (error.response?.status !== 404) {
         setError("Σφάλμα κατά την φόρτωση των δεδομένων");
@@ -184,16 +350,8 @@ const ExteriorBlindsTabContent = ({
         }
       );
 
-      const responseData = response.data;
-      setFormData((prev) => ({
-        ...prev,
-        total_investment_cost: responseData.total_investment_cost,
-        annual_energy_savings: responseData.annual_energy_savings,
-        annual_economic_benefit: responseData.annual_economic_benefit,
-        payback_period: responseData.payback_period,
-        net_present_value: responseData.net_present_value,
-        internal_rate_of_return: responseData.internal_rate_of_return,
-      }));
+      // Reload δεδομένων μετά την επιτυχημένη αποθήκευση για να πάρουμε τα υπολογισμένα πεδία
+      await fetchExteriorBlindsData();
 
       if (showMessage) {
         const message =
@@ -205,6 +363,7 @@ const ExteriorBlindsTabContent = ({
       }
       setError(null);
       setErrorField(null);
+      setValidationErrors({});
     } catch (error) {
       if (showMessage) {
         setError("Σφάλμα κατά την αποθήκευση των δεδομένων");
@@ -240,6 +399,7 @@ const ExteriorBlindsTabContent = ({
             value={formData.window_area}
             onChange={(e) => handleInputChange("window_area", e.target.value)}
             variant="outlined"
+            error={validationErrors.window_area}
             inputProps={{ step: 0.1, min: 0.1 }}
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -272,6 +432,7 @@ const ExteriorBlindsTabContent = ({
             value={formData.cost_per_m2}
             onChange={(e) => handleInputChange("cost_per_m2", e.target.value)}
             variant="outlined"
+            error={validationErrors.cost_per_m2}
             inputProps={{ step: 0.01, min: 0 }}
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -295,7 +456,10 @@ const ExteriorBlindsTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.installationCost || "Κόστος εγκατάστασης") + " (€)"
+              <span>
+                {translations.installationCost || "Κόστος εγκατάστασης"} (€){" "}
+                <span style={{ color: "red" }}>*</span>
+              </span>
             }
             type="number"
             value={formData.installation_cost}
@@ -303,6 +467,7 @@ const ExteriorBlindsTabContent = ({
               handleInputChange("installation_cost", e.target.value)
             }
             variant="outlined"
+            error={validationErrors.installation_cost}
             inputProps={{ step: 0.01, min: 0 }}
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -326,8 +491,10 @@ const ExteriorBlindsTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.maintenanceCost || "Ετήσιο κόστος συντήρησης") +
-              " (€)"
+              <span>
+                {translations.maintenanceCost || "Ετήσιο κόστος συντήρησης"} (€){" "}
+                <span style={{ color: "red" }}>*</span>
+              </span>
             }
             type="number"
             value={formData.maintenance_cost}
@@ -335,8 +502,156 @@ const ExteriorBlindsTabContent = ({
               handleInputChange("maintenance_cost", e.target.value)
             }
             variant="outlined"
+            error={validationErrors.maintenance_cost}
             inputProps={{ step: 0.01, min: 0 }}
             sx={{
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                "&.Mui-focused": {
+                  color: "var(--color-primary)",
+                },
+              },
+            }}
+          />
+        </Grid>
+
+        <Grid item xs={12}>
+          <Typography variant="h6" className="font-semibold text-gray-800 mb-2 mt-4">
+            {translations.calculationParameters || "Παράμετροι Υπολογισμού"}
+          </Typography>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            fullWidth
+            label={
+              <span>
+                {translations.shadingCoefficient || "Συντελεστής σκίασης"} (%){" "}
+                <span style={{ color: "red" }}>*</span>
+              </span>
+            }
+            type="number"
+            value={formData.shading_coefficient}
+            onChange={(e) => handleInputChange("shading_coefficient", e.target.value)}
+            variant="outlined"
+            error={validationErrors.shading_coefficient}
+            inputProps={{ step: 1, min: 0, max: 100 }}
+            helperText="Ποσοστό μείωσης ηλιακών κερδών (60-80%)"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                "&.Mui-focused": {
+                  color: "var(--color-primary)",
+                },
+              },
+            }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            fullWidth
+            label={
+              (translations.solarRadiation || "Ηλιακή ακτινοβολία") + " (kWh/m²/ημ)"
+            }
+            type="number"
+            value={formData.solar_radiation}
+            variant="outlined"
+            InputProps={{ readOnly: true }}
+            inputProps={{ step: 0.1, min: 0 }}
+            helperText="Φορτώνεται από τον Νομό"
+            sx={{
+              "& .MuiInputBase-input": {
+                color: "var(--color-primary)",
+                fontWeight: "bold",
+              },
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                "&.Mui-focused": {
+                  color: "var(--color-primary)",
+                },
+              },
+            }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            fullWidth
+            label={
+              <span>
+                {translations.coolingMonths || "Μήνες ψύξης"}{" "}
+                <span style={{ color: "red" }}>*</span>
+              </span>
+            }
+            type="number"
+            value={formData.cooling_months}
+            onChange={(e) => handleInputChange("cooling_months", e.target.value)}
+            variant="outlined"
+            error={validationErrors.cooling_months}
+            inputProps={{ step: 1, min: 1, max: 12 }}
+            helperText="Αριθμός μηνών λειτουργίας ψύξης (4-6)"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                "&.Mui-focused": {
+                  color: "var(--color-primary)",
+                },
+              },
+            }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            fullWidth
+            label={
+              <span>
+                {translations.coolingSystemEER || "Απόδοση ψύξης (EER)"}{" "}
+                {!eerFromCoolingSystem && <span style={{ color: "red" }}>*</span>}
+              </span>
+            }
+            type="number"
+            value={formData.cooling_system_eer}
+            onChange={(e) => !eerFromCoolingSystem && handleInputChange("cooling_system_eer", e.target.value)}
+            variant="outlined"
+            error={validationErrors.cooling_system_eer}
+            InputProps={{ readOnly: eerFromCoolingSystem }}
+            inputProps={{ step: 0.1, min: 1.0, max: 5.0 }}
+            helperText={eerFromCoolingSystem ? "Φορτώνεται από το Σύστημα Ψύξης" : "Energy Efficiency Ratio (2.0-3.5)"}
+            sx={{
+              "& .MuiInputBase-input": eerFromCoolingSystem ? {
+                color: "var(--color-primary)",
+                fontWeight: "bold",
+              } : {},
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
                   borderColor: "var(--color-primary)",
@@ -372,20 +687,19 @@ const ExteriorBlindsTabContent = ({
           <TextField
             fullWidth
             label={
-              <span>
-                {translations.coolingEnergySavings ||
-                  "Εξοικονόμηση ενέργειας ψύξης"}{" "}
-                (kWh/έτος) <span style={{ color: "red" }}>*</span>
-              </span>
+              (translations.coolingEnergySavings ||
+                "Εξοικονόμηση ενέργειας ψύξης") + " (kWh/έτος)"
             }
             type="number"
             value={formData.cooling_energy_savings}
-            onChange={(e) =>
-              handleInputChange("cooling_energy_savings", e.target.value)
-            }
             variant="outlined"
-            inputProps={{ step: 0.1, min: 0 }}
+            InputProps={{ readOnly: true }}
+            helperText="Υπολογίζεται αυτόματα από τις παραμέτρους"
             sx={{
+              "& .MuiInputBase-input": {
+                color: "var(--color-primary)",
+                fontWeight: "bold",
+              },
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
                   borderColor: "var(--color-primary)",
@@ -407,15 +721,13 @@ const ExteriorBlindsTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.energyCostKwh || "Κόστος ενέργειας") + " (€/kWh)"
+              (translations.energyCostKwh || "Κόστος ηλεκτρικής ενέργειας") + " (€/kWh)"
             }
             type="number"
             value={formData.energy_cost_kwh}
-            onChange={(e) =>
-              handleInputChange("energy_cost_kwh", e.target.value)
-            }
             variant="outlined"
-            inputProps={{ step: 0.01, min: 0 }}
+            InputProps={{ readOnly: true }}
+            helperText="Φορτώνεται αυτόματα από το έργο"
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -449,11 +761,17 @@ const ExteriorBlindsTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={(translations.timePeriod || "Χρονικό διάστημα") + " (έτη)"}
+            label={
+              <span>
+                {translations.timePeriod || "Χρονικό διάστημα"} (έτη){" "}
+                <span style={{ color: "red" }}>*</span>
+              </span>
+            }
             type="number"
             value={formData.time_period}
             onChange={(e) => handleInputChange("time_period", e.target.value)}
             variant="outlined"
+            error={validationErrors.time_period}
             inputProps={{ step: 1, min: 1, max: 50 }}
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -477,17 +795,20 @@ const ExteriorBlindsTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.discountRate || "Προεξοφλητικός συντελεστής") +
-              " (%)"
+              <span>
+                {translations.discountRate || "Επιτόκιο αναγωγής"} (%){" "}
+                <span style={{ color: "red" }}>*</span>
+              </span>
             }
             type="number"
             value={formData.discount_rate}
             onChange={(e) => handleInputChange("discount_rate", e.target.value)}
             variant="outlined"
+            error={validationErrors.discount_rate}
             inputProps={{ step: 0.1, min: 0, max: 30 }}
             helperText={
               translations.discountRateHelper ||
-              "Σταθερή τιμή 5% για τους υπολογισμούς NPV"
+              "Τιμή για τους υπολογισμούς NPV"
             }
             sx={{
               "& .MuiOutlinedInput-root": {

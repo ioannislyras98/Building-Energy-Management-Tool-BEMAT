@@ -6,6 +6,14 @@ class Command(BaseCommand):
     help = 'Populate the prefectures table with initial data'
 
     def handle(self, *args, **options):
+        # Ηλιακή ακτινοβολία ανά ενεργειακή ζώνη
+        solar_radiation_by_zone = {
+            'A': 4.75,  # Ζώνη Α (Βόρεια Ελλάδα): 4.5-5.0
+            'B': 5.25,  # Ζώνη Β (Κεντρική Ελλάδα): 5.0-5.5
+            'C': 5.75,  # Ζώνη Γ (Νότια Ελλάδα, Αθήνα): 5.5-6.0
+            'D': 6.25,  # Ζώνη Δ (Νησιά, Κρήτη): 6.0-6.5
+        }
+        
         prefecture_data = [
             {'name': 'Ηρακλείου', 'zone': 'A', 'temperature_winter': 12.5, 'temperature_summer': 26.8},
             {'name': 'Χανίων', 'zone': 'A', 'temperature_winter': 12.2, 'temperature_summer': 26.5},
@@ -62,22 +70,34 @@ class Command(BaseCommand):
         ]
 
         created_count = 0
+        updated_count = 0
         for data in prefecture_data:
+            zone = data['zone']
+            solar_radiation = solar_radiation_by_zone.get(zone, 5.0)
+            
             prefecture, created = Prefecture.objects.get_or_create(
                 name=data['name'],
                 defaults={
-                    'zone': data['zone'],
+                    'zone': zone,
                     'temperature_winter': data['temperature_winter'],
                     'temperature_summer': data['temperature_summer'],
+                    'solar_radiation': solar_radiation,
                     'is_active': True
                 }
             )
             if created:
                 created_count += 1
-                self.stdout.write(f"Created prefecture: {prefecture.name}")
+                self.stdout.write(f"Created prefecture: {prefecture.name} (Zone {zone}, Solar: {solar_radiation} kWh/m²/day)")
             else:
-                self.stdout.write(f"Prefecture already exists: {prefecture.name}")
+                # Ενημέρωση solar_radiation αν δεν έχει ήδη τιμή
+                if prefecture.solar_radiation is None or prefecture.solar_radiation == 5.0:
+                    prefecture.solar_radiation = solar_radiation
+                    prefecture.save()
+                    updated_count += 1
+                    self.stdout.write(f"Updated solar radiation for {prefecture.name}: {solar_radiation} kWh/m²/day")
+                else:
+                    self.stdout.write(f"Prefecture already exists: {prefecture.name}")
 
         self.stdout.write(
-            self.style.SUCCESS(f'Successfully created {created_count} prefectures')
+            self.style.SUCCESS(f'Successfully created {created_count} prefectures and updated {updated_count} with solar radiation values')
         )

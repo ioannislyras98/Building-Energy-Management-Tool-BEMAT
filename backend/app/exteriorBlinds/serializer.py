@@ -5,6 +5,7 @@ from .models import ExteriorBlinds
 class ExteriorBlindsSerializer(serializers.ModelSerializer):
     """Serializer for ExteriorBlinds model"""
     
+    cooling_energy_savings = serializers.FloatField(read_only=True)
     total_investment_cost = serializers.FloatField(read_only=True)
     annual_energy_savings = serializers.FloatField(read_only=True)
     annual_economic_benefit = serializers.FloatField(read_only=True)
@@ -16,7 +17,9 @@ class ExteriorBlindsSerializer(serializers.ModelSerializer):
         model = ExteriorBlinds
         fields = [
             'uuid', 'building', 'project',
-            'window_area', 'cost_per_m2', 'installation_cost', 'maintenance_cost',
+            'window_area', 'shading_coefficient', 'solar_radiation', 
+            'cooling_months', 'cooling_system_eer',
+            'cost_per_m2', 'installation_cost', 'maintenance_cost',
             'cooling_energy_savings', 'energy_cost_kwh',
             'time_period', 'discount_rate',
             'total_investment_cost', 'annual_energy_savings', 'annual_economic_benefit',
@@ -25,14 +28,16 @@ class ExteriorBlindsSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             'uuid', 'created_at', 'updated_at',
+            'cooling_energy_savings',
             'total_investment_cost', 'annual_energy_savings', 'annual_economic_benefit',
             'payback_period', 'net_present_value', 'internal_rate_of_return'
         ]
     
     def to_internal_value(self, data):
         """Προ-επεξεργασία δεδομένων εισόδου"""
-        for field in ['window_area', 'cost_per_m2', 'installation_cost', 'maintenance_cost',
-                      'cooling_energy_savings', 'energy_cost_kwh', 'time_period', 'discount_rate']:
+        for field in ['window_area', 'shading_coefficient', 'solar_radiation', 'cooling_months',
+                      'cooling_system_eer', 'cost_per_m2', 'installation_cost', 'maintenance_cost',
+                      'energy_cost_kwh', 'time_period', 'discount_rate']:
             if field in data and data[field] == '':
                 data[field] = None
         
@@ -62,7 +67,7 @@ class ExteriorBlindsSerializer(serializers.ModelSerializer):
         
         messages = error_messages.get(language, error_messages['el'])
         
-        required_fields = ['window_area', 'cost_per_m2', 'cooling_energy_savings']
+        required_fields = ['window_area', 'cost_per_m2']
         
         for field in required_fields:
             value = data.get(field)
@@ -81,10 +86,4 @@ class ExteriorBlindsSerializer(serializers.ModelSerializer):
         """Επικύρωση κόστους ανά m²"""
         if value is not None and value < 0:
             raise serializers.ValidationError("Το κόστος ανά m² δεν μπορεί να είναι αρνητικό")
-        return value
-    
-    def validate_cooling_energy_savings(self, value):
-        """Επικύρωση εξοικονόμησης ενέργειας"""
-        if value is not None and value < 0:
-            raise serializers.ValidationError("Η εξοικονόμηση ενέργειας δεν μπορεί να είναι αρνητική")
         return value

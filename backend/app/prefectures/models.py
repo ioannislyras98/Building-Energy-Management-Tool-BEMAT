@@ -44,6 +44,13 @@ class Prefecture(models.Model):
         null=True,
         blank=True
     )
+    solar_radiation = models.FloatField(
+        verbose_name="Μέση ημερήσια ηλιακή ακτινοβολία (kWh/m²/ημέρα)",
+        help_text="Μέση ημερήσια ηλιακή ακτινοβολία για τους μήνες ψύξης",
+        default=5.0,
+        null=True,
+        blank=True
+    )
     is_active = models.BooleanField(
         default=True,
         verbose_name="Ενεργό",
