@@ -690,6 +690,7 @@ Annual_economic_benefit = Annual_energy_savings - Annual_maintenance_cost
 ```
 
 Όπου:
+
 - `Annual_energy_savings`: Ετήσια εξοικονόμηση ενέργειας σε € (kWh × €/kWh)
 - `Annual_maintenance_cost`: Ετήσιο κόστος συντήρησης σε €
 
