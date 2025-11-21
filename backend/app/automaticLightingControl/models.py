@@ -35,7 +35,6 @@ class AutomaticLightingControl(models.Model):
         max_digits=10,
         decimal_places=2,
         verbose_name="Κόστος εγκατάστασης (€)",
-        default=0,
         validators=[MinValueValidator(0)],
         help_text="Επιπλέον κόστος εγκατάστασης (εργασία, υλικά κλπ)"
     )
@@ -43,24 +42,50 @@ class AutomaticLightingControl(models.Model):
         max_digits=10,
         decimal_places=2,
         verbose_name="Ετήσιο κόστος συντήρησης (€)",
-        default=0,
         validators=[MinValueValidator(0)],
         help_text="Ετήσιο κόστος συντήρησης και λειτουργίας του συστήματος"
     )
     
-    # Ενεργειακά Στοιχεία
+    # Ενεργειακά Στοιχεία - Τρέχοντα Δεδομένα
+    current_lighting_power_density = models.FloatField(
+        verbose_name="Τρέχουσα ισχύς φωτισμού (W/m²)",
+        default=10,
+        validators=[MinValueValidator(0)],
+        help_text="Μέση ισχύς φωτισμού ανά τετραγωνικό μέτρο πριν την εγκατάσταση"
+    )
+    operating_hours_per_day = models.FloatField(
+        verbose_name="Ώρες λειτουργίας φωτισμού ανά ημέρα",
+        default=8,
+        validators=[MinValueValidator(0.1)],
+        help_text="Μέσες ώρες που λειτουργεί ο φωτισμός ημερησίως"
+    )
+    operating_days_per_year = models.IntegerField(
+        verbose_name="Ημέρες λειτουργίας ανά έτος",
+        default=250,
+        validators=[MinValueValidator(1)],
+        help_text="Αριθμός ημερών που λειτουργεί το κτίριο ετησίως"
+    )
+    estimated_savings_percentage = models.FloatField(
+        verbose_name="Εκτιμώμενο ποσοστό εξοικονόμησης (%)",
+        default=30,
+        validators=[MinValueValidator(0)],
+        help_text="Ποσοστό εξοικονόμησης ενέργειας από αυτόματο έλεγχο (συνήθως 25-40%)"
+    )
+    
+    # Αυτόματα υπολογιζόμενα ενεργειακά στοιχεία
     lighting_energy_savings = models.FloatField(
         verbose_name="Εξοικονόμηση ενέργειας φωτισμού (kWh/έτος)",
-        validators=[MinValueValidator(0)],
-        help_text="Ετήσια εξοικονόμηση ενέργειας από την αυτόματη ρύθμιση φωτισμού"
+        null=True,
+        blank=True,
+        help_text="Αυτόματος υπολογισμός: Τρέχουσα κατανάλωση × Ποσοστό εξοικονόμησης"
     )
     energy_cost_kwh = models.DecimalField(
         max_digits=6,
         decimal_places=3,
         verbose_name="Κόστος ενέργειας (€/kWh)",
-        default=0.150,
-        validators=[MinValueValidator(0)],
-        help_text="Τιμή ενέργειας ανά kWh"
+        null=True,
+        blank=True,
+        help_text="Αυτόματη λήψη από το έργο - Τιμή ενέργειας ανά kWh"
     )
     
     # Παράμετροι Αξιολόγησης
@@ -73,10 +98,10 @@ class AutomaticLightingControl(models.Model):
     discount_rate = models.DecimalField(
         max_digits=5,
         decimal_places=2,
-        verbose_name="Προεξοφλητικός συντελεστής (%)",
+        verbose_name="Επιτόκιο αναγωγής (%)",
         default=5.0,
         validators=[MinValueValidator(0)],
-        help_text="Προεξοφλητικός συντελεστής για υπολογισμό NPV"
+        help_text="Επιτόκιο αναγωγής για υπολογισμό NPV"
     )
     
     # Υπολογιζόμενα Πεδία
@@ -118,7 +143,7 @@ class AutomaticLightingControl(models.Model):
         verbose_name="Καθαρή παρούσα αξία - NPV (€)",
         null=True,
         blank=True,
-        help_text="Αυτόματος υπολογισμός NPV με προεξοφλητικό συντελεστή"
+        help_text="Αυτόματος υπολογισμός NPV με επιτόκιο αναγωγής"
     )
     internal_rate_of_return = models.DecimalField(
         max_digits=8,
@@ -143,11 +168,31 @@ class AutomaticLightingControl(models.Model):
     def _calculate_economics(self):
         """Υπολογισμός οικονομικών δεικτών"""
         try:
+            # Υπολογισμός τρέχουσας ετήσιας κατανάλωσης
+            current_annual_consumption = (
+                float(self.lighting_area) * 
+                float(self.current_lighting_power_density) / 1000 * 
+                float(self.operating_hours_per_day) * 
+                int(self.operating_days_per_year)
+            )
+            
+            # Υπολογισμός εξοικονόμησης ενέργειας
+            self.lighting_energy_savings = (
+                current_annual_consumption * 
+                (float(self.estimated_savings_percentage) / 100)
+            )
+            
             # Συνολικό κόστος επένδυσης
             self.total_investment_cost = (
                 float(self.lighting_area) * float(self.cost_per_m2) + 
                 float(self.installation_cost)
             )
+            
+            # Λήψη κόστους ενέργειας από το project
+            if not self.energy_cost_kwh and self.project:
+                self.energy_cost_kwh = float(self.project.cost_per_kwh_electricity or 0.150)
+            elif not self.energy_cost_kwh:
+                self.energy_cost_kwh = 0.150
             
             # Ετήσια ενεργειακή εξοικονόμηση
             self.annual_energy_savings = (
@@ -179,42 +224,54 @@ class AutomaticLightingControl(models.Model):
                     npv_sum += annual_benefit / ((1 + discount_rate_decimal) ** year)
                 self.net_present_value = npv_sum - float(self.total_investment_cost)
             else:
-                # Αν δεν υπάρχει προεξοφλητικός συντελεστής
+                # Αν δεν υπάρχει επιτόκιο αναγωγής
                 self.net_present_value = (annual_benefit * years) - float(self.total_investment_cost)
             
             # IRR υπολογισμός με Newton-Raphson
+            # IRR είναι το επιτόκιο όπου NPV = 0
+            # NPV = -Initial_Investment + Σ[(Annual_Savings - Maintenance_Cost) / (1 + IRR)^t] = 0
             if float(self.total_investment_cost) > 0 and annual_benefit > 0:
-                # Υπολογισμός IRR: βρίσκουμε το επιτόκιο όπου NPV = 0
                 initial_investment = float(self.total_investment_cost)
                 
-                # Αρχική εκτίμηση IRR
-                irr = 0.1  # 10%
+                # Αρχική εκτίμηση IRR (απλή προσέγγιση)
+                simple_roi = annual_benefit / initial_investment
+                irr = simple_roi if simple_roi < 1 else 0.1
+                
                 tolerance = 0.00001
                 max_iterations = 1000
                 
-                for _ in range(max_iterations):
-                    # Υπολογισμός NPV με το τρέχον IRR
+                for iteration in range(max_iterations):
+                    # Υπολογισμός NPV και της παραγώγου του ως προς IRR
                     npv = -initial_investment
                     npv_derivative = 0
                     
                     for year in range(1, years + 1):
-                        factor = (1 + irr) ** year
-                        npv += annual_benefit / factor
-                        npv_derivative -= year * annual_benefit / (factor * (1 + irr))
+                        discount_factor = (1 + irr) ** year
+                        # Cash flow για κάθε έτος (καθαρό όφελος)
+                        cash_flow = annual_benefit
+                        npv += cash_flow / discount_factor
+                        # Παράγωγος του NPV ως προς IRR
+                        npv_derivative -= year * cash_flow / (discount_factor * (1 + irr))
                     
                     # Έλεγχος σύγκλισης
                     if abs(npv) < tolerance:
                         break
                     
-                    # Newton-Raphson update
-                    if npv_derivative != 0:
-                        irr = irr - npv / npv_derivative
+                    # Newton-Raphson update: IRR_new = IRR_old - f(IRR)/f'(IRR)
+                    if abs(npv_derivative) > 1e-10:
+                        irr_new = irr - npv / npv_derivative
+                        
+                        # Περιορισμός του IRR σε λογικά όρια (-99% έως 1000%)
+                        irr_new = max(-0.99, min(irr_new, 10.0))
+                        
+                        # Έλεγχος για ταλάντωση
+                        if abs(irr_new - irr) < tolerance:
+                            irr = irr_new
+                            break
+                        
+                        irr = irr_new
                     else:
                         break
-                    
-                    # Αποφυγή αρνητικών IRR
-                    if irr < -0.99:
-                        irr = -0.99
                 
                 self.internal_rate_of_return = irr * 100
             else:

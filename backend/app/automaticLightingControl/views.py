@@ -20,20 +20,46 @@ logger = logging.getLogger(__name__)
 def get_automatic_lighting_control_by_building(request, building_id):
     """
     Λήψη στοιχείων αυτόματου ελέγχου φωτισμού για συγκεκριμένο κτίριο
+    Ενημερώνει αυτόματα το κόστος ενέργειας από το project και επαναϋπολογίζει
     """
     try:
         building = get_object_or_404(Building, uuid=building_id)
         
         automatic_lighting_control = AutomaticLightingControl.objects.get(building=building)
         
+        # Πάντα ενημερώνουμε το energy_cost_kwh από το project
+        if automatic_lighting_control.project:
+            project_energy_cost = automatic_lighting_control.project.cost_per_kwh_electricity or 0.150
+            
+            # Αν το energy_cost_kwh διαφέρει από το project, ενημερώνουμε και επαναϋπολογίζουμε
+            if automatic_lighting_control.energy_cost_kwh != project_energy_cost:
+                automatic_lighting_control.energy_cost_kwh = project_energy_cost
+                automatic_lighting_control.save()  # Αυτό θα τριγγεράρει το _calculate_economics()
+        
         serializer = AutomaticLightingControlSerializer(automatic_lighting_control)
         return Response(serializer.data, status=status.HTTP_200_OK)
         
     except AutomaticLightingControl.DoesNotExist:
-        return Response(
-            {"detail": "Δεν βρέθηκαν στοιχεία αυτόματου ελέγχου φωτισμού για αυτό το κτίριο"},
-            status=status.HTTP_404_NOT_FOUND
-        )
+        # Αν δεν υπάρχει record, επιστρέφουμε την τιμή ενέργειας από το project
+        try:
+            project = building.project
+            energy_cost_kwh = project.cost_per_kwh_electricity or 0.150
+            
+            return Response(
+                {
+                    "detail": "Δεν βρέθηκαν στοιχεία αυτόματου ελέγχου φωτισμού για αυτό το κτίριο",
+                    "energy_cost_kwh": str(energy_cost_kwh)
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except:
+            return Response(
+                {
+                    "detail": "Δεν βρέθηκαν στοιχεία αυτόματου ελέγχου φωτισμού για αυτό το κτίριο",
+                    "energy_cost_kwh": "0.150"
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
     except Exception as e:
         return Response(
             {"detail": f"Σφάλμα κατά την ανάκτηση των δεδομένων: {str(e)}"},

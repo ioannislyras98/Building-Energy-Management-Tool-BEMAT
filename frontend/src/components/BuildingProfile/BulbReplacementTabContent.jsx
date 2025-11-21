@@ -1733,10 +1733,6 @@ const BulbReplacementTabContent = ({
                 },
               },
             }}
-            helperText={
-              translations.npvHelperText ||
-              "Θετική τιμή δείχνει κερδοφόρα επένδυση"
-            }
           />
         </Grid>
 
@@ -1764,10 +1760,6 @@ const BulbReplacementTabContent = ({
                 },
               },
             }}
-            helperText={
-              translations.paybackHelperText ||
-              "Χρόνος που χρειάζεται για την ανάκτηση της επένδυσης"
-            }
           />
         </Grid>
 
@@ -1795,9 +1787,6 @@ const BulbReplacementTabContent = ({
                 },
               },
             }}
-            helperText={
-              translations.irrHelperText || "Απόδοση της επένδυσης ως ποσοστό"
-            }
           />
         </Grid>
       </Grid>

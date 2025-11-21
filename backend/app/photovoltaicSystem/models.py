@@ -260,9 +260,9 @@ class PhotovoltaicSystem(models.Model):
         decimal_places=2, 
         blank=True, 
         null=True,
-        verbose_name='Επιτόκιο προεξόφλησης (%)',
+        verbose_name='Επιτόκιο αναγωγής (%)',
         validators=[MinValueValidator(0), MaxValueValidator(100)],
-        help_text='Επιτόκιο προεξόφλησης για τον υπολογισμό NPV'
+        help_text='Επιτόκιο αναγωγής για τον υπολογισμό NPV'
     )
     annual_operational_costs = models.DecimalField(
         max_digits=10, 
@@ -472,7 +472,7 @@ class PhotovoltaicSystem(models.Model):
             annual_savings = float(self.annual_savings or 0)
             project_lifetime_years = 25
             
-            # Χρήση του επιτοκίου προεξόφλησης από το πεδίο
+            # Χρήση του επιτοκίου αναγωγής από το πεδίο
             discount_rate_pct = float(self.discount_rate or 5.0)
             discount_rate = discount_rate_pct / 100.0
             

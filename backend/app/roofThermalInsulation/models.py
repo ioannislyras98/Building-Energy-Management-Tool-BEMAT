@@ -63,7 +63,7 @@ class RoofThermalInsulation(models.Model):
         help_text="Ετήσια κόστη συντήρησης και λειτουργίας"
     )
     discount_rate = models.FloatField(
-        verbose_name="Επιτόκιο Προεξόφλησης (%)", 
+        verbose_name="Επιτόκιο αναγωγής (%)", 
         default=5.0,
         help_text="Επιτόκιο για τον υπολογισμό της παρούσας αξίας"
     )

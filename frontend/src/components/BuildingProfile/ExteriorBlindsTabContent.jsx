@@ -806,10 +806,6 @@ const ExteriorBlindsTabContent = ({
             variant="outlined"
             error={validationErrors.discount_rate}
             inputProps={{ step: 0.1, min: 0, max: 30 }}
-            helperText={
-              translations.discountRateHelper ||
-              "Τιμή για τους υπολογισμούς NPV"
-            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {

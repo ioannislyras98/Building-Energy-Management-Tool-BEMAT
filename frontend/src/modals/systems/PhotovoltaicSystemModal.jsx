@@ -553,7 +553,7 @@ function PhotovoltaicSystemModalForm({
             <h3>Οικονομικά Στοιχεία</h3>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="discount_rate">Επιτόκιο Προεξόφλησης (%)</label>
+                <label htmlFor="discount_rate">Επιτόκιο αναγωγής (%)</label>
                 <input
                   type="number"
                   id="discount_rate"

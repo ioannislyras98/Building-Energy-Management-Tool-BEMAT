@@ -958,14 +958,20 @@ const WindowReplacementTabContent = ({
                 color: "var(--color-primary)",
                 fontWeight: "bold",
               },
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
               "& .MuiInputLabel-root": {
-                color: "var(--color-primary)",
+                "&.Mui-focused": {
+                  color: "var(--color-primary)",
+                },
               },
             }}
-            helperText={
-              translations.autoCalculatedCostHelper ||
-              "Υπολογίζεται αυτόματα από την επιφάνεια και το κόστος ανά m²"
-            }
           />
         </Grid>
 
@@ -986,17 +992,23 @@ const WindowReplacementTabContent = ({
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
-                color: "var(--color-success)",
+                color: "var(--color-primary)",
                 fontWeight: "bold",
               },
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
+              },
               "& .MuiInputLabel-root": {
-                color: "var(--color-success)",
+                "&.Mui-focused": {
+                  color: "var(--color-primary)",
+                },
               },
             }}
-            helperText={
-              translations.autoCalculatedBenefitHelper ||
-              "Υπολογίζεται αυτόματα βάσει ενεργειακής εξοικονόμησης και κόστους ενέργειας"
-            }
           />
         </Grid>
 
@@ -1041,10 +1053,6 @@ const WindowReplacementTabContent = ({
             value={formData.discount_rate}
             onChange={(e) => handleInputChange("discount_rate", e.target.value)}
             inputProps={{ step: 0.1, min: 0, max: 100 }}
-            helperText={
-              translations.discountRateHelper ||
-              "Επιτόκιο αναγωγής για τους υπολογισμούς NPV"
-            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -1075,26 +1083,23 @@ const WindowReplacementTabContent = ({
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
-                color:
-                  calculatedResults.net_present_value >= 0 ? "green" : "red",
+                color: "var(--color-primary)",
                 fontWeight: "bold",
               },
               "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
                 "&.Mui-focused fieldset": {
-                  borderColor: "rgba(0, 0, 0, 0.23)",
+                  borderColor: "var(--color-primary)",
                 },
               },
               "& .MuiInputLabel-root": {
                 "&.Mui-focused": {
-                  color:
-                    calculatedResults.net_present_value >= 0 ? "green" : "red",
+                  color: "var(--color-primary)",
                 },
               },
             }}
-            helperText={
-              translations.npvHelperText ||
-              "Θετική τιμή δείχνει κερδοφόρα επένδυση"
-            }
           />
         </Grid>
 
@@ -1111,21 +1116,19 @@ const WindowReplacementTabContent = ({
                 fontWeight: "bold",
               },
               "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
                 "&.Mui-focused fieldset": {
-                  borderColor: "rgba(0, 0, 0, 0.23)",
+                  borderColor: "var(--color-primary)",
                 },
               },
               "& .MuiInputLabel-root": {
-                color: "var(--color-primary)",
                 "&.Mui-focused": {
                   color: "var(--color-primary)",
                 },
               },
             }}
-            helperText={
-              translations.paybackHelperText ||
-              "Χρόνος που χρειάζεται για την ανάκτηση της επένδυσης"
-            }
           />
         </Grid>
 
@@ -1138,24 +1141,23 @@ const WindowReplacementTabContent = ({
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
-                color: "var(--color-success)",
+                color: "var(--color-primary)",
                 fontWeight: "bold",
               },
               "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "var(--color-primary)",
+                },
                 "&.Mui-focused fieldset": {
-                  borderColor: "rgba(0, 0, 0, 0.23)",
+                  borderColor: "var(--color-primary)",
                 },
               },
               "& .MuiInputLabel-root": {
-                color: "var(--color-success)",
                 "&.Mui-focused": {
-                  color: "var(--color-success)",
+                  color: "var(--color-primary)",
                 },
               },
             }}
-            helperText={
-              translations.irrHelperText || "Απόδοση της επένδυσης ως ποσοστό"
-            }
           />
         </Grid>
       </Grid>

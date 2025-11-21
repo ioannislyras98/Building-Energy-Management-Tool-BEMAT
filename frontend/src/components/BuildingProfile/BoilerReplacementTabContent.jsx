@@ -580,10 +580,6 @@ const BoilerReplacementTabContent = ({
             onChange={(e) => handleInputChange("discount_rate", e.target.value)}
             variant="outlined"
             inputProps={{ step: 0.1, min: 0, max: 30 }}
-            helperText={
-              translations.discountRateHelper ||
-              "Επιτόκιο αναγωγής για τους υπολογισμούς NPV (προτεινόμενη τιμή: 5%)"
-            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {

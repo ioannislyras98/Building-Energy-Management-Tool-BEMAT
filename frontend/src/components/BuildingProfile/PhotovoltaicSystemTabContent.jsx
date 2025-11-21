@@ -1074,7 +1074,7 @@ const PhotovoltaicSystemTabContent = ({
                 fullWidth
                 label={
                   translations.fields?.discountRate ||
-                  "Επιτόκιο προεξόφλησης (%)"
+                  "Επιτόκιο αναγωγής (%)"
                 }
                 type="number"
                 value={photovoltaicSystem.discount_rate || ""}
@@ -1094,10 +1094,6 @@ const PhotovoltaicSystemTabContent = ({
                     },
                   },
                 }}
-                helperText={
-                  translations.discountRateHelp ||
-                  "Χρησιμοποιείται για τον υπολογισμό NPV (συνήθως 5%)"
-                }
               />
             </Grid>
 
@@ -1126,10 +1122,6 @@ const PhotovoltaicSystemTabContent = ({
                     },
                   },
                 }}
-                helperText={
-                  translations.annualOperationalCostsHelp ||
-                  "Κόστη συντήρησης και λειτουργίας ανά έτος (χρησιμοποιείται για τον υπολογισμό IRR)"
-                }
               />
             </Grid>
 

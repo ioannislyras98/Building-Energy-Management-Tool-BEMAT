@@ -677,22 +677,93 @@ IRR = (Annual_economic_benefit ÷ Total_investment_cost) × 100
 
 ### 1. Οικονομικοί Δείκτες
 
-**Περίοδος Αποπληρωμής:**
+**Περίοδος Αποπληρωμής (Payback Period):**
 
 ```
 Payback_period = Total_investment_cost ÷ Annual_economic_benefit
 ```
 
-**Καθαρή Παρούσα Αξία (NPV):**
+**Ετήσιο Οικονομικό Όφελος (ΕΒΑ - Annual Economic Benefit):**
 
 ```
-NPV = Σ[Annual_benefit ÷ (1 + discount_rate)^year] - Initial_investment
+Annual_economic_benefit = Annual_energy_savings - Annual_maintenance_cost
 ```
 
-**Εσωτερικός Βαθμός Απόδοσης (IRR):**
+Όπου:
+- `Annual_energy_savings`: Ετήσια εξοικονόμηση ενέργειας σε € (kWh × €/kWh)
+- `Annual_maintenance_cost`: Ετήσιο κόστος συντήρησης σε €
+
+**Καθαρή Παρούσα Αξία (NPV - Net Present Value):**
+
+Η NPV υπολογίζεται με τη μέθοδο της προεξόφλησης των μελλοντικών ταμειακών ροών:
 
 ```
-IRR = (Annual_economic_benefit ÷ Total_investment_cost) × 100
+NPV = Σ[Annual_economic_benefit ÷ (1 + discount_rate)^t] - Initial_investment
+
+Όπου:
+- t = 1, 2, 3, ..., n (αριθμός ετών)
+- discount_rate = Επιτόκιο αναγωγής (π.χ. 0.05 για 5%)
+- n = Χρονικό διάστημα αξιολόγησης σε έτη
+- Initial_investment = Αρχικό κόστος επένδυσης
+
+Αναλυτικά:
+NPV = [ΕΒΑ/(1+r)¹] + [ΕΒΑ/(1+r)²] + [ΕΒΑ/(1+r)³] + ... + [ΕΒΑ/(1+r)ⁿ] - Κόστος
+
+Ερμηνεία:
+- NPV > 0: Η επένδυση είναι κερδοφόρα
+- NPV = 0: Η επένδυση επιστρέφει ακριβώς το κόστος κεφαλαίου
+- NPV < 0: Η επένδυση δεν είναι οικονομικά βιώσιμη
+```
+
+**Εσωτερικός Βαθμός Απόδοσης (IRR - Internal Rate of Return):**
+
+Ο IRR είναι το επιτόκιο στο οποίο η NPV γίνεται μηδέν. Υπολογίζεται με τη μέθοδο Newton-Raphson:
+
+```
+Στόχος: Εύρεση IRR όπου NPV(IRR) = 0
+
+Μέθοδος Newton-Raphson:
+IRR(n+1) = IRR(n) - f(IRR(n)) / f'(IRR(n))
+
+Όπου:
+f(IRR) = Σ[Annual_economic_benefit / (1 + IRR)^t] - Initial_investment
+f'(IRR) = -Σ[t × Annual_economic_benefit / (1 + IRR)^(t+1)]
+
+Διαδικασία:
+1. Αρχική εκτίμηση: IRR_initial = Annual_economic_benefit / Initial_investment
+2. Επαναληπτικός υπολογισμός μέχρι σύγκλισης (|NPV| < 0.01)
+3. Έλεγχος ορίων: -99% ≤ IRR ≤ 1000%
+4. Μέγιστες επαναλήψεις: 100
+
+Ερμηνεία:
+- IRR > discount_rate: Η επένδυση είναι ελκυστική
+- IRR = discount_rate: Η επένδυση είναι οριακή
+- IRR < discount_rate: Η επένδυση δεν είναι ελκυστική
+```
+
+**Παράδειγμα Υπολογισμού:**
+
+```
+Δεδομένα:
+- Κόστος επένδυσης: 10,000 €
+- Ετήσια εξοικονόμηση ενέργειας: 1,500 €
+- Ετήσιο κόστος συντήρησης: 200 €
+- Επιτόκιο αναγωγής: 5%
+- Διάρκεια: 15 έτη
+
+Υπολογισμός:
+1. ΕΒΑ = 1,500 - 200 = 1,300 €/έτος
+
+2. Payback Period = 10,000 / 1,300 = 7.7 έτη
+
+3. NPV = [1,300/(1.05)¹] + [1,300/(1.05)²] + ... + [1,300/(1.05)¹⁵] - 10,000
+   NPV = 1,238 + 1,179 + ... + 625 - 10,000
+   NPV = 13,465 - 10,000 = +3,465 € (κερδοφόρα)
+
+4. IRR: Βρίσκουμε το r όπου NPV = 0
+   Αρχική εκτίμηση: 1,300 / 10,000 = 13%
+   Μετά από επαναλήψεις: IRR ≈ 10.2%
+   (Επειδή IRR = 10.2% > discount_rate = 5%, η επένδυση είναι ελκυστική)
 ```
 
 ### 2. Ενεργειακοί Υπολογισμοί
