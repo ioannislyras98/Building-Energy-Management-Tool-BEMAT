@@ -374,7 +374,14 @@ function BuildingModalForm({
           {isEdit ? params.h2Edit || "Επεξεργασία Κτιρίου" : params.h2}
         </h2>
         <p className="text-sm text-gray-500 text-center mb-4 sticky top-8 bg-white z-10">
-          <span className="text-red-500">*</span> {params.requiredFieldsNote}
+          {params.requiredFieldsNote.split('*').map((part, index) => (
+            <span key={index}>
+              {part}
+              {index < params.requiredFieldsNote.split('*').length - 1 && (
+                <span className="text-red-500">*</span>
+              )}
+            </span>
+          ))}
         </p>
 
         {errors.general && (
