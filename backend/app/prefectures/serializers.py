@@ -11,7 +11,7 @@ class PrefectureSerializer(serializers.ModelSerializer):
         model = Prefecture
         fields = [
             'uuid', 'name', 'zone', 'zone_display', 'temperature_winter', 
-            'temperature_summer', 'solar_radiation', 'is_active', 'created_at', 'updated_at', 
+            'temperature_summer', 'solar_radiation', 'annual_solar_radiation', 'is_active', 'created_at', 'updated_at', 
             'created_by', 'created_by_name'
         ]
         read_only_fields = ['uuid', 'created_at', 'updated_at']
@@ -27,4 +27,4 @@ class PrefectureListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Prefecture
-        fields = ['uuid', 'name', 'zone', 'zone_display', 'temperature_winter', 'temperature_summer', 'solar_radiation']
+        fields = ['uuid', 'name', 'zone', 'zone_display', 'temperature_winter', 'temperature_summer', 'solar_radiation', 'annual_solar_radiation', 'is_active']

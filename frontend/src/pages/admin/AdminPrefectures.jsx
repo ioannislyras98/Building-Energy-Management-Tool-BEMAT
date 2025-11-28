@@ -17,7 +17,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import "../../assets/styles/forms.css";
 import {
-  getAllPrefectures,
+  getAllPrefecturesAdmin,
   createPrefecture,
   updatePrefecture,
   deletePrefecture,
@@ -38,6 +38,8 @@ const AdminPrefectures = () => {
     zone: "",
     temperature_winter: "",
     temperature_summer: "",
+    solar_radiation: "",
+    annual_solar_radiation: "",
     is_active: true,
   });
   const [sortConfig, setSortConfig] = useState({
@@ -90,6 +92,8 @@ const AdminPrefectures = () => {
           zone: "",
           temperature_winter: "",
           temperature_summer: "",
+          solar_radiation: "",
+          annual_solar_radiation: "",
           is_active: true,
         });
       }
@@ -103,7 +107,7 @@ const AdminPrefectures = () => {
   const fetchPrefectures = async () => {
     try {
       setLoading(true);
-      const data = await getAllPrefectures();
+      const data = await getAllPrefecturesAdmin();
       setPrefectures(data);
     } catch (err) {
       setError("Error loading prefectures");
@@ -139,6 +143,8 @@ const AdminPrefectures = () => {
         ...formData,
         temperature_winter: parseFloat(formData.temperature_winter),
         temperature_summer: parseFloat(formData.temperature_summer),
+        solar_radiation: formData.solar_radiation ? parseFloat(formData.solar_radiation) : null,
+        annual_solar_radiation: formData.annual_solar_radiation ? parseFloat(formData.annual_solar_radiation) : null,
       };
 
       if (editingPrefecture) {
@@ -157,6 +163,8 @@ const AdminPrefectures = () => {
         zone: "",
         temperature_winter: "",
         temperature_summer: "",
+        solar_radiation: "",
+        annual_solar_radiation: "",
         is_active: true,
       });
       setErrors({});
@@ -178,6 +186,8 @@ const AdminPrefectures = () => {
       zone: prefecture.zone || "",
       temperature_winter: prefecture.temperature_winter || "",
       temperature_summer: prefecture.temperature_summer || "",
+      solar_radiation: prefecture.solar_radiation || "",
+      annual_solar_radiation: prefecture.annual_solar_radiation || "",
       is_active:
         prefecture.is_active !== undefined ? prefecture.is_active : true,
     });
@@ -444,6 +454,30 @@ const AdminPrefectures = () => {
               </th>
               <th
                 className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+                onClick={() => handleSort("solar_radiation")}>
+                <div className="flex items-center justify-center space-x-1">
+                  <span>
+                    {language === "en" ? "Solar Rad. (kWh/m²/day)" : "Ηλ. Ακτ. (kWh/m²/ημέρα)"}
+                  </span>
+                  {sortConfig.key === "solar_radiation" && (
+                    <span>{sortConfig.direction === "asc" ? "↑" : "↓"}</span>
+                  )}
+                </div>
+              </th>
+              <th
+                className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+                onClick={() => handleSort("annual_solar_radiation")}>
+                <div className="flex items-center justify-center space-x-1">
+                  <span>
+                    {language === "en" ? "Annual Solar (kWh/m²/yr)" : "Ετήσια Ηλ. (kWh/m²/έτος)"}
+                  </span>
+                  {sortConfig.key === "annual_solar_radiation" && (
+                    <span>{sortConfig.direction === "asc" ? "↑" : "↓"}</span>
+                  )}
+                </div>
+              </th>
+              <th
+                className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200"
                 onClick={() => handleSort("is_active")}>
                 <div className="flex items-center justify-center space-x-1">
                   <span>{language === "en" ? "Active" : "Ενεργό"}</span>
@@ -460,7 +494,7 @@ const AdminPrefectures = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {sortedPrefectures.length === 0 ? (
               <tr>
-                <td colSpan="5" className="px-6 py-12 text-center">
+                <td colSpan="8" className="px-6 py-12 text-center">
                   <div className="text-gray-500">
                     <FaMapMarkerAlt className="mx-auto h-8 w-8 text-gray-400 mb-4" />
                     <p className="text-lg font-medium">
@@ -520,12 +554,22 @@ const AdminPrefectures = () => {
                       ? `${prefecture.temperature_summer}°C`
                       : "-"}
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-700">
+                    {prefecture.solar_radiation
+                      ? `${prefecture.solar_radiation}`
+                      : "-"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-700">
+                    {prefecture.annual_solar_radiation
+                      ? `${prefecture.annual_solar_radiation}`
+                      : "-"}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         prefecture.is_active
                           ? "bg-green-100 text-green-800"
-                          : "bg-primary-light text-primary-bold"
+                          : "bg-red-100 text-red-800"
                       }`}>
                       {prefecture.is_active ? text.active : text.inactive}
                     </span>
@@ -607,6 +651,28 @@ const AdminPrefectures = () => {
               />
 
               <InputEntryModal
+                entry={language === "en" ? "Daily Solar Radiation (kWh/m²/day)" : "Μέση Ημερήσια Ηλιακή Ακτινοβολία (kWh/m²/ημέρα)"}
+                id="solar_radiation"
+                type="number"
+                value={formData.solar_radiation}
+                onChange={handleChange}
+                example={language === "en" ? "e.g., 5.0" : "π.χ., 5.0"}
+                error={showValidationErrors ? errors.solar_radiation : ""}
+                step="0.1"
+              />
+
+              <InputEntryModal
+                entry={language === "en" ? "Annual Solar Radiation (kWh/m²/year)" : "Ετήσια Ηλιακή Ακτινοβολία (kWh/m²/έτος)"}
+                id="annual_solar_radiation"
+                type="number"
+                value={formData.annual_solar_radiation}
+                onChange={handleChange}
+                example={language === "en" ? "e.g., 1600" : "π.χ., 1600"}
+                error={showValidationErrors ? errors.annual_solar_radiation : ""}
+                step="0.1"
+              />
+
+              <InputEntryModal
                 entry={text.activeStatus}
                 id="is_active"
                 type="select"
@@ -635,6 +701,8 @@ const AdminPrefectures = () => {
                       zone: "",
                       temperature_winter: "",
                       temperature_summer: "",
+                      solar_radiation: "",
+                      annual_solar_radiation: "",
                       is_active: true,
                     });
                     setErrors({});

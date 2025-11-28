@@ -6,6 +6,7 @@ from .models import Prefecture
 class PrefectureAdmin(admin.ModelAdmin):
     list_display = [
         'name', 'zone', 'temperature_winter', 'temperature_summer',
+        'solar_radiation', 'annual_solar_radiation',
         'is_active', 'created_by', 'created_at'
     ]
     list_filter = ['zone', 'is_active', 'created_by', 'created_at']
@@ -19,6 +20,9 @@ class PrefectureAdmin(admin.ModelAdmin):
         }),
         ('Θερμοκρασίες', {
             'fields': ('temperature_winter', 'temperature_summer')
+        }),
+        ('Ηλιακή Ακτινοβολία', {
+            'fields': ('solar_radiation', 'annual_solar_radiation')
         }),
         ('Μεταδεδομένα', {
             'fields': ('uuid', 'created_at', 'updated_at', 'created_by'),

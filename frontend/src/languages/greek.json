@@ -1363,7 +1363,7 @@
       "hybrid": "Υβριδικό"
     },
     "autoCalculatedCost": "Υπολογίζεται αυτόματα από το άθροισμα των κοστών εγκατάστασης",
-    "autoCalculatedUnexpected": "Υπολογίζεται ως 5% του συνολικού κόστους",
+    "autoCalculatedUnexpected": "Υπολογίζεται ως 9% του συνολικού κόστους",
     "autoCalculatedValueAfterUnexpected": "Άθροισμα συνολικού κόστους και απρόβλεπτων εξόδων",
     "autoCalculatedTax": "Υπολογίζεται ως 24% της αξίας μετά τα απρόβλεπτα έξοδα",
     "autoCalculatedTotalProject": "Άθροισμα αξίας μετά απρόβλεπτα και φόρου",

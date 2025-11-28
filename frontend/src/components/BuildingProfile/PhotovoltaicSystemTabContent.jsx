@@ -105,6 +105,25 @@ const PhotovoltaicSystemTabContent = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingSystem, setDeletingSystem] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
+  const [numericValues, setNumericValues] = useState({});
+
+  // Fetch numeric values
+  useEffect(() => {
+    $.ajax({
+      url: `${API_BASE_URL}/numeric_values/`,
+      method: "GET",
+      success: (response) => {
+        const values = {};
+        response.forEach(item => {
+          values[item.name] = item.value;
+        });
+        setNumericValues(values);
+      },
+      error: (error) => {
+        console.error("Error fetching numeric values:", error);
+      }
+    });
+  }, []);
 
   // Fetch project data
   useEffect(() => {
@@ -1162,7 +1181,7 @@ const PhotovoltaicSystemTabContent = ({
                 }}
                 helperText={
                   translations.autoCalculatedUnexpected ||
-                  "9% του συνολικού κόστους"
+                  `${numericValues['Απρόβλεπτα έξοδα (%)'] || 9}% του συνολικού κόστους`
                 }
               />
             </Grid>
@@ -1208,7 +1227,10 @@ const PhotovoltaicSystemTabContent = ({
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label={`${translations.fields?.taxBurden || "ΦΠΑ 24% (€)"} - ${
+                label={`${
+                  translations.fields?.taxBurden || 
+                  `ΦΠΑ ${numericValues['Φορολογική επιβάρυνση (%)'] || 24}% (€)`
+                } - ${
                   translations.autoCalculated || "Αυτόματος Υπολογισμός"
                 }`}
                 type="text"

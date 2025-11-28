@@ -192,9 +192,14 @@ def calculate_photovoltaic_costs(request):
     
     total_equipment_cost = sum(costs.values())
     
-    unexpected_expenses = total_equipment_cost * 0.09
+    # Get rates from NumericValue model
+    from numericValues.models import NumericValue
+    unexpected_rate = NumericValue.get_value('Απρόβλεπτα έξοδα (%)') / 100.0
+    tax_rate = NumericValue.get_value('Φορολογική επιβάρυνση (%)') / 100.0
+    
+    unexpected_expenses = total_equipment_cost * unexpected_rate
     value_after_unexpected = total_equipment_cost + unexpected_expenses
-    tax_burden = value_after_unexpected * 0.24
+    tax_burden = value_after_unexpected * tax_rate
     total_cost = value_after_unexpected + tax_burden
     
     return Response({

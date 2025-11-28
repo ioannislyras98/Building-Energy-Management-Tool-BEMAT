@@ -37,6 +37,31 @@ class Command(BaseCommand):
                 'value': 0.04,
                 'created_by': admin_user
             },
+            {
+                'name': 'Ηλιακή ακτινοβολία (kWh/m²/έτος)',
+                'value': 1600.0,
+                'created_by': admin_user
+            },
+            {
+                'name': 'Performance Ratio (PR)',
+                'value': 0.80,
+                'created_by': admin_user
+            },
+            {
+                'name': 'Απρόβλεπτα έξοδα (%)',
+                'value': 9.0,
+                'created_by': admin_user
+            },
+            {
+                'name': 'Φορολογική επιβάρυνση (%)',
+                'value': 24.0,
+                'created_by': admin_user
+            },
+            {
+                'name': 'Συντελεστής μετατροπής BTU σε Watts',
+                'value': 0.293,
+                'created_by': admin_user
+            },
         ]
 
         created_count = 0

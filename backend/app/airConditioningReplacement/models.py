@@ -41,8 +41,10 @@ class OldAirConditioning(models.Model):
     def calculate_consumption(self):
         """Υπολογισμός κατανάλωσης ενέργειας"""
         if self.btu_type and self.cop_percentage and self.eer_percentage:
-            # Μετατροπή BTU σε Watts (1 BTU/hr ≈ 0.293 Watts)
-            watts = self.btu_type * 0.293
+            # Μετατροπή BTU σε Watts
+            from numericValues.models import NumericValue
+            btu_to_watts = NumericValue.get_value('Συντελεστής μετατροπής BTU σε Watts')
+            watts = self.btu_type * btu_to_watts
             
             # Υπολογισμός κατανάλωσης θέρμανσης
             if self.cop_percentage > 0:
@@ -103,8 +105,10 @@ class NewAirConditioning(models.Model):
     def calculate_consumption(self):
         """Υπολογισμός κατανάλωσης ενέργειας"""
         if self.btu_type and self.cop_percentage and self.eer_percentage:
-            # Μετατροπή BTU σε Watts (1 BTU/hr ≈ 0.293 Watts)
-            watts = self.btu_type * 0.293
+            # Μετατροπή BTU σε Watts
+            from numericValues.models import NumericValue
+            btu_to_watts = NumericValue.get_value('Συντελεστής μετατροπής BTU σε Watts')
+            watts = self.btu_type * btu_to_watts
             
             # Υπολογισμός κατανάλωσης θέρμανσης
             if self.cop_percentage > 0:

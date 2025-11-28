@@ -1371,7 +1371,7 @@
       "hybrid": "Hybrid"
     },
     "autoCalculatedCost": "Automatically calculated from the sum of installation costs",
-    "autoCalculatedUnexpected": "Calculated as 5% of total cost",
+    "autoCalculatedUnexpected": "Calculated as 9% of total cost",
     "autoCalculatedValueAfterUnexpected": "Sum of total cost and unexpected expenses",
     "autoCalculatedTax": "Calculated as 24% of value after unexpected expenses",
     "autoCalculatedTotalProject": "Sum of value after unexpected and tax",
