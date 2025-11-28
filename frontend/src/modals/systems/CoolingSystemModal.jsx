@@ -213,121 +213,104 @@ function CoolingSystemModalForm({
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="mb-4">
-              {" "}
-              <label htmlFor="cooling_system_type" className="label-name">
-                {params.coolingSystemType || "Τύπος Συστήματος Ψύξης"}{" "}
-                <span className="text-red-500 ml-1">*</span>
-              </label>{" "}
-              <input
-                type="text"
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <InputEntryModal
+                entry={params.coolingSystemType || "Τύπος Συστήματος Ψύξης"}
                 id="cooling_system_type"
+                type="text"
                 value={formData.cooling_system_type}
                 onChange={handleChange}
-                className={`input-field ${
-                  errors.cooling_system_type && showValidationErrors
-                    ? "error-input"
-                    : ""
-                }`}
-                placeholder={
+                error={showValidationErrors ? errors.cooling_system_type : ""}
+                example={
                   params.coolingSystemTypePlaceholder ||
                   "Εισάγετε τον τύπο του συστήματος ψύξης"
                 }
+                required
               />
-              {showValidationErrors && errors.cooling_system_type && (
-                <div className="text-red-500 text-xs mt-1">
-                  {errors.cooling_system_type}
-                </div>
-              )}
-            </div>{" "}
-            <div className="mb-4">
-              <label
-                htmlFor="cooling_unit_accessibility"
-                className="label-name">
-                {params.coolingUnitAccessibility ||
-                  "Δυνατότητα Πρόσβασης στη Μονάδα Ψύξης"}
-              </label>
-              <input
-                type="text"
+              <InputEntryModal
+                entry={
+                  params.coolingUnitAccessibility ||
+                  "Δυνατότητα Πρόσβασης Μονάδας"
+                }
                 id="cooling_unit_accessibility"
+                type="text"
                 value={formData.cooling_unit_accessibility}
                 onChange={handleChange}
-                className={`input-field ${
-                  errors.cooling_unit_accessibility && showValidationErrors
-                    ? "error-input"
-                    : ""
-                }`}
-                placeholder={
+                error={
+                  showValidationErrors ? errors.cooling_unit_accessibility : ""
+                }
+                example={
                   params.coolingUnitAccessibilityPlaceholder ||
-                  "Εισάγετε τη δυνατότητα πρόσβασης στη μονάδα ψύξης"
+                  "Εισάγετε τη δυνατότητα πρόσβασης"
                 }
               />
-              {showValidationErrors && errors.cooling_unit_accessibility && (
-                <div className="text-red-500 text-xs mt-1">
-                  {errors.cooling_unit_accessibility}
-                </div>
-              )}
-            </div>{" "}
-            <InputEntryModal
-              entry={params.heatPumpType || "Τύπος Αντλίας Θερμότητας"}
-              id="heat_pump_type"
-              type="text"
-              value={formData.heat_pump_type}
-              onChange={handleChange}
-              error={showValidationErrors ? errors.heat_pump_type : ""}
-            />
-            <InputEntryModal
-              entry={params.powerKW || "Ισχύς (W)"}
-              id="power_kw"
-              type="number"
-              value={formData.power_kw}
-              onChange={handleChange}
-              error={showValidationErrors ? errors.power_kw : ""}
-              step="0.01"
-              min="0"
-              required
-            />
-            <InputEntryModal
-              entry={params.constructionYear || "Έτος Κατασκευής"}
-              id="construction_year"
-              type="number"
-              value={formData.construction_year}
-              onChange={handleChange}
-              error={showValidationErrors ? errors.construction_year : ""}
-              min="1900"
-              max={new Date().getFullYear()}
-            />
-            <InputEntryModal
-              entry={
-                params.energyEfficiencyRatio ||
-                "Συντελεστής Ενεργειακής Απόδοσης (EER)"
-              }
-              id="energy_efficiency_ratio"
-              type="number"
-              value={formData.energy_efficiency_ratio}
-              onChange={handleChange}
-              error={showValidationErrors ? errors.energy_efficiency_ratio : ""}
-              step="0.01"
-              min="0"
-              required
-            />
-            <InputEntryModal
-              entry={params.maintenancePeriod || "Περίοδος Συντήρησης"}
-              id="maintenance_period"
-              type="text"
-              value={formData.maintenance_period}
-              onChange={handleChange}
-              error={showValidationErrors ? errors.maintenance_period : ""}
-            />
-            <InputEntryModal
-              entry={params.operatingHours || "Ώρες Λειτουργίας"}
-              id="operating_hours"
-              type="text"
-              value={formData.operating_hours}
-              onChange={handleChange}
-              error={showValidationErrors ? errors.operating_hours : ""}
-            />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <InputEntryModal
+                entry={params.heatPumpType || "Τύπος Αντλίας Θερμότητας"}
+                id="heat_pump_type"
+                type="text"
+                value={formData.heat_pump_type}
+                onChange={handleChange}
+                error={showValidationErrors ? errors.heat_pump_type : ""}
+              />
+              <InputEntryModal
+                entry={params.powerKW || "Ισχύς (W)"}
+                id="power_kw"
+                type="number"
+                value={formData.power_kw}
+                onChange={handleChange}
+                error={showValidationErrors ? errors.power_kw : ""}
+                step="0.01"
+                min="0"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <InputEntryModal
+                entry={params.constructionYear || "Έτος Κατασκευής"}
+                id="construction_year"
+                type="number"
+                value={formData.construction_year}
+                onChange={handleChange}
+                error={showValidationErrors ? errors.construction_year : ""}
+                min="1900"
+                max={new Date().getFullYear()}
+              />
+              <InputEntryModal
+                entry={
+                  params.energyEfficiencyRatio ||
+                  "Συντελεστής Απόδοσης (EER)"
+                }
+                id="energy_efficiency_ratio"
+                type="number"
+                value={formData.energy_efficiency_ratio}
+                onChange={handleChange}
+                error={showValidationErrors ? errors.energy_efficiency_ratio : ""}
+                step="0.01"
+                min="0"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <InputEntryModal
+                entry={params.maintenancePeriod || "Περίοδος Συντήρησης"}
+                id="maintenance_period"
+                type="text"
+                value={formData.maintenance_period}
+                onChange={handleChange}
+                error={showValidationErrors ? errors.maintenance_period : ""}
+              />
+              <InputEntryModal
+                entry={params.operatingHours || "Ώρες Λειτουργίας"}
+                id="operating_hours"
+                type="text"
+                value={formData.operating_hours}
+                onChange={handleChange}
+                error={showValidationErrors ? errors.operating_hours : ""}
+              />
+            </div>
           </div>
 
           <div className="flex justify-between mt-6">

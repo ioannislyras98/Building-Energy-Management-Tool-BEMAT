@@ -283,29 +283,18 @@ function BoilerDetailModalForm({
               min="1900"
               max={new Date().getFullYear()}
             />
-            <div className="mb-4">
-              <label htmlFor="fuel_type" className="label-name">
-                {params.fuelType || "Είδος Καυσίμου"}{" "}
-                <span className="text-red-500 ml-1">*</span>
-              </label>
-              <input
-                type="text"
-                id="fuel_type"
-                value={formData.fuel_type}
-                onChange={handleChange}
-                className={`input-field ${
-                  errors.fuel_type && showValidationErrors ? "error-input" : ""
-                }`}
-                placeholder={
-                  params.fuelTypePlaceholder || "Εισάγετε το είδος καυσίμου"
-                }
-              />
-              {showValidationErrors && errors.fuel_type && (
-                <div className="text-red-500 text-xs mt-1">
-                  {errors.fuel_type}
-                </div>
-              )}
-            </div>
+            <InputEntryModal
+              entry={params.fuelType || "Είδος Καυσίμου"}
+              id="fuel_type"
+              type="text"
+              value={formData.fuel_type}
+              onChange={handleChange}
+              error={showValidationErrors ? errors.fuel_type : ""}
+              example={
+                params.fuelTypePlaceholder || "Εισάγετε το είδος καυσίμου"
+              }
+              required
+            />
             <InputEntryModal
               entry={params.nitrogenMonoxide || "Μονοξείδιο Αζώτου (ppm)"}
               id="nitrogen_monoxide"

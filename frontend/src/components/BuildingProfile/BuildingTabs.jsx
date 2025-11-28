@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import EnergyProfileTabContent from "./EnergyProfileTabContent";
 import SystemsTabContent from "./SystemsTabContent";
@@ -27,6 +28,7 @@ const dataProvider = {
 };
 
 const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData, scenarioId }) => {
+  const navigate = useNavigate();
   // If scenarioId exists, set active tab to Scenarios tab (index 4)
   const [activeTab, setActiveTab] = useState(scenarioId ? 4 : 0);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -73,6 +75,16 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData, scenari
     }
   };
 
+  const handleTabClick = (index) => {
+    // If clicking on Scenarios tab (index 4) and we're already in a scenario,
+    // navigate back to the building page without scenarioId
+    if (index === 4 && scenarioId) {
+      navigate(`/projects/${projectUuid}/buildings/${buildingUuid}`);
+    } else {
+      setActiveTab(index);
+    }
+  };
+
   return (
     <div className="w-full">
       <div className="relative bg-gray-100 rounded-xl p-1.5 mb-6 shadow-inner">
@@ -107,7 +119,7 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData, scenari
                   ? "text-white bg-primary shadow-lg transform scale-[1.02] border-2 border-primary"
                   : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/70 bg-transparent"
               }`}
-              onClick={() => setActiveTab(index)}>
+              onClick={() => handleTabClick(index)}>
               <span
                 className={`${
                   activeTab === index ? "font-bold" : "font-medium"

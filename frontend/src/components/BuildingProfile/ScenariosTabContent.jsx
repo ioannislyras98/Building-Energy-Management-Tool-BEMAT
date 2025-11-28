@@ -580,30 +580,68 @@ const ScenariosTabContent = ({
         <Grid container spacing={4}>
           {scenarioTypes.map((scenario) => (
             <Grid item xs={12} md={6} lg={4} key={scenario.id}>
-              {" "}
               <Card
-                className="h-full cursor-pointer transform hover:scale-105 hover:shadow-xl transition-transform"
+                className="h-full cursor-pointer transform hover:scale-105 hover:shadow-xl transition-all duration-300 flex flex-col"
                 onClick={() => handleScenarioSelect(scenario.id)}
                 sx={{
                   background: `linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%)`,
                   color: "white",
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
                   "&:hover": {
                     boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
                   },
                 }}>
-                <CardContent className="p-6">
-                  <div className="flex items-center mb-4">
-                    <div className="bg-white/20 p-3 rounded-full mr-4">
-                      {scenario.icon}
+                <CardContent 
+                  className="p-6 flex-grow flex flex-col"
+                  sx={{ 
+                    flexGrow: 1, 
+                    display: "flex", 
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    "&:last-child": { paddingBottom: "24px" }
+                  }}>
+                  <div className="flex flex-col flex-grow">
+                    {/* Icon Section - Fixed Height */}
+                    <div className="flex justify-center mb-4">
+                      <div className="bg-white/20 p-4 rounded-full">
+                        {scenario.icon}
+                      </div>
                     </div>
-                    <Typography variant="h6" className="font-bold">
-                      {scenario.title}
-                    </Typography>
+                    
+                    {/* Title Section - Flexible Height with minimum */}
+                    <div className="mb-3 flex items-center justify-center">
+                      <Typography 
+                        variant="h6" 
+                        className="font-bold text-center"
+                        sx={{ 
+                          fontSize: { xs: "1rem", sm: "1.05rem", md: "1.1rem" },
+                          lineHeight: "1.3",
+                          minHeight: { xs: "auto", md: "64px" },
+                          display: "flex",
+                          alignItems: "center"
+                        }}>
+                        {scenario.title}
+                      </Typography>
+                    </div>
+                    
+                    {/* Description Section - Flexible Height */}
+                    <div className="flex-grow mb-4">
+                      <Typography 
+                        variant="body2" 
+                        className="opacity-90 text-center"
+                        sx={{
+                          fontSize: { xs: "0.8rem", sm: "0.85rem", md: "0.875rem" },
+                          lineHeight: "1.5"
+                        }}>
+                        {scenario.description}
+                      </Typography>
+                    </div>
                   </div>
-                  <Typography variant="body2" className="opacity-90">
-                    {scenario.description}
-                  </Typography>
-                  <div className="mt-4 pt-4 border-t border-white/20">
+                  
+                  {/* Button Section - Always at Bottom */}
+                  <div className="pt-4 border-t border-white/20">
                     <Button
                       variant="contained"
                       fullWidth
@@ -611,6 +649,10 @@ const ScenariosTabContent = ({
                       sx={{
                         backgroundColor: "rgba(255, 255, 255, 0.2)",
                         color: "white",
+                        textTransform: "none",
+                        fontWeight: "600",
+                        py: { xs: 1.2, sm: 1.5 },
+                        fontSize: { xs: "0.85rem", sm: "0.9rem" },
                         "&:hover": {
                           backgroundColor: "rgba(255, 255, 255, 0.3)",
                         },
