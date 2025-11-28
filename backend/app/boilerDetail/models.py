@@ -44,7 +44,7 @@ class BoilerDetail(models.Model):
         null=True,
         blank=True,
         validators=[MinValueValidator(0)],
-        verbose_name='Ονομαστική Ισχύς (kW)'
+        verbose_name='Ονομαστική Ισχύς (W)'
     )
     internal_efficiency = models.DecimalField(
         max_digits=5,

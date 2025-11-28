@@ -148,13 +148,11 @@ function CoolingSystemModalForm({
       },
       data: JSON.stringify(apiData),
       success: (response) => {
-
         onSubmitSuccess(response);
         resetForm();
         onClose();
       },
       error: (jqXHR) => {
-
         handleApiError(jqXHR);
       },
     });
@@ -280,7 +278,7 @@ function CoolingSystemModalForm({
               error={showValidationErrors ? errors.heat_pump_type : ""}
             />
             <InputEntryModal
-              entry={params.powerKW || "Ισχύς (kW)"}
+              entry={params.powerKW || "Ισχύς (W)"}
               id="power_kw"
               type="number"
               value={formData.power_kw}

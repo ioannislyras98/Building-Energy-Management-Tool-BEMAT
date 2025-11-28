@@ -251,13 +251,13 @@ function BoilerDetailModalForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {" "}
             <InputEntryModal
-              entry={params.nominalPower || "Ονομαστική Ισχύς (kW)"}
+              entry={params.nominalPower || "Ονομαστική Ισχύς (W)"}
               id="nominal_power"
               type="number"
               value={formData.nominal_power}
               onChange={handleChange}
               error={showValidationErrors ? errors.nominal_power : ""}
-              step="0.01"
+              step="1"
               min="0"
               required
             />
