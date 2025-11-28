@@ -198,19 +198,26 @@ class BulbReplacement(models.Model):
             
         if self.energy_savings_kwh and self.energy_cost_kwh:
             self.annual_cost_savings = self.energy_savings_kwh * self.energy_cost_kwh
-            
+        
+        discount_rate = 0.05
+        years = self.lifespan_years or 10
+        annual_net_savings = (self.annual_cost_savings or 0) - (self.maintenance_cost_annual or 0)
+        
+        # Υπολογισμός περιόδου αποπληρωμής (μόνο αν το όφελος είναι θετικό)
         if self.annual_cost_savings and self.total_investment_cost and self.annual_cost_savings > 0:
             self.payback_period = self.total_investment_cost / self.annual_cost_savings
-            
-            discount_rate = 0.05
-            years = self.lifespan_years or 10
-            annual_net_savings = self.annual_cost_savings - (self.maintenance_cost_annual or 0)
-            
+        else:
+            self.payback_period = 0
+        
+        # Υπολογισμός NPV (υπολογίζεται και για αρνητικές τιμές)
+        if annual_net_savings != 0:
             pv_savings = 0
             for year in range(1, int(years) + 1):
                 pv_savings += annual_net_savings / (1 + discount_rate) ** year
                 
             self.net_present_value = pv_savings - self.total_investment_cost
+        else:
+            self.net_present_value = -self.total_investment_cost
             
             # Calculate IRR using Newton-Raphson method
             if self.total_investment_cost > 0 and annual_net_savings > 0 and years > 0:

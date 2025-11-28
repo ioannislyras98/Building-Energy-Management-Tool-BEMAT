@@ -184,19 +184,26 @@ class WindowReplacement(models.Model):
             
         if self.window_area and self.cost_per_sqm:
             self.total_investment_cost = self.window_area * self.cost_per_sqm
-            
+        
+        discount_rate = (self.discount_rate or 5.0) / 100
+        years = self.lifespan_years or 20
+        annual_net_savings = (self.annual_cost_savings or 0) - (self.maintenance_cost_annual or 0)
+        
+        # Υπολογισμός περιόδου αποπληρωμής (μόνο αν το όφελος είναι θετικό)
         if self.annual_cost_savings and self.total_investment_cost and self.annual_cost_savings > 0:
             self.payback_period = self.total_investment_cost / self.annual_cost_savings
-            
-            discount_rate = (self.discount_rate or 5.0) / 100
-            years = self.lifespan_years or 20
-            annual_net_savings = self.annual_cost_savings - (self.maintenance_cost_annual or 0)
-            
+        else:
+            self.payback_period = 0
+        
+        # Υπολογισμός NPV (υπολογίζεται και για αρνητικές τιμές)
+        if annual_net_savings != 0:
             pv_savings = 0
             for year in range(1, int(years) + 1):
                 pv_savings += annual_net_savings / (1 + discount_rate) ** year
                 
             self.net_present_value = pv_savings - self.total_investment_cost
+        else:
+            self.net_present_value = -self.total_investment_cost
             
             # Calculate IRR using Newton-Raphson method
             if self.total_investment_cost > 0 and annual_net_savings > 0 and years > 0:

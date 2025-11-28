@@ -818,7 +818,7 @@ const AirConditioningReplacementTabContent = ({
                 }
                 type="text"
                 value={
-                  analysis?.energy_savings_kwh
+                  analysis?.energy_savings_kwh !== undefined && analysis?.energy_savings_kwh !== null
                     ? parseFloat(analysis.energy_savings_kwh).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                     : ""
                 }
@@ -830,7 +830,7 @@ const AirConditioningReplacementTabContent = ({
                 }
                 sx={{
                   "& .MuiInputBase-input": {
-                    color: "var(--color-primary)",
+                    color: analysis?.energy_savings_kwh >= 0 ? "var(--color-primary)" : "red",
                     fontWeight: "bold",
                   },
                   "& .MuiOutlinedInput-root": {
@@ -1023,7 +1023,7 @@ const AirConditioningReplacementTabContent = ({
                 }
                 type="text"
                 value={
-                  analysis?.annual_energy_savings
+                  analysis?.annual_energy_savings !== undefined && analysis?.annual_energy_savings !== null
                     ? parseFloat(analysis.annual_energy_savings).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
                     : ""
                 }
@@ -1035,7 +1035,7 @@ const AirConditioningReplacementTabContent = ({
                 }
                 sx={{
                   "& .MuiInputBase-input": {
-                    color: "green",
+                    color: analysis?.annual_energy_savings >= 0 ? "green" : "red",
                     fontWeight: "bold",
                   },
                   "& .MuiOutlinedInput-root": {
@@ -1065,7 +1065,7 @@ const AirConditioningReplacementTabContent = ({
                 }
                 type="text"
                 value={
-                  analysis?.annual_economic_benefit
+                  analysis?.annual_economic_benefit !== undefined && analysis?.annual_economic_benefit !== null
                     ? parseFloat(analysis.annual_economic_benefit).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
                     : ""
                 }
@@ -1077,7 +1077,7 @@ const AirConditioningReplacementTabContent = ({
                 }
                 sx={{
                   "& .MuiInputBase-input": {
-                    color: "green",
+                    color: analysis?.annual_economic_benefit >= 0 ? "green" : "red",
                     fontWeight: "bold",
                   },
                   "& .MuiOutlinedInput-root": {
@@ -1106,8 +1106,10 @@ const AirConditioningReplacementTabContent = ({
                 }
                 type="text"
                 value={
-                  analysis?.payback_period
-                    ? parseFloat(analysis.payback_period).toFixed(1)
+                  analysis?.payback_period !== undefined && analysis?.payback_period !== null
+                    ? (parseFloat(analysis.payback_period) > 0
+                        ? parseFloat(analysis.payback_period).toFixed(1) + ' έτη'
+                        : 'Δεν αποπληρώνεται')
                     : ""
                 }
                 variant="outlined"
@@ -1118,7 +1120,7 @@ const AirConditioningReplacementTabContent = ({
                 }
                 sx={{
                   "& .MuiInputBase-input": {
-                    color: "var(--color-primary)",
+                    color: analysis?.payback_period > 0 ? "var(--color-primary)" : "red",
                     fontWeight: "bold",
                   },
                   "& .MuiOutlinedInput-root": {
@@ -1191,8 +1193,10 @@ const AirConditioningReplacementTabContent = ({
                 }
                 type="text"
                 value={
-                  analysis?.internal_rate_of_return
-                    ? parseFloat(analysis.internal_rate_of_return).toFixed(2)
+                  analysis?.internal_rate_of_return !== undefined && analysis?.internal_rate_of_return !== null
+                    ? (parseFloat(analysis.internal_rate_of_return) > 0
+                        ? parseFloat(analysis.internal_rate_of_return).toFixed(2) + '%'
+                        : 'Μη κερδοφόρα επένδυση')
                     : ""
                 }
                 variant="outlined"
@@ -1202,7 +1206,7 @@ const AirConditioningReplacementTabContent = ({
                 }
                 sx={{
                   "& .MuiInputBase-input": {
-                    color: "var(--color-primary)",
+                    color: analysis?.internal_rate_of_return > 0 ? "var(--color-primary)" : "red",
                     fontWeight: "bold",
                   },
                   "& .MuiOutlinedInput-root": {

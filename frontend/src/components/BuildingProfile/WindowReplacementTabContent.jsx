@@ -1076,14 +1076,18 @@ const WindowReplacementTabContent = ({
             fullWidth
             label={translations.netPresentValue || "Καθαρή παρούσα αξία (€)"}
             type="text"
-            value={calculatedResults.net_present_value.toLocaleString("el-GR", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            value={
+              calculatedResults.net_present_value !== undefined && calculatedResults.net_present_value !== null
+                ? calculatedResults.net_present_value.toLocaleString("el-GR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }) + ' €'
+                : ""
+            }
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
-                color: "var(--color-primary)",
+                color: calculatedResults.net_present_value >= 0 ? "green" : "red",
                 fontWeight: "bold",
               },
               "& .MuiOutlinedInput-root": {
@@ -1108,11 +1112,17 @@ const WindowReplacementTabContent = ({
             fullWidth
             label={translations.paybackPeriod || "Περίοδος Αποπληρωμής (έτη)"}
             type="text"
-            value={calculatedResults.payback_period.toFixed(1)}
+            value={
+              calculatedResults.payback_period !== undefined && calculatedResults.payback_period !== null
+                ? (calculatedResults.payback_period > 0
+                    ? calculatedResults.payback_period.toFixed(1) + ' έτη'
+                    : 'Δεν αποπληρώνεται')
+                : ""
+            }
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
-                color: "var(--color-primary)",
+                color: calculatedResults.payback_period > 0 ? "var(--color-primary)" : "red",
                 fontWeight: "bold",
               },
               "& .MuiOutlinedInput-root": {
@@ -1137,11 +1147,17 @@ const WindowReplacementTabContent = ({
             fullWidth
             label={translations.irr || "Εσωτερικός Βαθμός Απόδοσης (%)"}
             type="text"
-            value={calculatedResults.internal_rate_of_return.toFixed(2)}
+            value={
+              calculatedResults.internal_rate_of_return !== undefined && calculatedResults.internal_rate_of_return !== null
+                ? (calculatedResults.internal_rate_of_return > 0
+                    ? calculatedResults.internal_rate_of_return.toFixed(2) + '%'
+                    : 'Μη κερδοφόρα επένδυση')
+                : ""
+            }
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
-                color: "var(--color-primary)",
+                color: calculatedResults.internal_rate_of_return > 0 ? "var(--color-primary)" : "red",
                 fontWeight: "bold",
               },
               "& .MuiOutlinedInput-root": {

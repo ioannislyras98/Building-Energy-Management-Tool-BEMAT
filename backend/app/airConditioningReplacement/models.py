@@ -186,19 +186,23 @@ class AirConditioningAnalysis(models.Model):
         if not self.energy_cost_kwh and self.project:
             self.energy_cost_kwh = float(self.project.cost_per_kwh_electricity or 0)
         
-        # Υπολογισμός ετήσιας ενεργειακής εξοικονόμησης
-        if self.energy_savings_kwh > 0 and self.energy_cost_kwh > 0:
+        # Υπολογισμός ετήσιας ενεργειακής εξοικονόμησης (μπορεί να είναι αρνητική)
+        if self.energy_cost_kwh > 0:
             self.annual_energy_savings = self.energy_savings_kwh * self.energy_cost_kwh
+        else:
+            self.annual_energy_savings = 0
         
-        # Ετήσιο οικονομικό όφελος = Ετήσια ενεργειακή εξοικονόμηση (χωρίς αφαίρεση συντήρησης)
+        # Ετήσιο οικονομικό όφελος = Ετήσια ενεργειακή εξοικονόμηση (μπορεί να είναι αρνητικό)
         self.annual_economic_benefit = self.annual_energy_savings
         
-        # Υπολογισμός περιόδου αποπληρωμής
+        # Υπολογισμός περιόδου αποπληρωμής (μόνο αν το όφελος είναι θετικό)
         if self.annual_economic_benefit > 0 and self.total_investment_cost > 0:
             self.payback_period = self.total_investment_cost / self.annual_economic_benefit
+        else:
+            self.payback_period = 0
         
-        # Υπολογισμός NPV
-        if self.annual_economic_benefit > 0:
+        # Υπολογισμός NPV (υπολογίζεται και για αρνητικές τιμές)
+        if self.annual_economic_benefit != 0:
             discount_rate_decimal = self.discount_rate / 100
             pv_savings = 0
             
@@ -211,6 +215,8 @@ class AirConditioningAnalysis(models.Model):
                 pv_savings = self.annual_economic_benefit * self.lifespan_years
             
             self.net_present_value = pv_savings - self.total_investment_cost
+        else:
+            self.net_present_value = -self.total_investment_cost
         
         # Calculate IRR using Newton-Raphson method
         if self.total_investment_cost > 0 and self.annual_economic_benefit > 0 and self.lifespan_years > 0:

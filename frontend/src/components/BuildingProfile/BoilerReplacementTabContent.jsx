@@ -44,6 +44,7 @@ const BoilerReplacementTabContent = ({
   const [error, setError] = useState(null);
   const [errorField, setErrorField] = useState(null); 
   const [success, setSuccess] = useState(null);
+  const [hasBoilerSystemEfficiency, setHasBoilerSystemEfficiency] = useState(false);
   const [formData, setFormData] = useState({
     // Συντελεστές απόδοσης
     old_boiler_efficiency: "",
@@ -116,6 +117,19 @@ const BoilerReplacementTabContent = ({
   useEffect(() => {
     fetchBoilerReplacementData();
   }, [buildingUuid, projectUuid]);
+
+  // Παίρνουμε την απόδοση του παλιού λέβητα από το σύστημα λέβητα
+  useEffect(() => {
+    if (buildingData?.heating_system?.efficiency && !formData.old_boiler_efficiency) {
+      setFormData(prev => ({
+        ...prev,
+        old_boiler_efficiency: buildingData.heating_system.efficiency
+      }));
+      setHasBoilerSystemEfficiency(true);
+    } else if (buildingData?.heating_system?.efficiency) {
+      setHasBoilerSystemEfficiency(true);
+    }
+  }, [buildingData]);
 
   const fetchBoilerReplacementData = async () => {
     if (!buildingUuid || !projectUuid) return;
@@ -266,6 +280,8 @@ const BoilerReplacementTabContent = ({
             value={formData.old_boiler_efficiency}
             onChange={(e) => handleInputChange("old_boiler_efficiency", e.target.value)}
             variant="outlined"
+            InputProps={{ readOnly: hasBoilerSystemEfficiency }}
+            helperText={hasBoilerSystemEfficiency ? "Αυτόματη ανάκτηση από το σύστημα λέβητα" : ""}
             inputProps={{ step: 0.1, min: 0.1, max: 100 }}
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -476,13 +492,8 @@ const BoilerReplacementTabContent = ({
             type="number"
             value={formData.heating_oil_savings_liters}
             variant="outlined"
-            disabled
             helperText="Αυτόματος υπολογισμός με βάση τους συντελεστές απόδοσης"
             sx={{
-              "& .MuiInputBase-input": {
-                color: "green",
-                fontWeight: "bold",
-              },
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
                   borderColor: "var(--color-primary)",
@@ -509,7 +520,6 @@ const BoilerReplacementTabContent = ({
             type="number"
             value={formData.oil_price_per_liter}
             variant="outlined"
-            disabled
             helperText="Αυτόματη ανάκτηση από τα στοιχεία του έργου"
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -664,8 +674,8 @@ const BoilerReplacementTabContent = ({
             }
             type="text"
             value={
-              formData.annual_energy_savings
-                ? parseFloat(formData.annual_energy_savings).toLocaleString()
+              formData.annual_energy_savings !== undefined && formData.annual_energy_savings !== null
+                ? parseFloat(formData.annual_energy_savings).toLocaleString() + ' €'
                 : ""
             }
             variant="outlined"
@@ -676,7 +686,7 @@ const BoilerReplacementTabContent = ({
             }
             sx={{
               "& .MuiInputBase-input": {
-                color: "green",
+                color: formData.annual_energy_savings >= 0 ? "green" : "red",
                 fontWeight: "bold",
               },
               "& .MuiOutlinedInput-root": {
@@ -706,8 +716,8 @@ const BoilerReplacementTabContent = ({
             }
             type="text"
             value={
-              formData.annual_economic_benefit
-                ? parseFloat(formData.annual_economic_benefit).toLocaleString()
+              formData.annual_economic_benefit !== undefined && formData.annual_economic_benefit !== null
+                ? parseFloat(formData.annual_economic_benefit).toLocaleString() + ' €'
                 : ""
             }
             variant="outlined"
@@ -718,7 +728,7 @@ const BoilerReplacementTabContent = ({
             }
             sx={{
               "& .MuiInputBase-input": {
-                color: "green",
+                color: formData.annual_economic_benefit >= 0 ? "green" : "red",
                 fontWeight: "bold",
               },
               "& .MuiOutlinedInput-root": {
@@ -745,8 +755,10 @@ const BoilerReplacementTabContent = ({
             label={translations.paybackPeriod || "Περίοδος αποπληρωμής (έτη)"}
             type="text"
             value={
-              formData.payback_period
-                ? parseFloat(formData.payback_period).toFixed(1)
+              formData.payback_period !== undefined && formData.payback_period !== null
+                ? (parseFloat(formData.payback_period) > 0
+                    ? parseFloat(formData.payback_period).toFixed(1) + ' έτη'
+                    : 'Δεν αποπληρώνεται')
                 : ""
             }
             variant="outlined"
@@ -757,7 +769,7 @@ const BoilerReplacementTabContent = ({
             }
             sx={{
               "& .MuiInputBase-input": {
-                color: "var(--color-primary)",
+                color: formData.payback_period > 0 ? "var(--color-primary)" : "red",
                 fontWeight: "bold",
               },
               "& .MuiOutlinedInput-root": {
@@ -786,8 +798,8 @@ const BoilerReplacementTabContent = ({
             }
             type="text"
             value={
-              formData.net_present_value
-                ? parseFloat(formData.net_present_value).toLocaleString()
+              formData.net_present_value !== undefined && formData.net_present_value !== null
+                ? parseFloat(formData.net_present_value).toLocaleString() + ' €'
                 : ""
             }
             variant="outlined"
@@ -828,8 +840,10 @@ const BoilerReplacementTabContent = ({
             }
             type="text"
             value={
-              formData.internal_rate_of_return
-                ? parseFloat(formData.internal_rate_of_return).toFixed(2)
+              formData.internal_rate_of_return !== undefined && formData.internal_rate_of_return !== null
+                ? (parseFloat(formData.internal_rate_of_return) > 0
+                    ? parseFloat(formData.internal_rate_of_return).toFixed(2) + '%'
+                    : 'Μη κερδοφόρα επένδυση')
                 : ""
             }
             variant="outlined"
@@ -840,7 +854,7 @@ const BoilerReplacementTabContent = ({
             }
             sx={{
               "& .MuiInputBase-input": {
-                color: "var(--color-primary)",
+                color: formData.internal_rate_of_return > 0 ? "var(--color-primary)" : "red",
                 fontWeight: "bold",
               },
               "& .MuiOutlinedInput-root": {
@@ -970,7 +984,7 @@ const BoilerReplacementTabContent = ({
               backgroundColor: "var(--color-primary)",
             },
           }}>
-          <Tab label={translations.boilerDataTab || "Στοιχεία Λέβητα"} />
+          <Tab label={translations.boilerDataTab || "Σύστημα Λέβητα"} />
           <Tab label={translations.energyDataTab || "Ενεργειακά Στοιχεία"} />
           <Tab
             label={

@@ -186,39 +186,42 @@ class BoilerReplacement(models.Model):
             else:
                 self.heating_oil_savings_liters = 0
             
-            # Υπολογισμός ετήσιας οικονομικής εξοικονόμησης σε €
+            # Υπολογισμός ετήσιας οικονομικής εξοικονόμησης σε € (μπορεί να είναι αρνητική)
             oil_price = float(self.oil_price_per_liter or 0)
             self.annual_energy_savings = (
                 float(self.heating_oil_savings_liters) * oil_price
             )
             
-            # Υπολογισμός ετήσιου οικονομικού οφέλους
+            # Υπολογισμός ετήσιου οικονομικού οφέλους (μπορεί να είναι αρνητικό)
             self.annual_economic_benefit = (
                 float(self.annual_energy_savings) - float(self.maintenance_cost)
             )
             
-            # Υπολογισμός περιόδου αποπληρωμής
+            # Υπολογισμός περιόδου αποπληρωμής (μόνο αν το όφελος είναι θετικό)
             if float(self.annual_economic_benefit) > 0:
                 self.payback_period = (
                     float(self.total_investment_cost) / float(self.annual_economic_benefit)
                 )
             else:
-                self.payback_period = None
+                self.payback_period = 0
             
-            # NPV υπολογισμός
+            # NPV υπολογισμός (υπολογίζεται και για αρνητικές τιμές)
             discount_rate_decimal = float(self.discount_rate) / 100
             years = int(self.time_period)
             annual_benefit = float(self.annual_economic_benefit)
             
-            if discount_rate_decimal > 0:
-                # NPV = Σ[Annual_Benefit / (1 + r)^t] - Initial_Investment
-                npv_sum = 0
-                for year in range(1, years + 1):
-                    npv_sum += annual_benefit / ((1 + discount_rate_decimal) ** year)
-                self.net_present_value = npv_sum - float(self.total_investment_cost)
+            if annual_benefit != 0:
+                if discount_rate_decimal > 0:
+                    # NPV = Σ[Annual_Benefit / (1 + r)^t] - Initial_Investment
+                    npv_sum = 0
+                    for year in range(1, years + 1):
+                        npv_sum += annual_benefit / ((1 + discount_rate_decimal) ** year)
+                    self.net_present_value = npv_sum - float(self.total_investment_cost)
+                else:
+                    # Αν δεν υπάρχει προεξοφλητικός συντελεστής
+                    self.net_present_value = (annual_benefit * years) - float(self.total_investment_cost)
             else:
-                # Αν δεν υπάρχει προεξοφλητικός συντελεστής
-                self.net_present_value = (annual_benefit * years) - float(self.total_investment_cost)
+                self.net_present_value = -float(self.total_investment_cost)
             
             # IRR υπολογισμός με Newton-Raphson
             if float(self.total_investment_cost) > 0 and annual_benefit > 0:
