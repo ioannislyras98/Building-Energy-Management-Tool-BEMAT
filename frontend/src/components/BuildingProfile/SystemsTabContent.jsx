@@ -243,7 +243,7 @@ const SystemsTabContent = ({
                   {labels.nominalPowerLabel || "Ονομαστική Ισχύς:"}
                 </span>
                 <span className="font-semibold text-gray-900 bg-green-100 px-3 py-1 rounded-full text-sm">
-                  {data.nominal_power} kW
+                  {data.nominal_power} W
                 </span>
               </div>
             )}
@@ -299,7 +299,7 @@ const SystemsTabContent = ({
                   {labels.powerLabel || "Ισχύς:"}
                 </span>
                 <span className="font-semibold text-gray-900 bg-green-100 px-3 py-1 rounded-full text-sm">
-                  {data.power_kw} kW
+                  {data.power_kw} W
                 </span>
               </div>
             )}
