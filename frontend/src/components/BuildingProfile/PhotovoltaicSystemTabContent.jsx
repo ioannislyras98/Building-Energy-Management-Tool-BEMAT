@@ -104,6 +104,7 @@ const PhotovoltaicSystemTabContent = ({
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingSystem, setDeletingSystem] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
 
   // Fetch project data
   useEffect(() => {
@@ -280,6 +281,15 @@ const PhotovoltaicSystemTabContent = ({
   };
 
   const handleInputChange = (field, value) => {
+    // Clear validation error for this field
+    if (validationErrors[field]) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+
     if (field.includes("unit_price")) {
       if (value === "") {
         setPhotovoltaicSystem((prev) => ({
@@ -308,11 +318,94 @@ const PhotovoltaicSystemTabContent = ({
   };
 
   const handleSave = () => {
+    // Clear previous messages
+    setError(null);
+    setSuccess(null);
+    setValidationErrors({});
+
     if (!token) {
       setError(
         translations.errorSave ||
           "Δεν είναι δυνατή η αποθήκευση - λείπει το token πιστοποίησης"
       );
+      return;
+    }
+
+    // Validate required fields
+    const errors = {};
+    
+    // Validate installation fields
+    if (!photovoltaicSystem.pv_panels_quantity || parseFloat(photovoltaicSystem.pv_panels_quantity) <= 0) {
+      errors.pv_panels_quantity = true;
+    }
+    if (!photovoltaicSystem.pv_panels_unit_price || parseFloat(photovoltaicSystem.pv_panels_unit_price) <= 0) {
+      errors.pv_panels_unit_price = true;
+    }
+    if (!photovoltaicSystem.metal_bases_quantity || parseFloat(photovoltaicSystem.metal_bases_quantity) <= 0) {
+      errors.metal_bases_quantity = true;
+    }
+    if (!photovoltaicSystem.metal_bases_unit_price || parseFloat(photovoltaicSystem.metal_bases_unit_price) <= 0) {
+      errors.metal_bases_unit_price = true;
+    }
+    if (!photovoltaicSystem.piping_quantity || parseFloat(photovoltaicSystem.piping_quantity) <= 0) {
+      errors.piping_quantity = true;
+    }
+    if (!photovoltaicSystem.piping_unit_price || parseFloat(photovoltaicSystem.piping_unit_price) <= 0) {
+      errors.piping_unit_price = true;
+    }
+    if (!photovoltaicSystem.wiring_quantity || parseFloat(photovoltaicSystem.wiring_quantity) <= 0) {
+      errors.wiring_quantity = true;
+    }
+    if (!photovoltaicSystem.wiring_unit_price || parseFloat(photovoltaicSystem.wiring_unit_price) <= 0) {
+      errors.wiring_unit_price = true;
+    }
+    if (!photovoltaicSystem.inverter_quantity || parseFloat(photovoltaicSystem.inverter_quantity) <= 0) {
+      errors.inverter_quantity = true;
+    }
+    if (!photovoltaicSystem.inverter_unit_price || parseFloat(photovoltaicSystem.inverter_unit_price) <= 0) {
+      errors.inverter_unit_price = true;
+    }
+    if (!photovoltaicSystem.installation_quantity || parseFloat(photovoltaicSystem.installation_quantity) <= 0) {
+      errors.installation_quantity = true;
+    }
+    if (!photovoltaicSystem.installation_unit_price || parseFloat(photovoltaicSystem.installation_unit_price) <= 0) {
+      errors.installation_unit_price = true;
+    }
+    
+    // Validate energy indicator fields
+    if (!photovoltaicSystem.power_per_panel || parseFloat(photovoltaicSystem.power_per_panel) <= 0) {
+      errors.power_per_panel = true;
+    }
+    if (!photovoltaicSystem.collector_efficiency || parseFloat(photovoltaicSystem.collector_efficiency) <= 0) {
+      errors.collector_efficiency = true;
+    }
+    if (photovoltaicSystem.installation_angle === "" || photovoltaicSystem.installation_angle === null || parseFloat(photovoltaicSystem.installation_angle) < 0) {
+      errors.installation_angle = true;
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      
+      const hasInstallationErrors = Object.keys(errors).some(key => 
+        ['pv_panels_quantity', 'pv_panels_unit_price', 'metal_bases_quantity', 
+         'metal_bases_unit_price', 'piping_quantity', 'piping_unit_price',
+         'wiring_quantity', 'wiring_unit_price', 'inverter_quantity', 
+         'inverter_unit_price', 'installation_quantity', 'installation_unit_price'].includes(key)
+      );
+      const hasEnergyErrors = Object.keys(errors).some(key => 
+        ['power_per_panel', 'collector_efficiency', 'installation_angle'].includes(key)
+      );
+      
+      if (hasInstallationErrors && hasEnergyErrors) {
+        setError("Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στις καρτέλες Εγκατάσταση και Ενεργειακοί Δείκτες");
+        setTabValue(0);
+      } else if (hasInstallationErrors) {
+        setError("Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στην καρτέλα Εγκατάσταση");
+        setTabValue(0);
+      } else if (hasEnergyErrors) {
+        setError("Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στην καρτέλα Ενεργειακοί Δείκτες");
+        setTabValue(1);
+      }
       return;
     }
 
@@ -554,13 +647,13 @@ const PhotovoltaicSystemTabContent = ({
                       {translations.table?.category || "Κατηγορία"}
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-primary border-b">
-                      {translations.table?.quantity || "Ποσότητα"}
+                      {translations.table?.quantity || "Ποσότητα"} <span style={{ color: "#ff4444" }}>*</span>
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-primary border-b">
                       {translations.table?.unit || "Μονάδα"}
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-primary border-b">
-                      {translations.table?.unitPrice || "Τιμή Μονάδας (€)"}
+                      {translations.table?.unitPrice || "Τιμή Μονάδας (€)"} <span style={{ color: "#ff4444" }}>*</span>
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-primary border-b">
                       {translations.table?.totalCost || "Συνολικό Κόστος (€)"}
@@ -575,8 +668,9 @@ const PhotovoltaicSystemTabContent = ({
                         "Φωτοβολταϊκά Πλαίσια"}
                     </td>
                     <td className="px-4 py-3">
-                      <input
+                      <TextField
                         type="number"
+                        size="small"
                         value={photovoltaicSystem.pv_panels_quantity}
                         onChange={(e) =>
                           handleInputChange(
@@ -584,17 +678,27 @@ const PhotovoltaicSystemTabContent = ({
                             e.target.value
                           )
                         }
-                        className="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary border-primary-light"
+                        error={validationErrors.pv_panels_quantity}
+                        sx={{ 
+                          width: "80px",
+                          "& .MuiOutlinedInput-root": {
+                            "&:hover fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                          },
+                        }}
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700">
                       {translations.units?.pieces || "τεμάχια"}
                     </td>
                     <td className="px-4 py-3">
-                      <input
+                      <TextField
                         type="number"
-                        step="0.01"
-                        min="0"
+                        size="small"
                         value={photovoltaicSystem.pv_panels_unit_price}
                         onChange={(e) =>
                           handleInputChange(
@@ -602,7 +706,19 @@ const PhotovoltaicSystemTabContent = ({
                             e.target.value
                           )
                         }
-                        className="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary border-primary-light"
+                        error={validationErrors.pv_panels_unit_price}
+                        inputProps={{ step: 0.01, min: 0 }}
+                        sx={{ 
+                          width: "100px",
+                          "& .MuiOutlinedInput-root": {
+                            "&:hover fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                          },
+                        }}
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 font-medium">
@@ -623,8 +739,9 @@ const PhotovoltaicSystemTabContent = ({
                         "Μεταλλικές Βάσεις Στήριξης"}
                     </td>
                     <td className="px-4 py-3">
-                      <input
+                      <TextField
                         type="number"
+                        size="small"
                         value={photovoltaicSystem.metal_bases_quantity}
                         onChange={(e) =>
                           handleInputChange(
@@ -632,17 +749,27 @@ const PhotovoltaicSystemTabContent = ({
                             e.target.value
                           )
                         }
-                        className="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary border-primary-light"
+                        error={validationErrors.metal_bases_quantity}
+                        sx={{ 
+                          width: "80px",
+                          "& .MuiOutlinedInput-root": {
+                            "&:hover fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                          },
+                        }}
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700">
                       {translations.units?.pieces || "τεμάχια"}
                     </td>
                     <td className="px-4 py-3">
-                      <input
+                      <TextField
                         type="number"
-                        step="0.01"
-                        min="0"
+                        size="small"
                         value={photovoltaicSystem.metal_bases_unit_price}
                         onChange={(e) =>
                           handleInputChange(
@@ -650,7 +777,19 @@ const PhotovoltaicSystemTabContent = ({
                             e.target.value
                           )
                         }
-                        className="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary border-primary-light"
+                        error={validationErrors.metal_bases_unit_price}
+                        inputProps={{ step: 0.01, min: 0 }}
+                        sx={{ 
+                          width: "100px",
+                          "& .MuiOutlinedInput-root": {
+                            "&:hover fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                          },
+                        }}
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 font-medium">
@@ -674,28 +813,51 @@ const PhotovoltaicSystemTabContent = ({
                       {translations.installation?.piping || "Σωληνώσεις"}
                     </td>
                     <td className="px-4 py-3">
-                      <input
+                      <TextField
                         type="number"
+                        size="small"
                         value={photovoltaicSystem.piping_quantity}
                         onChange={(e) =>
                           handleInputChange("piping_quantity", e.target.value)
                         }
-                        className="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary border-primary-light"
+                        error={validationErrors.piping_quantity}
+                        sx={{ 
+                          width: "80px",
+                          "& .MuiOutlinedInput-root": {
+                            "&:hover fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                          },
+                        }}
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700">
                       {translations.units?.meters || "μέτρα"}
                     </td>
                     <td className="px-4 py-3">
-                      <input
+                      <TextField
                         type="number"
-                        step="0.01"
-                        min="0"
+                        size="small"
                         value={photovoltaicSystem.piping_unit_price}
                         onChange={(e) =>
                           handleInputChange("piping_unit_price", e.target.value)
                         }
-                        className="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary border-primary-light"
+                        error={validationErrors.piping_unit_price}
+                        inputProps={{ step: 0.01, min: 0 }}
+                        sx={{ 
+                          width: "100px",
+                          "& .MuiOutlinedInput-root": {
+                            "&:hover fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                          },
+                        }}
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 font-medium">
@@ -715,28 +877,51 @@ const PhotovoltaicSystemTabContent = ({
                       {translations.installation?.wiring || "Καλωδιώσεις"}
                     </td>
                     <td className="px-4 py-3">
-                      <input
+                      <TextField
                         type="number"
+                        size="small"
                         value={photovoltaicSystem.wiring_quantity}
                         onChange={(e) =>
                           handleInputChange("wiring_quantity", e.target.value)
                         }
-                        className="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary border-primary-light"
+                        error={validationErrors.wiring_quantity}
+                        sx={{ 
+                          width: "80px",
+                          "& .MuiOutlinedInput-root": {
+                            "&:hover fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                          },
+                        }}
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700">
                       {translations.units?.meters || "μέτρα"}
                     </td>
                     <td className="px-4 py-3">
-                      <input
+                      <TextField
                         type="number"
-                        step="0.01"
-                        min="0"
+                        size="small"
                         value={photovoltaicSystem.wiring_unit_price}
                         onChange={(e) =>
                           handleInputChange("wiring_unit_price", e.target.value)
                         }
-                        className="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary border-primary-light"
+                        error={validationErrors.wiring_unit_price}
+                        inputProps={{ step: 0.01, min: 0 }}
+                        sx={{ 
+                          width: "100px",
+                          "& .MuiOutlinedInput-root": {
+                            "&:hover fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                          },
+                        }}
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 font-medium">
@@ -756,23 +941,34 @@ const PhotovoltaicSystemTabContent = ({
                       {translations.installation?.inverter || "Αντιστροφέας"}
                     </td>
                     <td className="px-4 py-3">
-                      <input
+                      <TextField
                         type="number"
+                        size="small"
                         value={photovoltaicSystem.inverter_quantity}
                         onChange={(e) =>
                           handleInputChange("inverter_quantity", e.target.value)
                         }
-                        className="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary border-primary-light"
+                        error={validationErrors.inverter_quantity}
+                        sx={{ 
+                          width: "80px",
+                          "& .MuiOutlinedInput-root": {
+                            "&:hover fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                          },
+                        }}
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700">
                       {translations.units?.pieces || "τεμάχια"}
                     </td>
                     <td className="px-4 py-3">
-                      <input
+                      <TextField
                         type="number"
-                        step="0.01"
-                        min="0"
+                        size="small"
                         value={photovoltaicSystem.inverter_unit_price}
                         onChange={(e) =>
                           handleInputChange(
@@ -780,7 +976,19 @@ const PhotovoltaicSystemTabContent = ({
                             e.target.value
                           )
                         }
-                        className="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary border-primary-light"
+                        error={validationErrors.inverter_unit_price}
+                        inputProps={{ step: 0.01, min: 0 }}
+                        sx={{ 
+                          width: "100px",
+                          "& .MuiOutlinedInput-root": {
+                            "&:hover fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                          },
+                        }}
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 font-medium">
@@ -800,8 +1008,9 @@ const PhotovoltaicSystemTabContent = ({
                       {translations.installation?.installation || "Εγκατάσταση"}
                     </td>
                     <td className="px-4 py-3">
-                      <input
+                      <TextField
                         type="number"
+                        size="small"
                         value={photovoltaicSystem.installation_quantity}
                         onChange={(e) =>
                           handleInputChange(
@@ -809,17 +1018,27 @@ const PhotovoltaicSystemTabContent = ({
                             e.target.value
                           )
                         }
-                        className="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary border-primary-light"
+                        error={validationErrors.installation_quantity}
+                        sx={{ 
+                          width: "80px",
+                          "& .MuiOutlinedInput-root": {
+                            "&:hover fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                          },
+                        }}
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700">
                       {translations.units?.hours || "ώρες"}
                     </td>
                     <td className="px-4 py-3">
-                      <input
+                      <TextField
                         type="number"
-                        step="0.01"
-                        min="0"
+                        size="small"
                         value={photovoltaicSystem.installation_unit_price}
                         onChange={(e) =>
                           handleInputChange(
@@ -827,7 +1046,19 @@ const PhotovoltaicSystemTabContent = ({
                             e.target.value
                           )
                         }
-                        className="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary border-primary-light"
+                        error={validationErrors.installation_unit_price}
+                        inputProps={{ step: 0.01, min: 0 }}
+                        sx={{ 
+                          width: "100px",
+                          "& .MuiOutlinedInput-root": {
+                            "&:hover fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "var(--color-primary)",
+                            },
+                          },
+                        }}
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 font-medium">
@@ -1285,13 +1516,17 @@ const PhotovoltaicSystemTabContent = ({
               <TextField
                 fullWidth
                 label={
-                  translations.fields?.powerPerPanel || "Ισχύς ανά πάνελ (W)"
+                  <>
+                    {translations.fields?.powerPerPanel || "Ισχύς ανά πάνελ (W)"}{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </>
                 }
                 type="number"
                 value={photovoltaicSystem.power_per_panel || ""}
                 onChange={(e) =>
                   handleInputChange("power_per_panel", e.target.value)
                 }
+                error={validationErrors.power_per_panel}
                 inputProps={{ step: 1, min: 0 }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
@@ -1312,14 +1547,18 @@ const PhotovoltaicSystemTabContent = ({
               <TextField
                 fullWidth
                 label={
-                  translations.fields?.collectorEfficiency ||
-                  "Απόδοση συλλέκτη (%)"
+                  <>
+                    {translations.fields?.collectorEfficiency ||
+                    "Απόδοση συλλέκτη (%)"}{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </>
                 }
                 type="number"
                 value={photovoltaicSystem.collector_efficiency || ""}
                 onChange={(e) =>
                   handleInputChange("collector_efficiency", e.target.value)
                 }
+                error={validationErrors.collector_efficiency}
                 inputProps={{ step: 0.1, min: 0, max: 100 }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
@@ -1340,14 +1579,18 @@ const PhotovoltaicSystemTabContent = ({
               <TextField
                 fullWidth
                 label={
-                  translations.fields?.installationAngle ||
-                  "Γωνία εγκατάστασης (°)"
+                  <>
+                    {translations.fields?.installationAngle ||
+                    "Γωνία εγκατάστασης (°)"}{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </>
                 }
                 type="number"
                 value={photovoltaicSystem.installation_angle || ""}
                 onChange={(e) =>
                   handleInputChange("installation_angle", e.target.value)
                 }
+                error={validationErrors.installation_angle}
                 inputProps={{ step: 1, min: 0, max: 90 }}
                 helperText="Βέλτιστη γωνία για Ελλάδα: 32°"
                 sx={{

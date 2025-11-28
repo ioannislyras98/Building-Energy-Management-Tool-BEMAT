@@ -277,26 +277,26 @@ class PhotovoltaicSystem(models.Model):
     power_per_panel = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
-        blank=True, 
-        null=True,
+        default=400.0,
         verbose_name='Ισχύς ανά πλαίσιο (W)',
-        validators=[MinValueValidator(0)]
+        validators=[MinValueValidator(0)],
+        help_text='Υποχρεωτικό πεδίο για τον υπολογισμό της ετήσιας παραγωγής'
     )
     collector_efficiency = models.DecimalField(
         max_digits=5, 
         decimal_places=2, 
-        blank=True, 
-        null=True,
+        default=20.0,
         verbose_name='Βαθμός απόδοσης συλλεκτών (%)',
-        validators=[MinValueValidator(0), MaxValueValidator(100)]
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        help_text='Υποχρεωτικό πεδίο για τον υπολογισμό της ετήσιας παραγωγής'
     )
     installation_angle = models.DecimalField(
         max_digits=5, 
         decimal_places=2, 
-        blank=True, 
-        null=True,
+        default=32.0,
         verbose_name='Κλίση τοποθέτησης (°)',
-        validators=[MinValueValidator(0), MaxValueValidator(90)]
+        validators=[MinValueValidator(0), MaxValueValidator(90)],
+        help_text='Υποχρεωτικό πεδίο για τον υπολογισμό της ετήσιας παραγωγής'
     )
     pv_usage = models.CharField(
         max_length=255,
@@ -497,7 +497,7 @@ class PhotovoltaicSystem(models.Model):
         - P: Ονομαστική ισχύς ανά πλαίσιο (kW) - μετατροπή από W
         - efficiency: Απόδοση συλλέκτη (%)
         - n: Αριθμός πλαισίων
-        - H: Ηλιακή ακτινοβολία (kWh/m²/έτος) - μέση τιμή για Ελλάδα: 1600 kWh/m²/έτος
+        - H: Ηλιακή ακτινοβολία (kWh/m²/έτος) - παίρνεται από τον νομό του κτιρίου
         - PR: Performance Ratio (Συντελεστής απόδοσης συστήματος) - τυπική τιμή: 0.8
         """
         try:
@@ -508,8 +508,17 @@ class PhotovoltaicSystem(models.Model):
             num_panels = float(self.pv_panels_quantity)
             collector_efficiency = float(self.collector_efficiency) / 100.0
             
+            # Προσπάθεια να πάρουμε την ηλιακή ακτινοβολία από τον νομό του κτιρίου
+            solar_irradiation = 1600.0  # Default value
+            if self.building and hasattr(self.building, 'prefecture') and self.building.prefecture:
+                if hasattr(self.building.prefecture, 'annual_solar_radiation') and self.building.prefecture.annual_solar_radiation:
+                    solar_irradiation = float(self.building.prefecture.annual_solar_radiation)
+            else:
+                # Fallback στο NumericValue
+                from numericValues.models import NumericValue
+                solar_irradiation = NumericValue.get_value('Ηλιακή ακτινοβολία (kWh/m²/έτος)')
+            
             from numericValues.models import NumericValue
-            solar_irradiation = NumericValue.get_value('Ηλιακή ακτινοβολία (kWh/m²/έτος)')
             performance_ratio = NumericValue.get_value('Performance Ratio (PR)')
             
             angle = float(self.installation_angle)

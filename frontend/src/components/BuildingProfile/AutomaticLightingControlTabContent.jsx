@@ -775,7 +775,7 @@ const AutomaticLightingControlTabContent = ({
             type="text"
             value={
               formData.total_investment_cost
-                ? parseFloat(formData.total_investment_cost).toLocaleString()
+                ? parseFloat(formData.total_investment_cost).toLocaleString() + ' €'
                 : ""
             }
             variant="outlined"
@@ -817,7 +817,7 @@ const AutomaticLightingControlTabContent = ({
             type="text"
             value={
               formData.annual_energy_savings
-                ? parseFloat(formData.annual_energy_savings).toLocaleString()
+                ? parseFloat(formData.annual_energy_savings).toLocaleString() + ' €'
                 : ""
             }
             variant="outlined"
@@ -855,7 +855,7 @@ const AutomaticLightingControlTabContent = ({
             type="text"
             value={
               formData.annual_economic_benefit
-                ? parseFloat(formData.annual_economic_benefit).toLocaleString()
+                ? parseFloat(formData.annual_economic_benefit).toLocaleString() + ' €'
                 : ""
             }
             variant="outlined"
@@ -890,7 +890,7 @@ const AutomaticLightingControlTabContent = ({
             type="text"
             value={
               formData.payback_period
-                ? parseFloat(formData.payback_period).toFixed(1)
+                ? parseFloat(formData.payback_period).toFixed(1) + ' έτη'
                 : ""
             }
             variant="outlined"
@@ -927,7 +927,7 @@ const AutomaticLightingControlTabContent = ({
             type="text"
             value={
               formData.net_present_value
-                ? parseFloat(formData.net_present_value).toLocaleString()
+                ? parseFloat(formData.net_present_value).toLocaleString() + ' €'
                 : ""
             }
             variant="outlined"
@@ -965,7 +965,7 @@ const AutomaticLightingControlTabContent = ({
             type="text"
             value={
               formData.internal_rate_of_return
-                ? parseFloat(formData.internal_rate_of_return).toFixed(2)
+                ? parseFloat(formData.internal_rate_of_return).toFixed(2) + '%'
                 : ""
             }
             variant="outlined"

@@ -7,11 +7,20 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Ηλιακή ακτινοβολία ανά ενεργειακή ζώνη
+        # Ημερήσια (kWh/m²/ημέρα)
         solar_radiation_by_zone = {
             'A': 4.75,  # Ζώνη Α (Βόρεια Ελλάδα): 4.5-5.0
             'B': 5.25,  # Ζώνη Β (Κεντρική Ελλάδα): 5.0-5.5
             'C': 5.75,  # Ζώνη Γ (Νότια Ελλάδα, Αθήνα): 5.5-6.0
             'D': 6.25,  # Ζώνη Δ (Νησιά, Κρήτη): 6.0-6.5
+        }
+        
+        # Ετήσια ηλιακή ακτινοβολία (kWh/m²/έτος) για φωτοβολταϊκά
+        annual_solar_radiation_by_zone = {
+            'A': 1850.0,  # Ζώνη Α (Νότια Ελλάδα, Νησιά): 1800-1900
+            'B': 1650.0,  # Ζώνη Β (Κεντρική Ελλάδα): 1600-1700
+            'C': 1450.0,  # Ζώνη Γ (Βόρεια Ελλάδα): 1400-1500
+            'D': 1350.0,  # Ζώνη Δ (Ορεινή Ελλάδα): 1300-1400
         }
         
         prefecture_data = [
@@ -74,6 +83,7 @@ class Command(BaseCommand):
         for data in prefecture_data:
             zone = data['zone']
             solar_radiation = solar_radiation_by_zone.get(zone, 5.0)
+            annual_solar_radiation = annual_solar_radiation_by_zone.get(zone, 1600.0)
             
             prefecture, created = Prefecture.objects.get_or_create(
                 name=data['name'],
@@ -82,19 +92,27 @@ class Command(BaseCommand):
                     'temperature_winter': data['temperature_winter'],
                     'temperature_summer': data['temperature_summer'],
                     'solar_radiation': solar_radiation,
+                    'annual_solar_radiation': annual_solar_radiation,
                     'is_active': True
                 }
             )
             if created:
                 created_count += 1
-                self.stdout.write(f"Created prefecture: {prefecture.name} (Zone {zone}, Solar: {solar_radiation} kWh/m²/day)")
+                self.stdout.write(f"Created prefecture: {prefecture.name} (Zone {zone}, Solar: {solar_radiation} kWh/m²/day, Annual: {annual_solar_radiation} kWh/m²/year)")
             else:
-                # Ενημέρωση solar_radiation αν δεν έχει ήδη τιμή
+                # Ενημέρωση solar_radiation και annual_solar_radiation αν δεν έχουν ήδη τιμές
+                updated = False
                 if prefecture.solar_radiation is None or prefecture.solar_radiation == 5.0:
                     prefecture.solar_radiation = solar_radiation
+                    updated = True
+                if prefecture.annual_solar_radiation is None or prefecture.annual_solar_radiation == 1600.0:
+                    prefecture.annual_solar_radiation = annual_solar_radiation
+                    updated = True
+                
+                if updated:
                     prefecture.save()
                     updated_count += 1
-                    self.stdout.write(f"Updated solar radiation for {prefecture.name}: {solar_radiation} kWh/m²/day")
+                    self.stdout.write(f"Updated solar radiation for {prefecture.name}: Daily={solar_radiation} kWh/m²/day, Annual={annual_solar_radiation} kWh/m²/year")
                 else:
                     self.stdout.write(f"Prefecture already exists: {prefecture.name}")
 

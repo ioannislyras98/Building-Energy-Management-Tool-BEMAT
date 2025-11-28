@@ -45,6 +45,7 @@ const BoilerReplacementTabContent = ({
   const [errorField, setErrorField] = useState(null); 
   const [success, setSuccess] = useState(null);
   const [hasBoilerSystemEfficiency, setHasBoilerSystemEfficiency] = useState(false);
+  const [boilerDetails, setBoilerDetails] = useState(null);
   const [formData, setFormData] = useState({
     // Συντελεστές απόδοσης
     old_boiler_efficiency: "",
@@ -116,20 +117,80 @@ const BoilerReplacementTabContent = ({
   }, [language, errorField, translations]);
   useEffect(() => {
     fetchBoilerReplacementData();
+    fetchBoilerDetails();
   }, [buildingUuid, projectUuid]);
 
-  // Παίρνουμε την απόδοση του παλιού λέβητα από το σύστημα λέβητα
-  useEffect(() => {
-    if (buildingData?.heating_system?.efficiency && !formData.old_boiler_efficiency) {
-      setFormData(prev => ({
-        ...prev,
-        old_boiler_efficiency: buildingData.heating_system.efficiency
-      }));
-      setHasBoilerSystemEfficiency(true);
-    } else if (buildingData?.heating_system?.efficiency) {
-      setHasBoilerSystemEfficiency(true);
+  // Fetch boiler details (σύστημα λέβητα)
+  const fetchBoilerDetails = async () => {
+    if (!buildingUuid) return;
+
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/boiler_details/building/${buildingUuid}/`,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      
+      if (response.data) {
+        console.log("Boiler Details Response:", response.data);
+        setBoilerDetails(response.data);
+      }
+    } catch (error) {
+      if (error.response?.status !== 404) {
+        console.error("Σφάλμα κατά την φόρτωση του συστήματος λέβητα:", error);
+      } else {
+        console.log("Δεν υπάρχει σύστημα λέβητα");
+        setBoilerDetails(null);
+      }
     }
-  }, [buildingData]);
+  };
+
+  // Παίρνουμε την απόδοση του παλιού λέβητα από το σύστημα λέβητα (boiler_details)
+  // Λογική: Αν υπάρχει boiler_details record, ελέγχουμε αν η τιμή του σεναρίου διαφέρει
+  // Μόνο αν διαφέρει, ενημερώνουμε με την τιμή του συστήματος και κλειδώνουμε το πεδίο
+  useEffect(() => {
+    console.log("Boiler Details Response:", boilerDetails);
+    
+    // Το API επιστρέφει: { status: "success", data: [ { internal_efficiency: "91.00", ... } ] }
+    let systemEfficiency = null;
+    
+    if (boilerDetails?.data && Array.isArray(boilerDetails.data) && boilerDetails.data.length > 0) {
+      systemEfficiency = boilerDetails.data[0]?.internal_efficiency;
+      console.log("Internal Efficiency από σύστημα λέβητα:", systemEfficiency);
+    }
+    
+    // Αν υπάρχει record στο σύστημα λέβητα
+    if (systemEfficiency !== undefined && systemEfficiency !== null) {
+      // Συγκρίνουμε την τιμή του σεναρίου με την τιμή του συστήματος
+      const currentEfficiency = parseFloat(formData.old_boiler_efficiency);
+      const systemEfficiencyValue = parseFloat(systemEfficiency);
+      
+      console.log("Current Efficiency (σενάριο):", currentEfficiency);
+      console.log("System Efficiency (σύστημα):", systemEfficiencyValue);
+      
+      // Αν είναι διαφορετικές ή δεν υπάρχει τιμή, ενημερώνουμε
+      if (isNaN(currentEfficiency) || currentEfficiency !== systemEfficiencyValue) {
+        console.log("✅ Ενημέρωση απόδοσης παλιού λέβητα από σύστημα:", systemEfficiency);
+        setFormData(prev => ({
+          ...prev,
+          old_boiler_efficiency: systemEfficiency
+        }));
+      } else {
+        console.log("✓ Η απόδοση είναι ήδη ίδια - δεν χρειάζεται ενημέρωση");
+      }
+      
+      // Κλειδώνουμε το πεδίο όταν υπάρχει record
+      setHasBoilerSystemEfficiency(true);
+    } else {
+      console.log("⚠️ Δεν υπάρχει σύστημα λέβητα - το πεδίο παραμένει ξεκλειδωμένο");
+      // Αν δεν υπάρχει record, ξεκλειδώνουμε το πεδίο
+      setHasBoilerSystemEfficiency(false);
+    }
+  }, [boilerDetails]);
 
   const fetchBoilerReplacementData = async () => {
     if (!buildingUuid || !projectUuid) return;
@@ -243,6 +304,10 @@ const BoilerReplacementTabContent = ({
         }
         setError(null);
         setErrorField(null);
+        
+        // Refresh data after save
+        await fetchBoilerReplacementData();
+        await fetchBoilerDetails();
       }
     } catch (error) {
       if (showMessage) {

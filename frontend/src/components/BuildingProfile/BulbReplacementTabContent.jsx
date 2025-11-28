@@ -447,7 +447,7 @@ const BulbReplacementTabContent = ({
             fullWidth
             label={
               <>
-                {translations.oldBulbCount || "Πλήθος παλαιών λαμπτήρων"}{" "}
+                {translations.oldBulbCount || "Πλήθος παλαιών λαμπτήρων"} (τεμ.){" "}
                 <span style={{ color: "red" }}>*</span>
               </>
             }
@@ -482,7 +482,7 @@ const BulbReplacementTabContent = ({
             fullWidth
             label={
               <>
-                {translations.oldOperatingHours || "Ώρες λειτουργίας ανά έτος"}{" "}
+                {translations.oldOperatingHours || "Ώρες λειτουργίας"} (ώρες/έτος){" "}
                 <span style={{ color: "red" }}>*</span>
               </>
             }
@@ -630,7 +630,7 @@ const BulbReplacementTabContent = ({
             fullWidth
             label={
               <>
-                {translations.newBulbCount || "Πλήθος νέων λαμπτήρων"}{" "}
+                {translations.newBulbCount || "Πλήθος νέων λαμπτήρων"} (τεμ.){" "}
                 <span style={{ color: "red" }}>*</span>
               </>
             }
@@ -665,7 +665,7 @@ const BulbReplacementTabContent = ({
             fullWidth
             label={
               <>
-                {translations.newOperatingHours || "Ώρες λειτουργίας ανά έτος"}{" "}
+                {translations.newOperatingHours || "Ώρες λειτουργίας"} (ώρες/έτος){" "}
                 <span style={{ color: "red" }}>*</span>
               </>
             }
@@ -1007,7 +1007,7 @@ const BulbReplacementTabContent = ({
           fullWidth
           label={
             <>
-              {translations.oldBulbCount || "Πλήθος παλαιών λαμπτήρων"}{" "}
+              {translations.oldBulbCount || "Πλήθος παλαιών λαμπτήρων"} (τεμ.){" "}
               <span style={{ color: "red" }}>*</span>
             </>
           }
@@ -1040,7 +1040,7 @@ const BulbReplacementTabContent = ({
           fullWidth
           label={
             <>
-              {translations.oldOperatingHours || "Ώρες λειτουργίας ανά έτος"}{" "}
+              {translations.oldOperatingHours || "Ώρες λειτουργίας"} (ώρες/έτος){" "}
               <span style={{ color: "red" }}>*</span>
             </>
           }
@@ -1149,7 +1149,7 @@ const BulbReplacementTabContent = ({
           fullWidth
           label={
             <>
-              {translations.newBulbCount || "Πλήθος νέων λαμπτήρων"}{" "}
+              {translations.newBulbCount || "Πλήθος νέων λαμπτήρων"} (τεμ.){" "}
               <span style={{ color: "red" }}>*</span>
             </>
           }
@@ -1182,7 +1182,7 @@ const BulbReplacementTabContent = ({
           fullWidth
           label={
             <>
-              {translations.newOperatingHours || "Ώρες λειτουργίας ανά έτος"}{" "}
+              {translations.newOperatingHours || "Ώρες λειτουργίας"} (ώρες/έτος){" "}
               <span style={{ color: "red" }}>*</span>
             </>
           }
@@ -1541,7 +1541,7 @@ const BulbReplacementTabContent = ({
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               }
-            )}
+            ) + ' €'}
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
@@ -1583,7 +1583,7 @@ const BulbReplacementTabContent = ({
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               }
-            )}
+            ) + ' €'}
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {

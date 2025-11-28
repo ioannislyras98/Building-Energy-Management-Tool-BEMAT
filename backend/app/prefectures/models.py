@@ -51,6 +51,13 @@ class Prefecture(models.Model):
         null=True,
         blank=True
     )
+    annual_solar_radiation = models.FloatField(
+        verbose_name="Ετήσια ηλιακή ακτινοβολία (kWh/m²/έτος)",
+        help_text="Ετήσια ηλιακή ακτινοβολία για υπολογισμό φωτοβολταϊκών συστημάτων",
+        default=1600.0,
+        null=True,
+        blank=True
+    )
     is_active = models.BooleanField(
         default=True,
         verbose_name="Ενεργό",
