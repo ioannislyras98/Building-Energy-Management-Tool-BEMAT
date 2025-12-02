@@ -296,7 +296,7 @@ export async function getBuildingById(buildingUuid) {
         headers: getAuthHeaders(),
       }
     );
-    return response.data;
+    return response.data.data || response.data;
   } catch (error) {
     throw error;
   }

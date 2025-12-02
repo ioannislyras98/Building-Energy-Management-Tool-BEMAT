@@ -373,3 +373,45 @@ def update_air_conditioning_analysis(request, analysis_uuid):
             'success': False,
             'message': f'Σφάλμα: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_air_conditioning_data_by_building(request, building_uuid):
+    """Λήψη όλων των δεδομένων κλιματιστικών για συγκεκριμένο κτίριο (combined endpoint για Results tab)"""
+    try:
+        building = get_object_or_404(Building, uuid=building_uuid)
+        
+        if not has_access_permission(request.user, building):
+            return Response({
+                'success': False,
+                'message': 'Access denied'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Fetch analysis
+        if is_admin_user(request.user):
+            analysis = AirConditioningAnalysis.objects.filter(building=building).order_by('-created_at').first()
+        else:
+            analysis = AirConditioningAnalysis.objects.filter(
+                building=building
+            ).filter(
+                models.Q(user=request.user) | models.Q(user__isnull=True)
+            ).order_by('-created_at').first()
+        
+        if analysis:
+            serializer = AirConditioningAnalysisSerializer(analysis)
+            return Response({
+                'success': True,
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+        
+        return Response({
+            'success': True,
+            'data': None,
+            'message': 'Δεν βρέθηκε ανάλυση για αυτό το κτίριο'
+        }, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': f'Σφάλμα: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

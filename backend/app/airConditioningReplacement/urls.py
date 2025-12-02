@@ -2,6 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # Combined endpoint for Results tab
+    path('building/<uuid:building_uuid>/', views.get_air_conditioning_data_by_building, name='get_air_conditioning_data_by_building'),
+    
     # Old Air Conditioning URLs
     path('old/create/', views.create_old_air_conditioning, name='create_old_air_conditioning'),
     path('old/building/<uuid:building_uuid>/', views.get_old_air_conditionings_by_building, name='get_old_air_conditionings_by_building'),

@@ -205,6 +205,9 @@ const ResultsTabContent = ({
           let scenarioItems = [];
           if (responseData.data && Array.isArray(responseData.data)) {
             scenarioItems = responseData.data;
+          } else if (responseData.data && typeof responseData.data === "object" && responseData.data !== null) {
+            // Handle response format like { success: true, data: {...} }
+            scenarioItems = [responseData.data];
           } else if (Array.isArray(responseData)) {
             scenarioItems = responseData;
           } else if (responseData && typeof responseData === "object") {
