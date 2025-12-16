@@ -19,6 +19,10 @@ class Material(models.Model):
         ('metal', 'Μέταλλα'),
         ('glass', 'Γυαλί'),
         ('masonry', 'Τοιχοποιία'),
+        ('plaster', 'Επιχρίσματα'),
+        ('stone', 'Πετρώματα'),
+        ('roof', 'Υλικά Οροφής'),
+        ('flooring', 'Δάπεδα'),
         ('other', 'Άλλα'),
     ]
 

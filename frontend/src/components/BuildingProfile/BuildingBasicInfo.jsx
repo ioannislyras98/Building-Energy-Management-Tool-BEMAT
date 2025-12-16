@@ -49,7 +49,7 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">
-                  {building.data?.name || params.loading}
+                  {building?.name || params.loading}
                 </h2>
                 <p className="text-blue-100 text-sm">
                   {dialogText?.basicInfo?.title || "Basic Information"}
@@ -83,7 +83,7 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
                 {params.description}
               </p>
               <p className="text-gray-800 leading-relaxed">
-                {building.data?.description || "N/A"}
+                {building?.description || "N/A"}
               </p>
             </div>
           </div>
@@ -97,7 +97,7 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
                 {params.examined_area}
               </p>
               <p className="text-gray-800 font-semibold">
-                {building.data?.examined_area || "N/A"} m²
+                {building?.examined_area || "N/A"} m²
               </p>
             </div>
           </div>
@@ -111,7 +111,7 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
                 {params.yearBuilt}
               </p>
               <p className="text-gray-800 font-semibold">
-                {building.data?.year_built || "N/A"}
+                {building?.year_built || "N/A"}
               </p>
             </div>
           </div>
@@ -126,7 +126,7 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
               </p>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-800 font-semibold">
-                  {building.data?.energy_class || "N/A"}
+                  {building?.energy_class || "N/A"}
                 </p>
               </div>
             </div>

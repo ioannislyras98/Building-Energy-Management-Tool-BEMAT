@@ -16,23 +16,56 @@ class Command(BaseCommand):
         self.stdout.write('Loading materials data...')
 
         materials_data = [
+            # Ξυλεία (Wood)
             {'name': 'Ερυθρά Ξυλεία', 'category': 'wood', 'thermal_conductivity': 0.11},
             {'name': 'Λευκή Ξυλεία', 'category': 'wood', 'thermal_conductivity': 0.12},
             {'name': 'Βελανιδιά - Οξυά', 'category': 'wood', 'thermal_conductivity': 0.18},
             
+            # Τοιχοποιία (Masonry)
+            {'name': 'Τούβλο', 'category': 'masonry', 'thermal_conductivity': 0.727},
+            {'name': 'Γυψοσανίδα', 'category': 'masonry', 'thermal_conductivity': 0.42},
+            {'name': 'Πέτρα', 'category': 'masonry', 'thermal_conductivity': 0.87},
+            
+            # Σκυρόδεμα (Concrete)
             {'name': 'Οπλισμένο Σκυρόδεμα', 'category': 'concrete', 'thermal_conductivity': 2.10},
+            {'name': 'Οπλισματό Σκυρόδεμα', 'category': 'concrete', 'thermal_conductivity': 1.731},
+            {'name': 'Απλό Σκυρόδεμα', 'category': 'concrete', 'thermal_conductivity': 2.10},
+            {'name': 'Σκυρόδεμα ελαφρώς οπλισμένο', 'category': 'concrete', 'thermal_conductivity': 1.80},
+            {'name': 'Γαρμπιλοσκυρόδεμα', 'category': 'concrete', 'thermal_conductivity': 1.50},
             {'name': 'Τσιμεντοκονίαμα', 'category': 'concrete', 'thermal_conductivity': 1.40},
             
-            {'name': 'Υαλοπίνακας', 'category': 'glass', 'thermal_conductivity': 1.00},
+            # Επιχρίσματα (Plaster)
+            {'name': 'Ασβεστοκονίαμα', 'category': 'plaster', 'thermal_conductivity': 0.87},
+            {'name': 'Γύψος', 'category': 'plaster', 'thermal_conductivity': 0.43},
             
-            {'name': 'Γυψοσανίδα', 'category': 'masonry', 'thermal_conductivity': 0.42},
-            {'name': 'Πέτρα', 'category': 'masonry', 'thermal_conductivity': 1.75},
-            
-            {'name': 'Αλουμίνιο', 'category': 'metal', 'thermal_conductivity': 200.00},
-            {'name': 'Χάλυβας', 'category': 'metal', 'thermal_conductivity': 60.00},
-            
+            # Μονωτικά Υλικά (Insulation)
+            {'name': 'Υαλοβάμβακας', 'category': 'insulation', 'thermal_conductivity': 0.045},
+            {'name': 'Πολυουρεθάνη', 'category': 'insulation', 'thermal_conductivity': 0.031},
+            {'name': 'Πετροβάμβακας', 'category': 'insulation', 'thermal_conductivity': 0.044},
+            {'name': 'Διογκωμένη Πολυστερίνη', 'category': 'insulation', 'thermal_conductivity': 0.035},
+            {'name': 'Εξηλασμένη Πολυστερίνη', 'category': 'insulation', 'thermal_conductivity': 0.033},
             {'name': 'Ορυκτοβάμβακας', 'category': 'insulation', 'thermal_conductivity': 0.035},
             {'name': 'Οικοδομική Μόνωση', 'category': 'insulation', 'thermal_conductivity': 0.035},
+            
+            # Πετρώματα (Stone)
+            {'name': 'Γρανίτης', 'category': 'stone', 'thermal_conductivity': 3.50},
+            {'name': 'Μάρμαρο', 'category': 'stone', 'thermal_conductivity': 3.50},
+            
+            # Μέταλλα (Metal)
+            {'name': 'Χάλυβας', 'category': 'metal', 'thermal_conductivity': 1.80},
+            {'name': 'Αλουμίνιο', 'category': 'metal', 'thermal_conductivity': 200.00},
+            {'name': 'Χαλκός', 'category': 'metal', 'thermal_conductivity': 372.00},
+            
+            # Δάπεδα (Flooring)
+            {'name': 'Άμμος', 'category': 'flooring', 'thermal_conductivity': 0.33},
+            {'name': 'Άσφαλτος', 'category': 'flooring', 'thermal_conductivity': 0.74},
+            
+            # Γυαλί (Glass)
+            {'name': 'Υαλοπίνακας', 'category': 'glass', 'thermal_conductivity': 1.00},
+            {'name': 'Γυαλί', 'category': 'glass', 'thermal_conductivity': 1.00},
+            
+            # Υλικά Οροφής (Roof)
+            {'name': 'Κεραμίδια', 'category': 'roof', 'thermal_conductivity': 1.00},
         ]
 
         created_count = 0

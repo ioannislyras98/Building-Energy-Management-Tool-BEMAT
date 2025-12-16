@@ -27,9 +27,11 @@ logger = logging.getLogger(__name__)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_available_materials(request):
-    """Get all available materials for thermal insulation"""
+    """Get all available materials for wall thermal insulation (excludes roof-only materials)"""
     try:
-        materials = Material.objects.filter(is_active=True)
+        # Exclude materials only suitable for roofs (e.g., tiles)
+        excluded_categories = ['roof']
+        materials = Material.objects.filter(is_active=True).exclude(category__in=excluded_categories)
         serializer = MaterialListSerializer(materials, many=True)
         return Response({
             "success": True,

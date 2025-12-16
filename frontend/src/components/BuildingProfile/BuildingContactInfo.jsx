@@ -24,7 +24,7 @@ export default function BuildingContactInfo({
   onEditContact,
   onDeleteContact,
 }) {
-  const contacts = building.data?.contacts || [];
+  const contacts = building?.contacts || [];
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [currentContact, setCurrentContact] = useState(null);
   const cookies = new Cookies();
@@ -58,7 +58,7 @@ export default function BuildingContactInfo({
   const confirmDelete = () => {
     if (currentContact && onDeleteContact) {
       const settings = {
-        url: `${API_BASE_URL}/buildings/${building.data.uuid}/contacts/${currentContact.uuid}/delete/`,
+        url: `${API_BASE_URL}/buildings/${building?.uuid}/contacts/${currentContact.uuid}/delete/`,
         method: "DELETE",
         timeout: 0,
         headers: {

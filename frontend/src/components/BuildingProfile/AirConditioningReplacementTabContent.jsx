@@ -305,12 +305,13 @@ const AirConditioningReplacementTabContent = ({
       }
 
       if (response.success) {
-        setSuccess("Η ανάλυση ενημερώθηκε επιτυχώς");
-        setAnalysis(response.data);
+        setSuccess(translations.analysisSaved || "Η ανάλυση ενημερώθηκε επιτυχώς");
+        // Refresh all data to get updated calculations from backend
+        await fetchData();
       }
     } catch (error) {
 
-      setError(error.responseJSON?.message || "Σφάλμα κατά την αποθήκευση");
+      setError(error.responseJSON?.message || translations.saveError || "Σφάλμα κατά την αποθήκευση");
     }
     setLoading(false);
   };
@@ -543,7 +544,7 @@ const AirConditioningReplacementTabContent = ({
             variant="contained"
             startIcon={<SaveIcon />}
             onClick={handleAnalysisSubmit}
-            disabled={loading || oldACs.length === 0 || newACs.length === 0}
+            disabled={loading}
             sx={{
               backgroundColor: "var(--color-primary)",
               "&:hover": {

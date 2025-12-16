@@ -217,6 +217,23 @@ textarea:focus {
   @apply px-6 py-4 space-y-4 max-h-96 overflow-y-auto;
 }
 
+/* Material select dropdown - ensure scrollable list */
+.material-select {
+  max-height: 300px !important;
+}
+
+/* Increase dropdown size for better visibility */
+select.input-field {
+  max-height: 250px;
+}
+
+/* When select has many options, show scrollbar in dropdown */
+@supports (-webkit-appearance: none) {
+  select option {
+    padding: 8px 12px;
+  }
+}
+
 /* Hide number input spinners/arrows */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
