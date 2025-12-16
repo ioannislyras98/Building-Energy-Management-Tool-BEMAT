@@ -12,11 +12,7 @@ services:
       - "traefik.http.routers.web.entrypoints=https"
       - "traefik.http.routers.web.tls=true"
       - "traefik.http.routers.web.tls.certresolver=myresolver"
-      - "traefik.http.routers.web.priority=100"
       - "traefik.http.services.web.loadbalancer.server.port=8000"
-      # Headers middleware for proper proxy headers
-      - "traefik.http.middlewares.web-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.routers.web.middlewares=web-headers"
       # Optional: HTTP to HTTPS redirect
       #- "traefik.http.routers.web-http.rule=Host(`energymanagement.epu.ntua.gr`)"
       #- "traefik.http.routers.web-http.entrypoints=http"

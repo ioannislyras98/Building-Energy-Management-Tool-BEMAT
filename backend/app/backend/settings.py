@@ -32,12 +32,6 @@ DEBUG = os.environ.get("DEBUG", "True") == "True"
 # Read ALLOWED_HOSTS from environment variable (comma-separated)
 ALLOWED_HOSTS = [host.strip() for host in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if host.strip()]
 
-# Security settings for running behind reverse proxy (Traefik)
-# This tells Django to trust the X-Forwarded-Proto header from the proxy
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# Use forwarded host header
-USE_X_FORWARDED_HOST = True
 
 # Application definition
 
@@ -200,15 +194,6 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_ALL_ORIGINS = False  # Set to True only in development
-
-CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
-]
 
 CORS_ALLOW_HEADERS = [
     'accept',
