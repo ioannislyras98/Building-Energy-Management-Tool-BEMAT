@@ -377,7 +377,13 @@ const BulbReplacementTabContent = ({
 
         <Grid item xs={12} sm={6}>
           <FormControl fullWidth>
-            <InputLabel id="old-bulb-type-label">
+            <InputLabel
+              id="old-bulb-type-label"
+              sx={{
+                "&.Mui-focused": {
+                  color: "var(--color-primary)",
+                },
+              }}>
               {translations.oldBulbType || "Τύπος παλαιού φορτίου"}
             </InputLabel>
             <Select
@@ -560,7 +566,13 @@ const BulbReplacementTabContent = ({
 
         <Grid item xs={12} sm={6}>
           <FormControl fullWidth>
-            <InputLabel id="new-bulb-type-label">
+            <InputLabel
+              id="new-bulb-type-label"
+              sx={{
+                "&.Mui-focused": {
+                  color: "var(--color-primary)",
+                },
+              }}>
               {translations.newBulbType || "Τύπος νέου φορτίου"}
             </InputLabel>
             <Select
@@ -939,7 +951,13 @@ const BulbReplacementTabContent = ({
 
       <Grid item xs={12} sm={6}>
         <FormControl fullWidth>
-          <InputLabel id="old-bulb-type-label">
+          <InputLabel
+            id="old-bulb-type-label"
+            sx={{
+              "&.Mui-focused": {
+                color: "var(--color-primary)",
+              },
+            }}>
             {translations.oldBulbType || "Τύπος παλαιού φορτίου"}
           </InputLabel>
           <Select
@@ -1081,7 +1099,13 @@ const BulbReplacementTabContent = ({
 
       <Grid item xs={12} sm={6}>
         <FormControl fullWidth>
-          <InputLabel id="new-bulb-type-label">
+          <InputLabel
+            id="new-bulb-type-label"
+            sx={{
+              "&.Mui-focused": {
+                color: "var(--color-primary)",
+              },
+            }}>
             {translations.newBulbType || "Τύπος νέου φορτίου"}
           </InputLabel>
           <Select
