@@ -73,8 +73,8 @@ const ImagesTabContent = ({
     if (!selectedImage) return;
 
     try {
-      await deleteImage(selectedImage.id);
-      handleImageDeleted(selectedImage.id);
+      await deleteImage(selectedImage.uuid);
+      handleImageDeleted(selectedImage.uuid);
       setOpenDeleteDialog(false);
       setSelectedImage(null);
     } catch (error) {
@@ -107,14 +107,14 @@ const ImagesTabContent = ({
 
   const handleImageUpdated = (updatedImage) => {
     setImages((prevImages) =>
-      prevImages.map((img) => (img.id === updatedImage.id ? updatedImage : img))
+      prevImages.map((img) => (img.uuid === updatedImage.uuid ? updatedImage : img))
     );
     setError(null);
   };
 
   const handleImageDeleted = (deletedImageId) => {
     setImages((prevImages) =>
-      prevImages.filter((img) => img.id !== deletedImageId)
+      prevImages.filter((img) => img.uuid !== deletedImageId)
     );
     setError(null);
   };
@@ -188,7 +188,7 @@ const ImagesTabContent = ({
                 const categoryInfo = getCategoryInfo(image.category);
                 return (
                   <div
-                    key={image.id}
+                    key={image.uuid}
                     className="building-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                     <div className="h-full flex flex-col">
                       {/* Image */}

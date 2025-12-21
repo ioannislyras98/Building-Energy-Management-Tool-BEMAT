@@ -129,7 +129,7 @@ function EditImageModalForm({
     }
 
     try {
-      const response = await updateImage(image.id, submitData);
+      const response = await updateImage(image.uuid, submitData);
       onImageUpdated(response);
       onClose();
       setSelectedFile(null);

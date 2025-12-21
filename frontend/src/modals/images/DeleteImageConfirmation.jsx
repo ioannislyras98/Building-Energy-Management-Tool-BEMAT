@@ -29,8 +29,8 @@ function DeleteImageConfirmationForm({
     setError(null);
 
     try {
-      await deleteImage(image.id);
-      onImageDeleted(image.id);
+      await deleteImage(image.uuid);
+      onImageDeleted(image.uuid);
       onClose();
     } catch (error) {
       setError(params.deleteError || "Σφάλμα κατά την διαγραφή της εικόνας");
