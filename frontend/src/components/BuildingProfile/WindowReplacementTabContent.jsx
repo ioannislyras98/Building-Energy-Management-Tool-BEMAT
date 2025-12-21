@@ -113,6 +113,18 @@ const WindowReplacementTabContent = ({
             lifespan_years: data.lifespan_years || "",
             discount_rate: data.discount_rate || "5",
           }));
+          
+          // Update calculated results with values from backend
+          setCalculatedResults({
+            energy_savings_summer: data.energy_savings_summer || 0,
+            energy_savings_winter: data.energy_savings_winter || 0,
+            total_energy_savings: data.total_energy_savings || 0,
+            annual_cost_savings: data.annual_cost_savings || 0,
+            total_investment_cost: data.total_investment_cost || 0,
+            payback_period: data.payback_period || 0,
+            net_present_value: data.net_present_value || 0,
+            internal_rate_of_return: data.internal_rate_of_return || 0,
+          });
         }
       },
       error: (jqXHR) => {

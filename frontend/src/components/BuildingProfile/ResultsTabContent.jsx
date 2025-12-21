@@ -237,12 +237,17 @@ const ResultsTabContent = ({
                   0,
                 annual_energy_savings:
                   parseFloat(item.annual_energy_savings) ||
+                  parseFloat(item.annual_economic_benefit) ||
+                  parseFloat(item.annual_benefit) ||
                   parseFloat(item.annual_savings) ||
+                  parseFloat(item.annual_cost_savings) ||
+                  parseFloat(item.calculated_annual_savings) ||
                   0,
                 annual_economic_benefit:
                   parseFloat(item.annual_economic_benefit) ||
                   parseFloat(item.annual_benefit) ||
                   parseFloat(item.annual_savings) ||
+                  parseFloat(item.annual_cost_savings) ||
                   parseFloat(item.calculated_annual_savings) ||
                   0,
                 payback_period:

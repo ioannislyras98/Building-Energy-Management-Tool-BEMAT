@@ -186,13 +186,13 @@ const ScenariosTabContent = ({
   const handleScenarioSelect = (scenarioId) => {
     const actualProjectUuid = projectUuid || paramProjectUuid;
     const actualBuildingUuid = buildingUuid || paramBuildingUuid;
-    navigate(`/projects/${actualProjectUuid}/buildings/${actualBuildingUuid}/${scenarioId}`);
+    navigate(`/projects/${actualProjectUuid}/buildings/${actualBuildingUuid}/scenarios/${scenarioId}`);
   };
 
   const handleBackToScenarios = () => {
     const actualProjectUuid = projectUuid || paramProjectUuid;
     const actualBuildingUuid = buildingUuid || paramBuildingUuid;
-    navigate(`/projects/${actualProjectUuid}/buildings/${actualBuildingUuid}`);
+    navigate(`/projects/${actualProjectUuid}/buildings/${actualBuildingUuid}/scenarios`);
   };
   if (selectedScenario) {
     if (selectedScenario === "thermal-insulation") {

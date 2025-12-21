@@ -50,6 +50,7 @@ const HotWaterUpgradeTabContent = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [existingUuid, setExistingUuid] = useState(null);
   const cookies = new Cookies(null, { path: "/" });
   const token = cookies.get("token");
 
@@ -101,6 +102,7 @@ const HotWaterUpgradeTabContent = ({
       success: (response) => {
         if (response.success && response.data && response.data.length > 0) {
           const data = response.data[0];
+          setExistingUuid(data.uuid);
           setFormData({
             solar_collectors_quantity: data.solar_collectors_quantity || "",
             solar_collectors_unit_price: data.solar_collectors_unit_price || "",
@@ -124,6 +126,22 @@ const HotWaterUpgradeTabContent = ({
             lifespan_years: data.lifespan_years || 10,
             discount_rate: data.discount_rate || 5,
             annual_operating_expenses: data.annual_operating_expenses || "",
+          });
+          
+          // Update calculated results with values from backend
+          setCalculatedResults({
+            solar_collectors_subtotal: data.solar_collectors_subtotal || 0,
+            metal_support_bases_subtotal: data.metal_support_bases_subtotal || 0,
+            solar_system_subtotal: data.solar_system_subtotal || 0,
+            insulated_pipes_subtotal: data.insulated_pipes_subtotal || 0,
+            central_heater_installation_subtotal: data.central_heater_installation_subtotal || 0,
+            total_investment_cost: data.total_investment_cost || 0,
+            annual_energy_consumption_kwh: data.annual_energy_consumption_kwh || 0,
+            annual_solar_savings_kwh: data.annual_solar_savings_kwh || 0,
+            annual_economic_benefit: data.annual_economic_benefit || 0,
+            payback_period: data.payback_period || 0,
+            net_present_value: data.net_present_value || 0,
+            internal_rate_of_return: data.internal_rate_of_return || 0,
           });
         }
       },

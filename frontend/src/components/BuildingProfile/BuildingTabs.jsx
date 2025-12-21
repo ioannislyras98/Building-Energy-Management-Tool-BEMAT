@@ -27,10 +27,15 @@ const dataProvider = {
   deleteMany: () => Promise.resolve({ data: [] }),
 };
 
-const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData, scenarioId }) => {
+const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData, scenarioId, initialTab = 0 }) => {
   const navigate = useNavigate();
-  // If scenarioId exists, set active tab to Scenarios tab (index 4)
-  const [activeTab, setActiveTab] = useState(scenarioId ? 4 : 0);
+  // Use initialTab from URL or default to 0
+  const [activeTab, setActiveTab] = useState(initialTab);
+  
+  // Update activeTab when initialTab changes (from URL navigation)
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
   const scrollContainerRef = useRef(null);
@@ -75,12 +80,25 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData, scenari
     }
   };
 
+  // Map tab indices to URL segments
+  const tabUrlMapping = {
+    0: '/energy-profile',
+    1: '/systems',
+    2: '/thermal-zones',
+    3: '/electrical-consumptions',
+    4: '/scenarios',
+    5: '/results',
+    6: '/images',
+  };
+
   const handleTabClick = (index) => {
     // If clicking on Scenarios tab (index 4) and we're already in a scenario,
-    // navigate back to the building page without scenarioId
+    // navigate back to the scenarios list
     if (index === 4 && scenarioId) {
-      navigate(`/projects/${projectUuid}/buildings/${buildingUuid}`);
+      navigate(`/projects/${projectUuid}/buildings/${buildingUuid}/scenarios`);
     } else {
+      const urlSuffix = tabUrlMapping[index] || '';
+      navigate(`/projects/${projectUuid}/buildings/${buildingUuid}${urlSuffix}`);
       setActiveTab(index);
     }
   };

@@ -20,9 +20,26 @@ export default function BuildingProfilePage() {
   const location = useLocation();
   const { language } = useLanguage();
   
-  // Extract scenario ID from URL path
+  // Extract tab or scenario ID from URL path
   const pathParts = location.pathname.split('/');
-  const scenarioId = pathParts.length > 5 ? pathParts[5] : null;
+  const urlSegment = pathParts.length > 5 ? pathParts[5] : null;
+  const scenarioName = pathParts.length > 6 && urlSegment === 'scenarios' ? pathParts[6] : null;
+  
+  // Map URL segments to tab indices
+  const tabMapping = {
+    'energy-profile': 0,
+    'systems': 1,
+    'thermal-zones': 2,
+    'electrical-consumptions': 3,
+    'scenarios': 4,
+    'results': 5,
+    'images': 6,
+  };
+  
+  // Check if it's a main tab or a scenario
+  const isMainTab = urlSegment && tabMapping.hasOwnProperty(urlSegment);
+  const initialTab = isMainTab ? tabMapping[urlSegment] : 0;
+  const scenarioId = scenarioName || null;
   const text =
     language === "en"
       ? english_text.BuildingProfile
@@ -206,6 +223,7 @@ export default function BuildingProfilePage() {
                   projectUuid={projectUuid}
                   buildingData={building}
                   scenarioId={scenarioId}
+                  initialTab={initialTab}
                 />
               </div>
             </div>

@@ -44,6 +44,38 @@ function App() {
                 element={<BuildingProfilePage />}
               />
               <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/energy-profile"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/systems"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/thermal-zones"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/electrical-consumptions"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/scenarios"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/scenarios/:scenarioId"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/results"
+                element={<BuildingProfilePage />}
+              />
+              <Route
+                path="/projects/:projectUuid/buildings/:buildingUuid/images"
+                element={<BuildingProfilePage />}
+              />
+              <Route
                 path="/projects/:projectUuid/buildings/:buildingUuid/thermal-insulation"
                 element={<BuildingProfilePage />}
               />
