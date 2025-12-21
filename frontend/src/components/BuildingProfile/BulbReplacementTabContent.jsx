@@ -59,7 +59,7 @@ const BulbReplacementTabContent = ({
     language === "en"
       ? english_text.BulbReplacementTabContent || {}
       : greek_text.BulbReplacementTabContent || {};
-  
+
   useEffect(() => {
     if (buildingUuid && token) {
       fetchExistingData();
@@ -122,9 +122,7 @@ const BulbReplacementTabContent = ({
           });
         }
       },
-      error: (jqXHR) => {
-
-      },
+      error: (jqXHR) => {},
     });
   };
 
@@ -176,7 +174,7 @@ const BulbReplacementTabContent = ({
       ...prev,
       [field]: value,
     }));
-    
+
     // Clear validation error when user starts typing
     if (validationErrors[field]) {
       setValidationErrors((prev) => ({
@@ -248,35 +246,37 @@ const BulbReplacementTabContent = ({
       }
 
       npv = pvSavings - totalInvestmentCost;
-      
+
       // Calculate IRR using Newton-Raphson method
-      const netAnnualSavings = annualCostSavings - parseFloat(maintenance_cost_annual || 0);
+      const netAnnualSavings =
+        annualCostSavings - parseFloat(maintenance_cost_annual || 0);
       if (netAnnualSavings > 0 && totalInvestmentCost > 0 && years > 0) {
         let guess = 0.1;
         const maxIterations = 1000;
         const tolerance = 0.00001;
-        
+
         for (let i = 0; i < maxIterations; i++) {
           let npvAtGuess = -totalInvestmentCost;
           let derivativeNpv = 0;
-          
+
           for (let year = 1; year <= years; year++) {
             const discountFactor = Math.pow(1 + guess, year);
             npvAtGuess += netAnnualSavings / discountFactor;
-            derivativeNpv -= (year * netAnnualSavings) / Math.pow(1 + guess, year + 1);
+            derivativeNpv -=
+              (year * netAnnualSavings) / Math.pow(1 + guess, year + 1);
           }
-          
+
           if (Math.abs(npvAtGuess) < tolerance) {
             irr = guess * 100;
             break;
           }
-          
+
           if (Math.abs(derivativeNpv) > 0.000001) {
             guess = guess - npvAtGuess / derivativeNpv;
           } else {
             break;
           }
-          
+
           if (guess < -0.99) guess = -0.99;
           if (guess > 10) guess = 10;
         }
@@ -315,7 +315,8 @@ const BulbReplacementTabContent = ({
     if (!formData.new_operating_hours) errors.new_operating_hours = true;
     if (!formData.cost_per_new_bulb) errors.cost_per_new_bulb = true;
     if (!formData.installation_cost) errors.installation_cost = true;
-    if (!formData.maintenance_cost_annual) errors.maintenance_cost_annual = true;
+    if (!formData.maintenance_cost_annual)
+      errors.maintenance_cost_annual = true;
 
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
@@ -429,7 +430,11 @@ const BulbReplacementTabContent = ({
             }
             variant="outlined"
             error={validationErrors.old_power_per_bulb}
-            helperText={validationErrors.old_power_per_bulb ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+            helperText={
+              validationErrors.old_power_per_bulb
+                ? "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -464,7 +469,11 @@ const BulbReplacementTabContent = ({
             }
             variant="outlined"
             error={validationErrors.old_bulb_count}
-            helperText={validationErrors.old_bulb_count ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+            helperText={
+              validationErrors.old_bulb_count
+                ? "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -488,8 +497,8 @@ const BulbReplacementTabContent = ({
             fullWidth
             label={
               <>
-                {translations.oldOperatingHours || "Ώρες λειτουργίας"} (ώρες/έτος){" "}
-                <span style={{ color: "red" }}>*</span>
+                {translations.oldOperatingHours || "Ώρες λειτουργίας"}{" "}
+                (ώρες/έτος) <span style={{ color: "red" }}>*</span>
               </>
             }
             type="number"
@@ -499,7 +508,11 @@ const BulbReplacementTabContent = ({
             }
             variant="outlined"
             error={validationErrors.old_operating_hours}
-            helperText={validationErrors.old_operating_hours ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+            helperText={
+              validationErrors.old_operating_hours
+                ? "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -618,7 +631,11 @@ const BulbReplacementTabContent = ({
             }
             variant="outlined"
             error={validationErrors.new_power_per_bulb}
-            helperText={validationErrors.new_power_per_bulb ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+            helperText={
+              validationErrors.new_power_per_bulb
+                ? "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -653,7 +670,11 @@ const BulbReplacementTabContent = ({
             }
             variant="outlined"
             error={validationErrors.new_bulb_count}
-            helperText={validationErrors.new_bulb_count ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+            helperText={
+              validationErrors.new_bulb_count
+                ? "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -677,8 +698,8 @@ const BulbReplacementTabContent = ({
             fullWidth
             label={
               <>
-                {translations.newOperatingHours || "Ώρες λειτουργίας"} (ώρες/έτος){" "}
-                <span style={{ color: "red" }}>*</span>
+                {translations.newOperatingHours || "Ώρες λειτουργίας"}{" "}
+                (ώρες/έτος) <span style={{ color: "red" }}>*</span>
               </>
             }
             type="number"
@@ -688,7 +709,11 @@ const BulbReplacementTabContent = ({
             }
             variant="outlined"
             error={validationErrors.new_operating_hours}
-            helperText={validationErrors.new_operating_hours ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+            helperText={
+              validationErrors.new_operating_hours
+                ? "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -754,7 +779,10 @@ const BulbReplacementTabContent = ({
     <div className="space-y-4">
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Typography variant="h6" className="font-semibold mb-4" style={{ color: "var(--color-primary)" }}>
+          <Typography
+            variant="h6"
+            className="font-semibold mb-4"
+            style={{ color: "var(--color-primary)" }}>
             {translations.economicData || "Οικονομικά Στοιχεία"}
           </Typography>
         </Grid>
@@ -775,7 +803,11 @@ const BulbReplacementTabContent = ({
             }
             variant="outlined"
             error={validationErrors.cost_per_new_bulb}
-            helperText={validationErrors.cost_per_new_bulb ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+            helperText={
+              validationErrors.cost_per_new_bulb
+                ? "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -810,7 +842,11 @@ const BulbReplacementTabContent = ({
             }
             variant="outlined"
             error={validationErrors.installation_cost}
-            helperText={validationErrors.installation_cost ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+            helperText={
+              validationErrors.installation_cost
+                ? "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -912,7 +948,11 @@ const BulbReplacementTabContent = ({
             }
             variant="outlined"
             error={validationErrors.maintenance_cost_annual}
-            helperText={validationErrors.maintenance_cost_annual ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+            helperText={
+              validationErrors.maintenance_cost_annual
+                ? "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -1001,7 +1041,11 @@ const BulbReplacementTabContent = ({
           }
           variant="outlined"
           error={validationErrors.old_power_per_bulb}
-          helperText={validationErrors.old_power_per_bulb ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+          helperText={
+            validationErrors.old_power_per_bulb
+              ? "Αυτό το πεδίο είναι υποχρεωτικό"
+              : ""
+          }
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -1034,7 +1078,11 @@ const BulbReplacementTabContent = ({
           onChange={(e) => handleInputChange("old_bulb_count", e.target.value)}
           variant="outlined"
           error={validationErrors.old_bulb_count}
-          helperText={validationErrors.old_bulb_count ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+          helperText={
+            validationErrors.old_bulb_count
+              ? "Αυτό το πεδίο είναι υποχρεωτικό"
+              : ""
+          }
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -1069,7 +1117,11 @@ const BulbReplacementTabContent = ({
           }
           variant="outlined"
           error={validationErrors.old_operating_hours}
-          helperText={validationErrors.old_operating_hours ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+          helperText={
+            validationErrors.old_operating_hours
+              ? "Αυτό το πεδίο είναι υποχρεωτικό"
+              : ""
+          }
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -1149,7 +1201,11 @@ const BulbReplacementTabContent = ({
           }
           variant="outlined"
           error={validationErrors.new_power_per_bulb}
-          helperText={validationErrors.new_power_per_bulb ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+          helperText={
+            validationErrors.new_power_per_bulb
+              ? "Αυτό το πεδίο είναι υποχρεωτικό"
+              : ""
+          }
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -1182,7 +1238,11 @@ const BulbReplacementTabContent = ({
           onChange={(e) => handleInputChange("new_bulb_count", e.target.value)}
           variant="outlined"
           error={validationErrors.new_bulb_count}
-          helperText={validationErrors.new_bulb_count ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+          helperText={
+            validationErrors.new_bulb_count
+              ? "Αυτό το πεδίο είναι υποχρεωτικό"
+              : ""
+          }
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -1217,7 +1277,11 @@ const BulbReplacementTabContent = ({
           }
           variant="outlined"
           error={validationErrors.new_operating_hours}
-          helperText={validationErrors.new_operating_hours ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+          helperText={
+            validationErrors.new_operating_hours
+              ? "Αυτό το πεδίο είναι υποχρεωτικό"
+              : ""
+          }
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -1261,7 +1325,11 @@ const BulbReplacementTabContent = ({
           }
           variant="outlined"
           error={validationErrors.cost_per_new_bulb}
-          helperText={validationErrors.cost_per_new_bulb ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+          helperText={
+            validationErrors.cost_per_new_bulb
+              ? "Αυτό το πεδίο είναι υποχρεωτικό"
+              : ""
+          }
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -1296,7 +1364,11 @@ const BulbReplacementTabContent = ({
           }
           variant="outlined"
           error={validationErrors.installation_cost}
-          helperText={validationErrors.installation_cost ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+          helperText={
+            validationErrors.installation_cost
+              ? "Αυτό το πεδίο είναι υποχρεωτικό"
+              : ""
+          }
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -1395,7 +1467,11 @@ const BulbReplacementTabContent = ({
           }
           variant="outlined"
           error={validationErrors.maintenance_cost_annual}
-          helperText={validationErrors.maintenance_cost_annual ? "Αυτό το πεδίο είναι υποχρεωτικό" : ""}
+          helperText={
+            validationErrors.maintenance_cost_annual
+              ? "Αυτό το πεδίο είναι υποχρεωτικό"
+              : ""
+          }
           sx={{
             "& .MuiOutlinedInput-root": {
               "&:hover fieldset": {
@@ -1559,13 +1635,12 @@ const BulbReplacementTabContent = ({
               translations.autoCalculated || "Αυτόματος Υπολογισμός"
             }`}
             type="text"
-            value={calculatedResults.total_investment_cost.toLocaleString(
-              "el-GR",
-              {
+            value={
+              calculatedResults.total_investment_cost.toLocaleString("el-GR", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
-              }
-            ) + ' €'}
+              }) + " €"
+            }
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
@@ -1601,13 +1676,12 @@ const BulbReplacementTabContent = ({
               translations.autoCalculated || "Αυτόματος Υπολογισμός"
             }`}
             type="text"
-            value={calculatedResults.annual_cost_savings.toLocaleString(
-              "el-GR",
-              {
+            value={
+              calculatedResults.annual_cost_savings.toLocaleString("el-GR", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
-              }
-            ) + ' €'}
+              }) + " €"
+            }
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
@@ -1732,11 +1806,12 @@ const BulbReplacementTabContent = ({
             label={translations.netPresentValue || "Καθαρή παρούσα αξία (€)"}
             type="text"
             value={
-              calculatedResults.net_present_value !== undefined && calculatedResults.net_present_value !== null
+              calculatedResults.net_present_value !== undefined &&
+              calculatedResults.net_present_value !== null
                 ? calculatedResults.net_present_value.toLocaleString("el-GR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                  }) + ' €'
+                  }) + " €"
                 : ""
             }
             InputProps={{ readOnly: true }}
@@ -1770,16 +1845,20 @@ const BulbReplacementTabContent = ({
             label={translations.paybackPeriod || "Περίοδος Αποπληρωμής (έτη)"}
             type="text"
             value={
-              calculatedResults.payback_period !== undefined && calculatedResults.payback_period !== null
-                ? (calculatedResults.payback_period > 0
-                    ? calculatedResults.payback_period.toFixed(1) + ' έτη'
-                    : 'Δεν αποπληρώνεται')
+              calculatedResults.payback_period !== undefined &&
+              calculatedResults.payback_period !== null
+                ? calculatedResults.payback_period > 0
+                  ? calculatedResults.payback_period.toFixed(1) + " έτη"
+                  : "Δεν αποπληρώνεται"
                 : ""
             }
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
-                color: calculatedResults.payback_period > 0 ? "var(--color-primary)" : "red",
+                color:
+                  calculatedResults.payback_period > 0
+                    ? "var(--color-primary)"
+                    : "red",
                 fontWeight: "bold",
               },
               "& .MuiInputLabel-root": {
@@ -1803,16 +1882,20 @@ const BulbReplacementTabContent = ({
             label={translations.irr || "Εσωτερικός Βαθμός Απόδοσης (%)"}
             type="text"
             value={
-              calculatedResults.internal_rate_of_return !== undefined && calculatedResults.internal_rate_of_return !== null
-                ? (calculatedResults.internal_rate_of_return > 0
-                    ? calculatedResults.internal_rate_of_return.toFixed(2) + '%'
-                    : 'Μη κερδοφόρα επένδυση')
+              calculatedResults.internal_rate_of_return !== undefined &&
+              calculatedResults.internal_rate_of_return !== null
+                ? calculatedResults.internal_rate_of_return > 0
+                  ? calculatedResults.internal_rate_of_return.toFixed(2) + "%"
+                  : "Μη κερδοφόρα επένδυση"
                 : ""
             }
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
-                color: calculatedResults.internal_rate_of_return > 0 ? "var(--color-success)" : "red",
+                color:
+                  calculatedResults.internal_rate_of_return > 0
+                    ? "var(--color-success)"
+                    : "red",
                 fontWeight: "bold",
               },
               "& .MuiInputLabel-root": {
