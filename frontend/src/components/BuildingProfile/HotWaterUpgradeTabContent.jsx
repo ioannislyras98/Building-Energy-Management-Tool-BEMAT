@@ -34,8 +34,7 @@ function TabPanel(props) {
       hidden={value !== index}
       id={`hot-water-tabpanel-${index}`}
       aria-labelledby={`hot-water-tab-${index}`}
-      {...other}
-    >
+      {...other}>
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
@@ -105,17 +104,22 @@ const HotWaterUpgradeTabContent = ({
           setFormData({
             solar_collectors_quantity: data.solar_collectors_quantity || "",
             solar_collectors_unit_price: data.solar_collectors_unit_price || "",
-            metal_support_bases_quantity: data.metal_support_bases_quantity || "",
-            metal_support_bases_unit_price: data.metal_support_bases_unit_price || "",
+            metal_support_bases_quantity:
+              data.metal_support_bases_quantity || "",
+            metal_support_bases_unit_price:
+              data.metal_support_bases_unit_price || "",
             solar_system_quantity: data.solar_system_quantity || 1,
             solar_system_unit_price: data.solar_system_unit_price || "",
             insulated_pipes_quantity: data.insulated_pipes_quantity || "",
             insulated_pipes_unit_price: data.insulated_pipes_unit_price || "",
-            central_heater_installation_quantity: data.central_heater_installation_quantity || 1,
-            central_heater_installation_unit_price: data.central_heater_installation_unit_price || "",
+            central_heater_installation_quantity:
+              data.central_heater_installation_quantity || 1,
+            central_heater_installation_unit_price:
+              data.central_heater_installation_unit_price || "",
             electric_heater_power: data.electric_heater_power || "",
             operating_hours_per_year: data.operating_hours_per_year || "",
-            solar_utilization_percentage: data.solar_utilization_percentage || 80,
+            solar_utilization_percentage:
+              data.solar_utilization_percentage || 80,
             energy_cost_kwh: data.energy_cost_kwh || "",
             lifespan_years: data.lifespan_years || 10,
             discount_rate: data.discount_rate || 5,
@@ -123,9 +127,7 @@ const HotWaterUpgradeTabContent = ({
           });
         }
       },
-      error: (jqXHR) => {
-
-      },
+      error: (jqXHR) => {},
     });
   };
 
@@ -200,18 +202,39 @@ const HotWaterUpgradeTabContent = ({
       discount_rate,
       annual_operating_expenses,
     } = formData;
-    const solarCollectorsSubtotal = parseFloat(solar_collectors_quantity || 0) * parseFloat(solar_collectors_unit_price || 0);
-    const metalSupportBasesSubtotal = parseFloat(metal_support_bases_quantity || 0) * parseFloat(metal_support_bases_unit_price || 0);
-    const solarSystemSubtotal = parseFloat(solar_system_quantity || 0) * parseFloat(solar_system_unit_price || 0);
-    const insulatedPipesSubtotal = parseFloat(insulated_pipes_quantity || 0) * parseFloat(insulated_pipes_unit_price || 0);
-    const centralHeaterSubtotal = parseFloat(central_heater_installation_quantity || 0) * parseFloat(central_heater_installation_unit_price || 0);
-    const totalInvestmentCost = solarCollectorsSubtotal + metalSupportBasesSubtotal + solarSystemSubtotal + insulatedPipesSubtotal + centralHeaterSubtotal;
-    const annualEnergyConsumption = electric_heater_power && operating_hours_per_year
-      ? (parseFloat(electric_heater_power) * parseFloat(operating_hours_per_year)) / 1000
-      : 0;
+    const solarCollectorsSubtotal =
+      parseFloat(solar_collectors_quantity || 0) *
+      parseFloat(solar_collectors_unit_price || 0);
+    const metalSupportBasesSubtotal =
+      parseFloat(metal_support_bases_quantity || 0) *
+      parseFloat(metal_support_bases_unit_price || 0);
+    const solarSystemSubtotal =
+      parseFloat(solar_system_quantity || 0) *
+      parseFloat(solar_system_unit_price || 0);
+    const insulatedPipesSubtotal =
+      parseFloat(insulated_pipes_quantity || 0) *
+      parseFloat(insulated_pipes_unit_price || 0);
+    const centralHeaterSubtotal =
+      parseFloat(central_heater_installation_quantity || 0) *
+      parseFloat(central_heater_installation_unit_price || 0);
+    const totalInvestmentCost =
+      solarCollectorsSubtotal +
+      metalSupportBasesSubtotal +
+      solarSystemSubtotal +
+      insulatedPipesSubtotal +
+      centralHeaterSubtotal;
+    const annualEnergyConsumption =
+      electric_heater_power && operating_hours_per_year
+        ? (parseFloat(electric_heater_power) *
+            parseFloat(operating_hours_per_year)) /
+          1000
+        : 0;
 
-    const annualSolarSavings = annualEnergyConsumption * (parseFloat(solar_utilization_percentage || 0) / 100);
-    const annualEconomicBenefit = annualSolarSavings * parseFloat(energy_cost_kwh || 0);
+    const annualSolarSavings =
+      annualEnergyConsumption *
+      (parseFloat(solar_utilization_percentage || 0) / 100);
+    const annualEconomicBenefit =
+      annualSolarSavings * parseFloat(energy_cost_kwh || 0);
     let paybackPeriod = 0;
     if (annualEconomicBenefit > 0 && totalInvestmentCost > 0) {
       paybackPeriod = totalInvestmentCost / annualEconomicBenefit;
@@ -230,39 +253,40 @@ const HotWaterUpgradeTabContent = ({
     } else {
       npv = -totalInvestmentCost;
     }
-    
+
     // Calculate IRR using Newton-Raphson method
     let irr = 0;
     const netAnnualBenefit = annualEconomicBenefit - operatingExpenses;
-    
+
     if (totalInvestmentCost > 0 && netAnnualBenefit > 0 && years > 0) {
       let guess = 0.1; // Initial guess 10%
       const maxIterations = 1000;
       const tolerance = 0.00001;
-      
+
       for (let i = 0; i < maxIterations; i++) {
         let npvAtGuess = -totalInvestmentCost;
         let derivativeNpv = 0;
-        
+
         for (let year = 1; year <= years; year++) {
           const discountFactor = Math.pow(1 + guess, year);
           npvAtGuess += netAnnualBenefit / discountFactor;
-          derivativeNpv -= (year * netAnnualBenefit) / Math.pow(1 + guess, year + 1);
+          derivativeNpv -=
+            (year * netAnnualBenefit) / Math.pow(1 + guess, year + 1);
         }
-        
+
         // Check for convergence
         if (Math.abs(npvAtGuess) < tolerance) {
           irr = guess * 100;
           break;
         }
-        
+
         // Newton-Raphson update
         if (Math.abs(derivativeNpv) > 0.000001) {
           guess = guess - npvAtGuess / derivativeNpv;
         } else {
           break;
         }
-        
+
         // Keep guess within reasonable bounds
         if (guess < -0.99) guess = -0.99;
         if (guess > 10) guess = 10;
@@ -291,11 +315,11 @@ const HotWaterUpgradeTabContent = ({
 
   // Update error message when language changes
   useEffect(() => {
-    if (error && Object.values(validationErrors).some(err => err)) {
+    if (error && Object.values(validationErrors).some((err) => err)) {
       // If there's a validation error, update the message with the new language
       setError(
-        translations.requiredFieldsError || 
-        "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Στοιχεία Συστήματος με τιμές μεγαλύτερες από 0"
+        translations.requiredFieldsError ||
+          "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Στοιχεία Συστήματος με τιμές μεγαλύτερες από 0"
       );
     }
   }, [language, translations]);
@@ -308,59 +332,97 @@ const HotWaterUpgradeTabContent = ({
 
     // Validate all required fields
     const newValidationErrors = {
-      solar_collectors_quantity: !formData.solar_collectors_quantity || parseFloat(formData.solar_collectors_quantity) <= 0,
-      solar_collectors_unit_price: !formData.solar_collectors_unit_price || parseFloat(formData.solar_collectors_unit_price) <= 0,
-      metal_support_bases_quantity: !formData.metal_support_bases_quantity || parseFloat(formData.metal_support_bases_quantity) <= 0,
-      metal_support_bases_unit_price: !formData.metal_support_bases_unit_price || parseFloat(formData.metal_support_bases_unit_price) <= 0,
-      solar_system_quantity: !formData.solar_system_quantity || parseFloat(formData.solar_system_quantity) <= 0,
-      solar_system_unit_price: !formData.solar_system_unit_price || parseFloat(formData.solar_system_unit_price) <= 0,
-      insulated_pipes_quantity: !formData.insulated_pipes_quantity || parseFloat(formData.insulated_pipes_quantity) <= 0,
-      insulated_pipes_unit_price: !formData.insulated_pipes_unit_price || parseFloat(formData.insulated_pipes_unit_price) <= 0,
-      central_heater_installation_quantity: !formData.central_heater_installation_quantity || parseFloat(formData.central_heater_installation_quantity) <= 0,
-      central_heater_installation_unit_price: !formData.central_heater_installation_unit_price || parseFloat(formData.central_heater_installation_unit_price) <= 0,
-      electric_heater_power: !formData.electric_heater_power || parseFloat(formData.electric_heater_power) <= 0,
-      operating_hours_per_year: !formData.operating_hours_per_year || parseFloat(formData.operating_hours_per_year) <= 0,
-      solar_utilization_percentage: !formData.solar_utilization_percentage || parseFloat(formData.solar_utilization_percentage) <= 0,
-      lifespan_years: !formData.lifespan_years || parseFloat(formData.lifespan_years) <= 0,
-      discount_rate: !formData.discount_rate || parseFloat(formData.discount_rate) <= 0,
-      annual_operating_expenses: !formData.annual_operating_expenses || parseFloat(formData.annual_operating_expenses) < 0,
+      solar_collectors_quantity:
+        !formData.solar_collectors_quantity ||
+        parseFloat(formData.solar_collectors_quantity) <= 0,
+      solar_collectors_unit_price:
+        !formData.solar_collectors_unit_price ||
+        parseFloat(formData.solar_collectors_unit_price) <= 0,
+      metal_support_bases_quantity:
+        !formData.metal_support_bases_quantity ||
+        parseFloat(formData.metal_support_bases_quantity) <= 0,
+      metal_support_bases_unit_price:
+        !formData.metal_support_bases_unit_price ||
+        parseFloat(formData.metal_support_bases_unit_price) <= 0,
+      solar_system_quantity:
+        !formData.solar_system_quantity ||
+        parseFloat(formData.solar_system_quantity) <= 0,
+      solar_system_unit_price:
+        !formData.solar_system_unit_price ||
+        parseFloat(formData.solar_system_unit_price) <= 0,
+      insulated_pipes_quantity:
+        !formData.insulated_pipes_quantity ||
+        parseFloat(formData.insulated_pipes_quantity) <= 0,
+      insulated_pipes_unit_price:
+        !formData.insulated_pipes_unit_price ||
+        parseFloat(formData.insulated_pipes_unit_price) <= 0,
+      central_heater_installation_quantity:
+        !formData.central_heater_installation_quantity ||
+        parseFloat(formData.central_heater_installation_quantity) <= 0,
+      central_heater_installation_unit_price:
+        !formData.central_heater_installation_unit_price ||
+        parseFloat(formData.central_heater_installation_unit_price) <= 0,
+      electric_heater_power:
+        !formData.electric_heater_power ||
+        parseFloat(formData.electric_heater_power) <= 0,
+      operating_hours_per_year:
+        !formData.operating_hours_per_year ||
+        parseFloat(formData.operating_hours_per_year) <= 0,
+      solar_utilization_percentage:
+        !formData.solar_utilization_percentage ||
+        parseFloat(formData.solar_utilization_percentage) <= 0,
+      lifespan_years:
+        !formData.lifespan_years || parseFloat(formData.lifespan_years) <= 0,
+      discount_rate:
+        !formData.discount_rate || parseFloat(formData.discount_rate) <= 0,
+      annual_operating_expenses:
+        !formData.annual_operating_expenses ||
+        parseFloat(formData.annual_operating_expenses) < 0,
     };
 
     setValidationErrors(newValidationErrors);
 
     // Check if there are any validation errors
-    if (Object.values(newValidationErrors).some(error => error)) {
+    if (Object.values(newValidationErrors).some((error) => error)) {
       // Check which tab has errors
       const systemComponentsErrors = [
-        'solar_collectors_quantity', 'solar_collectors_unit_price',
-        'metal_support_bases_quantity', 'metal_support_bases_unit_price',
-        'solar_system_quantity', 'solar_system_unit_price',
-        'insulated_pipes_quantity', 'insulated_pipes_unit_price',
-        'central_heater_installation_quantity', 'central_heater_installation_unit_price'
-      ].some(key => newValidationErrors[key]);
+        "solar_collectors_quantity",
+        "solar_collectors_unit_price",
+        "metal_support_bases_quantity",
+        "metal_support_bases_unit_price",
+        "solar_system_quantity",
+        "solar_system_unit_price",
+        "insulated_pipes_quantity",
+        "insulated_pipes_unit_price",
+        "central_heater_installation_quantity",
+        "central_heater_installation_unit_price",
+      ].some((key) => newValidationErrors[key]);
 
       const economicDataErrors = [
-        'electric_heater_power', 'operating_hours_per_year',
-        'solar_utilization_percentage', 'lifespan_years',
-        'discount_rate', 'annual_operating_expenses'
-      ].some(key => newValidationErrors[key]);
+        "electric_heater_power",
+        "operating_hours_per_year",
+        "solar_utilization_percentage",
+        "lifespan_years",
+        "discount_rate",
+        "annual_operating_expenses",
+      ].some((key) => newValidationErrors[key]);
 
       if (systemComponentsErrors && economicDataErrors) {
         setError(
-          translations.requiredFieldsErrorBoth || 
-          "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Στοιχεία Συστήματος και Τα Οικονομικά Στοιχεία"
+          translations.requiredFieldsErrorBoth ||
+            "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Στοιχεία Συστήματος και Τα Οικονομικά Στοιχεία"
         );
         setTabValue(0);
       } else if (systemComponentsErrors) {
         setError(
-          translations.requiredFieldsError || 
-          "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Στοιχεία Συστήματος με τιμές μεγαλύτερες από 0"
+          translations.requiredFieldsError ||
+            "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Στοιχεία Συστήματος με τιμές μεγαλύτερες από 0"
         );
         setTabValue(0);
       } else if (economicDataErrors) {
         setError(
-          translations.requiredFieldsErrorEconomic || 
-          "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Οικονομικά Στοιχεία"
+          translations.requiredFieldsErrorEconomic ||
+            "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Οικονομικά Στοιχεία"
         );
         setTabValue(1);
       }
@@ -386,14 +448,12 @@ const HotWaterUpgradeTabContent = ({
       },
       data: JSON.stringify(submitData),
       success: (response) => {
-
         setSuccess(
           translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
         );
         setLoading(false);
       },
       error: (jqXHR) => {
-
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
@@ -406,7 +466,9 @@ const HotWaterUpgradeTabContent = ({
 
   const renderSystemComponents = () => (
     <div className="space-y-4">
-      <Typography variant="h6" sx={{ fontWeight: "bold", color: "var(--color-primary)", mb: 2 }}>
+      <Typography
+        variant="h6"
+        sx={{ fontWeight: "bold", color: "var(--color-primary)", mb: 2 }}>
         {translations.systemComponents || "Στοιχεία Συστήματος"}
       </Typography>
 
@@ -417,13 +479,21 @@ const HotWaterUpgradeTabContent = ({
               <TableCell sx={{ fontWeight: "bold", color: "white" }}>
                 {translations.itemType || "Είδος"}
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold", color: "white" }} align="center">
-                {translations.quantity || "Ποσότητα"} <span style={{ color: "#ff4444" }}>*</span>
+              <TableCell
+                sx={{ fontWeight: "bold", color: "white" }}
+                align="center">
+                {translations.quantity || "Ποσότητα"}{" "}
+                <span style={{ color: "#ff4444" }}>*</span>
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold", color: "white" }} align="center">
-                {translations.unitPrice || "Τιμή Μονάδας (€)"} <span style={{ color: "#ff4444" }}>*</span>
+              <TableCell
+                sx={{ fontWeight: "bold", color: "white" }}
+                align="center">
+                {translations.unitPrice || "Τιμή Μονάδας (€)"}{" "}
+                <span style={{ color: "#ff4444" }}>*</span>
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold", color: "white" }} align="center">
+              <TableCell
+                sx={{ fontWeight: "bold", color: "white" }}
+                align="center">
                 {translations.subtotal || "Υποσύνολο (€)"}
               </TableCell>
             </TableRow>
@@ -441,10 +511,13 @@ const HotWaterUpgradeTabContent = ({
                   required
                   value={formData.solar_collectors_quantity}
                   onChange={(e) =>
-                    handleInputChange("solar_collectors_quantity", e.target.value)
+                    handleInputChange(
+                      "solar_collectors_quantity",
+                      e.target.value
+                    )
                   }
                   error={validationErrors.solar_collectors_quantity}
-                  sx={{ 
+                  sx={{
                     width: "80px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -464,10 +537,13 @@ const HotWaterUpgradeTabContent = ({
                   required
                   value={formData.solar_collectors_unit_price}
                   onChange={(e) =>
-                    handleInputChange("solar_collectors_unit_price", e.target.value)
+                    handleInputChange(
+                      "solar_collectors_unit_price",
+                      e.target.value
+                    )
                   }
                   error={validationErrors.solar_collectors_unit_price}
-                  sx={{ 
+                  sx={{
                     width: "100px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -497,10 +573,13 @@ const HotWaterUpgradeTabContent = ({
                   required
                   value={formData.metal_support_bases_quantity}
                   onChange={(e) =>
-                    handleInputChange("metal_support_bases_quantity", e.target.value)
+                    handleInputChange(
+                      "metal_support_bases_quantity",
+                      e.target.value
+                    )
                   }
                   error={validationErrors.metal_support_bases_quantity}
-                  sx={{ 
+                  sx={{
                     width: "80px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -520,10 +599,13 @@ const HotWaterUpgradeTabContent = ({
                   required
                   value={formData.metal_support_bases_unit_price}
                   onChange={(e) =>
-                    handleInputChange("metal_support_bases_unit_price", e.target.value)
+                    handleInputChange(
+                      "metal_support_bases_unit_price",
+                      e.target.value
+                    )
                   }
                   error={validationErrors.metal_support_bases_unit_price}
-                  sx={{ 
+                  sx={{
                     width: "100px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -556,7 +638,7 @@ const HotWaterUpgradeTabContent = ({
                     handleInputChange("solar_system_quantity", e.target.value)
                   }
                   error={validationErrors.solar_system_quantity}
-                  sx={{ 
+                  sx={{
                     width: "80px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -579,7 +661,7 @@ const HotWaterUpgradeTabContent = ({
                     handleInputChange("solar_system_unit_price", e.target.value)
                   }
                   error={validationErrors.solar_system_unit_price}
-                  sx={{ 
+                  sx={{
                     width: "100px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -600,7 +682,8 @@ const HotWaterUpgradeTabContent = ({
             {/* Insulated Pipes */}
             <TableRow>
               <TableCell>
-                {translations.insulatedPipes || "Σωληνώσεις με μόνωση πάχους 9 mm"}
+                {translations.insulatedPipes ||
+                  "Σωληνώσεις με μόνωση πάχους 9 mm"}
               </TableCell>
               <TableCell align="center">
                 <TextField
@@ -609,10 +692,13 @@ const HotWaterUpgradeTabContent = ({
                   required
                   value={formData.insulated_pipes_quantity}
                   onChange={(e) =>
-                    handleInputChange("insulated_pipes_quantity", e.target.value)
+                    handleInputChange(
+                      "insulated_pipes_quantity",
+                      e.target.value
+                    )
                   }
                   error={validationErrors.insulated_pipes_quantity}
-                  sx={{ 
+                  sx={{
                     width: "80px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -632,10 +718,13 @@ const HotWaterUpgradeTabContent = ({
                   required
                   value={formData.insulated_pipes_unit_price}
                   onChange={(e) =>
-                    handleInputChange("insulated_pipes_unit_price", e.target.value)
+                    handleInputChange(
+                      "insulated_pipes_unit_price",
+                      e.target.value
+                    )
                   }
                   error={validationErrors.insulated_pipes_unit_price}
-                  sx={{ 
+                  sx={{
                     width: "100px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -656,7 +745,8 @@ const HotWaterUpgradeTabContent = ({
             {/* Central Heater Installation */}
             <TableRow>
               <TableCell>
-                {translations.centralHeaterInstallation || "Εγκατάσταση κεντρικού θερμαντήρα"}
+                {translations.centralHeaterInstallation ||
+                  "Εγκατάσταση κεντρικού θερμαντήρα"}
               </TableCell>
               <TableCell align="center">
                 <TextField
@@ -665,10 +755,13 @@ const HotWaterUpgradeTabContent = ({
                   required
                   value={formData.central_heater_installation_quantity}
                   onChange={(e) =>
-                    handleInputChange("central_heater_installation_quantity", e.target.value)
+                    handleInputChange(
+                      "central_heater_installation_quantity",
+                      e.target.value
+                    )
                   }
                   error={validationErrors.central_heater_installation_quantity}
-                  sx={{ 
+                  sx={{
                     width: "80px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -688,10 +781,15 @@ const HotWaterUpgradeTabContent = ({
                   required
                   value={formData.central_heater_installation_unit_price}
                   onChange={(e) =>
-                    handleInputChange("central_heater_installation_unit_price", e.target.value)
+                    handleInputChange(
+                      "central_heater_installation_unit_price",
+                      e.target.value
+                    )
                   }
-                  error={validationErrors.central_heater_installation_unit_price}
-                  sx={{ 
+                  error={
+                    validationErrors.central_heater_installation_unit_price
+                  }
+                  sx={{
                     width: "100px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -705,7 +803,9 @@ const HotWaterUpgradeTabContent = ({
                 />
               </TableCell>
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                {calculatedResults.central_heater_installation_subtotal.toFixed(2)}
+                {calculatedResults.central_heater_installation_subtotal.toFixed(
+                  2
+                )}
               </TableCell>
             </TableRow>
           </TableBody>
@@ -716,7 +816,9 @@ const HotWaterUpgradeTabContent = ({
 
   const renderEconomicData = () => (
     <div className="space-y-4">
-      <Typography variant="h6" sx={{ fontWeight: "bold", color: "var(--color-primary)", mb: 2 }}>
+      <Typography
+        variant="h6"
+        sx={{ fontWeight: "bold", color: "var(--color-primary)", mb: 2 }}>
         {translations.economicData || "Οικονομικά Στοιχεία"}
       </Typography>
 
@@ -726,7 +828,9 @@ const HotWaterUpgradeTabContent = ({
             fullWidth
             label={
               <>
-                {translations.electricHeaterPower || "Ηλεκτρικός θερμοσίφωνας, ισχύς"} (W) <span style={{ color: "red" }}>*</span>
+                {translations.electricHeaterPower ||
+                  "Ηλεκτρικός θερμοσίφωνας, ισχύς"}{" "}
+                (W) <span style={{ color: "red" }}>*</span>
               </>
             }
             type="number"
@@ -759,7 +863,9 @@ const HotWaterUpgradeTabContent = ({
             fullWidth
             label={
               <>
-                {translations.operatingHoursPerYear || "Ώρες λειτουργίας ανά έτος"} <span style={{ color: "red" }}>*</span>
+                {translations.operatingHoursPerYear ||
+                  "Ώρες λειτουργίας ανά έτος"}{" "}
+                <span style={{ color: "red" }}>*</span>
               </>
             }
             type="number"
@@ -792,7 +898,9 @@ const HotWaterUpgradeTabContent = ({
             fullWidth
             label={
               <>
-                {translations.solarUtilizationPercentage || "Ποσοστό αξιοποίησης ηλιακού θερμοσίφωνα"} (%) <span style={{ color: "red" }}>*</span>
+                {translations.solarUtilizationPercentage ||
+                  "Ποσοστό αξιοποίησης ηλιακού θερμοσίφωνα"}{" "}
+                (%) <span style={{ color: "red" }}>*</span>
               </>
             }
             type="number"
@@ -858,7 +966,8 @@ const HotWaterUpgradeTabContent = ({
             fullWidth
             label={
               <>
-                {translations.lifespanYears || "Χρονικό διάστημα"} (έτη) <span style={{ color: "red" }}>*</span>
+                {translations.lifespanYears || "Χρονικό διάστημα"} (έτη){" "}
+                <span style={{ color: "red" }}>*</span>
               </>
             }
             type="number"
@@ -891,14 +1000,13 @@ const HotWaterUpgradeTabContent = ({
             fullWidth
             label={
               <>
-                {translations.discountRate || "Επιτόκιο αναγωγής"} (%) <span style={{ color: "red" }}>*</span>
+                {translations.discountRate || "Επιτόκιο αναγωγής"} (%){" "}
+                <span style={{ color: "red" }}>*</span>
               </>
             }
             type="number"
             value={formData.discount_rate}
-            onChange={(e) =>
-              handleInputChange("discount_rate", e.target.value)
-            }
+            onChange={(e) => handleInputChange("discount_rate", e.target.value)}
             variant="outlined"
             error={validationErrors.discount_rate}
             sx={{
@@ -924,7 +1032,9 @@ const HotWaterUpgradeTabContent = ({
             fullWidth
             label={
               <>
-                {translations.annualOperatingExpenses || "Λειτουργικά έξοδα ανά έτος"} (€) <span style={{ color: "red" }}>*</span>
+                {translations.annualOperatingExpenses ||
+                  "Λειτουργικά έξοδα ανά έτος"}{" "}
+                (€) <span style={{ color: "red" }}>*</span>
               </>
             }
             type="number"
@@ -957,7 +1067,9 @@ const HotWaterUpgradeTabContent = ({
 
   const renderEconomicAnalysis = () => (
     <div className="space-y-4">
-      <Typography variant="h6" sx={{ fontWeight: "bold", color: "var(--color-primary)", mb: 2 }}>
+      <Typography
+        variant="h6"
+        sx={{ fontWeight: "bold", color: "var(--color-primary)", mb: 2 }}>
         {translations.economicAnalysis || "Οικονομική Ανάλυση"}
       </Typography>
 
@@ -1113,8 +1225,7 @@ const HotWaterUpgradeTabContent = ({
               "&:hover": {
                 backgroundColor: "var(--color-primary-dark)",
               },
-            }}
-          >
+            }}>
             {loading
               ? translations.saving || "Αποθήκευση..."
               : translations.save || "Αποθήκευση"}
@@ -1129,7 +1240,10 @@ const HotWaterUpgradeTabContent = ({
         </Alert>
       )}
       {success && (
-        <Alert severity="success" className="mb-4" onClose={() => setSuccess(null)}>
+        <Alert
+          severity="success"
+          className="mb-4"
+          onClose={() => setSuccess(null)}>
           {success}
         </Alert>
       )}
@@ -1158,8 +1272,7 @@ const HotWaterUpgradeTabContent = ({
             "& .MuiTabs-indicator": {
               backgroundColor: "var(--color-primary)",
             },
-          }}
-        >
+          }}>
           <Tab label={translations.systemComponents || "Στοιχεία Συστήματος"} />
           <Tab label={translations.economicData || "Οικονομικά Στοιχεία"} />
           <Tab label={translations.economicAnalysis || "Οικονομική Ανάλυση"} />
