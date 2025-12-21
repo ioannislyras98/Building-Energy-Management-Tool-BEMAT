@@ -27,11 +27,18 @@ const dataProvider = {
   deleteMany: () => Promise.resolve({ data: [] }),
 };
 
-const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData, scenarioId, initialTab = 0 }) => {
+const BuildingTabs = ({
+  params,
+  buildingUuid,
+  projectUuid,
+  buildingData,
+  scenarioId,
+  initialTab = 0,
+}) => {
   const navigate = useNavigate();
   // Use initialTab from URL or default to 0
   const [activeTab, setActiveTab] = useState(initialTab);
-  
+
   // Update activeTab when initialTab changes (from URL navigation)
   useEffect(() => {
     setActiveTab(initialTab);
@@ -57,7 +64,8 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData, scenari
 
   const checkScroll = () => {
     if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      const { scrollLeft, scrollWidth, clientWidth } =
+        scrollContainerRef.current;
       setShowLeftArrow(scrollLeft > 0);
       setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
     }
@@ -82,13 +90,13 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData, scenari
 
   // Map tab indices to URL segments
   const tabUrlMapping = {
-    0: '/energy-profile',
-    1: '/systems',
-    2: '/thermal-zones',
-    3: '/electrical-consumptions',
-    4: '/scenarios',
-    5: '/results',
-    6: '/images',
+    0: "/energy-profile",
+    1: "/systems",
+    2: "/thermal-zones",
+    3: "/electrical-consumptions",
+    4: "/scenarios",
+    5: "/results",
+    6: "/images",
   };
 
   const handleTabClick = (index) => {
@@ -97,8 +105,10 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData, scenari
     if (index === 4 && scenarioId) {
       navigate(`/projects/${projectUuid}/buildings/${buildingUuid}/scenarios`);
     } else {
-      const urlSuffix = tabUrlMapping[index] || '';
-      navigate(`/projects/${projectUuid}/buildings/${buildingUuid}${urlSuffix}`);
+      const urlSuffix = tabUrlMapping[index] || "";
+      navigate(
+        `/projects/${projectUuid}/buildings/${buildingUuid}${urlSuffix}`
+      );
       setActiveTab(index);
     }
   };
@@ -114,7 +124,7 @@ const BuildingTabs = ({ params, buildingUuid, projectUuid, buildingData, scenari
             <FaChevronLeft className="text-primary" size={16} />
           </button>
         )}
-        
+
         {showRightArrow && (
           <button
             onClick={() => scroll("right")}

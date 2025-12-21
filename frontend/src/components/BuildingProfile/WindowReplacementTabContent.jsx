@@ -113,7 +113,7 @@ const WindowReplacementTabContent = ({
             lifespan_years: data.lifespan_years || "",
             discount_rate: data.discount_rate || "5",
           }));
-          
+
           // Update calculated results with values from backend
           setCalculatedResults({
             energy_savings_summer: data.energy_savings_summer || 0,
@@ -127,9 +127,7 @@ const WindowReplacementTabContent = ({
           });
         }
       },
-      error: (jqXHR) => {
-
-      },
+      error: (jqXHR) => {},
     });
   };
 
@@ -201,7 +199,12 @@ const WindowReplacementTabContent = ({
       : `${API_BASE_URL}/window_replacements/create/`;
     const method = existingUuid ? "PUT" : "POST";
 
-    console.log("🔵 AutoSave called - existingUuid:", existingUuid, "| Method:", method);
+    console.log(
+      "🔵 AutoSave called - existingUuid:",
+      existingUuid,
+      "| Method:",
+      method
+    );
 
     $.ajax({
       url: url,
@@ -213,7 +216,10 @@ const WindowReplacementTabContent = ({
       data: JSON.stringify(submitData),
       success: (response) => {
         if (response.data && response.data.uuid && !existingUuid) {
-          console.log("✅ AutoSave - Created new record, UUID:", response.data.uuid);
+          console.log(
+            "✅ AutoSave - Created new record, UUID:",
+            response.data.uuid
+          );
           setExistingUuid(response.data.uuid);
         } else {
           console.log("✅ AutoSave - Updated existing record");
@@ -247,7 +253,7 @@ const WindowReplacementTabContent = ({
       ...prev,
       [field]: value,
     }));
-    
+
     // Clear validation error when user starts typing
     if (validationErrors[field] !== undefined) {
       setValidationErrors((prev) => ({
@@ -255,7 +261,7 @@ const WindowReplacementTabContent = ({
         [field]: false,
       }));
     }
-    
+
     if (
       [
         "old_thermal_conductivity",
@@ -366,35 +372,37 @@ const WindowReplacementTabContent = ({
         }
 
         npv = pvSavings - totalInvestmentCost;
-        
+
         // Calculate IRR using Newton-Raphson method
-        const netAnnualSavings = annualCostSavings - parseFloat(maintenance_cost_annual || 0);
+        const netAnnualSavings =
+          annualCostSavings - parseFloat(maintenance_cost_annual || 0);
         if (netAnnualSavings > 0 && totalInvestmentCost > 0 && years > 0) {
           let guess = 0.1;
           const maxIterations = 1000;
           const tolerance = 0.00001;
-          
+
           for (let i = 0; i < maxIterations; i++) {
             let npvAtGuess = -totalInvestmentCost;
             let derivativeNpv = 0;
-            
+
             for (let year = 1; year <= years; year++) {
               const discountFactor = Math.pow(1 + guess, year);
               npvAtGuess += netAnnualSavings / discountFactor;
-              derivativeNpv -= (year * netAnnualSavings) / Math.pow(1 + guess, year + 1);
+              derivativeNpv -=
+                (year * netAnnualSavings) / Math.pow(1 + guess, year + 1);
             }
-            
+
             if (Math.abs(npvAtGuess) < tolerance) {
               irr = guess * 100;
               break;
             }
-            
+
             if (Math.abs(derivativeNpv) > 0.000001) {
               guess = guess - npvAtGuess / derivativeNpv;
             } else {
               break;
             }
-            
+
             if (guess < -0.99) guess = -0.99;
             if (guess > 10) guess = 10;
           }
@@ -438,12 +446,15 @@ const WindowReplacementTabContent = ({
       window_area: !formData.window_area,
       cost_per_sqm: !formData.cost_per_sqm,
     };
-    
+
     setValidationErrors(newValidationErrors);
-    
+
     // Check if there are any validation errors
-    if (Object.values(newValidationErrors).some(error => error)) {
-      setError(translations.requiredFieldsError || "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία");
+    if (Object.values(newValidationErrors).some((error) => error)) {
+      setError(
+        translations.requiredFieldsError ||
+          "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία"
+      );
       return;
     }
 
@@ -473,7 +484,12 @@ const WindowReplacementTabContent = ({
       : `${API_BASE_URL}/window_replacements/create/`;
     const method = existingUuid ? "PUT" : "POST";
 
-    console.log("🟢 HandleSubmit called - existingUuid:", existingUuid, "| Method:", method);
+    console.log(
+      "🟢 HandleSubmit called - existingUuid:",
+      existingUuid,
+      "| Method:",
+      method
+    );
 
     $.ajax({
       url: url,
@@ -485,7 +501,10 @@ const WindowReplacementTabContent = ({
       data: JSON.stringify(submitData),
       success: (response) => {
         if (response.data && response.data.uuid && !existingUuid) {
-          console.log("✅ HandleSubmit - Created new record, UUID:", response.data.uuid);
+          console.log(
+            "✅ HandleSubmit - Created new record, UUID:",
+            response.data.uuid
+          );
           setExistingUuid(response.data.uuid);
         } else {
           console.log("✅ HandleSubmit - Updated existing record");
@@ -536,7 +555,8 @@ const WindowReplacementTabContent = ({
             error={validationErrors.old_thermal_conductivity}
             helperText={
               validationErrors.old_thermal_conductivity
-                ? translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
+                ? translations.fieldRequired ||
+                  "Αυτό το πεδίο είναι υποχρεωτικό"
                 : ""
             }
             sx={{
@@ -582,7 +602,8 @@ const WindowReplacementTabContent = ({
             error={validationErrors.new_thermal_conductivity}
             helperText={
               validationErrors.new_thermal_conductivity
-                ? translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
+                ? translations.fieldRequired ||
+                  "Αυτό το πεδίο είναι υποχρεωτικό"
                 : ""
             }
             sx={{
@@ -625,7 +646,8 @@ const WindowReplacementTabContent = ({
             error={validationErrors.window_area}
             helperText={
               validationErrors.window_area
-                ? translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
+                ? translations.fieldRequired ||
+                  "Αυτό το πεδίο είναι υποχρεωτικό"
                 : ""
             }
             sx={{
@@ -701,7 +723,8 @@ const WindowReplacementTabContent = ({
             error={validationErrors.cost_per_sqm}
             helperText={
               validationErrors.cost_per_sqm
-                ? translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
+                ? translations.fieldRequired ||
+                  "Αυτό το πεδίο είναι υποχρεωτικό"
                 : ""
             }
             sx={{
@@ -1089,17 +1112,19 @@ const WindowReplacementTabContent = ({
             label={translations.netPresentValue || "Καθαρή παρούσα αξία (€)"}
             type="text"
             value={
-              calculatedResults.net_present_value !== undefined && calculatedResults.net_present_value !== null
+              calculatedResults.net_present_value !== undefined &&
+              calculatedResults.net_present_value !== null
                 ? calculatedResults.net_present_value.toLocaleString("el-GR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                  }) + ' €'
+                  }) + " €"
                 : ""
             }
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
-                color: calculatedResults.net_present_value >= 0 ? "green" : "red",
+                color:
+                  calculatedResults.net_present_value >= 0 ? "green" : "red",
                 fontWeight: "bold",
               },
               "& .MuiOutlinedInput-root": {
@@ -1125,16 +1150,20 @@ const WindowReplacementTabContent = ({
             label={translations.paybackPeriod || "Περίοδος Αποπληρωμής (έτη)"}
             type="text"
             value={
-              calculatedResults.payback_period !== undefined && calculatedResults.payback_period !== null
-                ? (calculatedResults.payback_period > 0
-                    ? calculatedResults.payback_period.toFixed(1) + ' έτη'
-                    : 'Δεν αποπληρώνεται')
+              calculatedResults.payback_period !== undefined &&
+              calculatedResults.payback_period !== null
+                ? calculatedResults.payback_period > 0
+                  ? calculatedResults.payback_period.toFixed(1) + " έτη"
+                  : "Δεν αποπληρώνεται"
                 : ""
             }
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
-                color: calculatedResults.payback_period > 0 ? "var(--color-primary)" : "red",
+                color:
+                  calculatedResults.payback_period > 0
+                    ? "var(--color-primary)"
+                    : "red",
                 fontWeight: "bold",
               },
               "& .MuiOutlinedInput-root": {
@@ -1160,16 +1189,20 @@ const WindowReplacementTabContent = ({
             label={translations.irr || "Εσωτερικός Βαθμός Απόδοσης (%)"}
             type="text"
             value={
-              calculatedResults.internal_rate_of_return !== undefined && calculatedResults.internal_rate_of_return !== null
-                ? (calculatedResults.internal_rate_of_return > 0
-                    ? calculatedResults.internal_rate_of_return.toFixed(2) + '%'
-                    : 'Μη κερδοφόρα επένδυση')
+              calculatedResults.internal_rate_of_return !== undefined &&
+              calculatedResults.internal_rate_of_return !== null
+                ? calculatedResults.internal_rate_of_return > 0
+                  ? calculatedResults.internal_rate_of_return.toFixed(2) + "%"
+                  : "Μη κερδοφόρα επένδυση"
                 : ""
             }
             InputProps={{ readOnly: true }}
             sx={{
               "& .MuiInputBase-input": {
-                color: calculatedResults.internal_rate_of_return > 0 ? "var(--color-primary)" : "red",
+                color:
+                  calculatedResults.internal_rate_of_return > 0
+                    ? "var(--color-primary)"
+                    : "red",
                 fontWeight: "bold",
               },
               "& .MuiOutlinedInput-root": {

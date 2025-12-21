@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import $ from "jquery";
 import { useLanguage } from "../context/LanguageContext";
 import english_text from "../languages/english.json";
 import greek_text from "../languages/greek.json";
 import InputEntryModal from "../modals/shared/InputEntryModal";
+import API_BASE_URL from "../config/api.js";
 import {
   FaUser,
   FaLock,

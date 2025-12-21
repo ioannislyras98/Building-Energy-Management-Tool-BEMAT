@@ -44,14 +44,15 @@ const ScenariosTabContent = ({
   scenarioId,
 }) => {
   const navigate = useNavigate();
-  const { projectUuid: paramProjectUuid, buildingUuid: paramBuildingUuid } = useParams();
+  const { projectUuid: paramProjectUuid, buildingUuid: paramBuildingUuid } =
+    useParams();
   const [selectedScenario, setSelectedScenario] = useState(scenarioId || null);
   const { language } = useLanguage();
   const translations =
     language === "en"
       ? english_text.ScenariosTabContent || {}
       : greek_text.ScenariosTabContent || {};
-  
+
   // Update selected scenario when scenarioId prop changes
   useEffect(() => {
     setSelectedScenario(scenarioId || null);
@@ -137,8 +138,7 @@ const ScenariosTabContent = ({
     {
       id: "natural-gas-network",
       title:
-        translations.naturalGasNetwork ||
-        "Εγκατάσταση δικτύου φυσικού αερίου",
+        translations.naturalGasNetwork || "Εγκατάσταση δικτύου φυσικού αερίου",
       description:
         translations.naturalGasNetworkDesc ||
         "Ανάλυση και υπολογισμός οφελών από την εγκατάσταση δικτύου φυσικού αερίου",
@@ -148,9 +148,7 @@ const ScenariosTabContent = ({
     },
     {
       id: "exterior-blinds",
-      title:
-        translations.exteriorBlinds ||
-        "Εγκατάσταση εξωτερικών περσίδων",
+      title: translations.exteriorBlinds || "Εγκατάσταση εξωτερικών περσίδων",
       description:
         translations.exteriorBlindsDesc ||
         "Ανάλυση και υπολογισμός οφελών από την εγκατάσταση εξωτερικών περσίδων",
@@ -172,9 +170,7 @@ const ScenariosTabContent = ({
     },
     {
       id: "boiler-replacement",
-      title:
-        translations.boilerReplacement ||
-        "Αντικατάσταση λέβητα",
+      title: translations.boilerReplacement || "Αντικατάσταση λέβητα",
       description:
         translations.boilerReplacementDesc ||
         "Ανάλυση και υπολογισμός οφελών από την αντικατάσταση λέβητα",
@@ -186,13 +182,17 @@ const ScenariosTabContent = ({
   const handleScenarioSelect = (scenarioId) => {
     const actualProjectUuid = projectUuid || paramProjectUuid;
     const actualBuildingUuid = buildingUuid || paramBuildingUuid;
-    navigate(`/projects/${actualProjectUuid}/buildings/${actualBuildingUuid}/scenarios/${scenarioId}`);
+    navigate(
+      `/projects/${actualProjectUuid}/buildings/${actualBuildingUuid}/scenarios/${scenarioId}`
+    );
   };
 
   const handleBackToScenarios = () => {
     const actualProjectUuid = projectUuid || paramProjectUuid;
     const actualBuildingUuid = buildingUuid || paramBuildingUuid;
-    navigate(`/projects/${actualProjectUuid}/buildings/${actualBuildingUuid}/scenarios`);
+    navigate(
+      `/projects/${actualProjectUuid}/buildings/${actualBuildingUuid}/scenarios`
+    );
   };
   if (selectedScenario) {
     if (selectedScenario === "thermal-insulation") {
@@ -593,14 +593,14 @@ const ScenariosTabContent = ({
                     boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
                   },
                 }}>
-                <CardContent 
+                <CardContent
                   className="p-6 flex-grow flex flex-col"
-                  sx={{ 
-                    flexGrow: 1, 
-                    display: "flex", 
+                  sx={{
+                    flexGrow: 1,
+                    display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-between",
-                    "&:last-child": { paddingBottom: "24px" }
+                    "&:last-child": { paddingBottom: "24px" },
                   }}>
                   <div className="flex flex-col flex-grow">
                     {/* Icon Section - Fixed Height */}
@@ -609,37 +609,41 @@ const ScenariosTabContent = ({
                         {scenario.icon}
                       </div>
                     </div>
-                    
+
                     {/* Title Section - Flexible Height with minimum */}
                     <div className="mb-3 flex items-center justify-center">
-                      <Typography 
-                        variant="h6" 
+                      <Typography
+                        variant="h6"
                         className="font-bold text-center"
-                        sx={{ 
+                        sx={{
                           fontSize: { xs: "1rem", sm: "1.05rem", md: "1.1rem" },
                           lineHeight: "1.3",
                           minHeight: { xs: "auto", md: "64px" },
                           display: "flex",
-                          alignItems: "center"
+                          alignItems: "center",
                         }}>
                         {scenario.title}
                       </Typography>
                     </div>
-                    
+
                     {/* Description Section - Flexible Height */}
                     <div className="flex-grow mb-4">
-                      <Typography 
-                        variant="body2" 
+                      <Typography
+                        variant="body2"
                         className="opacity-90 text-center"
                         sx={{
-                          fontSize: { xs: "0.8rem", sm: "0.85rem", md: "0.875rem" },
-                          lineHeight: "1.5"
+                          fontSize: {
+                            xs: "0.8rem",
+                            sm: "0.85rem",
+                            md: "0.875rem",
+                          },
+                          lineHeight: "1.5",
                         }}>
                         {scenario.description}
                       </Typography>
                     </div>
                   </div>
-                  
+
                   {/* Button Section - Always at Bottom */}
                   <div className="pt-4 border-t border-white/20">
                     <Button

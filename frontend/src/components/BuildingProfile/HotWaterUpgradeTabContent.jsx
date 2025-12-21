@@ -127,16 +127,19 @@ const HotWaterUpgradeTabContent = ({
             discount_rate: data.discount_rate || 5,
             annual_operating_expenses: data.annual_operating_expenses || "",
           });
-          
+
           // Update calculated results with values from backend
           setCalculatedResults({
             solar_collectors_subtotal: data.solar_collectors_subtotal || 0,
-            metal_support_bases_subtotal: data.metal_support_bases_subtotal || 0,
+            metal_support_bases_subtotal:
+              data.metal_support_bases_subtotal || 0,
             solar_system_subtotal: data.solar_system_subtotal || 0,
             insulated_pipes_subtotal: data.insulated_pipes_subtotal || 0,
-            central_heater_installation_subtotal: data.central_heater_installation_subtotal || 0,
+            central_heater_installation_subtotal:
+              data.central_heater_installation_subtotal || 0,
             total_investment_cost: data.total_investment_cost || 0,
-            annual_energy_consumption_kwh: data.annual_energy_consumption_kwh || 0,
+            annual_energy_consumption_kwh:
+              data.annual_energy_consumption_kwh || 0,
             annual_solar_savings_kwh: data.annual_solar_savings_kwh || 0,
             annual_economic_benefit: data.annual_economic_benefit || 0,
             payback_period: data.payback_period || 0,
