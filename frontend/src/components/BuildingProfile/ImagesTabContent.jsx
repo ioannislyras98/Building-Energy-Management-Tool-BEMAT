@@ -107,7 +107,9 @@ const ImagesTabContent = ({
 
   const handleImageUpdated = (updatedImage) => {
     setImages((prevImages) =>
-      prevImages.map((img) => (img.uuid === updatedImage.uuid ? updatedImage : img))
+      prevImages.map((img) =>
+        img.uuid === updatedImage.uuid ? updatedImage : img
+      )
     );
     setError(null);
   };
