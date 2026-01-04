@@ -11,28 +11,25 @@ class Command(BaseCommand):
             action='store_true',
             help='Update existing materials if thermal conductivity differs',
         )
+        parser.add_argument(
+            '--clean',
+            action='store_true',
+            help='Delete materials not in the current list',
+        )
 
     def handle(self, *args, **options):
         self.stdout.write('Loading materials data...')
 
         materials_data = [
-            # Ξυλεία (Wood)
-            {'name': 'Ερυθρά Ξυλεία', 'category': 'wood', 'thermal_conductivity': 0.11},
-            {'name': 'Λευκή Ξυλεία', 'category': 'wood', 'thermal_conductivity': 0.12},
-            {'name': 'Βελανιδιά - Οξυά', 'category': 'wood', 'thermal_conductivity': 0.18},
-            
             # Τοιχοποιία (Masonry)
             {'name': 'Τούβλο', 'category': 'masonry', 'thermal_conductivity': 0.727},
             {'name': 'Γυψοσανίδα', 'category': 'masonry', 'thermal_conductivity': 0.42},
             {'name': 'Πέτρα', 'category': 'masonry', 'thermal_conductivity': 0.87},
             
             # Σκυρόδεμα (Concrete)
-            {'name': 'Οπλισμένο Σκυρόδεμα', 'category': 'concrete', 'thermal_conductivity': 2.10},
             {'name': 'Οπλισματό Σκυρόδεμα', 'category': 'concrete', 'thermal_conductivity': 1.731},
             {'name': 'Απλό Σκυρόδεμα', 'category': 'concrete', 'thermal_conductivity': 2.10},
-            {'name': 'Σκυρόδεμα ελαφρώς οπλισμένο', 'category': 'concrete', 'thermal_conductivity': 1.80},
-            {'name': 'Γαρμπιλοσκυρόδεμα', 'category': 'concrete', 'thermal_conductivity': 1.50},
-            {'name': 'Τσιμεντοκονίαμα', 'category': 'concrete', 'thermal_conductivity': 1.40},
+            {'name': 'Γαρμπιλοσκυρόδεμα', 'category': 'concrete', 'thermal_conductivity': 0.64},
             
             # Επιχρίσματα (Plaster)
             {'name': 'Ασβεστοκονίαμα', 'category': 'plaster', 'thermal_conductivity': 0.87},
@@ -44,8 +41,6 @@ class Command(BaseCommand):
             {'name': 'Πετροβάμβακας', 'category': 'insulation', 'thermal_conductivity': 0.044},
             {'name': 'Διογκωμένη Πολυστερίνη', 'category': 'insulation', 'thermal_conductivity': 0.035},
             {'name': 'Εξηλασμένη Πολυστερίνη', 'category': 'insulation', 'thermal_conductivity': 0.033},
-            {'name': 'Ορυκτοβάμβακας', 'category': 'insulation', 'thermal_conductivity': 0.035},
-            {'name': 'Οικοδομική Μόνωση', 'category': 'insulation', 'thermal_conductivity': 0.035},
             
             # Πετρώματα (Stone)
             {'name': 'Γρανίτης', 'category': 'stone', 'thermal_conductivity': 3.50},
@@ -61,16 +56,16 @@ class Command(BaseCommand):
             {'name': 'Άσφαλτος', 'category': 'flooring', 'thermal_conductivity': 0.74},
             
             # Γυαλί (Glass)
-            {'name': 'Υαλοπίνακας', 'category': 'glass', 'thermal_conductivity': 1.00},
             {'name': 'Γυαλί', 'category': 'glass', 'thermal_conductivity': 1.00},
             
             # Υλικά Οροφής (Roof)
-            {'name': 'Κεραμίδια', 'category': 'roof', 'thermal_conductivity': 1.00},
+            {'name': 'Κεραμίδια', 'category': 'roof', 'thermal_conductivity': 0.7},
         ]
 
         created_count = 0
         updated_count = 0
         skipped_count = 0
+        deleted_count = 0
 
         for material_data in materials_data:
             try:
@@ -103,8 +98,30 @@ class Command(BaseCommand):
                     self.style.ERROR(f'Error processing {material_data["name"]}: {str(e)}')
                 )
 
+        # Διαγραφή υλικών που δεν υπάρχουν στη λίστα
+        if options['clean']:
+            valid_material_ids = set()
+            for material_data in materials_data:
+                try:
+                    material = Material.objects.get(
+                        name=material_data['name'],
+                        category=material_data['category']
+                    )
+                    valid_material_ids.add(material.uuid)
+                except Material.DoesNotExist:
+                    pass
+            
+            # Διαγραφή όσων δεν υπάρχουν
+            materials_to_delete = Material.objects.exclude(uuid__in=valid_material_ids)
+            deleted_count = materials_to_delete.count()
+            for material in materials_to_delete:
+                self.stdout.write(f'Deleting: {material.name}')
+                material.delete()
+
+        result_message = f'Materials loading completed: {created_count} created, {updated_count} updated, {skipped_count} skipped'
+        if options['clean']:
+            result_message += f', {deleted_count} deleted'
+        
         self.stdout.write(
-            self.style.SUCCESS(
-                f'Materials loading completed: {created_count} created, {updated_count} updated, {skipped_count} skipped'
-            )
+            self.style.SUCCESS(result_message)
         )

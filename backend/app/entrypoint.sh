@@ -20,7 +20,7 @@ echo "Loading initial prefectures data..."
 python manage.py populate_prefectures
 
 echo "Loading initial materials data..."
-python manage.py load_materials
+python manage.py load_materials --update --clean
 
 echo "Loading initial numeric values..."
 python manage.py create_numeric_values

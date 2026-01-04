@@ -27,7 +27,7 @@ echo "Loading initial prefectures data..."
 python manage.py populate_prefectures || echo "⚠️  Prefectures already loaded or command not found"
 
 echo "Loading initial materials data..."
-python manage.py load_materials || echo "⚠️  Materials already loaded or command not found"
+python manage.py load_materials --update --clean || echo "⚠️  Materials loading failed or command not found"
 
 echo "Loading initial numeric values..."
 python manage.py create_numeric_values || echo "⚠️  Numeric values already loaded or command not found"
