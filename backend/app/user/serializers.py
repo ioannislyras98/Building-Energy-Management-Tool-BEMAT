@@ -6,6 +6,9 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
+from .validators import validate_password_with_translation
 import logging
 
 logger = logging.getLogger(__name__)
@@ -23,6 +26,19 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'date_joined': {'read_only': True},
         }
+    
+    def validate_password(self, value):
+        """Validate password using custom translator with Django validators"""
+        # Get language from request headers
+        language = 'en'
+        if self.context and 'request' in self.context:
+            language = self.context['request'].headers.get('X-Language', 'en')
+        
+        try:
+            validate_password_with_translation(value, language=language)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError(e.messages)
+        return value
     
     def create(self, validated_data):
         logger.debug(f"Creating new user with email: {validated_data.get('email')}")

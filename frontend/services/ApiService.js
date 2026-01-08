@@ -623,7 +623,7 @@ export async function login(email, password) {
   }
 }
 
-export async function signup(userData) {
+export async function signup(userData, language = 'en') {
   try {
     const response = await axios.post(
       `${API_BASE_URL}/users/signup/`,
@@ -631,6 +631,7 @@ export async function signup(userData) {
       {
         headers: {
           "Content-Type": "application/json",
+          "X-Language": language,
         },
       }
     );

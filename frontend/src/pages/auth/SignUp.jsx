@@ -11,27 +11,34 @@ import { signup } from "../../../services/ApiService";
 
 const cookies = new Cookies(null, { path: "/" });
 
-async function submitData(event, params, setErrorMsg) {
+async function submitData(event, params, setErrorMsg, language = 'en') {
   event.preventDefault();
   setErrorMsg(false);
 
   const firstName = event.currentTarget.querySelector("#name").value.trim();
   const lastName = event.currentTarget.querySelector("#surname").value.trim();
+  const password = event.currentTarget.querySelector("#password").value;
+  const confirmPassword = event.currentTarget.querySelector("#confirm-password").value;
 
   if (!firstName || !lastName) {
     setErrorMsg(params.errorNameRequired);
     return;
   }
 
+  if (password !== confirmPassword) {
+    setErrorMsg(params.passwords_not_match);
+    return;
+  }
+
   const payload = {
     email: event.currentTarget.querySelector("#email").value,
-    password: event.currentTarget.querySelector("#password").value,
+    password: password,
     first_name: firstName,
     last_name: lastName,
   };
 
   try {
-    const response = await signup(payload);
+    const response = await signup(payload, language);
     console.log("Signup successful:", response);
     cookies.set("token", response.token, {
       path: "/",
@@ -41,17 +48,29 @@ async function submitData(event, params, setErrorMsg) {
   } catch (error) {
     console.error("Signup error:", error);
     if (error.response?.status === 400) {
-      const backendError =
-        error.response?.data?.error || error.response?.data?.email?.[0];
-      if (
-        backendError &&
-        (backendError.includes("already exists") ||
-          backendError.includes("user with this email") ||
-          backendError.includes("This field must be unique"))
-      ) {
-        setErrorMsg(params.errorMessage);
+      const data = error.response?.data;
+      
+      // Check for password validation errors
+      if (data?.password) {
+        const passwordErrors = data.password;
+        if (Array.isArray(passwordErrors) && passwordErrors.length > 0) {
+          setErrorMsg(passwordErrors[0]);
+        } else {
+          setErrorMsg(data?.password || params.errorMessage);
+        }
       } else {
-        setErrorMsg(backendError || params.errorMessage);
+        const backendError =
+          data?.error || data?.email?.[0] || data?.non_field_errors?.[0];
+        if (
+          backendError &&
+          (backendError.includes("already exists") ||
+            backendError.includes("user with this email") ||
+            backendError.includes("This field must be unique"))
+        ) {
+          setErrorMsg(params.errorMessage);
+        } else {
+          setErrorMsg(backendError || params.errorMessage);
+        }
       }
     } else {
       setErrorMsg(params.errorGeneral);
@@ -60,6 +79,7 @@ async function submitData(event, params, setErrorMsg) {
 }
 
 function SignUpForm({ params }) {
+  const { language } = useLanguage();
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -76,7 +96,7 @@ function SignUpForm({ params }) {
     <div id="form-container" className="">
       <form
         id="register-form"
-        onSubmit={(event) => submitData(event, params, setErrorMsg)}>
+        onSubmit={(event) => submitData(event, params, setErrorMsg, language)}>
         <div>
           <div className="logo-img"></div>
           <h2 className="register-title">{params.h2}</h2>
