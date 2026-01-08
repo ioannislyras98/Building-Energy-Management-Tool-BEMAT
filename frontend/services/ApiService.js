@@ -623,7 +623,7 @@ export async function login(email, password) {
   }
 }
 
-export async function signup(userData, language = 'en') {
+export async function signup(userData, language = "en") {
   try {
     const response = await axios.post(
       `${API_BASE_URL}/users/signup/`,
@@ -749,7 +749,6 @@ export async function deleteMaterial(materialId) {
     throw error;
   }
 }
-
 
 export async function getNumericValues() {
   try {

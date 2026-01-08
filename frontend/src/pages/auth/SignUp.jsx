@@ -11,14 +11,15 @@ import { signup } from "../../../services/ApiService";
 
 const cookies = new Cookies(null, { path: "/" });
 
-async function submitData(event, params, setErrorMsg, language = 'en') {
+async function submitData(event, params, setErrorMsg, language = "en") {
   event.preventDefault();
   setErrorMsg(false);
 
   const firstName = event.currentTarget.querySelector("#name").value.trim();
   const lastName = event.currentTarget.querySelector("#surname").value.trim();
   const password = event.currentTarget.querySelector("#password").value;
-  const confirmPassword = event.currentTarget.querySelector("#confirm-password").value;
+  const confirmPassword =
+    event.currentTarget.querySelector("#confirm-password").value;
 
   if (!firstName || !lastName) {
     setErrorMsg(params.errorNameRequired);
@@ -49,7 +50,7 @@ async function submitData(event, params, setErrorMsg, language = 'en') {
     console.error("Signup error:", error);
     if (error.response?.status === 400) {
       const data = error.response?.data;
-      
+
       // Check for password validation errors
       if (data?.password) {
         const passwordErrors = data.password;
