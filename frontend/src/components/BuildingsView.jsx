@@ -29,7 +29,6 @@ const BuildingsView = ({
     if (selectedProject && selectedProject.uuid && buildingUuid) {
       navigate(`/projects/${selectedProject.uuid}/buildings/${buildingUuid}`);
     } else {
-
     }
   };
 
@@ -56,7 +55,9 @@ const BuildingsView = ({
                 className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
                 aria-label={params.backToProjects}>
                 <MdArrowBack className="mr-1 sm:mr-2" size={16} />
-                <span className="hidden sm:inline">{params.backToProjects}</span>
+                <span className="hidden sm:inline">
+                  {params.backToProjects}
+                </span>
                 <span className="sm:hidden">Back</span>
               </button>
               <div className="flex flex-col">
@@ -100,9 +101,9 @@ const BuildingsView = ({
                 }>
                 <MdSend size={16} className="sm:mr-2" />
                 <span className="hidden sm:inline">
-                {selectedProject?.is_submitted
-                  ? progressTranslations?.projectSubmitted || "Submitted"
-                  : progressTranslations?.submitProject || "Submit"}
+                  {selectedProject?.is_submitted
+                    ? progressTranslations?.projectSubmitted || "Submitted"
+                    : progressTranslations?.submitProject || "Submit"}
                 </span>
               </button>
 

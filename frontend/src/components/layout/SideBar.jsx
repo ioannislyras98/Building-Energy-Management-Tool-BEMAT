@@ -289,13 +289,14 @@ export default function Sidenav() {
         <div className="pt-3 lg:inline-flex mt-auto">
           <div className="flex-1" />
           <div className="px-3 py-2 justify-end">
-            <button onClick={() => {
-              if (sidebarExpanded) {
-                handleSidebarCollapse();
-              } else {
-                setSidebarExpanded(true);
-              }
-            }}>
+            <button
+              onClick={() => {
+                if (sidebarExpanded) {
+                  handleSidebarCollapse();
+                } else {
+                  setSidebarExpanded(true);
+                }
+              }}>
               <FaArrowRight
                 className={`${
                   !sidebarExpanded ? "rotate-0" : "rotate-180"

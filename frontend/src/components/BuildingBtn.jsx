@@ -70,7 +70,7 @@ export default function BuildingBtn({
       if (refreshProjects) {
         refreshProjects();
       }
-    }, 120000); 
+    }, 120000);
 
     return () => clearInterval(interval);
   }, [uuid, refreshProjects]);

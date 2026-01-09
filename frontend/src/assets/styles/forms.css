@@ -97,7 +97,10 @@ select option {
 }
 
 /* Override any system color-scheme preferences for form elements */
-input, select, textarea, option {
+input,
+select,
+textarea,
+option {
   color-scheme: light !important;
   -webkit-appearance: none;
   -moz-appearance: none;

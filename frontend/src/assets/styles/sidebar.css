@@ -8,7 +8,7 @@
   #sidebar {
     @apply -translate-x-full;
   }
-  
+
   #sidebar.sidebar-expanded {
     @apply translate-x-0 w-64;
   }
