@@ -212,9 +212,39 @@ const RoofThermalInsulationMaterialModal = ({
       },
       data: JSON.stringify(submitData),
       success: (data) => {
-        setLoading(false);
-        onSubmitSuccess(data);
-        handleClose();
+        // Αν δημιουργείται παλιό υλικό (όχι επεξεργασία), δημιουργούμε αυτόματα και αντίστοιχο νέο υλικό με κόστος 0
+        if (!editItem && materialType === "old") {
+          const newMaterialData = {
+            ...submitData,
+            material_type: "new",
+            cost: 0,
+          };
+
+          $.ajax({
+            url: `${API_BASE_URL}/roof_thermal_insulations/${roofThermalInsulationUuid}/materials/add/`,
+            method: "POST",
+            headers: {
+              Authorization: `Token ${token}`,
+              "Content-Type": "application/json",
+            },
+            data: JSON.stringify(newMaterialData),
+            success: () => {
+              setLoading(false);
+              onSubmitSuccess(data);
+              handleClose();
+            },
+            error: () => {
+              // Ακόμα και αν αποτύχει η δημιουργία του νέου υλικού, συνεχίζουμε κανονικά
+              setLoading(false);
+              onSubmitSuccess(data);
+              handleClose();
+            },
+          });
+        } else {
+          setLoading(false);
+          onSubmitSuccess(data);
+          handleClose();
+        }
       },
       error: (jqXHR) => {
 

@@ -192,12 +192,45 @@ const ThermalInsulationMaterialModal = ({
       },
       data: JSON.stringify(formData),
       success: (data) => {
+        // Αν δημιουργείται παλιό υλικό (όχι επεξεργασία), δημιουργούμε αυτόματα και αντίστοιχο νέο υλικό με κόστος 0
+        if (!editItem && materialType === "old") {
+          const newMaterialData = {
+            ...formData,
+            material_type: "new",
+            cost: 0,
+          };
 
-        setLoading(false);
-        if (onSubmitSuccess) {
-          onSubmitSuccess(data);
+          $.ajax({
+            url: `${API_BASE_URL}/thermal_insulations/${thermalInsulationUuid}/materials/add/`,
+            method: "POST",
+            headers: {
+              Authorization: `Token ${token}`,
+              "Content-Type": "application/json",
+            },
+            data: JSON.stringify(newMaterialData),
+            success: () => {
+              setLoading(false);
+              if (onSubmitSuccess) {
+                onSubmitSuccess(data);
+              }
+              handleClose();
+            },
+            error: () => {
+              // Ακόμα και αν αποτύχει η δημιουργία του νέου υλικού, συνεχίζουμε κανονικά
+              setLoading(false);
+              if (onSubmitSuccess) {
+                onSubmitSuccess(data);
+              }
+              handleClose();
+            },
+          });
+        } else {
+          setLoading(false);
+          if (onSubmitSuccess) {
+            onSubmitSuccess(data);
+          }
+          handleClose();
         }
-        handleClose();
       },
       error: (jqXHR) => {
 
