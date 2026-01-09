@@ -16,8 +16,6 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { language } = useLanguage();
 
-
-
   const dialogText =
     language === "en"
       ? english_text.BuildingProfile

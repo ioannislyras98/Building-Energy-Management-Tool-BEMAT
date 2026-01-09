@@ -284,16 +284,12 @@ function BuildingModalForm({
 
     // Υποστήριξη και για editItem.data.uuid και για editItem.uuid
     const buildingUuidForUpdate = editItem?.data?.uuid || editItem?.uuid;
-    
+
     const url = isEdit
       ? `${API_BASE_URL}/buildings/update/${buildingUuidForUpdate}/`
       : `${API_BASE_URL}/buildings/create/`;
 
     const method = isEdit ? "PUT" : "POST";
-
-
-
-
 
     $.ajax({
       url: url,
@@ -378,10 +374,10 @@ function BuildingModalForm({
           {isEdit ? params.h2Edit || "Επεξεργασία Κτιρίου" : params.h2}
         </h2>
         <p className="text-sm text-gray-500 text-center mb-4 sticky top-8 bg-white z-10">
-          {params.requiredFieldsNote.split('*').map((part, index) => (
+          {params.requiredFieldsNote.split("*").map((part, index) => (
             <span key={index}>
               {part}
-              {index < params.requiredFieldsNote.split('*').length - 1 && (
+              {index < params.requiredFieldsNote.split("*").length - 1 && (
                 <span className="text-red-500">*</span>
               )}
             </span>
@@ -566,9 +562,13 @@ function BuildingModalForm({
                 onChange={handleChange}
                 example={params.energyClass_example}
                 error={showValidationErrors ? errors.energy_class : ""}
-                disabled={formData.is_certified === false || formData.is_certified === "false"}
+                disabled={
+                  formData.is_certified === false ||
+                  formData.is_certified === "false"
+                }
                 className={
-                  formData.is_certified === false || formData.is_certified === "false"
+                  formData.is_certified === false ||
+                  formData.is_certified === "false"
                     ? "bg-gray-100 cursor-not-allowed"
                     : errors.energy_class && showValidationErrors
                     ? "border-red-500 bg-red-50"
