@@ -263,6 +263,7 @@
       "name": "Building Name",
       "yearBuilt": "Year Built",
       "energyClass": "Energy Class",
+      "energyZone": "Energy Zone",
       "description": "Description",
       "examined_area": "Examined Area",
       "loading": "Loading..."

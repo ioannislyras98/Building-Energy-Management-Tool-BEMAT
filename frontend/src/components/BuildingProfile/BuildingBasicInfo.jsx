@@ -122,11 +122,11 @@ const BuildingBasicInfo = ({ building, params, onEdit, onDelete }) => {
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-500">
-                {params.energyClass}
+                {params.energyZone}
               </p>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-800 font-semibold">
-                  {building?.energy_class || "N/A"}
+                  {building?.energy_zone || "N/A"}
                 </p>
               </div>
             </div>

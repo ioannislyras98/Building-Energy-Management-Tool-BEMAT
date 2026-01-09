@@ -57,7 +57,8 @@ function BuildingModalForm({
   const token = cookies.get("token") || "";
   useEffect(() => {
     if (isEdit && editItem) {
-      const buildingData = editItem.data;
+      // Υποστήριξη και για editItem.data (από ProjectPage) και για απευθείας building object (από BuildingProfilePage)
+      const buildingData = editItem.data || editItem;
       setFormData({
         name: buildingData.name ?? "",
         usage: buildingData.usage ?? "",
@@ -281,8 +282,11 @@ function BuildingModalForm({
       }
     });
 
+    // Υποστήριξη και για editItem.data.uuid και για editItem.uuid
+    const buildingUuidForUpdate = editItem?.data?.uuid || editItem?.uuid;
+    
     const url = isEdit
-      ? `${API_BASE_URL}/buildings/update/${editItem.data.uuid}/`
+      ? `${API_BASE_URL}/buildings/update/${buildingUuidForUpdate}/`
       : `${API_BASE_URL}/buildings/create/`;
 
     const method = isEdit ? "PUT" : "POST";
@@ -302,7 +306,7 @@ function BuildingModalForm({
       data: JSON.stringify(buildingData),
       success: function (response) {
         const updatedBuilding = isEdit
-          ? { ...editItem, data: { ...editItem.data, ...buildingData } }
+          ? { ...buildingData, uuid: buildingUuidForUpdate }
           : { ...buildingData, uuid: response.uuid };
 
         onBuildingCreated(updatedBuilding);
@@ -562,8 +566,11 @@ function BuildingModalForm({
                 onChange={handleChange}
                 example={params.energyClass_example}
                 error={showValidationErrors ? errors.energy_class : ""}
+                disabled={formData.is_certified === false || formData.is_certified === "false"}
                 className={
-                  errors.energy_class && showValidationErrors
+                  formData.is_certified === false || formData.is_certified === "false"
+                    ? "bg-gray-100 cursor-not-allowed"
+                    : errors.energy_class && showValidationErrors
                     ? "border-red-500 bg-red-50"
                     : ""
                 }

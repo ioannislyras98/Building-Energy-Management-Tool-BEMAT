@@ -263,6 +263,7 @@
       "examined_area": "Εξεταζόμενη Επιφάνεια (m²)",
       "yearBuilt": "Έτος Κατασκευής",
       "energyClass": "Ενεργειακή Κλάση",
+      "energyZone": "Ενεργειακή Ζώνη",
       "loading": "Φόρτωση..."
     },
     "contactInfo": {
