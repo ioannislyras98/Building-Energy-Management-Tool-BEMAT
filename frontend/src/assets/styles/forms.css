@@ -12,7 +12,7 @@
 }
 
 #form-container {
-  @apply bg-neutral-100 px-6 text-gray-900 rounded-md w-96 h-auto;
+  @apply bg-neutral-100 px-4 sm:px-6 text-gray-900 rounded-md w-[90vw] sm:w-96 max-w-md h-auto;
 }
 
 #register-form,
@@ -197,8 +197,16 @@ textarea:focus {
 }
 
 .modal-content {
-  @apply relative bg-white rounded-lg shadow-xl max-w-md w-full max-h-full overflow-hidden;
-  min-width: 400px;
+  @apply relative bg-white rounded-lg shadow-xl w-full max-h-[90vh] overflow-hidden;
+  min-width: 280px;
+  max-width: min(400px, calc(100vw - 2rem));
+}
+
+@media (min-width: 640px) {
+  .modal-content {
+    min-width: 400px;
+    max-width: 500px;
+  }
 }
 
 .modal-header {

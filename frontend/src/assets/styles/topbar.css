@@ -2,18 +2,18 @@
   @apply bg-white border-primary-light shadow-sm shadow-primary fixed w-full top-0 start-0 border-b z-50;
 
   .topbar-items-container {
-    @apply flex flex-wrap items-center justify-between h-[60px];
+    @apply flex items-center justify-between h-[60px] px-2 sm:px-4;
 
     .logo {
-      @apply flex items-center space-x-3 rtl:space-x-reverse;
+      @apply flex items-center space-x-2 sm:space-x-3 rtl:space-x-reverse flex-shrink-0;
 
       span {
-        @apply self-center text-2xl font-semibold whitespace-nowrap text-primary;
+        @apply self-center text-xl sm:text-2xl font-semibold whitespace-nowrap text-primary;
       }
     }
 
     .nav-title {
-      @apply self-center font-normal leading-[15px] text-[20px];
+      @apply self-center font-normal leading-[15px] text-[16px] sm:text-[20px] hidden sm:block;
     }
 
     #logo-image {

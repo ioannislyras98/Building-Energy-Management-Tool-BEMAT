@@ -32,11 +32,25 @@ h1 {
 /* Default spacing for main content when sidebar is closed */
 .main-container,
 .admin-container {
-  @apply pl-20 pt-24 transition-all duration-200;
+  @apply pl-20 pt-20 pr-4 transition-all duration-200;
 }
 
 /* Responsive adjustments */
-@media (max-width: 1024px) {
+@media (max-width: 640px) {
+  .main-container,
+  .admin-container {
+    @apply pl-4 pr-4 pt-20;
+  }
+
+  .sidebar-open {
+    .main-container,
+    .admin-container {
+      @apply pl-4 pt-20;
+    }
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
   .main-container,
   .admin-container {
     @apply pl-6 pt-24;
@@ -50,8 +64,17 @@ h1 {
   }
 }
 
+@media (min-width: 1025px) {
+  .sidebar-open {
+    .main-container,
+    .admin-container {
+      @apply pl-60 pt-24;
+    }
+  }
+}
+
 h1.page-name {
-  @apply size-[3em] mt-[3vh] ml-[1vw] font-basic text-primary w-fit h-fit pb-14;
+  @apply text-2xl sm:text-3xl lg:text-[3em] mt-[2vh] sm:mt-[3vh] ml-[2vw] sm:ml-[1vw] font-basic text-primary w-fit h-fit pb-8 sm:pb-14;
 }
 
 /* Beautiful animations for BuildingProfilePage */

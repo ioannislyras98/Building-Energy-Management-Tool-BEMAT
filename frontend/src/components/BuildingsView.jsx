@@ -49,34 +49,35 @@ const BuildingsView = ({
     <div className="buildings-view">
       <div className="bg-white shadow-xl border-b border-gray-200 backdrop-blur-sm mb-6">
         <div className="p-4 md:p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6">
               <button
                 onClick={onBackClick}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+                className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
                 aria-label={params.backToProjects}>
-                <MdArrowBack className="mr-2" size={18} />
-                {params.backToProjects}
+                <MdArrowBack className="mr-1 sm:mr-2" size={16} />
+                <span className="hidden sm:inline">{params.backToProjects}</span>
+                <span className="sm:hidden">Back</span>
               </button>
               <div className="flex flex-col">
-                <span className="text-sm text-gray-500 font-medium tracking-wide uppercase">
+                <span className="text-xs sm:text-sm text-gray-500 font-medium tracking-wide uppercase">
                   {text?.projectLabel || "Project"}
                 </span>
                 <div className="relative">
-                  <h1 className="text-3xl font-bold text-gray-800 bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent drop-shadow-sm">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent drop-shadow-sm truncate max-w-[200px] sm:max-w-none">
                     {selectedProject.name}
                   </h1>
                 </div>
               </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={onUpdateProject}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+                className="inline-flex items-center px-2 py-1.5 sm:px-4 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
                 aria-label={params.update}>
-                <MdEdit size={18} className="mr-2" />
-                {params.update}
+                <MdEdit size={16} className="sm:mr-2" />
+                <span className="hidden sm:inline">{params.update}</span>
               </button>
 
               <button
@@ -97,18 +98,20 @@ const BuildingsView = ({
                     ? progressTranslations?.projectSubmitted || "Submitted"
                     : progressTranslations?.submitProject || "Submit Project"
                 }>
-                <MdSend size={18} className="mr-2" />
+                <MdSend size={16} className="sm:mr-2" />
+                <span className="hidden sm:inline">
                 {selectedProject?.is_submitted
                   ? progressTranslations?.projectSubmitted || "Submitted"
                   : progressTranslations?.submitProject || "Submit"}
+                </span>
               </button>
 
               <button
                 onClick={onDeleteProject}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-red-700 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+                className="inline-flex items-center px-2 py-1.5 sm:px-4 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-lg shadow-sm text-white bg-red-700 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
                 aria-label={params.delete}>
-                <MdDelete size={18} className="mr-2" />
-                {params.delete}
+                <MdDelete size={16} className="sm:mr-2" />
+                <span className="hidden sm:inline">{params.delete}</span>
               </button>
             </div>
           </div>

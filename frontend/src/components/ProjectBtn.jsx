@@ -38,7 +38,7 @@ export default function ProjectBtn({
     if (!completion_status) return null;
 
     return (
-      <div className="progress-info text-xs mt-1">
+      <div className="progress-info text-[10px] sm:text-xs mt-1">
         <div className="flex justify-between">
           <span className="text-primary">
             {translations?.systems || "Systems"}:{" "}
@@ -64,18 +64,18 @@ export default function ProjectBtn({
       <div className="project-icon !bg-primary">
         <BsBuildings className="p-icon !text-white" />
       </div>
-      <div className="info w-[180px]">
-        <div className="flex items-center justify-between">
-          <label className="poject-name opacity-80 font-bold text-primary">
+      <div className="info w-full">
+        <div className="flex items-center justify-between gap-2">
+          <label className="poject-name opacity-80 font-bold text-primary truncate text-sm sm:text-base">
             {name}
           </label>
           {getSubmissionIcon()}
         </div>
         <div className="project-details flex flex-col">
-          <span className="opacity-80 font-medium text-primary text-[13px]">
+          <span className="opacity-80 font-medium text-primary text-[11px] sm:text-[13px]">
             {params.buildings}: {buildings_count}
           </span>
-          <span className="opacity-80 font-extrabold text-primary text-[12px]">
+          <span className="opacity-80 font-extrabold text-primary text-[10px] sm:text-[12px]">
             {params.created}: {formatDate(date_created)}
           </span>
           {getProgressDisplay()}

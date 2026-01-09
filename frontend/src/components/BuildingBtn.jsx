@@ -91,7 +91,7 @@ export default function BuildingBtn({
     };
 
     return (
-      <div className="progress-info text-xs mt-1">
+      <div className="progress-info text-[10px] sm:text-xs mt-1">
         <div className="flex justify-between">
           <span className="text-primary">
             {translations?.systems || "Systems"}:{" "}
@@ -115,15 +115,15 @@ export default function BuildingBtn({
       <div className="project-icon !bg-primary">
         <BsBuilding className="p-icon !text-white" />
       </div>
-      <div className="info w-[180px]">
-        <label className="building-name opacity-80 font-bold text-primary">
+      <div className="info w-full">
+        <label className="building-name opacity-80 font-bold text-primary truncate text-sm sm:text-base block">
           {name}
         </label>
         <div className="building-details flex flex-col">
-          <span className="opacity-80 font-medium text-primary text-[13px]">
+          <span className="opacity-80 font-medium text-primary text-[11px] sm:text-[13px]">
             {params.usage}: {usage}
           </span>
-          <span className="opacity-80 font-extrabold text-primary text-[12px]">
+          <span className="opacity-80 font-extrabold text-primary text-[10px] sm:text-[12px]">
             {params.created}: {formatDate(date_created)}
           </span>
           {getProgressDisplay()}

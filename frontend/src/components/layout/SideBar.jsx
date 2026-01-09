@@ -17,6 +17,8 @@ import {
   FaBuilding,
   FaTools,
   FaCalculator,
+  FaBars,
+  FaTimes,
 } from "react-icons/fa";
 import { IoHome, IoFolderOpen, IoFolder } from "react-icons/io5";
 
@@ -95,15 +97,41 @@ export default function Sidenav() {
     }
   }, [sidebarExpanded]);
 
-  useEffect(() => {
-    if (!sidebarExpanded) {
-      setProjectsExpanded(false);
-      setAdminExpanded(false);
-    }
-  }, [sidebarExpanded]);
+  // Close dropdowns only when sidebar is manually collapsed (not when expanding)
+  const handleSidebarCollapse = () => {
+    setSidebarExpanded(false);
+    setProjectsExpanded(false);
+    setAdminExpanded(false);
+  };
 
   return (
     <>
+      {/* Mobile toggle button - visible only on small screens */}
+      <button
+        onClick={() => {
+          if (sidebarExpanded) {
+            handleSidebarCollapse();
+          } else {
+            setSidebarExpanded(true);
+          }
+        }}
+        className="fixed top-[70px] left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-primary-light sm:hidden"
+        aria-label="Toggle sidebar">
+        {sidebarExpanded ? (
+          <FaTimes className="text-primary text-xl" />
+        ) : (
+          <FaBars className="text-primary text-xl" />
+        )}
+      </button>
+
+      {/* Overlay for mobile when sidebar is open */}
+      {sidebarExpanded && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 sm:hidden"
+          onClick={handleSidebarCollapse}
+        />
+      )}
+
       <div
         id="sidebar"
         ref={sidebar}
@@ -126,7 +154,16 @@ export default function Sidenav() {
           {/* Projects Dropdown */}
           <div className="mt-4">
             <div
-              onClick={() => setProjectsExpanded(!projectsExpanded)}
+              onClick={() => {
+                if (!sidebarExpanded) {
+                  // If sidebar is collapsed, expand it and open projects
+                  setSidebarExpanded(true);
+                  setProjectsExpanded(true);
+                } else {
+                  // If sidebar is expanded, just toggle projects
+                  setProjectsExpanded(!projectsExpanded);
+                }
+              }}
               className="flex nav-link cursor-pointer hover:bg-gray-100 transition-colors duration-200 items-center">
               {projectsExpanded ? (
                 <IoFolderOpen className="sidebar-icon" />
@@ -187,7 +224,16 @@ export default function Sidenav() {
           {userInfo && (userInfo.is_superuser || userInfo.is_staff) && (
             <div className="mt-4">
               <div
-                onClick={() => setAdminExpanded(!adminExpanded)}
+                onClick={() => {
+                  if (!sidebarExpanded) {
+                    // If sidebar is collapsed, expand it and open admin panel
+                    setSidebarExpanded(true);
+                    setAdminExpanded(true);
+                  } else {
+                    // If sidebar is expanded, just toggle admin panel
+                    setAdminExpanded(!adminExpanded);
+                  }
+                }}
                 className="flex nav-link cursor-pointer hover:bg-primary/10 transition-colors duration-200 items-center">
                 <FaUserShield className="sidebar-icon text-primary text-lg" />
                 {sidebarExpanded && (
@@ -243,7 +289,13 @@ export default function Sidenav() {
         <div className="pt-3 lg:inline-flex mt-auto">
           <div className="flex-1" />
           <div className="px-3 py-2 justify-end">
-            <button onClick={() => setSidebarExpanded(!sidebarExpanded)}>
+            <button onClick={() => {
+              if (sidebarExpanded) {
+                handleSidebarCollapse();
+              } else {
+                setSidebarExpanded(true);
+              }
+            }}>
               <FaArrowRight
                 className={`${
                   !sidebarExpanded ? "rotate-0" : "rotate-180"
