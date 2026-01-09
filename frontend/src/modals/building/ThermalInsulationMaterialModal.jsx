@@ -105,7 +105,6 @@ const ThermalInsulationMaterialModal = ({
         setAvailableMaterials(response.data || []);
       },
       error: (jqXHR) => {
-
         setError(
           translations.errorLoadMaterials || "Σφάλμα κατά τη φόρτωση υλικών"
         );
@@ -233,7 +232,6 @@ const ThermalInsulationMaterialModal = ({
         }
       },
       error: (jqXHR) => {
-
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
