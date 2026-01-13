@@ -39,24 +39,24 @@ class OldAirConditioning(models.Model):
         super().save(*args, **kwargs)
 
     def calculate_consumption(self):
-        """Υπολογισμός κατανάλωσης ενέργειας"""
+        """Υπολογισμός κατανάλωσης ενέργειας σε Wh"""
         if self.btu_type and self.cop_percentage and self.eer_percentage:
             # Μετατροπή BTU σε Watts
             from numericValues.models import NumericValue
             btu_to_watts = NumericValue.get_value('Συντελεστής μετατροπής BTU σε Watts')
             watts = self.btu_type * btu_to_watts
             
-            # Υπολογισμός κατανάλωσης θέρμανσης
+            # Υπολογισμός κατανάλωσης θέρμανσης (COP = συντελεστής, όχι ποσοστό) - αποτέλεσμα σε Wh
             if self.cop_percentage > 0:
-                heating_power_consumption = watts / (self.cop_percentage / 100)
-                self.heating_consumption_kwh = (heating_power_consumption * self.heating_hours_per_year * self.quantity) / 1000
+                heating_power_consumption = watts / self.cop_percentage
+                self.heating_consumption_kwh = heating_power_consumption * self.heating_hours_per_year * self.quantity
             
-            # Υπολογισμός κατανάλωσης ψύξης
+            # Υπολογισμός κατανάλωσης ψύξης (EER = συντελεστής, όχι ποσοστό) - αποτέλεσμα σε Wh
             if self.eer_percentage > 0:
-                cooling_power_consumption = watts / (self.eer_percentage / 100)
-                self.cooling_consumption_kwh = (cooling_power_consumption * self.cooling_hours_per_year * self.quantity) / 1000
+                cooling_power_consumption = watts / self.eer_percentage
+                self.cooling_consumption_kwh = cooling_power_consumption * self.cooling_hours_per_year * self.quantity
             
-            # Συνολική κατανάλωση
+            # Συνολική κατανάλωση σε Wh
             self.total_consumption_kwh = self.heating_consumption_kwh + self.cooling_consumption_kwh
 
     def __str__(self):
@@ -103,24 +103,24 @@ class NewAirConditioning(models.Model):
         super().save(*args, **kwargs)
 
     def calculate_consumption(self):
-        """Υπολογισμός κατανάλωσης ενέργειας"""
+        """Υπολογισμός κατανάλωσης ενέργειας σε Wh"""
         if self.btu_type and self.cop_percentage and self.eer_percentage:
             # Μετατροπή BTU σε Watts
             from numericValues.models import NumericValue
             btu_to_watts = NumericValue.get_value('Συντελεστής μετατροπής BTU σε Watts')
             watts = self.btu_type * btu_to_watts
             
-            # Υπολογισμός κατανάλωσης θέρμανσης
+            # Υπολογισμός κατανάλωσης θέρμανσης (COP = συντελεστής, όχι ποσοστό) - αποτέλεσμα σε Wh
             if self.cop_percentage > 0:
-                heating_power_consumption = watts / (self.cop_percentage / 100)
-                self.heating_consumption_kwh = (heating_power_consumption * self.heating_hours_per_year * self.quantity) / 1000
+                heating_power_consumption = watts / self.cop_percentage
+                self.heating_consumption_kwh = heating_power_consumption * self.heating_hours_per_year * self.quantity
             
-            # Υπολογισμός κατανάλωσης ψύξης
+            # Υπολογισμός κατανάλωσης ψύξης (EER = συντελεστής, όχι ποσοστό) - αποτέλεσμα σε Wh
             if self.eer_percentage > 0:
-                cooling_power_consumption = watts / (self.eer_percentage / 100)
-                self.cooling_consumption_kwh = (cooling_power_consumption * self.cooling_hours_per_year * self.quantity) / 1000
+                cooling_power_consumption = watts / self.eer_percentage
+                self.cooling_consumption_kwh = cooling_power_consumption * self.cooling_hours_per_year * self.quantity
             
-            # Συνολική κατανάλωση
+            # Συνολική κατανάλωση σε Wh
             self.total_consumption_kwh = self.heating_consumption_kwh + self.cooling_consumption_kwh
 
     def calculate_cost(self):
@@ -191,8 +191,9 @@ class AirConditioningAnalysis(models.Model):
             self.energy_cost_kwh = float(self.project.cost_per_kwh_electricity or 0)
         
         # Υπολογισμός ετήσιας ενεργειακής εξοικονόμησης (μπορεί να είναι αρνητική)
+        # energy_savings_kwh είναι σε Wh, energy_cost_kwh είναι σε €/kWh, άρα διαιρούμε με 1000
         if self.energy_cost_kwh > 0:
-            self.annual_energy_savings = self.energy_savings_kwh * self.energy_cost_kwh
+            self.annual_energy_savings = (self.energy_savings_kwh / 1000) * self.energy_cost_kwh
         else:
             self.annual_energy_savings = 0
         

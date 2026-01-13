@@ -328,23 +328,23 @@ const AirConditioningReplacementTabContent = ({
     },
     {
       field: "cop_percentage",
-      headerName: translations.copPercentage || "COP (%)",
+      headerName: translations.copPercentage || "COP",
       flex: 0.8,
       minWidth: 100,
       renderCell: (params) => (
         <span className="font-medium">
-          {parseFloat(params.value || 0).toFixed(1)}%
+          {parseFloat(params.value || 0).toFixed(1)}
         </span>
       ),
     },
     {
       field: "eer_percentage",
-      headerName: translations.eerPercentage || "EER (%)",
+      headerName: translations.eerPercentage || "EER",
       flex: 0.8,
       minWidth: 100,
       renderCell: (params) => (
         <span className="font-medium">
-          {parseFloat(params.value || 0).toFixed(1)}%
+          {parseFloat(params.value || 0).toFixed(1)}
         </span>
       ),
     },
@@ -368,12 +368,12 @@ const AirConditioningReplacementTabContent = ({
     },
     {
       field: "total_consumption_kwh",
-      headerName: translations.totalConsumption || "Συνολική Κατανάλωση (kWh)",
+      headerName: translations.totalConsumption || "Συνολική Κατανάλωση (Wh)",
       flex: 1.2,
       minWidth: 150,
       renderCell: (params) => (
         <span className="font-medium text-primary">
-          {parseFloat(params.value || 0).toFixed(2)} kWh
+          {Math.round(parseFloat(params.value || 0)).toLocaleString('el-GR')} Wh
         </span>
       ),
     },
@@ -419,23 +419,23 @@ const AirConditioningReplacementTabContent = ({
     },
     {
       field: "cop_percentage",
-      headerName: translations.copPercentage || "COP (%)",
+      headerName: translations.copPercentage || "COP",
       flex: 0.8,
       minWidth: 100,
       renderCell: (params) => (
         <span className="font-medium">
-          {parseFloat(params.value || 0).toFixed(1)}%
+          {parseFloat(params.value || 0).toFixed(1)}
         </span>
       ),
     },
     {
       field: "eer_percentage",
-      headerName: translations.eerPercentage || "EER (%)",
+      headerName: translations.eerPercentage || "EER",
       flex: 0.8,
       minWidth: 100,
       renderCell: (params) => (
         <span className="font-medium">
-          {parseFloat(params.value || 0).toFixed(1)}%
+          {parseFloat(params.value || 0).toFixed(1)}
         </span>
       ),
     },
@@ -470,12 +470,12 @@ const AirConditioningReplacementTabContent = ({
     },
     {
       field: "total_consumption_kwh",
-      headerName: translations.totalConsumption || "Συνολική Κατανάλωση (kWh)",
+      headerName: translations.totalConsumption || "Συνολική Κατανάλωση (Wh)",
       flex: 1.2,
       minWidth: 150,
       renderCell: (params) => (
         <span className="font-medium text-primary">
-          {parseFloat(params.value || 0).toFixed(2)} kWh
+          {Math.round(parseFloat(params.value || 0)).toLocaleString('el-GR')} Wh
         </span>
       ),
     },
@@ -731,12 +731,12 @@ const AirConditioningReplacementTabContent = ({
                 fullWidth
                 label={
                   translations.totalOldConsumption ||
-                  "Συνολική παλαιά κατανάλωση (kWh)"
+                  "Συνολική παλαιά κατανάλωση (Wh)"
                 }
                 type="text"
                 value={
                   analysis?.total_old_consumption
-                    ? parseFloat(analysis.total_old_consumption).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                    ? Math.round(parseFloat(analysis.total_old_consumption)).toLocaleString('el-GR')
                     : ""
                 }
                 variant="outlined"
@@ -773,12 +773,12 @@ const AirConditioningReplacementTabContent = ({
                 fullWidth
                 label={
                   translations.totalNewConsumption ||
-                  "Συνολική νέα κατανάλωση (kWh)"
+                  "Συνολική νέα κατανάλωση (Wh)"
                 }
                 type="text"
                 value={
                   analysis?.total_new_consumption
-                    ? parseFloat(analysis.total_new_consumption).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                    ? Math.round(parseFloat(analysis.total_new_consumption)).toLocaleString('el-GR')
                     : ""
                 }
                 variant="outlined"
@@ -815,12 +815,12 @@ const AirConditioningReplacementTabContent = ({
                 fullWidth
                 label={
                   translations.energySavingsKwh ||
-                  "Ενεργειακή εξοικονόμηση (kWh)"
+                  "Ενεργειακή εξοικονόμηση (Wh)"
                 }
                 type="text"
                 value={
                   analysis?.energy_savings_kwh !== undefined && analysis?.energy_savings_kwh !== null
-                    ? parseFloat(analysis.energy_savings_kwh).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                    ? Math.round(parseFloat(analysis.energy_savings_kwh)).toLocaleString('el-GR')
                     : ""
                 }
                 variant="outlined"
@@ -1494,7 +1494,7 @@ const ACModal = ({
             {/* COP Percentage */}
             <div>
               <label htmlFor="cop_percentage" className="label-name">
-                {translations.copPercentage || "Απόδοση Θέρμανσης (COP) %"}
+                {translations.copPercentage || "Απόδοση Θέρμανσης (COP)"}
                 <span className="text-red-500 ml-1">*</span>
               </label>
               <input
@@ -1502,12 +1502,12 @@ const ACModal = ({
                 type="number"
                 step="0.1"
                 min="0"
-                max="1000"
+                max="10"
                 value={formData.cop_percentage}
                 onChange={(e) =>
                   handleInputChange("cop_percentage", e.target.value)
                 }
-                placeholder="π.χ. 350"
+                placeholder="π.χ. 3.5"
                 className={`input-field ${
                   validationErrors.cop_percentage ? "error-input" : ""
                 }`}
@@ -1523,7 +1523,7 @@ const ACModal = ({
             {/* EER Percentage */}
             <div>
               <label htmlFor="eer_percentage" className="label-name">
-                {translations.eerPercentage || "Απόδοση Ψύξης (EER) %"}
+                {translations.eerPercentage || "Απόδοση Ψύξης (EER)"}
                 <span className="text-red-500 ml-1">*</span>
               </label>
               <input
@@ -1531,12 +1531,12 @@ const ACModal = ({
                 type="number"
                 step="0.1"
                 min="0"
-                max="1000"
+                max="10"
                 value={formData.eer_percentage}
                 onChange={(e) =>
                   handleInputChange("eer_percentage", e.target.value)
                 }
-                placeholder="π.χ. 300"
+                placeholder="π.χ. 3.0"
                 className={`input-field ${
                   validationErrors.eer_percentage ? "error-input" : ""
                 }`}

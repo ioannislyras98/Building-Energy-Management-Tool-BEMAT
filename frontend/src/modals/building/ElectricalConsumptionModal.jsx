@@ -496,7 +496,7 @@ function ElectricalConsumptionModalForm({
             {/* Load Power */}
             <div className="mb-4">
               <InputEntryModal
-                entry={params.loadPower || "Ισχύς φορτίου (kW)"}
+                entry={params.loadPower || "Ισχύς φορτίου (W)"}
                 id="load_power"
                 type="number"
                 value={formData.load_power}

@@ -51,7 +51,7 @@ class HeatingSystem(models.Model):
         decimal_places=2,
         blank=True,
         null=True,
-        verbose_name='Ισχύς (kW)'
+        verbose_name='Ισχύς (W)'
     )
     construction_year = models.IntegerField(
         blank=True,
