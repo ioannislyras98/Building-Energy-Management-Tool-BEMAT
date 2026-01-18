@@ -272,6 +272,14 @@ const NaturalGasNetworkTabContent = ({
       ...prev,
       [field]: value,
     }));
+
+    // Clear validation error when user enters a value
+    if (validationErrors[field]) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        [field]: false,
+      }));
+    }
   };
 
   const calculateResults = useCallback(() => {

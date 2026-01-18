@@ -196,6 +196,14 @@ const AutomaticLightingControlTabContent = ({
       ...prev,
       [field]: value,
     }));
+
+    // Clear validation error when user enters a value
+    if (validationErrors[field]) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        [field]: false,
+      }));
+    }
   };
 
   const handleSave = async (showMessage = true) => {

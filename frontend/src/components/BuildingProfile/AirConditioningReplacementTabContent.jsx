@@ -123,9 +123,7 @@ const AirConditioningReplacementTabContent = ({
           discount_rate: analysisResponse.data.discount_rate || "5",
         });
       }
-    } catch (error) {
-
-    }
+    } catch (error) {}
   };
 
   const handleOldACSubmit = async (formData) => {
@@ -166,7 +164,6 @@ const AirConditioningReplacementTabContent = ({
         fetchData();
       }
     } catch (error) {
-
       setError(error.responseJSON?.message || "Σφάλμα κατά την αποθήκευση");
       throw error;
     } finally {
@@ -220,7 +217,6 @@ const AirConditioningReplacementTabContent = ({
         fetchData();
       }
     } catch (error) {
-
       setError(error.responseJSON?.message || "Σφάλμα κατά την αποθήκευση");
       throw error;
     } finally {
@@ -305,13 +301,18 @@ const AirConditioningReplacementTabContent = ({
       }
 
       if (response.success) {
-        setSuccess(translations.analysisSaved || "Η ανάλυση ενημερώθηκε επιτυχώς");
+        setSuccess(
+          translations.analysisSaved || "Η ανάλυση ενημερώθηκε επιτυχώς"
+        );
         // Refresh all data to get updated calculations from backend
         await fetchData();
       }
     } catch (error) {
-
-      setError(error.responseJSON?.message || translations.saveError || "Σφάλμα κατά την αποθήκευση");
+      setError(
+        error.responseJSON?.message ||
+          translations.saveError ||
+          "Σφάλμα κατά την αποθήκευση"
+      );
     }
     setLoading(false);
   };
@@ -373,7 +374,7 @@ const AirConditioningReplacementTabContent = ({
       minWidth: 150,
       renderCell: (params) => (
         <span className="font-medium text-primary">
-          {Math.round(parseFloat(params.value || 0)).toLocaleString('el-GR')} Wh
+          {Math.round(parseFloat(params.value || 0)).toLocaleString("el-GR")} Wh
         </span>
       ),
     },
@@ -475,7 +476,7 @@ const AirConditioningReplacementTabContent = ({
       minWidth: 150,
       renderCell: (params) => (
         <span className="font-medium text-primary">
-          {Math.round(parseFloat(params.value || 0)).toLocaleString('el-GR')} Wh
+          {Math.round(parseFloat(params.value || 0)).toLocaleString("el-GR")} Wh
         </span>
       ),
     },
@@ -605,13 +606,15 @@ const AirConditioningReplacementTabContent = ({
           <Tab
             label={translations.newAirConditioningsTab || "Νέα Κλιματιστικά"}
           />
+          <Tab label={translations.energyDataTab || "Ενεργειακά Στοιχεία"} />
           <Tab
-            label={translations.energyDataTab || "Ενεργειακά Στοιχεία"}
+            label={
+              translations.evaluationParametersTab || "Παράμετροι Αξιολόγησης"
+            }
           />
           <Tab
-            label={translations.evaluationParametersTab || "Παράμετροι Αξιολόγησης"}
+            label={translations.economicAnalysisTab || "Οικονομική Ανάλυση"}
           />
-          <Tab label={translations.economicAnalysisTab || "Οικονομική Ανάλυση"} />
         </Tabs>
 
         {/* Tab 1: Παλαιά Κλιματιστικά */}
@@ -720,7 +723,10 @@ const AirConditioningReplacementTabContent = ({
 
         {/* Tab 3: Ενεργειακά Στοιχεία */}
         <TabPanel value={tabValue} index={2}>
-          <Typography variant="h6" gutterBottom className="font-semibold text-green-700 mb-4">
+          <Typography
+            variant="h6"
+            gutterBottom
+            className="font-semibold text-green-700 mb-4">
             {translations.energyData || "Ενεργειακά Στοιχεία"}
           </Typography>
 
@@ -736,7 +742,9 @@ const AirConditioningReplacementTabContent = ({
                 type="text"
                 value={
                   analysis?.total_old_consumption
-                    ? Math.round(parseFloat(analysis.total_old_consumption)).toLocaleString('el-GR')
+                    ? Math.round(
+                        parseFloat(analysis.total_old_consumption)
+                      ).toLocaleString("el-GR")
                     : ""
                 }
                 variant="outlined"
@@ -778,7 +786,9 @@ const AirConditioningReplacementTabContent = ({
                 type="text"
                 value={
                   analysis?.total_new_consumption
-                    ? Math.round(parseFloat(analysis.total_new_consumption)).toLocaleString('el-GR')
+                    ? Math.round(
+                        parseFloat(analysis.total_new_consumption)
+                      ).toLocaleString("el-GR")
                     : ""
                 }
                 variant="outlined"
@@ -819,8 +829,11 @@ const AirConditioningReplacementTabContent = ({
                 }
                 type="text"
                 value={
-                  analysis?.energy_savings_kwh !== undefined && analysis?.energy_savings_kwh !== null
-                    ? Math.round(parseFloat(analysis.energy_savings_kwh)).toLocaleString('el-GR')
+                  analysis?.energy_savings_kwh !== undefined &&
+                  analysis?.energy_savings_kwh !== null
+                    ? Math.round(
+                        parseFloat(analysis.energy_savings_kwh)
+                      ).toLocaleString("el-GR")
                     : ""
                 }
                 variant="outlined"
@@ -831,7 +844,10 @@ const AirConditioningReplacementTabContent = ({
                 }
                 sx={{
                   "& .MuiInputBase-input": {
-                    color: analysis?.energy_savings_kwh >= 0 ? "var(--color-primary)" : "red",
+                    color:
+                      analysis?.energy_savings_kwh >= 0
+                        ? "var(--color-primary)"
+                        : "red",
                     fontWeight: "bold",
                   },
                   "& .MuiOutlinedInput-root": {
@@ -855,9 +871,7 @@ const AirConditioningReplacementTabContent = ({
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label={
-                  translations.energyCostKwh || "Κόστος ενέργειας (€/kWh)"
-                }
+                label={translations.energyCostKwh || "Κόστος ενέργειας (€/kWh)"}
                 type="text"
                 value={
                   analysis?.energy_cost_kwh
@@ -895,7 +909,10 @@ const AirConditioningReplacementTabContent = ({
 
         {/* Tab 4: Παράμετροι Αξιολόγησης */}
         <TabPanel value={tabValue} index={3}>
-          <Typography variant="h6" gutterBottom className="font-semibold text-primary mb-4">
+          <Typography
+            variant="h6"
+            gutterBottom
+            className="font-semibold text-primary mb-4">
             {translations.evaluationParameters || "Παράμετροι Αξιολόγησης"}
           </Typography>
 
@@ -904,7 +921,8 @@ const AirConditioningReplacementTabContent = ({
               <TextField
                 fullWidth
                 label={
-                  translations.lifespanYears || "Χρονικό διάστημα αξιολόγησης (έτη)"
+                  translations.lifespanYears ||
+                  "Χρονικό διάστημα αξιολόγησης (έτη)"
                 }
                 type="number"
                 value={analysisData.lifespan_years}
@@ -967,7 +985,10 @@ const AirConditioningReplacementTabContent = ({
 
         {/* Tab 5: Οικονομική Ανάλυση */}
         <TabPanel value={tabValue} index={4}>
-          <Typography variant="h6" gutterBottom className="font-semibold text-gray-800 mb-4">
+          <Typography
+            variant="h6"
+            gutterBottom
+            className="font-semibold text-gray-800 mb-4">
             {translations.economicAnalysisTab || "Οικονομική Ανάλυση"}
           </Typography>
 
@@ -983,7 +1004,10 @@ const AirConditioningReplacementTabContent = ({
                 type="text"
                 value={
                   analysis?.total_investment_cost
-                    ? parseFloat(analysis.total_investment_cost).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+                    ? parseFloat(analysis.total_investment_cost).toLocaleString(
+                        "el-GR",
+                        { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+                      ) + " €"
                     : ""
                 }
                 variant="outlined"
@@ -1024,8 +1048,12 @@ const AirConditioningReplacementTabContent = ({
                 }
                 type="text"
                 value={
-                  analysis?.annual_energy_savings !== undefined && analysis?.annual_energy_savings !== null
-                    ? parseFloat(analysis.annual_energy_savings).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+                  analysis?.annual_energy_savings !== undefined &&
+                  analysis?.annual_energy_savings !== null
+                    ? parseFloat(analysis.annual_energy_savings).toLocaleString(
+                        "el-GR",
+                        { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+                      ) + " €"
                     : ""
                 }
                 variant="outlined"
@@ -1036,7 +1064,8 @@ const AirConditioningReplacementTabContent = ({
                 }
                 sx={{
                   "& .MuiInputBase-input": {
-                    color: analysis?.annual_energy_savings >= 0 ? "green" : "red",
+                    color:
+                      analysis?.annual_energy_savings >= 0 ? "green" : "red",
                     fontWeight: "bold",
                   },
                   "& .MuiOutlinedInput-root": {
@@ -1066,8 +1095,14 @@ const AirConditioningReplacementTabContent = ({
                 }
                 type="text"
                 value={
-                  analysis?.annual_economic_benefit !== undefined && analysis?.annual_economic_benefit !== null
-                    ? parseFloat(analysis.annual_economic_benefit).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+                  analysis?.annual_economic_benefit !== undefined &&
+                  analysis?.annual_economic_benefit !== null
+                    ? parseFloat(
+                        analysis.annual_economic_benefit
+                      ).toLocaleString("el-GR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }) + " €"
                     : ""
                 }
                 variant="outlined"
@@ -1078,7 +1113,8 @@ const AirConditioningReplacementTabContent = ({
                 }
                 sx={{
                   "& .MuiInputBase-input": {
-                    color: analysis?.annual_economic_benefit >= 0 ? "green" : "red",
+                    color:
+                      analysis?.annual_economic_benefit >= 0 ? "green" : "red",
                     fontWeight: "bold",
                   },
                   "& .MuiOutlinedInput-root": {
@@ -1107,10 +1143,11 @@ const AirConditioningReplacementTabContent = ({
                 }
                 type="text"
                 value={
-                  analysis?.payback_period !== undefined && analysis?.payback_period !== null
-                    ? (parseFloat(analysis.payback_period) > 0
-                        ? parseFloat(analysis.payback_period).toFixed(1) + ' έτη'
-                        : 'Δεν αποπληρώνεται')
+                  analysis?.payback_period !== undefined &&
+                  analysis?.payback_period !== null
+                    ? parseFloat(analysis.payback_period) > 0
+                      ? parseFloat(analysis.payback_period).toFixed(1) + " έτη"
+                      : "Δεν αποπληρώνεται"
                     : ""
                 }
                 variant="outlined"
@@ -1121,7 +1158,10 @@ const AirConditioningReplacementTabContent = ({
                 }
                 sx={{
                   "& .MuiInputBase-input": {
-                    color: analysis?.payback_period > 0 ? "var(--color-primary)" : "red",
+                    color:
+                      analysis?.payback_period > 0
+                        ? "var(--color-primary)"
+                        : "red",
                     fontWeight: "bold",
                   },
                   "& .MuiOutlinedInput-root": {
@@ -1152,7 +1192,10 @@ const AirConditioningReplacementTabContent = ({
                 type="text"
                 value={
                   analysis?.net_present_value
-                    ? parseFloat(analysis.net_present_value).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+                    ? parseFloat(analysis.net_present_value).toLocaleString(
+                        "el-GR",
+                        { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+                      ) + " €"
                     : ""
                 }
                 variant="outlined"
@@ -1163,8 +1206,7 @@ const AirConditioningReplacementTabContent = ({
                 }
                 sx={{
                   "& .MuiInputBase-input": {
-                    color:
-                      analysis?.net_present_value >= 0 ? "green" : "red",
+                    color: analysis?.net_present_value >= 0 ? "green" : "red",
                     fontWeight: "bold",
                   },
                   "& .MuiOutlinedInput-root": {
@@ -1194,10 +1236,13 @@ const AirConditioningReplacementTabContent = ({
                 }
                 type="text"
                 value={
-                  analysis?.internal_rate_of_return !== undefined && analysis?.internal_rate_of_return !== null
-                    ? (parseFloat(analysis.internal_rate_of_return) > 0
-                        ? parseFloat(analysis.internal_rate_of_return).toFixed(2) + '%'
-                        : 'Μη κερδοφόρα επένδυση')
+                  analysis?.internal_rate_of_return !== undefined &&
+                  analysis?.internal_rate_of_return !== null
+                    ? parseFloat(analysis.internal_rate_of_return) > 0
+                      ? parseFloat(analysis.internal_rate_of_return).toFixed(
+                          2
+                        ) + "%"
+                      : "Μη κερδοφόρα επένδυση"
                     : ""
                 }
                 variant="outlined"
@@ -1207,7 +1252,10 @@ const AirConditioningReplacementTabContent = ({
                 }
                 sx={{
                   "& .MuiInputBase-input": {
-                    color: analysis?.internal_rate_of_return > 0 ? "var(--color-primary)" : "red",
+                    color:
+                      analysis?.internal_rate_of_return > 0
+                        ? "var(--color-primary)"
+                        : "red",
                     fontWeight: "bold",
                   },
                   "& .MuiOutlinedInput-root": {

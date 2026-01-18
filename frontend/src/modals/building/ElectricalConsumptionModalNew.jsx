@@ -195,9 +195,7 @@ function ElectricalConsumptionModalForm({
         const zones = Array.isArray(response.data) ? response.data : [];
         setThermalZones(zones);
       },
-      error: (jqXHR) => {
-
-      },
+      error: (jqXHR) => {},
     });
   };
 
@@ -214,9 +212,7 @@ function ElectricalConsumptionModalForm({
         const consumptions = Array.isArray(response) ? response : [];
         setEnergyConsumptions(consumptions);
       },
-      error: (jqXHR) => {
-
-      },
+      error: (jqXHR) => {},
     });
   };
 
@@ -295,7 +291,6 @@ function ElectricalConsumptionModalForm({
         "Content-Type": "application/json",
       },
       success: (response) => {
-
         setLoading(false);
         resetForm();
         onClose();
@@ -304,7 +299,6 @@ function ElectricalConsumptionModalForm({
         }
       },
       error: (jqXHR) => {
-
         setErrors({
           general:
             jqXHR.responseJSON?.detail ||

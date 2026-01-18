@@ -850,8 +850,8 @@ const HotWaterUpgradeTabContent = ({
             label={
               <>
                 {translations.electricHeaterPower ||
-                  "Ηλεκτρικός θερμοσίφωνας, ισχύς"}{" "}
-                (W) <span style={{ color: "red" }}>*</span>
+                  "Ηλεκτρικός θερμοσίφωνας, ισχύς (W)"}{" "}
+                <span style={{ color: "red" }}>*</span>
               </>
             }
             type="number"
@@ -920,8 +920,8 @@ const HotWaterUpgradeTabContent = ({
             label={
               <>
                 {translations.solarUtilizationPercentage ||
-                  "Ποσοστό αξιοποίησης ηλιακού θερμοσίφωνα"}{" "}
-                (%) <span style={{ color: "red" }}>*</span>
+                  "Ποσοστό αξιοποίησης ηλιακού θερμοσίφωνα (%)"}{" "}
+                <span style={{ color: "red" }}>*</span>
               </>
             }
             type="number"
@@ -953,7 +953,7 @@ const HotWaterUpgradeTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.energyCostKwh || "Κόστος ενέργειας") + " (€/kWh)"
+              translations.energyCostKwh || "Κόστος ενέργειας (€/kWh)"
             }
             type="number"
             value={formData.energy_cost_kwh}
@@ -987,7 +987,7 @@ const HotWaterUpgradeTabContent = ({
             fullWidth
             label={
               <>
-                {translations.lifespanYears || "Χρονικό διάστημα"} (έτη){" "}
+                {translations.lifespanYears || "Χρονικό διάστημα (έτη)"}{" "}
                 <span style={{ color: "red" }}>*</span>
               </>
             }
@@ -1021,7 +1021,7 @@ const HotWaterUpgradeTabContent = ({
             fullWidth
             label={
               <>
-                {translations.discountRate || "Επιτόκιο αναγωγής"} (%){" "}
+                {translations.discountRate || "Επιτόκιο αναγωγής (%)"}{" "}
                 <span style={{ color: "red" }}>*</span>
               </>
             }
@@ -1054,8 +1054,8 @@ const HotWaterUpgradeTabContent = ({
             label={
               <>
                 {translations.annualOperatingExpenses ||
-                  "Λειτουργικά έξοδα ανά έτος"}{" "}
-                (€) <span style={{ color: "red" }}>*</span>
+                  "Λειτουργικά έξοδα ανά έτος (€)"}{" "}
+                <span style={{ color: "red" }}>*</span>
               </>
             }
             type="number"

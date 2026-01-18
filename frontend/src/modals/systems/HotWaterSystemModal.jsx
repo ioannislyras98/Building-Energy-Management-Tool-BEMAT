@@ -152,13 +152,11 @@ function HotWaterSystemModalForm({
       },
       data: JSON.stringify(apiData),
       success: (response) => {
-
         onSubmitSuccess(response);
         resetForm();
         onClose();
       },
       error: (jqXHR) => {
-
         handleApiError(jqXHR);
       },
     });
