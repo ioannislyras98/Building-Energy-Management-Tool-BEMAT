@@ -952,9 +952,7 @@ const HotWaterUpgradeTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={
-              translations.energyCostKwh || "Κόστος ενέργειας (€/kWh)"
-            }
+            label={translations.energyCostKwh || "Κόστος ενέργειας (€/kWh)"}
             type="number"
             value={formData.energy_cost_kwh}
             variant="outlined"

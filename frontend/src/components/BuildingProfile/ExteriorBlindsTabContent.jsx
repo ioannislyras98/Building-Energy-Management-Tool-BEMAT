@@ -123,7 +123,10 @@ const ExteriorBlindsTabContent = ({
         errors[field] = true;
         hasErrors = true;
         // Determine which tab has the error
-        if ((field === 'time_period' || field === 'discount_rate') && firstErrorTab === 0) {
+        if (
+          (field === "time_period" || field === "discount_rate") &&
+          firstErrorTab === 0
+        ) {
           firstErrorTab = 2;
         }
       }
@@ -132,7 +135,10 @@ const ExteriorBlindsTabContent = ({
     setValidationErrors(errors);
 
     if (hasErrors) {
-      setError(translations.requiredFieldsError || "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία");
+      setError(
+        translations.requiredFieldsError ||
+          "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία"
+      );
       setTabValue(firstErrorTab);
       return false;
     }
@@ -163,31 +169,42 @@ const ExteriorBlindsTabContent = ({
 
   // Ξεχωριστό useEffect για την ηλιακή ακτινοβολία που εξαρτάται από το buildingData
   useEffect(() => {
-    const solarRadiation = buildingData?.data?.prefecture_data?.solar_radiation || buildingData?.prefecture_data?.solar_radiation;
+    const solarRadiation =
+      buildingData?.data?.prefecture_data?.solar_radiation ||
+      buildingData?.prefecture_data?.solar_radiation;
     if (solarRadiation) {
       setFormData((prev) => ({
         ...prev,
         solar_radiation: solarRadiation.toString(),
       }));
     }
-  }, [buildingData?.data?.prefecture_data?.solar_radiation, buildingData?.prefecture_data?.solar_radiation]);
+  }, [
+    buildingData?.data?.prefecture_data?.solar_radiation,
+    buildingData?.prefecture_data?.solar_radiation,
+  ]);
 
   const fetchPrefectureSolarRadiation = async () => {
     try {
       // Πρώτα προσπαθούμε να πάρουμε από τα buildingData.prefecture_data
-      if (buildingData && buildingData.prefecture_data && buildingData.prefecture_data.solar_radiation) {
+      if (
+        buildingData &&
+        buildingData.prefecture_data &&
+        buildingData.prefecture_data.solar_radiation
+      ) {
         setFormData((prev) => ({
           ...prev,
-          solar_radiation: buildingData.prefecture_data.solar_radiation.toString(),
+          solar_radiation:
+            buildingData.prefecture_data.solar_radiation.toString(),
         }));
         return;
       }
 
       // Αν δεν υπάρχει, φορτώνουμε από το API
-      const prefectureUuid = typeof buildingData.prefecture === 'object' 
-        ? buildingData.prefecture.uuid 
-        : buildingData.prefecture;
-      
+      const prefectureUuid =
+        typeof buildingData.prefecture === "object"
+          ? buildingData.prefecture.uuid
+          : buildingData.prefecture;
+
       const response = await axios.get(
         `${API_BASE_URL}/prefectures/get/${prefectureUuid}/`,
         {
@@ -198,7 +215,11 @@ const ExteriorBlindsTabContent = ({
         }
       );
 
-      if (response.data && response.data.data && response.data.data.solar_radiation) {
+      if (
+        response.data &&
+        response.data.data &&
+        response.data.data.solar_radiation
+      ) {
         setFormData((prev) => ({
           ...prev,
           solar_radiation: response.data.data.solar_radiation.toString(),
@@ -222,12 +243,17 @@ const ExteriorBlindsTabContent = ({
       );
 
       // Το API επιστρέφει { status: "success", data: [...] }
-      if (response.data && response.data.data && response.data.data.length > 0) {
+      if (
+        response.data &&
+        response.data.data &&
+        response.data.data.length > 0
+      ) {
         const coolingSystem = response.data.data[0]; // Παίρνουμε το πρώτο cooling system
         if (coolingSystem.energy_efficiency_ratio) {
           setFormData((prev) => ({
             ...prev,
-            cooling_system_eer: coolingSystem.energy_efficiency_ratio.toString(),
+            cooling_system_eer:
+              coolingSystem.energy_efficiency_ratio.toString(),
           }));
           setEerFromCoolingSystem(true);
         }
@@ -254,7 +280,8 @@ const ExteriorBlindsTabContent = ({
       if (response.data && response.data.data) {
         setFormData((prev) => ({
           ...prev,
-          energy_cost_kwh: response.data.data.cost_per_kwh_electricity || "0.15",
+          energy_cost_kwh:
+            response.data.data.cost_per_kwh_electricity || "0.15",
         }));
       }
     } catch (error) {
@@ -531,7 +558,9 @@ const ExteriorBlindsTabContent = ({
         </Grid>
 
         <Grid item xs={12}>
-          <Typography variant="h6" className="font-semibold text-gray-800 mb-2 mt-4">
+          <Typography
+            variant="h6"
+            className="font-semibold text-gray-800 mb-2 mt-4">
             {translations.calculationParameters || "Παράμετροι Υπολογισμού"}
           </Typography>
         </Grid>
@@ -547,7 +576,9 @@ const ExteriorBlindsTabContent = ({
             }
             type="number"
             value={formData.shading_coefficient}
-            onChange={(e) => handleInputChange("shading_coefficient", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("shading_coefficient", e.target.value)
+            }
             variant="outlined"
             error={validationErrors.shading_coefficient}
             inputProps={{ step: 1, min: 0, max: 100 }}
@@ -574,7 +605,8 @@ const ExteriorBlindsTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.solarRadiation || "Ηλιακή ακτινοβολία") + " (kWh/m²/ημ)"
+              (translations.solarRadiation || "Ηλιακή ακτινοβολία") +
+              " (kWh/m²/ημ)"
             }
             type="number"
             value={formData.solar_radiation}
@@ -615,7 +647,9 @@ const ExteriorBlindsTabContent = ({
             }
             type="number"
             value={formData.cooling_months}
-            onChange={(e) => handleInputChange("cooling_months", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("cooling_months", e.target.value)
+            }
             variant="outlined"
             error={validationErrors.cooling_months}
             inputProps={{ step: 1, min: 1, max: 12 }}
@@ -644,22 +678,33 @@ const ExteriorBlindsTabContent = ({
             label={
               <span>
                 {translations.coolingSystemEER || "Απόδοση ψύξης (EER)"}{" "}
-                {!eerFromCoolingSystem && <span style={{ color: "red" }}>*</span>}
+                {!eerFromCoolingSystem && (
+                  <span style={{ color: "red" }}>*</span>
+                )}
               </span>
             }
             type="number"
             value={formData.cooling_system_eer}
-            onChange={(e) => !eerFromCoolingSystem && handleInputChange("cooling_system_eer", e.target.value)}
+            onChange={(e) =>
+              !eerFromCoolingSystem &&
+              handleInputChange("cooling_system_eer", e.target.value)
+            }
             variant="outlined"
             error={validationErrors.cooling_system_eer}
             InputProps={{ readOnly: eerFromCoolingSystem }}
             inputProps={{ step: 0.1, min: 1.0, max: 5.0 }}
-            helperText={eerFromCoolingSystem ? "Φορτώνεται από το Σύστημα Ψύξης" : "Energy Efficiency Ratio (2.0-3.5)"}
+            helperText={
+              eerFromCoolingSystem
+                ? "Φορτώνεται από το Σύστημα Ψύξης"
+                : "Energy Efficiency Ratio (2.0-3.5)"
+            }
             sx={{
-              "& .MuiInputBase-input": eerFromCoolingSystem ? {
-                color: "var(--color-primary)",
-                fontWeight: "bold",
-              } : {},
+              "& .MuiInputBase-input": eerFromCoolingSystem
+                ? {
+                    color: "var(--color-primary)",
+                    fontWeight: "bold",
+                  }
+                : {},
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
                   borderColor: "var(--color-primary)",
@@ -729,7 +774,8 @@ const ExteriorBlindsTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.energyCostKwh || "Κόστος ηλεκτρικής ενέργειας") + " (€/kWh)"
+              (translations.energyCostKwh || "Κόστος ηλεκτρικής ενέργειας") +
+              " (€/kWh)"
             }
             type="number"
             value={formData.energy_cost_kwh}
@@ -1068,10 +1114,7 @@ const ExteriorBlindsTabContent = ({
             }
             variant="outlined"
             InputProps={{ readOnly: true }}
-            helperText={
-              translations.irrHelper ||
-              "Αυτόματος υπολογισμός IRR"
-            }
+            helperText={translations.irrHelper || "Αυτόματος υπολογισμός IRR"}
             sx={{
               "& .MuiInputBase-input": {
                 color: "var(--color-primary)",

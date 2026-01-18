@@ -43,7 +43,7 @@ const AutomaticLightingControlTabContent = ({
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [errorField, setErrorField] = useState(null); 
+  const [errorField, setErrorField] = useState(null);
   const [success, setSuccess] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
   const [formData, setFormData] = useState({
@@ -81,20 +81,23 @@ const AutomaticLightingControlTabContent = ({
       },
       current_lighting_power_density: {
         label:
-          translations.currentLightingPowerDensity ||
-          "Τρέχουσα ισχύς φωτισμού",
+          translations.currentLightingPowerDensity || "Τρέχουσα ισχύς φωτισμού",
         errorKey: "currentLightingPowerDensityRequired",
       },
       operating_hours_per_day: {
-        label: translations.operatingHoursPerDay || "Ώρες λειτουργίας ανά ημέρα",
+        label:
+          translations.operatingHoursPerDay || "Ώρες λειτουργίας ανά ημέρα",
         errorKey: "operatingHoursPerDayRequired",
       },
       operating_days_per_year: {
-        label: translations.operatingDaysPerYear || "Ημέρες λειτουργίας ανά έτος",
+        label:
+          translations.operatingDaysPerYear || "Ημέρες λειτουργίας ανά έτος",
         errorKey: "operatingDaysPerYearRequired",
       },
       estimated_savings_percentage: {
-        label: translations.estimatedSavingsPercentage || "Εκτιμώμενο ποσοστό εξοικονόμησης",
+        label:
+          translations.estimatedSavingsPercentage ||
+          "Εκτιμώμενο ποσοστό εξοικονόμησης",
         errorKey: "estimatedSavingsPercentageRequired",
       },
       installation_cost: {
@@ -122,8 +125,8 @@ const AutomaticLightingControlTabContent = ({
 
     if (hasError) {
       setError(
-        translations.fillRequiredFields || 
-        "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία"
+        translations.fillRequiredFields ||
+          "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία"
       );
       return false;
     }
@@ -160,7 +163,8 @@ const AutomaticLightingControlTabContent = ({
         cost_per_m2: data.cost_per_m2 || "",
         installation_cost: data.installation_cost || "",
         maintenance_cost: data.maintenance_cost || "",
-        current_lighting_power_density: data.current_lighting_power_density || "",
+        current_lighting_power_density:
+          data.current_lighting_power_density || "",
         operating_hours_per_day: data.operating_hours_per_day || "8",
         operating_days_per_year: data.operating_days_per_year || "250",
         estimated_savings_percentage: data.estimated_savings_percentage || "30",
@@ -178,10 +182,11 @@ const AutomaticLightingControlTabContent = ({
     } catch (error) {
       if (error.response?.status === 404) {
         // Αν δεν υπάρχει record, παίρνουμε το energy_cost_kwh από το response
-        const energyCostFromProject = error.response?.data?.energy_cost_kwh || "0.15";
-        setFormData(prev => ({
+        const energyCostFromProject =
+          error.response?.data?.energy_cost_kwh || "0.15";
+        setFormData((prev) => ({
           ...prev,
-          energy_cost_kwh: energyCostFromProject
+          energy_cost_kwh: energyCostFromProject,
         }));
       } else {
         setError("Σφάλμα κατά την φόρτωση των δεδομένων");
@@ -289,9 +294,12 @@ const AutomaticLightingControlTabContent = ({
             variant="outlined"
             inputProps={{ step: 0.1, min: 0.1 }}
             error={validationErrors.lighting_area}
-            helperText={validationErrors.lighting_area ? (
-              translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
-            ) : ""}
+            helperText={
+              validationErrors.lighting_area
+                ? translations.fieldRequired ||
+                  "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -325,9 +333,12 @@ const AutomaticLightingControlTabContent = ({
             variant="outlined"
             inputProps={{ step: 0.01, min: 0 }}
             error={validationErrors.cost_per_m2}
-            helperText={validationErrors.cost_per_m2 ? (
-              translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
-            ) : ""}
+            helperText={
+              validationErrors.cost_per_m2
+                ? translations.fieldRequired ||
+                  "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -363,9 +374,12 @@ const AutomaticLightingControlTabContent = ({
             variant="outlined"
             inputProps={{ step: 0.01, min: 0 }}
             error={validationErrors.installation_cost}
-            helperText={validationErrors.installation_cost ? (
-              translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
-            ) : ""}
+            helperText={
+              validationErrors.installation_cost
+                ? translations.fieldRequired ||
+                  "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -401,9 +415,12 @@ const AutomaticLightingControlTabContent = ({
             variant="outlined"
             inputProps={{ step: 0.01, min: 0 }}
             error={validationErrors.maintenance_cost}
-            helperText={validationErrors.maintenance_cost ? (
-              translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
-            ) : ""}
+            helperText={
+              validationErrors.maintenance_cost
+                ? translations.fieldRequired ||
+                  "Αυτό το πεδίο είναι υποχρεωτικό"
+                : ""
+            }
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": {
@@ -449,18 +466,20 @@ const AutomaticLightingControlTabContent = ({
             type="number"
             value={formData.current_lighting_power_density}
             onChange={(e) =>
-              handleInputChange("current_lighting_power_density", e.target.value)
+              handleInputChange(
+                "current_lighting_power_density",
+                e.target.value
+              )
             }
             variant="outlined"
             inputProps={{ step: 0.1, min: 0 }}
             error={validationErrors.current_lighting_power_density}
             helperText={
-              validationErrors.current_lighting_power_density ? (
-                translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
-              ) : (
-                translations.currentLightingPowerDensityHelper ||
-                "Μέση ισχύς φωτισμού ανά τετραγωνικό μέτρο πριν την εγκατάσταση"
-              )
+              validationErrors.current_lighting_power_density
+                ? translations.fieldRequired ||
+                  "Αυτό το πεδίο είναι υποχρεωτικό"
+                : translations.currentLightingPowerDensityHelper ||
+                  "Μέση ισχύς φωτισμού ανά τετραγωνικό μέτρο πριν την εγκατάσταση"
             }
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -485,7 +504,8 @@ const AutomaticLightingControlTabContent = ({
             fullWidth
             label={
               <span>
-                {translations.operatingHoursPerDay || "Ώρες λειτουργίας ανά ημέρα"}{" "}
+                {translations.operatingHoursPerDay ||
+                  "Ώρες λειτουργίας ανά ημέρα"}{" "}
                 <span style={{ color: "red" }}>*</span>
               </span>
             }
@@ -498,12 +518,11 @@ const AutomaticLightingControlTabContent = ({
             inputProps={{ step: 0.5, min: 0.1 }}
             error={validationErrors.operating_hours_per_day}
             helperText={
-              validationErrors.operating_hours_per_day ? (
-                translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
-              ) : (
-                translations.operatingHoursPerDayHelper ||
-                "Μέσες ώρες που λειτουργεί ο φωτισμός ημερησίως"
-              )
+              validationErrors.operating_hours_per_day
+                ? translations.fieldRequired ||
+                  "Αυτό το πεδίο είναι υποχρεωτικό"
+                : translations.operatingHoursPerDayHelper ||
+                  "Μέσες ώρες που λειτουργεί ο φωτισμός ημερησίως"
             }
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -528,7 +547,8 @@ const AutomaticLightingControlTabContent = ({
             fullWidth
             label={
               <span>
-                {translations.operatingDaysPerYear || "Ημέρες λειτουργίας ανά έτος"}{" "}
+                {translations.operatingDaysPerYear ||
+                  "Ημέρες λειτουργίας ανά έτος"}{" "}
                 <span style={{ color: "red" }}>*</span>
               </span>
             }
@@ -541,12 +561,11 @@ const AutomaticLightingControlTabContent = ({
             inputProps={{ step: 1, min: 1 }}
             error={validationErrors.operating_days_per_year}
             helperText={
-              validationErrors.operating_days_per_year ? (
-                translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
-              ) : (
-                translations.operatingDaysPerYearHelper ||
-                "Αριθμός ημερών που λειτουργεί το κτίριο ετησίως"
-              )
+              validationErrors.operating_days_per_year
+                ? translations.fieldRequired ||
+                  "Αυτό το πεδίο είναι υποχρεωτικό"
+                : translations.operatingDaysPerYearHelper ||
+                  "Αριθμός ημερών που λειτουργεί το κτίριο ετησίως"
             }
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -571,8 +590,9 @@ const AutomaticLightingControlTabContent = ({
             fullWidth
             label={
               <span>
-                {translations.estimatedSavingsPercentage || "Εκτιμώμενο ποσοστό εξοικονόμησης"} (%){" "}
-                <span style={{ color: "red" }}>*</span>
+                {translations.estimatedSavingsPercentage ||
+                  "Εκτιμώμενο ποσοστό εξοικονόμησης"}{" "}
+                (%) <span style={{ color: "red" }}>*</span>
               </span>
             }
             type="number"
@@ -584,12 +604,11 @@ const AutomaticLightingControlTabContent = ({
             inputProps={{ step: 1, min: 0, max: 100 }}
             error={validationErrors.estimated_savings_percentage}
             helperText={
-              validationErrors.estimated_savings_percentage ? (
-                translations.fieldRequired || "Αυτό το πεδίο είναι υποχρεωτικό"
-              ) : (
-                translations.estimatedSavingsPercentageHelper ||
-                "Ποσοστό εξοικονόμησης από αυτόματο έλεγχο (συνήθως 25-40%)"
-              )
+              validationErrors.estimated_savings_percentage
+                ? translations.fieldRequired ||
+                  "Αυτό το πεδίο είναι υποχρεωτικό"
+                : translations.estimatedSavingsPercentageHelper ||
+                  "Ποσοστό εξοικονόμησης από αυτόματο έλεγχο (συνήθως 25-40%)"
             }
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -613,7 +632,8 @@ const AutomaticLightingControlTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.lightingEnergySavings || "Εξοικονόμηση ενέργειας φωτισμού") + " (kWh/έτος)"
+              (translations.lightingEnergySavings ||
+                "Εξοικονόμηση ενέργειας φωτισμού") + " (kWh/έτος)"
             }
             type="text"
             value={
@@ -664,8 +684,7 @@ const AutomaticLightingControlTabContent = ({
             variant="outlined"
             InputProps={{ readOnly: true }}
             helperText={
-              translations.energyCostKwhHelper ||
-              "Αυτόματη λήψη από το έργο"
+              translations.energyCostKwhHelper || "Αυτόματη λήψη από το έργο"
             }
             sx={{
               "& .MuiInputBase-input": {
@@ -731,10 +750,7 @@ const AutomaticLightingControlTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={
-              (translations.discountRate || "Επιτόκιο αναγωγής") +
-              " (%)"
-            }
+            label={(translations.discountRate || "Επιτόκιο αναγωγής") + " (%)"}
             type="number"
             value={formData.discount_rate}
             onChange={(e) => handleInputChange("discount_rate", e.target.value)}
@@ -783,7 +799,8 @@ const AutomaticLightingControlTabContent = ({
             type="text"
             value={
               formData.total_investment_cost
-                ? parseFloat(formData.total_investment_cost).toLocaleString() + ' €'
+                ? parseFloat(formData.total_investment_cost).toLocaleString() +
+                  " €"
                 : ""
             }
             variant="outlined"
@@ -825,7 +842,8 @@ const AutomaticLightingControlTabContent = ({
             type="text"
             value={
               formData.annual_energy_savings
-                ? parseFloat(formData.annual_energy_savings).toLocaleString() + ' €'
+                ? parseFloat(formData.annual_energy_savings).toLocaleString() +
+                  " €"
                 : ""
             }
             variant="outlined"
@@ -863,7 +881,9 @@ const AutomaticLightingControlTabContent = ({
             type="text"
             value={
               formData.annual_economic_benefit
-                ? parseFloat(formData.annual_economic_benefit).toLocaleString() + ' €'
+                ? parseFloat(
+                    formData.annual_economic_benefit
+                  ).toLocaleString() + " €"
                 : ""
             }
             variant="outlined"
@@ -898,7 +918,7 @@ const AutomaticLightingControlTabContent = ({
             type="text"
             value={
               formData.payback_period
-                ? parseFloat(formData.payback_period).toFixed(1) + ' έτη'
+                ? parseFloat(formData.payback_period).toFixed(1) + " έτη"
                 : ""
             }
             variant="outlined"
@@ -935,7 +955,7 @@ const AutomaticLightingControlTabContent = ({
             type="text"
             value={
               formData.net_present_value
-                ? parseFloat(formData.net_present_value).toLocaleString() + ' €'
+                ? parseFloat(formData.net_present_value).toLocaleString() + " €"
                 : ""
             }
             variant="outlined"
@@ -973,7 +993,7 @@ const AutomaticLightingControlTabContent = ({
             type="text"
             value={
               formData.internal_rate_of_return
-                ? parseFloat(formData.internal_rate_of_return).toFixed(2) + '%'
+                ? parseFloat(formData.internal_rate_of_return).toFixed(2) + "%"
                 : ""
             }
             variant="outlined"

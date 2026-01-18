@@ -42,9 +42,10 @@ const BoilerReplacementTabContent = ({
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [errorField, setErrorField] = useState(null); 
+  const [errorField, setErrorField] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [hasBoilerSystemEfficiency, setHasBoilerSystemEfficiency] = useState(false);
+  const [hasBoilerSystemEfficiency, setHasBoilerSystemEfficiency] =
+    useState(false);
   const [boilerDetails, setBoilerDetails] = useState(null);
   const [formData, setFormData] = useState({
     // Συντελεστές απόδοσης
@@ -85,7 +86,9 @@ const BoilerReplacementTabContent = ({
         errorKey: "boilerCostRequired",
       },
       annual_heating_consumption_liters: {
-        label: translations.annualHeatingConsumptionLiters || "Ετήσια κατανάλωση θέρμανσης",
+        label:
+          translations.annualHeatingConsumptionLiters ||
+          "Ετήσια κατανάλωση θέρμανσης",
         errorKey: "annualHeatingConsumptionLitersRequired",
       },
     };
@@ -94,7 +97,9 @@ const BoilerReplacementTabContent = ({
       const value = formData[field];
       if (!value || value === "" || parseFloat(value) <= 0) {
         setErrorField(config.errorKey);
-        const errorMessage = translations[config.errorKey] || `Το πεδίο "${config.label}" είναι υποχρεωτικό`;
+        const errorMessage =
+          translations[config.errorKey] ||
+          `Το πεδίο "${config.label}" είναι υποχρεωτικό`;
         setError(errorMessage);
         return false;
       }
@@ -104,7 +109,10 @@ const BoilerReplacementTabContent = ({
     const oldEfficiency = parseFloat(formData.old_boiler_efficiency);
     const newEfficiency = parseFloat(formData.new_boiler_efficiency);
     if (newEfficiency <= oldEfficiency) {
-      setError(translations.efficiencyImprovementRequired || "Η απόδοση του νέου λέβητα πρέπει να είναι μεγαλύτερη από την απόδοση του παλιού");
+      setError(
+        translations.efficiencyImprovementRequired ||
+          "Η απόδοση του νέου λέβητα πρέπει να είναι μεγαλύτερη από την απόδοση του παλιού"
+      );
       return false;
     }
 
@@ -134,7 +142,7 @@ const BoilerReplacementTabContent = ({
           },
         }
       );
-      
+
       if (response.data) {
         console.log("Boiler Details Response:", response.data);
         setBoilerDetails(response.data);
@@ -154,39 +162,51 @@ const BoilerReplacementTabContent = ({
   // Μόνο αν διαφέρει, ενημερώνουμε με την τιμή του συστήματος και κλειδώνουμε το πεδίο
   useEffect(() => {
     console.log("Boiler Details Response:", boilerDetails);
-    
+
     // Το API επιστρέφει: { status: "success", data: [ { internal_efficiency: "91.00", ... } ] }
     let systemEfficiency = null;
-    
-    if (boilerDetails?.data && Array.isArray(boilerDetails.data) && boilerDetails.data.length > 0) {
+
+    if (
+      boilerDetails?.data &&
+      Array.isArray(boilerDetails.data) &&
+      boilerDetails.data.length > 0
+    ) {
       systemEfficiency = boilerDetails.data[0]?.internal_efficiency;
       console.log("Internal Efficiency από σύστημα λέβητα:", systemEfficiency);
     }
-    
+
     // Αν υπάρχει record στο σύστημα λέβητα
     if (systemEfficiency !== undefined && systemEfficiency !== null) {
       // Συγκρίνουμε την τιμή του σεναρίου με την τιμή του συστήματος
       const currentEfficiency = parseFloat(formData.old_boiler_efficiency);
       const systemEfficiencyValue = parseFloat(systemEfficiency);
-      
+
       console.log("Current Efficiency (σενάριο):", currentEfficiency);
       console.log("System Efficiency (σύστημα):", systemEfficiencyValue);
-      
+
       // Αν είναι διαφορετικές ή δεν υπάρχει τιμή, ενημερώνουμε
-      if (isNaN(currentEfficiency) || currentEfficiency !== systemEfficiencyValue) {
-        console.log("✅ Ενημέρωση απόδοσης παλιού λέβητα από σύστημα:", systemEfficiency);
-        setFormData(prev => ({
+      if (
+        isNaN(currentEfficiency) ||
+        currentEfficiency !== systemEfficiencyValue
+      ) {
+        console.log(
+          "✅ Ενημέρωση απόδοσης παλιού λέβητα από σύστημα:",
+          systemEfficiency
+        );
+        setFormData((prev) => ({
           ...prev,
-          old_boiler_efficiency: systemEfficiency
+          old_boiler_efficiency: systemEfficiency,
         }));
       } else {
         console.log("✓ Η απόδοση είναι ήδη ίδια - δεν χρειάζεται ενημέρωση");
       }
-      
+
       // Κλειδώνουμε το πεδίο όταν υπάρχει record
       setHasBoilerSystemEfficiency(true);
     } else {
-      console.log("⚠️ Δεν υπάρχει σύστημα λέβητα - το πεδίο παραμένει ξεκλειδωμένο");
+      console.log(
+        "⚠️ Δεν υπάρχει σύστημα λέβητα - το πεδίο παραμένει ξεκλειδωμένο"
+      );
       // Αν δεν υπάρχει record, ξεκλειδώνουμε το πεδίο
       setHasBoilerSystemEfficiency(false);
     }
@@ -217,9 +237,11 @@ const BoilerReplacementTabContent = ({
         installation_cost: data.installation_cost || "",
         maintenance_cost: data.maintenance_cost || "",
         // Ενεργειακά στοιχεία
-        annual_heating_consumption_liters: data.annual_heating_consumption_liters || "",
+        annual_heating_consumption_liters:
+          data.annual_heating_consumption_liters || "",
         heating_oil_savings_liters: data.heating_oil_savings_liters || "",
-        oil_price_per_liter: data.oil_price_per_liter || params?.oil_price_per_liter || "",
+        oil_price_per_liter:
+          data.oil_price_per_liter || params?.oil_price_per_liter || "",
         time_period: data.time_period || "20",
         discount_rate: data.discount_rate || "5.0",
         // Υπολογιζόμενα πεδία
@@ -235,9 +257,9 @@ const BoilerReplacementTabContent = ({
         setError("Σφάλμα κατά την φόρτωση των δεδομένων");
       } else {
         // Αν δεν υπάρχουν αποθηκευμένα δεδομένα, συμπλήρωσε την τιμή πετρελαίου από το project
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-          oil_price_per_liter: params?.oil_price_per_liter || ""
+          oil_price_per_liter: params?.oil_price_per_liter || "",
         }));
       }
     } finally {
@@ -312,7 +334,7 @@ const BoilerReplacementTabContent = ({
         }
         setError(null);
         setErrorField(null);
-        
+
         // Refresh data after save
         await fetchBoilerReplacementData();
         await fetchBoilerDetails();
@@ -345,16 +367,22 @@ const BoilerReplacementTabContent = ({
             fullWidth
             label={
               <span>
-                {translations.oldBoilerEfficiency || "Απόδοση παλιού λέβητα"} (%){" "}
-                <span style={{ color: "red" }}>*</span>
+                {translations.oldBoilerEfficiency || "Απόδοση παλιού λέβητα"}{" "}
+                (%) <span style={{ color: "red" }}>*</span>
               </span>
             }
             type="number"
             value={formData.old_boiler_efficiency}
-            onChange={(e) => handleInputChange("old_boiler_efficiency", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("old_boiler_efficiency", e.target.value)
+            }
             variant="outlined"
             InputProps={{ readOnly: hasBoilerSystemEfficiency }}
-            helperText={hasBoilerSystemEfficiency ? "Αυτόματη ανάκτηση από το σύστημα λέβητα" : ""}
+            helperText={
+              hasBoilerSystemEfficiency
+                ? "Αυτόματη ανάκτηση από το σύστημα λέβητα"
+                : ""
+            }
             inputProps={{ step: 0.1, min: 0.1, max: 100 }}
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -385,7 +413,9 @@ const BoilerReplacementTabContent = ({
             }
             type="number"
             value={formData.new_boiler_efficiency}
-            onChange={(e) => handleInputChange("new_boiler_efficiency", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("new_boiler_efficiency", e.target.value)
+            }
             variant="outlined"
             inputProps={{ step: 0.1, min: 0.1, max: 100 }}
             sx={{
@@ -408,7 +438,9 @@ const BoilerReplacementTabContent = ({
 
         {/* Κόστη Λέβητα */}
         <Grid item xs={12}>
-          <Typography variant="h6" className="font-semibold text-gray-800 mb-4 mt-4">
+          <Typography
+            variant="h6"
+            className="font-semibold text-gray-800 mb-4 mt-4">
             {translations.boilerCostData || "Κόστη Λέβητα"}
           </Typography>
         </Grid>
@@ -527,14 +559,18 @@ const BoilerReplacementTabContent = ({
             fullWidth
             label={
               <span>
-                {translations.annualHeatingConsumptionLiters || "Ετήσια κατανάλωση θέρμανσης"} (λίτρα/έτος){" "}
-                <span style={{ color: "red" }}>*</span>
+                {translations.annualHeatingConsumptionLiters ||
+                  "Ετήσια κατανάλωση θέρμανσης"}{" "}
+                (λίτρα/έτος) <span style={{ color: "red" }}>*</span>
               </span>
             }
             type="number"
             value={formData.annual_heating_consumption_liters}
             onChange={(e) =>
-              handleInputChange("annual_heating_consumption_liters", e.target.value)
+              handleInputChange(
+                "annual_heating_consumption_liters",
+                e.target.value
+              )
             }
             variant="outlined"
             inputProps={{ step: 1, min: 0 }}
@@ -560,7 +596,8 @@ const BoilerReplacementTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.heatingOilSavingsLiters || "Εξοικονόμηση πετρελαίου") + " (λίτρα/έτος)"
+              (translations.heatingOilSavingsLiters ||
+                "Εξοικονόμηση πετρελαίου") + " (λίτρα/έτος)"
             }
             type="number"
             value={formData.heating_oil_savings_liters}
@@ -588,7 +625,8 @@ const BoilerReplacementTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.oilPricePerLiter || "Τιμή πετρελαίου") + " (€/λίτρο)"
+              (translations.oilPricePerLiter || "Τιμή πετρελαίου") +
+              " (€/λίτρο)"
             }
             type="number"
             value={formData.oil_price_per_liter}
@@ -654,10 +692,7 @@ const BoilerReplacementTabContent = ({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label={
-              (translations.discountRate || "Επιτόκιο αναγωγής") +
-              " (%)"
-            }
+            label={(translations.discountRate || "Επιτόκιο αναγωγής") + " (%)"}
             type="number"
             value={formData.discount_rate}
             onChange={(e) => handleInputChange("discount_rate", e.target.value)}
@@ -747,8 +782,10 @@ const BoilerReplacementTabContent = ({
             }
             type="text"
             value={
-              formData.annual_energy_savings !== undefined && formData.annual_energy_savings !== null
-                ? parseFloat(formData.annual_energy_savings).toLocaleString() + ' €'
+              formData.annual_energy_savings !== undefined &&
+              formData.annual_energy_savings !== null
+                ? parseFloat(formData.annual_energy_savings).toLocaleString() +
+                  " €"
                 : ""
             }
             variant="outlined"
@@ -789,8 +826,11 @@ const BoilerReplacementTabContent = ({
             }
             type="text"
             value={
-              formData.annual_economic_benefit !== undefined && formData.annual_economic_benefit !== null
-                ? parseFloat(formData.annual_economic_benefit).toLocaleString() + ' €'
+              formData.annual_economic_benefit !== undefined &&
+              formData.annual_economic_benefit !== null
+                ? parseFloat(
+                    formData.annual_economic_benefit
+                  ).toLocaleString() + " €"
                 : ""
             }
             variant="outlined"
@@ -828,10 +868,11 @@ const BoilerReplacementTabContent = ({
             label={translations.paybackPeriod || "Περίοδος αποπληρωμής (έτη)"}
             type="text"
             value={
-              formData.payback_period !== undefined && formData.payback_period !== null
-                ? (parseFloat(formData.payback_period) > 0
-                    ? parseFloat(formData.payback_period).toFixed(1) + ' έτη'
-                    : 'Δεν αποπληρώνεται')
+              formData.payback_period !== undefined &&
+              formData.payback_period !== null
+                ? parseFloat(formData.payback_period) > 0
+                  ? parseFloat(formData.payback_period).toFixed(1) + " έτη"
+                  : "Δεν αποπληρώνεται"
                 : ""
             }
             variant="outlined"
@@ -842,7 +883,8 @@ const BoilerReplacementTabContent = ({
             }
             sx={{
               "& .MuiInputBase-input": {
-                color: formData.payback_period > 0 ? "var(--color-primary)" : "red",
+                color:
+                  formData.payback_period > 0 ? "var(--color-primary)" : "red",
                 fontWeight: "bold",
               },
               "& .MuiOutlinedInput-root": {
@@ -871,8 +913,9 @@ const BoilerReplacementTabContent = ({
             }
             type="text"
             value={
-              formData.net_present_value !== undefined && formData.net_present_value !== null
-                ? parseFloat(formData.net_present_value).toLocaleString() + ' €'
+              formData.net_present_value !== undefined &&
+              formData.net_present_value !== null
+                ? parseFloat(formData.net_present_value).toLocaleString() + " €"
                 : ""
             }
             variant="outlined"
@@ -913,21 +956,23 @@ const BoilerReplacementTabContent = ({
             }
             type="text"
             value={
-              formData.internal_rate_of_return !== undefined && formData.internal_rate_of_return !== null
-                ? (parseFloat(formData.internal_rate_of_return) > 0
-                    ? parseFloat(formData.internal_rate_of_return).toFixed(2) + '%'
-                    : 'Μη κερδοφόρα επένδυση')
+              formData.internal_rate_of_return !== undefined &&
+              formData.internal_rate_of_return !== null
+                ? parseFloat(formData.internal_rate_of_return) > 0
+                  ? parseFloat(formData.internal_rate_of_return).toFixed(2) +
+                    "%"
+                  : "Μη κερδοφόρα επένδυση"
                 : ""
             }
             variant="outlined"
             InputProps={{ readOnly: true }}
-            helperText={
-              translations.irrHelper ||
-              "Αυτόματος υπολογισμός IRR"
-            }
+            helperText={translations.irrHelper || "Αυτόματος υπολογισμός IRR"}
             sx={{
               "& .MuiInputBase-input": {
-                color: formData.internal_rate_of_return > 0 ? "var(--color-primary)" : "red",
+                color:
+                  formData.internal_rate_of_return > 0
+                    ? "var(--color-primary)"
+                    : "red",
                 fontWeight: "bold",
               },
               "& .MuiOutlinedInput-root": {

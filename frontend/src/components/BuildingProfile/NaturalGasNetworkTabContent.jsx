@@ -31,8 +31,7 @@ function TabPanel(props) {
       hidden={value !== index}
       id={`natural-gas-tabpanel-${index}`}
       aria-labelledby={`natural-gas-tab-${index}`}
-      {...other}
-    >
+      {...other}>
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
@@ -74,10 +73,10 @@ const NaturalGasNetworkTabContent = ({
     lifespan_years: 15,
     discount_rate: 5,
     annual_operating_expenses: "",
-    new_system_efficiency: 0.90,
+    new_system_efficiency: 0.9,
     natural_gas_price_per_kwh: "",
   });
-  
+
   const [networkUuid, setNetworkUuid] = useState(null);
   useEffect(() => {
     if (buildingUuid && token) {
@@ -102,7 +101,8 @@ const NaturalGasNetworkTabContent = ({
         if (response.data) {
           setFormData((prev) => ({
             ...prev,
-            natural_gas_price_per_kwh: response.data.natural_gas_price_per_m3 || "",
+            natural_gas_price_per_kwh:
+              response.data.natural_gas_price_per_m3 || "",
             oil_price_per_liter: response.data.oil_price_per_liter || "",
           }));
         }
@@ -115,9 +115,9 @@ const NaturalGasNetworkTabContent = ({
 
   useEffect(() => {
     if (buildingData && buildingData.annual_energy_cost) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        current_energy_cost_per_year: buildingData.annual_energy_cost
+        current_energy_cost_per_year: buildingData.annual_energy_cost,
       }));
     } else if (buildingUuid && token) {
       fetchEnergyConsumptions();
@@ -128,28 +128,31 @@ const NaturalGasNetworkTabContent = ({
       fetchEnergyConsumptions();
     }
   }, [formData, buildingUuid, token]);
-  
+
   // Επαναϋπολογισμός κόστους πετρελαίου όταν αλλάζει η τιμή
   useEffect(() => {
     if (formData.oil_price_per_liter && buildingUuid && token) {
       fetchEnergyConsumptions();
     }
   }, [formData.oil_price_per_liter]);
-  
+
   useEffect(() => {
     const currentCost = parseFloat(formData.current_energy_cost_per_year || 0);
     const gasCost = parseFloat(formData.natural_gas_cost_per_year || 0);
-    
+
     if (currentCost > 0 && gasCost > 0) {
       const savings = currentCost - gasCost;
       if (savings !== parseFloat(formData.annual_energy_savings || 0)) {
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-          annual_energy_savings: savings.toFixed(2)
+          annual_energy_savings: savings.toFixed(2),
         }));
       }
     }
-  }, [formData.current_energy_cost_per_year, formData.natural_gas_cost_per_year]);
+  }, [
+    formData.current_energy_cost_per_year,
+    formData.natural_gas_cost_per_year,
+  ]);
 
   const fetchEnergyConsumptions = () => {
     $.ajax({
@@ -163,36 +166,40 @@ const NaturalGasNetworkTabContent = ({
           // Υπολογίζουμε λίτρα πετρελαίου × τιμή ανά λίτρο
           const totalAnnualCost = response.reduce((sum, consumption) => {
             // Φιλτράρουμε μόνο το πετρέλαιο θέρμανσης
-            if (consumption.energy_source !== 'heating_oil') {
+            if (consumption.energy_source !== "heating_oil") {
               return sum;
             }
-            
+
             const liters = consumption.quantity || 0;
             let oilPricePerLiter = 1.0;
-            
+
             // Χρησιμοποιούμε την τιμή από το formData αν υπάρχει
             if (formData.oil_price_per_liter) {
               oilPricePerLiter = parseFloat(formData.oil_price_per_liter);
             } else if (params && params.oil_price_per_liter) {
               oilPricePerLiter = parseFloat(params.oil_price_per_liter);
-            } else if (buildingData && buildingData.project && buildingData.project.oil_price_per_liter) {
-              oilPricePerLiter = parseFloat(buildingData.project.oil_price_per_liter);
+            } else if (
+              buildingData &&
+              buildingData.project &&
+              buildingData.project.oil_price_per_liter
+            ) {
+              oilPricePerLiter = parseFloat(
+                buildingData.project.oil_price_per_liter
+              );
             }
-            
-            return sum + (liters * oilPricePerLiter);
+
+            return sum + liters * oilPricePerLiter;
           }, 0);
 
           if (totalAnnualCost > 0) {
-            setFormData(prev => ({
+            setFormData((prev) => ({
               ...prev,
-              current_energy_cost_per_year: totalAnnualCost.toFixed(2)
+              current_energy_cost_per_year: totalAnnualCost.toFixed(2),
             }));
           }
         }
       },
-      error: (jqXHR) => {
-
-      },
+      error: (jqXHR) => {},
     });
   };
 
@@ -207,50 +214,66 @@ const NaturalGasNetworkTabContent = ({
         if (response.success && response.data && response.data.length > 0) {
           const data = response.data[0];
           setNetworkUuid(data.uuid); // Αποθήκευση του UUID για το refresh
-          
-          setFormData(prev => ({
+
+          setFormData((prev) => ({
             ...prev,
             burner_replacement_quantity: data.burner_replacement_quantity || "",
-            burner_replacement_unit_price: data.burner_replacement_unit_price || "",
+            burner_replacement_unit_price:
+              data.burner_replacement_unit_price || "",
             gas_pipes_quantity: data.gas_pipes_quantity || "",
             gas_pipes_unit_price: data.gas_pipes_unit_price || "",
-            gas_detection_systems_quantity: data.gas_detection_systems_quantity || "",
-            gas_detection_systems_unit_price: data.gas_detection_systems_unit_price || "",
+            gas_detection_systems_quantity:
+              data.gas_detection_systems_quantity || "",
+            gas_detection_systems_unit_price:
+              data.gas_detection_systems_unit_price || "",
             boiler_cleaning_quantity: data.boiler_cleaning_quantity || "",
             boiler_cleaning_unit_price: data.boiler_cleaning_unit_price || "",
-            current_energy_cost_per_year: data.current_energy_cost_per_year || "",
+            current_energy_cost_per_year:
+              data.current_energy_cost_per_year || "",
             natural_gas_cost_per_year: data.natural_gas_cost_per_year || "",
             annual_energy_savings: data.annual_energy_savings || "",
             lifespan_years: data.lifespan_years || 15,
             discount_rate: data.discount_rate || 5,
             annual_operating_expenses: data.annual_operating_expenses || "",
-            new_system_efficiency: data.new_system_efficiency || 0.90,
+            new_system_efficiency: data.new_system_efficiency || 0.9,
             natural_gas_price_per_kwh: data.natural_gas_price_per_m3 || "",
             oil_price_per_liter: data.oil_price_per_liter || "",
           }));
-          
+
           // Φόρτωση υπολογισμένων αποτελεσμάτων από το backend
           setCalculatedResults({
-            burner_replacement_subtotal: parseFloat(data.burner_replacement_subtotal || 0),
+            burner_replacement_subtotal: parseFloat(
+              data.burner_replacement_subtotal || 0
+            ),
             gas_pipes_subtotal: parseFloat(data.gas_pipes_subtotal || 0),
-            gas_detection_systems_subtotal: parseFloat(data.gas_detection_systems_subtotal || 0),
-            boiler_cleaning_subtotal: parseFloat(data.boiler_cleaning_subtotal || 0),
+            gas_detection_systems_subtotal: parseFloat(
+              data.gas_detection_systems_subtotal || 0
+            ),
+            boiler_cleaning_subtotal: parseFloat(
+              data.boiler_cleaning_subtotal || 0
+            ),
             total_investment_cost: parseFloat(data.total_investment_cost || 0),
-            annual_economic_benefit: parseFloat(data.annual_economic_benefit || 0),
+            annual_economic_benefit: parseFloat(
+              data.annual_economic_benefit || 0
+            ),
             payback_period: parseFloat(data.payback_period || 0),
             net_present_value: parseFloat(data.net_present_value || 0),
-            internal_rate_of_return: parseFloat(data.internal_rate_of_return || 0),
+            internal_rate_of_return: parseFloat(
+              data.internal_rate_of_return || 0
+            ),
           });
-        } else if (response.success && response.current_energy_cost_per_year !== undefined) {
-          setFormData(prev => ({
+        } else if (
+          response.success &&
+          response.current_energy_cost_per_year !== undefined
+        ) {
+          setFormData((prev) => ({
             ...prev,
-            current_energy_cost_per_year: response.current_energy_cost_per_year.toString()
+            current_energy_cost_per_year:
+              response.current_energy_cost_per_year.toString(),
           }));
         }
       },
-      error: (jqXHR) => {
-
-      },
+      error: (jqXHR) => {},
     });
   };
 
@@ -299,31 +322,45 @@ const NaturalGasNetworkTabContent = ({
       lifespan_years,
       discount_rate,
     } = formData;
-    
-    const burnerReplacementSubtotal = parseFloat(burner_replacement_quantity || 0) * parseFloat(burner_replacement_unit_price || 0);
-    const gasPipesSubtotal = parseFloat(gas_pipes_quantity || 0) * parseFloat(gas_pipes_unit_price || 0);
-    const gasDetectionSystemsSubtotal = parseFloat(gas_detection_systems_quantity || 0) * parseFloat(gas_detection_systems_unit_price || 0);
-    const boilerCleaningSubtotal = parseFloat(boiler_cleaning_quantity || 0) * parseFloat(boiler_cleaning_unit_price || 0);
-    const totalInvestmentCost = burnerReplacementSubtotal + gasPipesSubtotal + gasDetectionSystemsSubtotal + boilerCleaningSubtotal;
-    
+
+    const burnerReplacementSubtotal =
+      parseFloat(burner_replacement_quantity || 0) *
+      parseFloat(burner_replacement_unit_price || 0);
+    const gasPipesSubtotal =
+      parseFloat(gas_pipes_quantity || 0) *
+      parseFloat(gas_pipes_unit_price || 0);
+    const gasDetectionSystemsSubtotal =
+      parseFloat(gas_detection_systems_quantity || 0) *
+      parseFloat(gas_detection_systems_unit_price || 0);
+    const boilerCleaningSubtotal =
+      parseFloat(boiler_cleaning_quantity || 0) *
+      parseFloat(boiler_cleaning_unit_price || 0);
+    const totalInvestmentCost =
+      burnerReplacementSubtotal +
+      gasPipesSubtotal +
+      gasDetectionSystemsSubtotal +
+      boilerCleaningSubtotal;
+
     // Υπολογισμός εξοικονόμησης
     let savings = 0;
     if (current_energy_cost_per_year && natural_gas_cost_per_year) {
-      savings = parseFloat(current_energy_cost_per_year) - parseFloat(natural_gas_cost_per_year);
+      savings =
+        parseFloat(current_energy_cost_per_year) -
+        parseFloat(natural_gas_cost_per_year);
     } else if (annual_energy_savings) {
       savings = parseFloat(annual_energy_savings);
     }
-    
+
     // Ετήσιο οικονομικό όφελος = εξοικονόμηση - λειτουργικά έξοδα
     const operatingExpenses = parseFloat(annual_operating_expenses || 0);
     const annualEconomicBenefit = savings - operatingExpenses;
-    
+
     // Περίοδος απόσβεσης
     let paybackPeriod = 0;
     if (annualEconomicBenefit > 0 && totalInvestmentCost > 0) {
       paybackPeriod = totalInvestmentCost / annualEconomicBenefit;
     }
-    
+
     // NPV με το discount_rate από τη φόρμα
     const discountRateDecimal = parseFloat(discount_rate || 5) / 100.0;
     const years = parseInt(lifespan_years) || 15;
@@ -337,7 +374,7 @@ const NaturalGasNetworkTabContent = ({
     } else {
       npv = -totalInvestmentCost;
     }
-    
+
     // IRR υπολογισμός με Newton-Raphson (απλοποιημένος)
     let irr = 0;
     if (totalInvestmentCost > 0 && annualEconomicBenefit > 0) {
@@ -345,20 +382,20 @@ const NaturalGasNetworkTabContent = ({
       if (totalBenefit > totalInvestmentCost) {
         // Αρχική εκτίμηση
         irr = (annualEconomicBenefit / totalInvestmentCost) * 0.8;
-        
+
         // Newton-Raphson για 20 επαναλήψεις
         for (let i = 0; i < 20; i++) {
           let npvCalc = -totalInvestmentCost;
           let derivative = 0;
-          
+
           for (let year = 1; year <= years; year++) {
             const factor = Math.pow(1 + irr, year);
             npvCalc += annualEconomicBenefit / factor;
-            derivative -= year * annualEconomicBenefit / (factor * (1 + irr));
+            derivative -= (year * annualEconomicBenefit) / (factor * (1 + irr));
           }
-          
+
           if (Math.abs(npvCalc) < 0.001) break;
-          
+
           if (Math.abs(derivative) > 0.000001) {
             irr = irr - npvCalc / derivative;
             if (irr < -0.99) irr = -0.99;
@@ -396,14 +433,26 @@ const NaturalGasNetworkTabContent = ({
       boiler_cleaning_quantity,
       boiler_cleaning_unit_price,
     } = formData;
-    
-    const burnerReplacementSubtotal = parseFloat(burner_replacement_quantity || 0) * parseFloat(burner_replacement_unit_price || 0);
-    const gasPipesSubtotal = parseFloat(gas_pipes_quantity || 0) * parseFloat(gas_pipes_unit_price || 0);
-    const gasDetectionSystemsSubtotal = parseFloat(gas_detection_systems_quantity || 0) * parseFloat(gas_detection_systems_unit_price || 0);
-    const boilerCleaningSubtotal = parseFloat(boiler_cleaning_quantity || 0) * parseFloat(boiler_cleaning_unit_price || 0);
-    const totalInvestmentCost = burnerReplacementSubtotal + gasPipesSubtotal + gasDetectionSystemsSubtotal + boilerCleaningSubtotal;
-    
-    setCalculatedResults(prev => ({
+
+    const burnerReplacementSubtotal =
+      parseFloat(burner_replacement_quantity || 0) *
+      parseFloat(burner_replacement_unit_price || 0);
+    const gasPipesSubtotal =
+      parseFloat(gas_pipes_quantity || 0) *
+      parseFloat(gas_pipes_unit_price || 0);
+    const gasDetectionSystemsSubtotal =
+      parseFloat(gas_detection_systems_quantity || 0) *
+      parseFloat(gas_detection_systems_unit_price || 0);
+    const boilerCleaningSubtotal =
+      parseFloat(boiler_cleaning_quantity || 0) *
+      parseFloat(boiler_cleaning_unit_price || 0);
+    const totalInvestmentCost =
+      burnerReplacementSubtotal +
+      gasPipesSubtotal +
+      gasDetectionSystemsSubtotal +
+      boilerCleaningSubtotal;
+
+    setCalculatedResults((prev) => ({
       ...prev,
       burner_replacement_subtotal: burnerReplacementSubtotal,
       gas_pipes_subtotal: gasPipesSubtotal,
@@ -430,28 +479,52 @@ const NaturalGasNetworkTabContent = ({
 
     // Validation for System Components
     const systemComponentsErrors = {};
-    if (!formData.burner_replacement_quantity || parseFloat(formData.burner_replacement_quantity) <= 0) {
+    if (
+      !formData.burner_replacement_quantity ||
+      parseFloat(formData.burner_replacement_quantity) <= 0
+    ) {
       systemComponentsErrors.burner_replacement_quantity = true;
     }
-    if (!formData.burner_replacement_unit_price || parseFloat(formData.burner_replacement_unit_price) <= 0) {
+    if (
+      !formData.burner_replacement_unit_price ||
+      parseFloat(formData.burner_replacement_unit_price) <= 0
+    ) {
       systemComponentsErrors.burner_replacement_unit_price = true;
     }
-    if (!formData.gas_pipes_quantity || parseFloat(formData.gas_pipes_quantity) <= 0) {
+    if (
+      !formData.gas_pipes_quantity ||
+      parseFloat(formData.gas_pipes_quantity) <= 0
+    ) {
       systemComponentsErrors.gas_pipes_quantity = true;
     }
-    if (!formData.gas_pipes_unit_price || parseFloat(formData.gas_pipes_unit_price) <= 0) {
+    if (
+      !formData.gas_pipes_unit_price ||
+      parseFloat(formData.gas_pipes_unit_price) <= 0
+    ) {
       systemComponentsErrors.gas_pipes_unit_price = true;
     }
-    if (!formData.gas_detection_systems_quantity || parseFloat(formData.gas_detection_systems_quantity) <= 0) {
+    if (
+      !formData.gas_detection_systems_quantity ||
+      parseFloat(formData.gas_detection_systems_quantity) <= 0
+    ) {
       systemComponentsErrors.gas_detection_systems_quantity = true;
     }
-    if (!formData.gas_detection_systems_unit_price || parseFloat(formData.gas_detection_systems_unit_price) <= 0) {
+    if (
+      !formData.gas_detection_systems_unit_price ||
+      parseFloat(formData.gas_detection_systems_unit_price) <= 0
+    ) {
       systemComponentsErrors.gas_detection_systems_unit_price = true;
     }
-    if (!formData.boiler_cleaning_quantity || parseFloat(formData.boiler_cleaning_quantity) <= 0) {
+    if (
+      !formData.boiler_cleaning_quantity ||
+      parseFloat(formData.boiler_cleaning_quantity) <= 0
+    ) {
       systemComponentsErrors.boiler_cleaning_quantity = true;
     }
-    if (!formData.boiler_cleaning_unit_price || parseFloat(formData.boiler_cleaning_unit_price) <= 0) {
+    if (
+      !formData.boiler_cleaning_unit_price ||
+      parseFloat(formData.boiler_cleaning_unit_price) <= 0
+    ) {
       systemComponentsErrors.boiler_cleaning_unit_price = true;
     }
 
@@ -463,14 +536,21 @@ const NaturalGasNetworkTabContent = ({
     if (!formData.discount_rate || parseFloat(formData.discount_rate) <= 0) {
       economicDataErrors.discount_rate = true;
     }
-    if (!formData.annual_operating_expenses || parseFloat(formData.annual_operating_expenses) < 0) {
+    if (
+      !formData.annual_operating_expenses ||
+      parseFloat(formData.annual_operating_expenses) < 0
+    ) {
       economicDataErrors.annual_operating_expenses = true;
     }
-    if (!formData.new_system_efficiency || parseFloat(formData.new_system_efficiency) <= 0) {
+    if (
+      !formData.new_system_efficiency ||
+      parseFloat(formData.new_system_efficiency) <= 0
+    ) {
       economicDataErrors.new_system_efficiency = true;
     }
 
-    const hasSystemComponentsErrors = Object.keys(systemComponentsErrors).length > 0;
+    const hasSystemComponentsErrors =
+      Object.keys(systemComponentsErrors).length > 0;
     const hasEconomicDataErrors = Object.keys(economicDataErrors).length > 0;
 
     if (hasSystemComponentsErrors || hasEconomicDataErrors) {
@@ -509,36 +589,50 @@ const NaturalGasNetworkTabContent = ({
       success: (response) => {
         if (response.success && response.data) {
           const data = response.data;
-          
+
           // Ενημέρωση του UUID αν είναι νέα εγγραφή
           if (data.uuid && !networkUuid) {
             setNetworkUuid(data.uuid);
           }
-          
+
           // Ενημέρωση formData με τα αποθηκευμένα δεδομένα
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
-            current_energy_cost_per_year: data.current_energy_cost_per_year || prev.current_energy_cost_per_year,
-            natural_gas_cost_per_year: data.natural_gas_cost_per_year || prev.natural_gas_cost_per_year,
-            annual_energy_savings: data.annual_energy_savings || prev.annual_energy_savings,
+            current_energy_cost_per_year:
+              data.current_energy_cost_per_year ||
+              prev.current_energy_cost_per_year,
+            natural_gas_cost_per_year:
+              data.natural_gas_cost_per_year || prev.natural_gas_cost_per_year,
+            annual_energy_savings:
+              data.annual_energy_savings || prev.annual_energy_savings,
             lifespan_years: data.lifespan_years || prev.lifespan_years,
             discount_rate: data.discount_rate || prev.discount_rate,
           }));
-          
+
           // Ενημέρωση calculatedResults με τα επαναϋπολογισμένα αποτελέσματα από το backend
           setCalculatedResults({
-            burner_replacement_subtotal: parseFloat(data.burner_replacement_subtotal || 0),
+            burner_replacement_subtotal: parseFloat(
+              data.burner_replacement_subtotal || 0
+            ),
             gas_pipes_subtotal: parseFloat(data.gas_pipes_subtotal || 0),
-            gas_detection_systems_subtotal: parseFloat(data.gas_detection_systems_subtotal || 0),
-            boiler_cleaning_subtotal: parseFloat(data.boiler_cleaning_subtotal || 0),
+            gas_detection_systems_subtotal: parseFloat(
+              data.gas_detection_systems_subtotal || 0
+            ),
+            boiler_cleaning_subtotal: parseFloat(
+              data.boiler_cleaning_subtotal || 0
+            ),
             total_investment_cost: parseFloat(data.total_investment_cost || 0),
-            annual_economic_benefit: parseFloat(data.annual_economic_benefit || 0),
+            annual_economic_benefit: parseFloat(
+              data.annual_economic_benefit || 0
+            ),
             payback_period: parseFloat(data.payback_period || 0),
             net_present_value: parseFloat(data.net_present_value || 0),
-            internal_rate_of_return: parseFloat(data.internal_rate_of_return || 0),
+            internal_rate_of_return: parseFloat(
+              data.internal_rate_of_return || 0
+            ),
           });
         }
-        
+
         setSuccessKey("successSave");
         setLoading(false);
       },
@@ -551,7 +645,9 @@ const NaturalGasNetworkTabContent = ({
 
   const renderSystemComponents = () => (
     <div className="space-y-4">
-      <Typography variant="h6" sx={{ fontWeight: "bold", color: "var(--color-primary)", mb: 2 }}>
+      <Typography
+        variant="h6"
+        sx={{ fontWeight: "bold", color: "var(--color-primary)", mb: 2 }}>
         {translations.systemComponents || "Στοιχεία Συστήματος"}
       </Typography>
 
@@ -562,13 +658,21 @@ const NaturalGasNetworkTabContent = ({
               <TableCell sx={{ fontWeight: "bold", color: "white" }}>
                 {translations.itemType || "Είδος"}
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold", color: "white" }} align="center">
-                {translations.quantity || "Ποσότητα"} <span style={{ color: "#ff4444" }}>*</span>
+              <TableCell
+                sx={{ fontWeight: "bold", color: "white" }}
+                align="center">
+                {translations.quantity || "Ποσότητα"}{" "}
+                <span style={{ color: "#ff4444" }}>*</span>
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold", color: "white" }} align="center">
-                {translations.unitPrice || "Τιμή Μονάδας (€)"} <span style={{ color: "#ff4444" }}>*</span>
+              <TableCell
+                sx={{ fontWeight: "bold", color: "white" }}
+                align="center">
+                {translations.unitPrice || "Τιμή Μονάδας (€)"}{" "}
+                <span style={{ color: "#ff4444" }}>*</span>
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold", color: "white" }} align="center">
+              <TableCell
+                sx={{ fontWeight: "bold", color: "white" }}
+                align="center">
                 {translations.expense || "Δαπάνη (€)"}
               </TableCell>
             </TableRow>
@@ -585,11 +689,14 @@ const NaturalGasNetworkTabContent = ({
                   size="small"
                   value={formData.burner_replacement_quantity}
                   onChange={(e) =>
-                    handleInputChange("burner_replacement_quantity", e.target.value)
+                    handleInputChange(
+                      "burner_replacement_quantity",
+                      e.target.value
+                    )
                   }
                   required
                   error={validationErrors.burner_replacement_quantity}
-                  sx={{ 
+                  sx={{
                     width: "80px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -608,11 +715,14 @@ const NaturalGasNetworkTabContent = ({
                   size="small"
                   value={formData.burner_replacement_unit_price}
                   onChange={(e) =>
-                    handleInputChange("burner_replacement_unit_price", e.target.value)
+                    handleInputChange(
+                      "burner_replacement_unit_price",
+                      e.target.value
+                    )
                   }
                   required
                   error={validationErrors.burner_replacement_unit_price}
-                  sx={{ 
+                  sx={{
                     width: "100px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -633,7 +743,8 @@ const NaturalGasNetworkTabContent = ({
             {/* Gas Pipes */}
             <TableRow>
               <TableCell>
-                {translations.gasPipes || "Γαλβανισμένος σιδηροσωλήνας κατάλληλος για φυσικό αέριο μαζί με τα απαραίτητα μικρουλικά, βάνες, φίλτρα κ.λπ."}
+                {translations.gasPipes ||
+                  "Γαλβανισμένος σιδηροσωλήνας κατάλληλος για φυσικό αέριο μαζί με τα απαραίτητα μικρουλικά, βάνες, φίλτρα κ.λπ."}
               </TableCell>
               <TableCell align="center">
                 <TextField
@@ -645,7 +756,7 @@ const NaturalGasNetworkTabContent = ({
                   }
                   required
                   error={validationErrors.gas_pipes_quantity}
-                  sx={{ 
+                  sx={{
                     width: "80px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -668,7 +779,7 @@ const NaturalGasNetworkTabContent = ({
                   }
                   required
                   error={validationErrors.gas_pipes_unit_price}
-                  sx={{ 
+                  sx={{
                     width: "100px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -689,7 +800,8 @@ const NaturalGasNetworkTabContent = ({
             {/* Gas Detection Systems */}
             <TableRow>
               <TableCell>
-                {translations.gasDetectionSystems || "Συστήματα Ανίχνευσης διαρροής φυσικού αερίου"}
+                {translations.gasDetectionSystems ||
+                  "Συστήματα Ανίχνευσης διαρροής φυσικού αερίου"}
               </TableCell>
               <TableCell align="center">
                 <TextField
@@ -697,11 +809,14 @@ const NaturalGasNetworkTabContent = ({
                   size="small"
                   value={formData.gas_detection_systems_quantity}
                   onChange={(e) =>
-                    handleInputChange("gas_detection_systems_quantity", e.target.value)
+                    handleInputChange(
+                      "gas_detection_systems_quantity",
+                      e.target.value
+                    )
                   }
                   required
                   error={validationErrors.gas_detection_systems_quantity}
-                  sx={{ 
+                  sx={{
                     width: "80px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -720,11 +835,14 @@ const NaturalGasNetworkTabContent = ({
                   size="small"
                   value={formData.gas_detection_systems_unit_price}
                   onChange={(e) =>
-                    handleInputChange("gas_detection_systems_unit_price", e.target.value)
+                    handleInputChange(
+                      "gas_detection_systems_unit_price",
+                      e.target.value
+                    )
                   }
                   required
                   error={validationErrors.gas_detection_systems_unit_price}
-                  sx={{ 
+                  sx={{
                     width: "100px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -745,7 +863,8 @@ const NaturalGasNetworkTabContent = ({
             {/* Boiler Cleaning */}
             <TableRow>
               <TableCell>
-                {translations.boilerCleaning || "Καθαρισμός λέβητα, ένωση και ρύθμιση καυστήρα"}
+                {translations.boilerCleaning ||
+                  "Καθαρισμός λέβητα, ένωση και ρύθμιση καυστήρα"}
               </TableCell>
               <TableCell align="center">
                 <TextField
@@ -753,11 +872,14 @@ const NaturalGasNetworkTabContent = ({
                   size="small"
                   value={formData.boiler_cleaning_quantity}
                   onChange={(e) =>
-                    handleInputChange("boiler_cleaning_quantity", e.target.value)
+                    handleInputChange(
+                      "boiler_cleaning_quantity",
+                      e.target.value
+                    )
                   }
                   required
                   error={validationErrors.boiler_cleaning_quantity}
-                  sx={{ 
+                  sx={{
                     width: "80px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -776,11 +898,14 @@ const NaturalGasNetworkTabContent = ({
                   size="small"
                   value={formData.boiler_cleaning_unit_price}
                   onChange={(e) =>
-                    handleInputChange("boiler_cleaning_unit_price", e.target.value)
+                    handleInputChange(
+                      "boiler_cleaning_unit_price",
+                      e.target.value
+                    )
                   }
                   required
                   error={validationErrors.boiler_cleaning_unit_price}
-                  sx={{ 
+                  sx={{
                     width: "100px",
                     "& .MuiOutlinedInput-root": {
                       "&:hover fieldset": {
@@ -805,7 +930,9 @@ const NaturalGasNetworkTabContent = ({
 
   const renderEconomicData = () => (
     <div className="space-y-4">
-      <Typography variant="h6" sx={{ fontWeight: "bold", color: "var(--color-primary)", mb: 2 }}>
+      <Typography
+        variant="h6"
+        sx={{ fontWeight: "bold", color: "var(--color-primary)", mb: 2 }}>
         {translations.economicData || "Οικονομικά Στοιχεία"}
       </Typography>
 
@@ -814,7 +941,8 @@ const NaturalGasNetworkTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.currentEnergyCostPerYear || "Ετήσιο κόστος ενέργειας πετρελαίου") + " (€)"
+              (translations.currentEnergyCostPerYear ||
+                "Ετήσιο κόστος ενέργειας πετρελαίου") + " (€)"
             }
             type="number"
             value={formData.current_energy_cost_per_year}
@@ -848,13 +976,17 @@ const NaturalGasNetworkTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.naturalGasCostPerYear || "Ετήσιο κόστος φυσικού αερίου") + " (€)"
+              (translations.naturalGasCostPerYear ||
+                "Ετήσιο κόστος φυσικού αερίου") + " (€)"
             }
             type="number"
             value={formData.natural_gas_cost_per_year}
             InputProps={{ readOnly: true }}
             variant="outlined"
-            helperText={translations.autoCalculatedHelperText || "Υπολογίζεται αυτόματα από τη θερμική απαίτηση και την απόδοση του συστήματος"}
+            helperText={
+              translations.autoCalculatedHelperText ||
+              "Υπολογίζεται αυτόματα από τη θερμική απαίτηση και την απόδοση του συστήματος"
+            }
             sx={{
               "& .MuiInputBase-input": {
                 color: "var(--color-primary)",
@@ -882,13 +1014,17 @@ const NaturalGasNetworkTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.annualEnergySavings || "Ετήσια ενεργειακή εξοικονόμηση") + " (€)"
+              (translations.annualEnergySavings ||
+                "Ετήσια ενεργειακή εξοικονόμηση") + " (€)"
             }
             type="number"
             value={formData.annual_energy_savings}
             InputProps={{ readOnly: true }}
             variant="outlined"
-            helperText={translations.autoCalculatedHelperText || "Υπολογίζεται αυτόματα από τη διαφορά κόστους"}
+            helperText={
+              translations.autoCalculatedHelperText ||
+              "Υπολογίζεται αυτόματα από τη διαφορά κόστους"
+            }
             sx={{
               "& .MuiInputBase-input": {
                 color: "var(--color-primary)",
@@ -917,7 +1053,8 @@ const NaturalGasNetworkTabContent = ({
             fullWidth
             label={
               <>
-                {translations.lifespanYears || "Χρονικό διάστημα"} (έτη) <span style={{ color: "red" }}>*</span>
+                {translations.lifespanYears || "Χρονικό διάστημα"} (έτη){" "}
+                <span style={{ color: "red" }}>*</span>
               </>
             }
             type="number"
@@ -950,14 +1087,13 @@ const NaturalGasNetworkTabContent = ({
             fullWidth
             label={
               <>
-                {translations.discountRate || "Επιτόκιο αναγωγής"} (%) <span style={{ color: "red" }}>*</span>
+                {translations.discountRate || "Επιτόκιο αναγωγής"} (%){" "}
+                <span style={{ color: "red" }}>*</span>
               </>
             }
             type="number"
             value={formData.discount_rate}
-            onChange={(e) =>
-              handleInputChange("discount_rate", e.target.value)
-            }
+            onChange={(e) => handleInputChange("discount_rate", e.target.value)}
             error={validationErrors.discount_rate}
             variant="outlined"
             sx={{
@@ -983,7 +1119,9 @@ const NaturalGasNetworkTabContent = ({
             fullWidth
             label={
               <>
-                {translations.annualOperatingExpenses || "Λειτουργικά έξοδα ανά έτος"} (€) <span style={{ color: "red" }}>*</span>
+                {translations.annualOperatingExpenses ||
+                  "Λειτουργικά έξοδα ανά έτος"}{" "}
+                (€) <span style={{ color: "red" }}>*</span>
               </>
             }
             type="number"
@@ -1016,7 +1154,8 @@ const NaturalGasNetworkTabContent = ({
             fullWidth
             label={
               <>
-                {translations.newSystemEfficiency || "Απόδοση νέου συστήματος"} (%) <span style={{ color: "red" }}>*</span>
+                {translations.newSystemEfficiency || "Απόδοση νέου συστήματος"}{" "}
+                (%) <span style={{ color: "red" }}>*</span>
               </>
             }
             type="number"
@@ -1077,7 +1216,8 @@ const NaturalGasNetworkTabContent = ({
           <TextField
             fullWidth
             label={
-              (translations.naturalGasPricePerKwh || "Τιμή φυσικού αερίου") + " (€/m³)"
+              (translations.naturalGasPricePerKwh || "Τιμή φυσικού αερίου") +
+              " (€/m³)"
             }
             type="number"
             value={formData.natural_gas_price_per_kwh}
@@ -1107,7 +1247,9 @@ const NaturalGasNetworkTabContent = ({
 
   const renderEconomicAnalysis = () => (
     <div className="space-y-4">
-      <Typography variant="h6" sx={{ fontWeight: "bold", color: "var(--color-primary)", mb: 2 }}>
+      <Typography
+        variant="h6"
+        sx={{ fontWeight: "bold", color: "var(--color-primary)", mb: 2 }}>
         {translations.economicAnalysis || "Οικονομική Ανάλυση"}
       </Typography>
 
@@ -1263,8 +1405,7 @@ const NaturalGasNetworkTabContent = ({
               "&:hover": {
                 backgroundColor: "var(--color-primary-dark)",
               },
-            }}
-          >
+            }}>
             {loading
               ? translations.saving || "Αποθήκευση..."
               : translations.save || "Αποθήκευση"}
@@ -1274,12 +1415,18 @@ const NaturalGasNetworkTabContent = ({
 
       {/* Error and Success Messages */}
       {errorKey && (
-        <Alert severity="error" className="mb-4" onClose={() => setErrorKey(null)}>
+        <Alert
+          severity="error"
+          className="mb-4"
+          onClose={() => setErrorKey(null)}>
           {translations[errorKey] || "Error"}
         </Alert>
       )}
       {successKey && (
-        <Alert severity="success" className="mb-4" onClose={() => setSuccessKey(null)}>
+        <Alert
+          severity="success"
+          className="mb-4"
+          onClose={() => setSuccessKey(null)}>
           {translations[successKey] || "Success"}
         </Alert>
       )}
@@ -1308,8 +1455,7 @@ const NaturalGasNetworkTabContent = ({
             "& .MuiTabs-indicator": {
               backgroundColor: "var(--color-primary)",
             },
-          }}
-        >
+          }}>
           <Tab label={translations.systemComponents || "Στοιχεία Συστήματος"} />
           <Tab label={translations.economicData || "Οικονομικά Στοιχεία"} />
           <Tab label={translations.economicAnalysis || "Οικονομική Ανάλυση"} />
