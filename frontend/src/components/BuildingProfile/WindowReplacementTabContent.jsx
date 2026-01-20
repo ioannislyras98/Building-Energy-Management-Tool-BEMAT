@@ -203,7 +203,7 @@ const WindowReplacementTabContent = ({
       "🔵 AutoSave called - existingUuid:",
       existingUuid,
       "| Method:",
-      method
+      method,
     );
 
     $.ajax({
@@ -218,14 +218,14 @@ const WindowReplacementTabContent = ({
         if (response.data && response.data.uuid && !existingUuid) {
           console.log(
             "✅ AutoSave - Created new record, UUID:",
-            response.data.uuid
+            response.data.uuid,
           );
           setExistingUuid(response.data.uuid);
         } else {
           console.log("✅ AutoSave - Updated existing record");
         }
         setSuccess(
-          translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
+          translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς",
         );
         setTimeout(() => setSuccess(null), 3000);
       },
@@ -234,7 +234,7 @@ const WindowReplacementTabContent = ({
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
-            "Σφάλμα κατά την αποθήκευση"
+            "Σφάλμα κατά την αποθήκευση",
         );
       },
     });
@@ -276,7 +276,7 @@ const WindowReplacementTabContent = ({
         field === "new_thermal_conductivity"
           ? value
           : formData.new_thermal_conductivity,
-        field === "window_area" ? value : formData.window_area
+        field === "window_area" ? value : formData.window_area,
       );
     }
     if (debounceTimeout) {
@@ -372,15 +372,21 @@ const WindowReplacementTabContent = ({
         let cumulativeDiscountedCashFlow = 0;
         discountedPaybackPeriod = years + 1; // Default: δεν αποπληρώνεται
         for (let year = 1; year <= years; year++) {
-          const discountedCashFlow = netAnnualSavings / Math.pow(1 + discountRateValue, year);
+          const discountedCashFlow =
+            netAnnualSavings / Math.pow(1 + discountRateValue, year);
           cumulativeDiscountedCashFlow += discountedCashFlow;
           pvSavings += discountedCashFlow;
-          
-          if (cumulativeDiscountedCashFlow >= totalInvestmentCost && discountedPaybackPeriod > years) {
+
+          if (
+            cumulativeDiscountedCashFlow >= totalInvestmentCost &&
+            discountedPaybackPeriod > years
+          ) {
             // Γραμμική παρεμβολή για ακριβέστερο υπολογισμό
-            const previousCumulative = cumulativeDiscountedCashFlow - discountedCashFlow;
-            const fractionOfYear = (totalInvestmentCost - previousCumulative) / discountedCashFlow;
-            discountedPaybackPeriod = (year - 1) + fractionOfYear;
+            const previousCumulative =
+              cumulativeDiscountedCashFlow - discountedCashFlow;
+            const fractionOfYear =
+              (totalInvestmentCost - previousCumulative) / discountedCashFlow;
+            discountedPaybackPeriod = year - 1 + fractionOfYear;
           }
         }
 
@@ -465,7 +471,7 @@ const WindowReplacementTabContent = ({
     if (Object.values(newValidationErrors).some((error) => error)) {
       setError(
         translations.requiredFieldsError ||
-          "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία"
+          "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία",
       );
       return;
     }
@@ -500,7 +506,7 @@ const WindowReplacementTabContent = ({
       "🟢 HandleSubmit called - existingUuid:",
       existingUuid,
       "| Method:",
-      method
+      method,
     );
 
     $.ajax({
@@ -515,14 +521,14 @@ const WindowReplacementTabContent = ({
         if (response.data && response.data.uuid && !existingUuid) {
           console.log(
             "✅ HandleSubmit - Created new record, UUID:",
-            response.data.uuid
+            response.data.uuid,
           );
           setExistingUuid(response.data.uuid);
         } else {
           console.log("✅ HandleSubmit - Updated existing record");
         }
         setSuccess(
-          translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
+          translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς",
         );
         setLoading(false);
       },
@@ -531,7 +537,7 @@ const WindowReplacementTabContent = ({
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
-            "Σφάλμα κατά την αποθήκευση"
+            "Σφάλμα κατά την αποθήκευση",
         );
         setLoading(false);
       },
@@ -997,7 +1003,7 @@ const WindowReplacementTabContent = ({
               {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
-              }
+              },
             )}
             InputProps={{ readOnly: true }}
             sx={{
@@ -1034,7 +1040,7 @@ const WindowReplacementTabContent = ({
               {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
-              }
+              },
             )}
             InputProps={{ readOnly: true }}
             sx={{

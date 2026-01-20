@@ -272,14 +272,20 @@ const HotWaterUpgradeTabContent = ({
       let cumulativeDiscountedCashFlow = 0;
       discountedPaybackPeriod = years + 1; // Default: δεν αποπληρώνεται
       for (let year = 1; year <= years; year++) {
-        const discountedCashFlow = netAnnualBenefit / Math.pow(1 + discountRateDecimal, year);
+        const discountedCashFlow =
+          netAnnualBenefit / Math.pow(1 + discountRateDecimal, year);
         cumulativeDiscountedCashFlow += discountedCashFlow;
         npv += discountedCashFlow;
-        
-        if (cumulativeDiscountedCashFlow >= totalInvestmentCost && discountedPaybackPeriod > years) {
-          const previousCumulative = cumulativeDiscountedCashFlow - discountedCashFlow;
-          const fractionOfYear = (totalInvestmentCost - previousCumulative) / discountedCashFlow;
-          discountedPaybackPeriod = (year - 1) + fractionOfYear;
+
+        if (
+          cumulativeDiscountedCashFlow >= totalInvestmentCost &&
+          discountedPaybackPeriod > years
+        ) {
+          const previousCumulative =
+            cumulativeDiscountedCashFlow - discountedCashFlow;
+          const fractionOfYear =
+            (totalInvestmentCost - previousCumulative) / discountedCashFlow;
+          discountedPaybackPeriod = year - 1 + fractionOfYear;
         }
       }
       npv -= totalInvestmentCost;
@@ -352,7 +358,7 @@ const HotWaterUpgradeTabContent = ({
       // If there's a validation error, update the message with the new language
       setError(
         translations.requiredFieldsError ||
-          "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Στοιχεία Συστήματος με τιμές μεγαλύτερες από 0"
+          "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Στοιχεία Συστήματος με τιμές μεγαλύτερες από 0",
       );
     }
   }, [language, translations]);
@@ -443,19 +449,19 @@ const HotWaterUpgradeTabContent = ({
       if (systemComponentsErrors && economicDataErrors) {
         setError(
           translations.requiredFieldsErrorBoth ||
-            "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Στοιχεία Συστήματος και Τα Οικονομικά Στοιχεία"
+            "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Στοιχεία Συστήματος και Τα Οικονομικά Στοιχεία",
         );
         setTabValue(0);
       } else if (systemComponentsErrors) {
         setError(
           translations.requiredFieldsError ||
-            "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Στοιχεία Συστήματος με τιμές μεγαλύτερες από 0"
+            "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Στοιχεία Συστήματος με τιμές μεγαλύτερες από 0",
         );
         setTabValue(0);
       } else if (economicDataErrors) {
         setError(
           translations.requiredFieldsErrorEconomic ||
-            "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Οικονομικά Στοιχεία"
+            "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία στα Οικονομικά Στοιχεία",
         );
         setTabValue(1);
       }
@@ -482,7 +488,7 @@ const HotWaterUpgradeTabContent = ({
       data: JSON.stringify(submitData),
       success: (response) => {
         setSuccess(
-          translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
+          translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς",
         );
         setLoading(false);
       },
@@ -490,7 +496,7 @@ const HotWaterUpgradeTabContent = ({
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
-            "Σφάλμα κατά την αποθήκευση"
+            "Σφάλμα κατά την αποθήκευση",
         );
         setLoading(false);
       },
@@ -546,7 +552,7 @@ const HotWaterUpgradeTabContent = ({
                   onChange={(e) =>
                     handleInputChange(
                       "solar_collectors_quantity",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   error={validationErrors.solar_collectors_quantity}
@@ -572,7 +578,7 @@ const HotWaterUpgradeTabContent = ({
                   onChange={(e) =>
                     handleInputChange(
                       "solar_collectors_unit_price",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   error={validationErrors.solar_collectors_unit_price}
@@ -608,7 +614,7 @@ const HotWaterUpgradeTabContent = ({
                   onChange={(e) =>
                     handleInputChange(
                       "metal_support_bases_quantity",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   error={validationErrors.metal_support_bases_quantity}
@@ -634,7 +640,7 @@ const HotWaterUpgradeTabContent = ({
                   onChange={(e) =>
                     handleInputChange(
                       "metal_support_bases_unit_price",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   error={validationErrors.metal_support_bases_unit_price}
@@ -727,7 +733,7 @@ const HotWaterUpgradeTabContent = ({
                   onChange={(e) =>
                     handleInputChange(
                       "insulated_pipes_quantity",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   error={validationErrors.insulated_pipes_quantity}
@@ -753,7 +759,7 @@ const HotWaterUpgradeTabContent = ({
                   onChange={(e) =>
                     handleInputChange(
                       "insulated_pipes_unit_price",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   error={validationErrors.insulated_pipes_unit_price}
@@ -790,7 +796,7 @@ const HotWaterUpgradeTabContent = ({
                   onChange={(e) =>
                     handleInputChange(
                       "central_heater_installation_quantity",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   error={validationErrors.central_heater_installation_quantity}
@@ -816,7 +822,7 @@ const HotWaterUpgradeTabContent = ({
                   onChange={(e) =>
                     handleInputChange(
                       "central_heater_installation_unit_price",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   error={
@@ -837,7 +843,7 @@ const HotWaterUpgradeTabContent = ({
               </TableCell>
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
                 {calculatedResults.central_heater_installation_subtotal.toFixed(
-                  2
+                  2,
                 )}
               </TableCell>
             </TableRow>

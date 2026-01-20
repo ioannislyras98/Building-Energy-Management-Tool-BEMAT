@@ -246,15 +246,21 @@ const BulbReplacementTabContent = ({
       let cumulativeDiscountedCashFlow = 0;
       discountedPaybackPeriod = years + 1; // Default: δεν αποπληρώνεται
       for (let year = 1; year <= years; year++) {
-        const discountedCashFlow = netAnnualSavings / Math.pow(1 + discountRate, year);
+        const discountedCashFlow =
+          netAnnualSavings / Math.pow(1 + discountRate, year);
         cumulativeDiscountedCashFlow += discountedCashFlow;
         pvSavings += discountedCashFlow;
-        
-        if (cumulativeDiscountedCashFlow >= totalInvestmentCost && discountedPaybackPeriod > years) {
+
+        if (
+          cumulativeDiscountedCashFlow >= totalInvestmentCost &&
+          discountedPaybackPeriod > years
+        ) {
           // Γραμμική παρεμβολή για ακριβέστερο υπολογισμό
-          const previousCumulative = cumulativeDiscountedCashFlow - discountedCashFlow;
-          const fractionOfYear = (totalInvestmentCost - previousCumulative) / discountedCashFlow;
-          discountedPaybackPeriod = (year - 1) + fractionOfYear;
+          const previousCumulative =
+            cumulativeDiscountedCashFlow - discountedCashFlow;
+          const fractionOfYear =
+            (totalInvestmentCost - previousCumulative) / discountedCashFlow;
+          discountedPaybackPeriod = year - 1 + fractionOfYear;
         }
       }
 
@@ -364,7 +370,7 @@ const BulbReplacementTabContent = ({
           setExistingUuid(response.data.uuid);
         }
         setSuccess(
-          translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς"
+          translations.successSave || "Τα δεδομένα αποθηκεύτηκαν επιτυχώς",
         );
         setLoading(false);
       },
@@ -372,7 +378,7 @@ const BulbReplacementTabContent = ({
         setError(
           jqXHR.responseJSON?.detail ||
             translations.errorSave ||
-            "Σφάλμα κατά την αποθήκευση"
+            "Σφάλμα κατά την αποθήκευση",
         );
         setLoading(false);
       },

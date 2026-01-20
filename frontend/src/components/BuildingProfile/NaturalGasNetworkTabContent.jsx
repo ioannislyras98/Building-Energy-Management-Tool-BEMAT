@@ -184,7 +184,7 @@ const NaturalGasNetworkTabContent = ({
               buildingData.project.oil_price_per_liter
             ) {
               oilPricePerLiter = parseFloat(
-                buildingData.project.oil_price_per_liter
+                buildingData.project.oil_price_per_liter,
               );
             }
 
@@ -243,23 +243,23 @@ const NaturalGasNetworkTabContent = ({
           // Φόρτωση υπολογισμένων αποτελεσμάτων από το backend
           setCalculatedResults({
             burner_replacement_subtotal: parseFloat(
-              data.burner_replacement_subtotal || 0
+              data.burner_replacement_subtotal || 0,
             ),
             gas_pipes_subtotal: parseFloat(data.gas_pipes_subtotal || 0),
             gas_detection_systems_subtotal: parseFloat(
-              data.gas_detection_systems_subtotal || 0
+              data.gas_detection_systems_subtotal || 0,
             ),
             boiler_cleaning_subtotal: parseFloat(
-              data.boiler_cleaning_subtotal || 0
+              data.boiler_cleaning_subtotal || 0,
             ),
             total_investment_cost: parseFloat(data.total_investment_cost || 0),
             annual_economic_benefit: parseFloat(
-              data.annual_economic_benefit || 0
+              data.annual_economic_benefit || 0,
             ),
             payback_period: parseFloat(data.payback_period || 0),
             net_present_value: parseFloat(data.net_present_value || 0),
             internal_rate_of_return: parseFloat(
-              data.internal_rate_of_return || 0
+              data.internal_rate_of_return || 0,
             ),
           });
         } else if (
@@ -372,14 +372,20 @@ const NaturalGasNetworkTabContent = ({
       let cumulativeDiscountedCashFlow = 0;
       discountedPaybackPeriod = years + 1; // Default: δεν αποπληρώνεται
       for (let year = 1; year <= years; year++) {
-        const discountedCashFlow = annualEconomicBenefit / Math.pow(1 + discountRateDecimal, year);
+        const discountedCashFlow =
+          annualEconomicBenefit / Math.pow(1 + discountRateDecimal, year);
         cumulativeDiscountedCashFlow += discountedCashFlow;
         npv += discountedCashFlow;
-        
-        if (cumulativeDiscountedCashFlow >= totalInvestmentCost && discountedPaybackPeriod > years) {
-          const previousCumulative = cumulativeDiscountedCashFlow - discountedCashFlow;
-          const fractionOfYear = (totalInvestmentCost - previousCumulative) / discountedCashFlow;
-          discountedPaybackPeriod = (year - 1) + fractionOfYear;
+
+        if (
+          cumulativeDiscountedCashFlow >= totalInvestmentCost &&
+          discountedPaybackPeriod > years
+        ) {
+          const previousCumulative =
+            cumulativeDiscountedCashFlow - discountedCashFlow;
+          const fractionOfYear =
+            (totalInvestmentCost - previousCumulative) / discountedCashFlow;
+          discountedPaybackPeriod = year - 1 + fractionOfYear;
         }
       }
       npv -= totalInvestmentCost;
@@ -625,23 +631,23 @@ const NaturalGasNetworkTabContent = ({
           // Ενημέρωση calculatedResults με τα επαναϋπολογισμένα αποτελέσματα από το backend
           setCalculatedResults({
             burner_replacement_subtotal: parseFloat(
-              data.burner_replacement_subtotal || 0
+              data.burner_replacement_subtotal || 0,
             ),
             gas_pipes_subtotal: parseFloat(data.gas_pipes_subtotal || 0),
             gas_detection_systems_subtotal: parseFloat(
-              data.gas_detection_systems_subtotal || 0
+              data.gas_detection_systems_subtotal || 0,
             ),
             boiler_cleaning_subtotal: parseFloat(
-              data.boiler_cleaning_subtotal || 0
+              data.boiler_cleaning_subtotal || 0,
             ),
             total_investment_cost: parseFloat(data.total_investment_cost || 0),
             annual_economic_benefit: parseFloat(
-              data.annual_economic_benefit || 0
+              data.annual_economic_benefit || 0,
             ),
             payback_period: parseFloat(data.payback_period || 0),
             net_present_value: parseFloat(data.net_present_value || 0),
             internal_rate_of_return: parseFloat(
-              data.internal_rate_of_return || 0
+              data.internal_rate_of_return || 0,
             ),
           });
         }
@@ -704,7 +710,7 @@ const NaturalGasNetworkTabContent = ({
                   onChange={(e) =>
                     handleInputChange(
                       "burner_replacement_quantity",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   required
@@ -730,7 +736,7 @@ const NaturalGasNetworkTabContent = ({
                   onChange={(e) =>
                     handleInputChange(
                       "burner_replacement_unit_price",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   required
@@ -824,7 +830,7 @@ const NaturalGasNetworkTabContent = ({
                   onChange={(e) =>
                     handleInputChange(
                       "gas_detection_systems_quantity",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   required
@@ -850,7 +856,7 @@ const NaturalGasNetworkTabContent = ({
                   onChange={(e) =>
                     handleInputChange(
                       "gas_detection_systems_unit_price",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   required
@@ -887,7 +893,7 @@ const NaturalGasNetworkTabContent = ({
                   onChange={(e) =>
                     handleInputChange(
                       "boiler_cleaning_quantity",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   required
@@ -913,7 +919,7 @@ const NaturalGasNetworkTabContent = ({
                   onChange={(e) =>
                     handleInputChange(
                       "boiler_cleaning_unit_price",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   required
