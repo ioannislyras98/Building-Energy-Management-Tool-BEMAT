@@ -17,6 +17,7 @@ class HotWaterUpgradeSerializer(serializers.ModelSerializer):
             'annual_solar_savings_kwh',
             'annual_economic_benefit',
             'payback_period',
+            'discounted_payback_period',
             'net_present_value',
             'internal_rate_of_return',
             'created_at',

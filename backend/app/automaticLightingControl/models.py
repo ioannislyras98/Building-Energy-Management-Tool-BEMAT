@@ -137,6 +137,14 @@ class AutomaticLightingControl(models.Model):
         blank=True,
         help_text="Αυτόματος υπολογισμός: Κόστος επένδυσης ÷ Ετήσιο όφελος"
     )
+    discounted_payback_period = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        verbose_name="Προεξοφλημένη περίοδος αποπληρωμής (έτη)",
+        null=True,
+        blank=True,
+        help_text="Αυτόματος υπολογισμός προεξοφλημένης περιόδου αποπληρωμής"
+    )
     net_present_value = models.DecimalField(
         max_digits=12,
         decimal_places=2,
@@ -217,6 +225,23 @@ class AutomaticLightingControl(models.Model):
             years = int(self.time_period)
             annual_benefit = float(self.annual_economic_benefit)
             
+            # Discounted Payback Period calculation
+            if annual_benefit > 0 and discount_rate_decimal > 0:
+                cumulative_discounted_cash_flow = 0
+                self.discounted_payback_period = years + 1  # Default: δεν αποπληρώνεται
+                
+                for year in range(1, years + 1):
+                    discounted_cash_flow = annual_benefit / ((1 + discount_rate_decimal) ** year)
+                    cumulative_discounted_cash_flow += discounted_cash_flow
+                    
+                    if cumulative_discounted_cash_flow >= float(self.total_investment_cost) and self.discounted_payback_period > years:
+                        # Linear interpolation for precise payback period
+                        previous = cumulative_discounted_cash_flow - discounted_cash_flow
+                        fraction = (float(self.total_investment_cost) - previous) / discounted_cash_flow
+                        self.discounted_payback_period = (year - 1) + fraction
+            else:
+                self.discounted_payback_period = 0
+            
             if discount_rate_decimal > 0:
                 # NPV = Σ[Annual_Benefit / (1 + r)^t] - Initial_Investment
                 npv_sum = 0
@@ -283,6 +308,7 @@ class AutomaticLightingControl(models.Model):
             self.annual_energy_savings = 0
             self.annual_economic_benefit = 0
             self.payback_period = None
+            self.discounted_payback_period = 0
             self.net_present_value = 0
             self.internal_rate_of_return = 0
 

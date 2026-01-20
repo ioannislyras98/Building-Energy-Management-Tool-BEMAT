@@ -10,6 +10,7 @@ class ExteriorBlindsSerializer(serializers.ModelSerializer):
     annual_energy_savings = serializers.FloatField(read_only=True)
     annual_economic_benefit = serializers.FloatField(read_only=True)
     payback_period = serializers.FloatField(read_only=True)
+    discounted_payback_period = serializers.FloatField(read_only=True)
     net_present_value = serializers.FloatField(read_only=True)
     internal_rate_of_return = serializers.FloatField(read_only=True)
     
@@ -23,14 +24,14 @@ class ExteriorBlindsSerializer(serializers.ModelSerializer):
             'cooling_energy_savings', 'energy_cost_kwh',
             'time_period', 'discount_rate',
             'total_investment_cost', 'annual_energy_savings', 'annual_economic_benefit',
-            'payback_period', 'net_present_value', 'internal_rate_of_return',
+            'payback_period', 'discounted_payback_period', 'net_present_value', 'internal_rate_of_return',
             'created_at', 'updated_at'
         ]
         read_only_fields = [
             'uuid', 'created_at', 'updated_at',
             'cooling_energy_savings',
             'total_investment_cost', 'annual_energy_savings', 'annual_economic_benefit',
-            'payback_period', 'net_present_value', 'internal_rate_of_return'
+            'payback_period', 'discounted_payback_period', 'net_present_value', 'internal_rate_of_return'
         ]
     
     def to_internal_value(self, data):

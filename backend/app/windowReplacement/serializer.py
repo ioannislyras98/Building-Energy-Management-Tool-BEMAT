@@ -20,13 +20,13 @@ class WindowReplacementSerializer(serializers.ModelSerializer):
             'energy_cost_kwh', 'maintenance_cost_annual', 'lifespan_years',
             'discount_rate', 'energy_savings_summer', 'energy_savings_winter', 'total_energy_savings',
             'annual_cost_savings', 'total_investment_cost', 'payback_period',
-            'net_present_value', 'internal_rate_of_return', 'efficiency_improvement',
+            'discounted_payback_period', 'net_present_value', 'internal_rate_of_return', 'efficiency_improvement',
             'total_lifetime_savings', 'created_at', 'updated_at'
         ]
         read_only_fields = [
             'uuid', 'user', 'created_at', 'updated_at', 'energy_savings_summer',
             'energy_savings_winter', 'total_energy_savings', 'annual_cost_savings',
-            'total_investment_cost', 'payback_period', 'net_present_value',
+            'total_investment_cost', 'payback_period', 'discounted_payback_period', 'net_present_value',
             'internal_rate_of_return', 'efficiency_improvement', 'total_lifetime_savings'
         ]
 

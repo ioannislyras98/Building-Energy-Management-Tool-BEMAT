@@ -39,6 +39,7 @@ class NaturalGasNetwork(models.Model):
     total_investment_cost = models.FloatField(default=0.0, help_text="Total investment cost (€)")
     annual_economic_benefit = models.FloatField(default=0.0, help_text="Annual economic benefit (€)")
     payback_period = models.FloatField(default=0.0, help_text="Payback period (years)")
+    discounted_payback_period = models.FloatField(default=0.0, help_text="Discounted payback period (years)")
     net_present_value = models.FloatField(default=0.0, help_text="Net Present Value (€)")
     internal_rate_of_return = models.FloatField(default=0.0, help_text="Internal Rate of Return (%)")
     
@@ -172,13 +173,25 @@ class NaturalGasNetwork(models.Model):
         discount_rate_decimal = float(self.discount_rate or 5) / 100.0
         years = self.lifespan_years
         npv = 0.0
+        cumulative_discounted_cash_flow = 0.0
+        self.discounted_payback_period = years + 1  # Default: δεν αποπληρώνεται
         
         if self.annual_economic_benefit > 0:
             for year in range(1, years + 1):
-                npv += self.annual_economic_benefit / ((1 + discount_rate_decimal) ** year)
+                discounted_cash_flow = self.annual_economic_benefit / ((1 + discount_rate_decimal) ** year)
+                cumulative_discounted_cash_flow += discounted_cash_flow
+                npv += discounted_cash_flow
+                
+                # Έλεγχος αν έχει αποπληρωθεί η επένδυση
+                if cumulative_discounted_cash_flow >= self.total_investment_cost and self.discounted_payback_period > years:
+                    previous_cumulative = cumulative_discounted_cash_flow - discounted_cash_flow
+                    fraction_of_year = (self.total_investment_cost - previous_cumulative) / discounted_cash_flow
+                    self.discounted_payback_period = (year - 1) + fraction_of_year
+                    
             npv -= self.total_investment_cost
         else:
             npv = -self.total_investment_cost
+            self.discounted_payback_period = 0
         
         self.net_present_value = round(npv, 2)
         

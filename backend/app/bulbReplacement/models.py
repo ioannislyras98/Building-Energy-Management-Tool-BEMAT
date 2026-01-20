@@ -132,6 +132,12 @@ class BulbReplacement(models.Model):
         null=True,
         blank=True
     )
+    discounted_payback_period = models.FloatField(
+        verbose_name="Προεξοφλημένη περίοδος αποπληρωμής (έτη)",
+        help_text="Χρόνος απόσβεσης με προεξόφληση",
+        null=True,
+        blank=True
+    )
     net_present_value = models.FloatField(
         verbose_name="Καθαρή παρούσα αξία (€)",
         help_text="NPV της επένδυσης",
@@ -209,15 +215,24 @@ class BulbReplacement(models.Model):
         else:
             self.payback_period = 0
         
-        # Υπολογισμός NPV (υπολογίζεται και για αρνητικές τιμές)
+        # Υπολογισμός NPV και Discounted Payback Period
         if annual_net_savings != 0:
             pv_savings = 0
+            cumulative_discounted_cash_flow = 0
+            self.discounted_payback_period = int(years) + 1  # Default: δεν αποπληρώνεται
+            
             for year in range(1, int(years) + 1):
-                pv_savings += annual_net_savings / (1 + discount_rate) ** year
+                discounted_cash_flow = annual_net_savings / (1 + discount_rate) ** year
+                cumulative_discounted_cash_flow += discounted_cash_flow
+                pv_savings += discounted_cash_flow
+                
+                # Έλεγχος αν έχει αποπληρωθεί η επένδυση
+                if cumulative_discounted_cash_flow >= self.total_investment_cost and self.discounted_payback_period > years:
+                    previous_cumulative = cumulative_discounted_cash_flow - discounted_cash_flow
+                    fraction_of_year = (self.total_investment_cost - previous_cumulative) / discounted_cash_flow
+                    self.discounted_payback_period = (year - 1) + fraction_of_year
                 
             self.net_present_value = pv_savings - self.total_investment_cost
-        else:
-            self.net_present_value = -self.total_investment_cost
             
             # Calculate IRR using Newton-Raphson method
             if self.total_investment_cost > 0 and annual_net_savings > 0 and years > 0:
@@ -252,6 +267,10 @@ class BulbReplacement(models.Model):
                     self.internal_rate_of_return = guess * 100 if guess > -0.99 else 0
             else:
                 self.internal_rate_of_return = 0
+        else:
+            self.net_present_value = -self.total_investment_cost
+            self.discounted_payback_period = 0
+            self.internal_rate_of_return = 0
 
     def get_efficiency_improvement(self):
         """

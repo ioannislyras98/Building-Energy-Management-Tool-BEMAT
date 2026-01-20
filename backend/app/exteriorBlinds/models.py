@@ -124,6 +124,13 @@ class ExteriorBlinds(models.Model):
         help_text="Αυτόματος υπολογισμός περιόδου αποπληρωμής"
     )
     
+    discounted_payback_period = models.FloatField(
+        verbose_name="Προεξοφλημένη περίοδος αποπληρωμής (έτη)",
+        blank=True,
+        null=True,
+        help_text="Αυτόματος υπολογισμός προεξοφλημένης περιόδου αποπληρωμής"
+    )
+    
     net_present_value = models.DecimalField(
         verbose_name="Καθαρή παρούσα αξία - NPV (€)",
         max_digits=12,
@@ -191,6 +198,29 @@ class ExteriorBlinds(models.Model):
             else:
                 self.payback_period = None
             
+            # Discounted Payback Period calculation
+            if self.annual_economic_benefit > 0 and self.discount_rate > 0:
+                discount_factor = self.discount_rate / 100
+                cumulative_discounted_cash_flow = 0
+                self.discounted_payback_period = None
+                
+                for year in range(1, self.time_period + 1):
+                    discounted_cash_flow = self.annual_economic_benefit / ((1 + discount_factor) ** year)
+                    cumulative_discounted_cash_flow += discounted_cash_flow
+                    
+                    if cumulative_discounted_cash_flow >= self.total_investment_cost:
+                        # Linear interpolation for precise payback period
+                        previous = cumulative_discounted_cash_flow - discounted_cash_flow
+                        fraction = (self.total_investment_cost - previous) / discounted_cash_flow
+                        self.discounted_payback_period = (year - 1) + fraction
+                        break
+                
+                # If payback not achieved within time period, set to time_period + 1
+                if self.discounted_payback_period is None:
+                    self.discounted_payback_period = self.time_period + 1
+            else:
+                self.discounted_payback_period = None
+            
             if self.annual_economic_benefit > 0 and self.discount_rate > 0:
                 discount_factor = self.discount_rate / 100
                 npv = 0
@@ -249,6 +279,7 @@ class ExteriorBlinds(models.Model):
             self.annual_energy_savings = None
             self.annual_economic_benefit = None
             self.payback_period = None
+            self.discounted_payback_period = None
             self.net_present_value = None
             self.internal_rate_of_return = None
     

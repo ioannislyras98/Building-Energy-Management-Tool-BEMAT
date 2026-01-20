@@ -94,6 +94,12 @@ class ExternalWallThermalInsulation(models.Model):
         blank=True,
         help_text="Περίοδος αποπληρωμής της επένδυσης σε έτη"
     )
+    discounted_payback_period = models.FloatField(
+        verbose_name="Προεξοφλημένη περίοδος αποπληρωμής (έτη)",
+        null=True,
+        blank=True,
+        help_text="Προεξοφλημένη περίοδος αποπληρωμής της επένδυσης σε έτη"
+    )
     internal_rate_of_return = models.FloatField(
         verbose_name="Εσωτερικός βαθμός απόδοσης (%)",
         null=True,
@@ -224,6 +230,42 @@ class ExternalWallThermalInsulation(models.Model):
         except (TypeError, ValueError, ZeroDivisionError):
             return None
 
+    def calculate_discounted_payback_period(self):
+        """
+        Calculate discounted payback period in years
+        Finds the time when cumulative discounted cash flows equal initial investment
+        """
+        try:
+            total_cost = float(self.total_cost or 0)
+            annual_benefit = float(self.annual_benefit or 0)
+            annual_operating_costs = float(self.annual_operating_costs or 0)
+            discount_rate = float(self.discount_rate or 5) / 100
+            time_period_years = int(self.time_period_years or 20)
+            
+            if total_cost <= 0 or annual_benefit <= 0 or discount_rate <= 0:
+                return None
+            
+            annual_net_benefit = annual_benefit - annual_operating_costs
+            if annual_net_benefit <= 0:
+                return None
+            
+            cumulative_discounted_cash_flow = 0
+            
+            for year in range(1, time_period_years + 1):
+                discounted_cash_flow = annual_net_benefit / ((1 + discount_rate) ** year)
+                cumulative_discounted_cash_flow += discounted_cash_flow
+                
+                if cumulative_discounted_cash_flow >= total_cost:
+                    # Linear interpolation for precise payback period
+                    previous = cumulative_discounted_cash_flow - discounted_cash_flow
+                    fraction = (total_cost - previous) / discounted_cash_flow
+                    return round((year - 1) + fraction, 2)
+            
+            # If payback not achieved within time period
+            return time_period_years + 1
+        except (TypeError, ValueError, ZeroDivisionError):
+            return None
+
     def calculate_internal_rate_of_return(self):
         """
         Calculate internal rate of return using Newton-Raphson method
@@ -317,6 +359,7 @@ class ExternalWallThermalInsulation(models.Model):
             self.annual_benefit = self.calculate_annual_benefit()
             self.net_present_value = self.calculate_npv()
             self.payback_period = self.calculate_payback_period()
+            self.discounted_payback_period = self.calculate_discounted_payback_period()
             self.internal_rate_of_return = self.calculate_internal_rate_of_return()
             if self.pk:
                 ExternalWallThermalInsulation.objects.filter(pk=self.pk).update(
@@ -324,6 +367,7 @@ class ExternalWallThermalInsulation(models.Model):
                     annual_benefit=self.annual_benefit,
                     net_present_value=self.net_present_value,
                     payback_period=self.payback_period,
+                    discounted_payback_period=self.discounted_payback_period,
                     internal_rate_of_return=self.internal_rate_of_return
                 )
         except Exception as e:

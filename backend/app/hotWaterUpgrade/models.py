@@ -44,6 +44,7 @@ class HotWaterUpgrade(models.Model):
     annual_solar_savings_kwh = models.FloatField(default=0.0)
     annual_economic_benefit = models.FloatField(default=0.0)
     payback_period = models.FloatField(default=0.0)
+    discounted_payback_period = models.FloatField(default=0.0)
     net_present_value = models.FloatField(default=0.0)
     internal_rate_of_return = models.FloatField(default=0.0)
 
@@ -80,19 +81,30 @@ class HotWaterUpgrade(models.Model):
             self.payback_period = 0
             
         discount_rate_decimal = self.discount_rate / 100.0
+        net_annual_benefit = self.annual_economic_benefit - self.annual_operating_expenses
+        
         if self.lifespan_years > 0 and self.annual_economic_benefit > 0:
             npv = 0
+            cumulative_discounted_cash_flow = 0
+            self.discounted_payback_period = self.lifespan_years + 1  # Default: δεν αποπληρώνεται
+            
             for year in range(1, self.lifespan_years + 1):
-                # Subtract annual operating expenses from the benefit
-                net_annual_benefit = self.annual_economic_benefit - self.annual_operating_expenses
-                npv += net_annual_benefit / ((1 + discount_rate_decimal) ** year)
+                discounted_cash_flow = net_annual_benefit / ((1 + discount_rate_decimal) ** year)
+                cumulative_discounted_cash_flow += discounted_cash_flow
+                npv += discounted_cash_flow
+                
+                # Έλεγχος αν έχει αποπληρωθεί η επένδυση
+                if cumulative_discounted_cash_flow >= self.total_investment_cost and self.discounted_payback_period > self.lifespan_years:
+                    previous_cumulative = cumulative_discounted_cash_flow - discounted_cash_flow
+                    fraction_of_year = (self.total_investment_cost - previous_cumulative) / discounted_cash_flow
+                    self.discounted_payback_period = (year - 1) + fraction_of_year
+                    
             self.net_present_value = npv - self.total_investment_cost
         else:
             self.net_present_value = -self.total_investment_cost
+            self.discounted_payback_period = 0
             
         # Calculate IRR using Newton-Raphson method
-        net_annual_benefit = self.annual_economic_benefit - self.annual_operating_expenses
-        
         if self.total_investment_cost > 0 and net_annual_benefit > 0 and self.lifespan_years > 0:
             guess = 0.1  # Initial guess 10%
             max_iterations = 1000

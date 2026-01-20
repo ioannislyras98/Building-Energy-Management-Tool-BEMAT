@@ -10,7 +10,7 @@ class BulbReplacementSerializer(serializers.ModelSerializer):
             'uuid', 'created_at', 'updated_at', 'user',
             'old_consumption_kwh', 'new_consumption_kwh',
             'energy_savings_kwh', 'total_investment_cost',
-            'annual_cost_savings', 'payback_period',
+            'annual_cost_savings', 'payback_period', 'discounted_payback_period',
             'net_present_value', 'internal_rate_of_return'
         )
 

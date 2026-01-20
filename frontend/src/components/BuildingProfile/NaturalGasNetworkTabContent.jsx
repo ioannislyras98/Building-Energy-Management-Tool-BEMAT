@@ -357,6 +357,7 @@ const NaturalGasNetworkTabContent = ({
 
     // Περίοδος απόσβεσης
     let paybackPeriod = 0;
+    let discountedPaybackPeriod = 0;
     if (annualEconomicBenefit > 0 && totalInvestmentCost > 0) {
       paybackPeriod = totalInvestmentCost / annualEconomicBenefit;
     }
@@ -367,8 +368,19 @@ const NaturalGasNetworkTabContent = ({
     let npv = 0;
 
     if (annualEconomicBenefit > 0) {
+      // Calculate Discounted Payback Period
+      let cumulativeDiscountedCashFlow = 0;
+      discountedPaybackPeriod = years + 1; // Default: δεν αποπληρώνεται
       for (let year = 1; year <= years; year++) {
-        npv += annualEconomicBenefit / Math.pow(1 + discountRateDecimal, year);
+        const discountedCashFlow = annualEconomicBenefit / Math.pow(1 + discountRateDecimal, year);
+        cumulativeDiscountedCashFlow += discountedCashFlow;
+        npv += discountedCashFlow;
+        
+        if (cumulativeDiscountedCashFlow >= totalInvestmentCost && discountedPaybackPeriod > years) {
+          const previousCumulative = cumulativeDiscountedCashFlow - discountedCashFlow;
+          const fractionOfYear = (totalInvestmentCost - previousCumulative) / discountedCashFlow;
+          discountedPaybackPeriod = (year - 1) + fractionOfYear;
+        }
       }
       npv -= totalInvestmentCost;
     } else {
@@ -416,6 +428,7 @@ const NaturalGasNetworkTabContent = ({
       total_investment_cost: totalInvestmentCost,
       annual_economic_benefit: annualEconomicBenefit,
       payback_period: paybackPeriod,
+      discounted_payback_period: discountedPaybackPeriod,
       net_present_value: npv,
       internal_rate_of_return: irr,
     });

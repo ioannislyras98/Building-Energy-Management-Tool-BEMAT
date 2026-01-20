@@ -347,6 +347,7 @@ const WindowReplacementTabContent = ({
       let annualCostSavings = 0;
       let totalInvestmentCost = 0;
       let paybackPeriod = 0;
+      let discountedPaybackPeriod = 0;
       let npv = 0;
       let irr = 0;
 
@@ -364,18 +365,28 @@ const WindowReplacementTabContent = ({
         const discountRateValue = parseFloat(discount_rate || 5) / 100;
         const years = parseFloat(lifespan_years) || 20;
         let pvSavings = 0;
+        const netAnnualSavings =
+          annualCostSavings - parseFloat(maintenance_cost_annual || 0);
 
+        // Calculate Discounted Payback Period
+        let cumulativeDiscountedCashFlow = 0;
+        discountedPaybackPeriod = years + 1; // Default: δεν αποπληρώνεται
         for (let year = 1; year <= years; year++) {
-          pvSavings +=
-            (annualCostSavings - parseFloat(maintenance_cost_annual || 0)) /
-            Math.pow(1 + discountRateValue, year);
+          const discountedCashFlow = netAnnualSavings / Math.pow(1 + discountRateValue, year);
+          cumulativeDiscountedCashFlow += discountedCashFlow;
+          pvSavings += discountedCashFlow;
+          
+          if (cumulativeDiscountedCashFlow >= totalInvestmentCost && discountedPaybackPeriod > years) {
+            // Γραμμική παρεμβολή για ακριβέστερο υπολογισμό
+            const previousCumulative = cumulativeDiscountedCashFlow - discountedCashFlow;
+            const fractionOfYear = (totalInvestmentCost - previousCumulative) / discountedCashFlow;
+            discountedPaybackPeriod = (year - 1) + fractionOfYear;
+          }
         }
 
         npv = pvSavings - totalInvestmentCost;
 
         // Calculate IRR using Newton-Raphson method
-        const netAnnualSavings =
-          annualCostSavings - parseFloat(maintenance_cost_annual || 0);
         if (netAnnualSavings > 0 && totalInvestmentCost > 0 && years > 0) {
           let guess = 0.1;
           const maxIterations = 1000;
@@ -416,6 +427,7 @@ const WindowReplacementTabContent = ({
         annual_cost_savings: annualCostSavings,
         total_investment_cost: totalInvestmentCost,
         payback_period: paybackPeriod,
+        discounted_payback_period: discountedPaybackPeriod,
         net_present_value: npv,
         internal_rate_of_return: irr,
       });

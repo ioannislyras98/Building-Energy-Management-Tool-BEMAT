@@ -152,6 +152,7 @@ class AirConditioningAnalysis(models.Model):
     annual_energy_savings = models.FloatField(default=0, help_text="Ετήσια ενεργειακή εξοικονόμηση (€)")
     annual_economic_benefit = models.FloatField(default=0, help_text="Ετήσιο οικονομικό όφελος (€)")
     payback_period = models.FloatField(default=0, help_text="Περίοδος αποπληρωμής (έτη)")
+    discounted_payback_period = models.FloatField(default=0, help_text="Προεξοφλημένη περίοδος αποπληρωμής (έτη)")
     net_present_value = models.FloatField(default=0, help_text="Καθαρή παρούσα αξία (€)")
     internal_rate_of_return = models.FloatField(default=0, help_text="Εσωτερικός βαθμός απόδοσης (%)")
     
@@ -211,10 +212,22 @@ class AirConditioningAnalysis(models.Model):
             discount_rate_decimal = self.discount_rate / 100
             pv_savings = 0
             
+            # Υπολογισμός Discounted Payback Period
+            cumulative_discounted_cash_flow = 0
+            self.discounted_payback_period = self.lifespan_years + 1  # Default: δεν αποπληρώνεται
+            
             if discount_rate_decimal > 0:
                 # NPV = Σ[Annual_Benefit / (1 + r)^t] - Initial_Investment
                 for year in range(1, self.lifespan_years + 1):
-                    pv_savings += self.annual_economic_benefit / ((1 + discount_rate_decimal) ** year)
+                    discounted_cash_flow = self.annual_economic_benefit / ((1 + discount_rate_decimal) ** year)
+                    cumulative_discounted_cash_flow += discounted_cash_flow
+                    pv_savings += discounted_cash_flow
+                    
+                    # Έλεγχος αν έχει αποπληρωθεί η επένδυση
+                    if cumulative_discounted_cash_flow >= self.total_investment_cost and self.discounted_payback_period > self.lifespan_years:
+                        previous_cumulative = cumulative_discounted_cash_flow - discounted_cash_flow
+                        fraction_of_year = (self.total_investment_cost - previous_cumulative) / discounted_cash_flow
+                        self.discounted_payback_period = (year - 1) + fraction_of_year
             else:
                 # Αν δεν υπάρχει προεξοφλητικός συντελεστής
                 pv_savings = self.annual_economic_benefit * self.lifespan_years
@@ -222,6 +235,7 @@ class AirConditioningAnalysis(models.Model):
             self.net_present_value = pv_savings - self.total_investment_cost
         else:
             self.net_present_value = -self.total_investment_cost
+            self.discounted_payback_period = 0
         
         # Calculate IRR using Newton-Raphson method
         if self.total_investment_cost > 0 and self.annual_economic_benefit > 0 and self.lifespan_years > 0:

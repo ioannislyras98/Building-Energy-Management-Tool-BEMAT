@@ -231,6 +231,14 @@ class PhotovoltaicSystem(models.Model):
         verbose_name='Περίοδος απόσβεσης (έτη)',
         validators=[MinValueValidator(0)]
     )
+    discounted_payback_period = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        blank=True, 
+        null=True,
+        verbose_name='Προεξοφλημένη περίοδος απόσβεσης (έτη)',
+        validators=[MinValueValidator(0)]
+    )
     annual_savings = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
@@ -413,6 +421,42 @@ class PhotovoltaicSystem(models.Model):
         except (TypeError, ValueError, ZeroDivisionError):
             return Decimal('0')
     
+    def calculate_discounted_payback_period(self):
+        """
+        Υπολογισμός προεξοφλημένης περιόδου απόσβεσης σε έτη
+        Βρίσκει τον χρόνο όπου οι σωρευτικές προεξοφλημένες ροές ισούνται με την αρχική επένδυση
+        """
+        try:
+            initial_investment = float(self.net_cost or self.total_cost or 0)
+            annual_savings = float(self.annual_savings or 0)
+            annual_operational_costs = float(self.annual_operational_costs or 0)
+            discount_rate = float(self.discount_rate or 5) / 100
+            project_lifetime_years = 25  # Τυπική διάρκεια ζωής φωτοβολταϊκού συστήματος
+            
+            if initial_investment <= 0 or annual_savings <= 0 or discount_rate <= 0:
+                return Decimal('0')
+            
+            annual_net_benefit = annual_savings - annual_operational_costs
+            if annual_net_benefit <= 0:
+                return Decimal('0')
+            
+            cumulative_discounted_cash_flow = 0
+            
+            for year in range(1, project_lifetime_years + 1):
+                discounted_cash_flow = annual_net_benefit / ((1 + discount_rate) ** year)
+                cumulative_discounted_cash_flow += discounted_cash_flow
+                
+                if cumulative_discounted_cash_flow >= initial_investment:
+                    # Linear interpolation for precise payback period
+                    previous = cumulative_discounted_cash_flow - discounted_cash_flow
+                    fraction = (initial_investment - previous) / discounted_cash_flow
+                    return round(Decimal(str((year - 1) + fraction)), 2)
+            
+            # If payback not achieved within time period
+            return Decimal(str(project_lifetime_years + 1))
+        except (TypeError, ValueError, ZeroDivisionError):
+            return Decimal('0')
+    
     def calculate_internal_rate_of_return(self):
         """
         Υπολογισμός IRR με Newton-Raphson method
@@ -577,6 +621,8 @@ class PhotovoltaicSystem(models.Model):
         self.annual_savings = self.calculate_annual_savings()
         
         self.payback_period = self.calculate_payback_period()
+        
+        self.discounted_payback_period = self.calculate_discounted_payback_period()
         
         self.internal_rate_of_return = self.calculate_internal_rate_of_return()
         

@@ -26,7 +26,7 @@ class AirConditioningAnalysisSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('id', 'energy_cost_kwh', 'total_old_consumption', 'total_new_consumption', 
                            'energy_savings_kwh', 'total_investment_cost', 'annual_energy_savings',
-                           'annual_economic_benefit', 'payback_period', 'net_present_value', 
+                           'annual_economic_benefit', 'payback_period', 'discounted_payback_period', 'net_present_value', 
                            'internal_rate_of_return', 'created_at', 'updated_at')
 
 
@@ -49,5 +49,5 @@ class AirConditioningAnalysisCreateSerializer(serializers.ModelSerializer):
         model = AirConditioningAnalysis
         exclude = ('id', 'user', 'energy_cost_kwh', 'total_old_consumption', 'total_new_consumption', 
                   'energy_savings_kwh', 'total_investment_cost', 'annual_energy_savings',
-                  'annual_economic_benefit', 'payback_period', 'net_present_value', 
+                  'annual_economic_benefit', 'payback_period', 'discounted_payback_period', 'net_present_value', 
                   'internal_rate_of_return', 'created_at', 'updated_at')

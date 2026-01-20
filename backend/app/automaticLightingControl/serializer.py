@@ -24,6 +24,11 @@ class AutomaticLightingControlSerializer(serializers.ModelSerializer):
         decimal_places=2, 
         read_only=True
     )
+    discounted_payback_period = serializers.DecimalField(
+        max_digits=8, 
+        decimal_places=2, 
+        read_only=True
+    )
     net_present_value = serializers.DecimalField(
         max_digits=12, 
         decimal_places=2, 
@@ -62,6 +67,7 @@ class AutomaticLightingControlSerializer(serializers.ModelSerializer):
             'annual_energy_savings',
             'annual_economic_benefit',
             'payback_period',
+            'discounted_payback_period',
             'net_present_value',
             'internal_rate_of_return',
             'created_at',
@@ -77,6 +83,7 @@ class AutomaticLightingControlSerializer(serializers.ModelSerializer):
             'annual_energy_savings',
             'annual_economic_benefit',
             'payback_period',
+            'discounted_payback_period',
             'net_present_value',
             'internal_rate_of_return',
         ]

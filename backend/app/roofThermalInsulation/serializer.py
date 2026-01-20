@@ -33,11 +33,11 @@ class RoofThermalInsulationSerializer(serializers.ModelSerializer):
             'u_coefficient', 'winter_hourly_losses', 'summer_hourly_losses',
             'heating_hours_per_year', 'cooling_hours_per_year', 'total_cost',
             'annual_benefit', 'time_period_years', 'annual_operating_costs',
-            'discount_rate', 'net_present_value', 'payback_period', 'internal_rate_of_return',
+            'discount_rate', 'net_present_value', 'payback_period', 'discounted_payback_period', 'internal_rate_of_return',
             'old_materials', 'new_materials', 'created_at', 'updated_at', 'created_by', 'created_by_name'
         ]
         read_only_fields = ['uuid', 'created_at', 'updated_at', 'created_by', 
-                          'payback_period', 'internal_rate_of_return', 'net_present_value', 'annual_benefit']
+                          'payback_period', 'discounted_payback_period', 'internal_rate_of_return', 'net_present_value', 'annual_benefit']
 
     def get_old_materials(self, obj):
         old_materials = obj.material_layers.filter(material_type='old')
@@ -62,7 +62,7 @@ class RoofThermalInsulationListSerializer(serializers.ModelSerializer):
         model = RoofThermalInsulation
         fields = [
             'uuid', 'building_name', 'project_name', 'u_coefficient',
-            'total_cost', 'annual_benefit', 'net_present_value', 'payback_period', 'internal_rate_of_return',
+            'total_cost', 'annual_benefit', 'net_present_value', 'payback_period', 'discounted_payback_period', 'internal_rate_of_return',
             'old_materials_count', 'new_materials_count', 'created_at'
         ]
 
