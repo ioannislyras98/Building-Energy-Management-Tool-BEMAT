@@ -56,7 +56,7 @@ const ProjectsManagement = () => {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       const data = response.data;
@@ -88,7 +88,7 @@ const ProjectsManagement = () => {
             "Content-Type": "application/json",
           },
           data: { project_ids: projectIds },
-        }
+        },
       );
 
       const data = response.data;
@@ -139,7 +139,7 @@ const ProjectsManagement = () => {
                 ]);
               } else {
                 setSelectedProjects((prev) =>
-                  prev.filter((id) => !filteredProjectIds.includes(id))
+                  prev.filter((id) => !filteredProjectIds.includes(id)),
                 );
               }
             }
@@ -157,7 +157,7 @@ const ProjectsManagement = () => {
               setSelectedProjects([...selectedProjects, project.id]);
             } else {
               setSelectedProjects(
-                selectedProjects.filter((id) => id !== project.id)
+                selectedProjects.filter((id) => id !== project.id),
               );
             }
           }}
@@ -261,7 +261,7 @@ const ProjectsManagement = () => {
           {project.date_created
             ? new Date(project.date_created).toLocaleDateString(
                 language === "en" ? "en-US" : "el-GR",
-                { year: "numeric", month: "short", day: "numeric" }
+                { year: "numeric", month: "short", day: "numeric" },
               )
             : "N/A"}
         </div>
