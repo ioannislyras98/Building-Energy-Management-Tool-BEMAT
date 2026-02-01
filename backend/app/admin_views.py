@@ -122,7 +122,6 @@ def admin_user_detail(request, user_uuid):
             'name': project.name,
             'date_created': project.date_created.strftime('%Y-%m-%d'),
             'buildings_count': project.buildings_count,
-            'cost_per_kwh_fuel': str(project.cost_per_kwh_fuel),
             'cost_per_kwh_electricity': str(project.cost_per_kwh_electricity)
         } for project in projects]
         
@@ -288,7 +287,7 @@ def admin_projects_table(request):
         valid_sort_fields = [
             'name', '-name', 'date_created', '-date_created', 'is_submitted', 
             '-is_submitted', 'user__email', '-user__email', 'buildings_count', 
-            '-buildings_count', 'cost_per_kwh_fuel', '-cost_per_kwh_fuel'
+            '-buildings_count'
         ]
         
         if sort_by in valid_sort_fields:
@@ -311,7 +310,7 @@ def admin_projects_table(request):
                 'is_submitted': project.is_submitted,
                 'date_created': project.date_created.isoformat() if project.date_created else None,
                 'buildings_count': project.buildings_count,
-                'cost_per_kwh_fuel': float(project.cost_per_kwh_fuel) if project.cost_per_kwh_fuel else 0,
+                'oil_price_per_liter': float(project.oil_price_per_liter) if project.oil_price_per_liter else 0,
                 'cost_per_kwh_electricity': float(project.cost_per_kwh_electricity) if project.cost_per_kwh_electricity else 0,
             })
         

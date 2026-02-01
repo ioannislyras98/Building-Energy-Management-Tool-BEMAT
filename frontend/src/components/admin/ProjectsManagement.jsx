@@ -233,12 +233,12 @@ const ProjectsManagement = () => {
       ),
     },
     {
-      key: "cost_per_kwh_fuel",
-      title: translations?.fuelCost || "Fuel Cost",
-      sortable: true,
+      key: "oil_price_per_liter",
+      title: translations?.oilPrice || "Oil Price",
+      sortable: false,
       render: (project) => (
         <div className="text-sm text-gray-900">
-          €{project.cost_per_kwh_fuel?.toFixed(3) || "0.000"}/kWh
+          €{project.oil_price_per_liter?.toFixed(3) || "0.000"}/L
         </div>
       ),
     },
