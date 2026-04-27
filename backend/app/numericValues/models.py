@@ -54,6 +54,7 @@ class NumericValue(models.Model):
                 'Εξωτερική (Rse)': 0.04,
                 'Ηλιακή ακτινοβολία (kWh/m²/έτος)': 1600.0,
                 'Performance Ratio (PR)': 0.80,
+                'Απόδοση αναφοράς συλλέκτη (%)': 21.0,
                 'Απρόβλεπτα έξοδα (%)': 9.0,
                 'Φορολογική επιβάρυνση (%)': 24.0,
                 'Συντελεστής μετατροπής BTU σε Watts': 0.293,
@@ -116,6 +117,11 @@ def create_default_numeric_values():
         {
             'name': 'Performance Ratio (PR)',
             'value': 0.80,
+            'created_by': admin_user
+        },
+        {
+            'name': 'Απόδοση αναφοράς συλλέκτη (%)',
+            'value': 21.0,
             'created_by': admin_user
         },
         {

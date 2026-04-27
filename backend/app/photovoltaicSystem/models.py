@@ -535,14 +535,14 @@ class PhotovoltaicSystem(models.Model):
         """
         Αυτόματος υπολογισμός της ετήσιας παραγωγής ενέργειας (kWh/έτος)
         
-        Τύπος: E = P × efficiency × n × H × PR
+        Τύπος: E = (P / 1000) × n × H × PR_adjusted × (η / ηref)
         Όπου:
         - E: Ετήσια παραγωγή ενέργειας (kWh/έτος)
-        - P: Ονομαστική ισχύς ανά πλαίσιο (kW) - μετατροπή από W
-        - efficiency: Απόδοση συλλέκτη (%)
+        - P: Ονομαστική ισχύς ανά πλαίσιο (W) - μετατροπή σε kW με /1000
         - n: Αριθμός πλαισίων
         - H: Ηλιακή ακτινοβολία (kWh/m²/έτος) - παίρνεται από τον νομό του κτιρίου
-        - PR: Performance Ratio (Συντελεστής απόδοσης συστήματος) - τυπική τιμή: 0.8
+        - PR_adjusted: Performance Ratio προσαρμοσμένο με βάση την κλίση
+        - η/ηref: λόγος απόδοσης συλλέκτη προς απόδοση αναφοράς
         """
         try:
             if not self.pv_panels_quantity or not self.power_per_panel or not self.installation_angle or not self.collector_efficiency:
@@ -550,7 +550,7 @@ class PhotovoltaicSystem(models.Model):
             
             power_per_panel_kw = float(self.power_per_panel) / 1000.0
             num_panels = float(self.pv_panels_quantity)
-            collector_efficiency = float(self.collector_efficiency) / 100.0
+            collector_efficiency_pct = float(self.collector_efficiency)
             
             # Προσπάθεια να πάρουμε την ηλιακή ακτινοβολία από τον νομό του κτιρίου
             solar_irradiation = 1600.0  # Default value
@@ -563,20 +563,26 @@ class PhotovoltaicSystem(models.Model):
                 solar_irradiation = NumericValue.get_value('Ηλιακή ακτινοβολία (kWh/m²/έτος)')
             
             from numericValues.models import NumericValue
-            performance_ratio = NumericValue.get_value('Performance Ratio (PR)')
+            performance_ratio_base = NumericValue.get_value('Performance Ratio (PR)')
+            reference_collector_efficiency = NumericValue.get_value('Απόδοση αναφοράς συλλέκτη (%)')
+            
+            if reference_collector_efficiency <= 0:
+                reference_collector_efficiency = 21.0
+            
+            collector_efficiency_factor = collector_efficiency_pct / reference_collector_efficiency
             
             angle = float(self.installation_angle)
             optimal_angle = 32.0
             angle_difference = abs(angle - optimal_angle)
             angle_loss_factor = max(0.90, 1.0 - (angle_difference * 0.005))
-            performance_ratio *= angle_loss_factor
+            performance_ratio_adjusted = performance_ratio_base * angle_loss_factor
             
             annual_production = (
                 power_per_panel_kw * 
-                collector_efficiency *
                 num_panels * 
                 solar_irradiation * 
-                performance_ratio
+                performance_ratio_adjusted *
+                collector_efficiency_factor
             )
             
             return round(Decimal(str(annual_production)), 2)

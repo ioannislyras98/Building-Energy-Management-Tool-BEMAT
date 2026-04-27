@@ -87,17 +87,18 @@
 **Βασικός Τύπος:**
 
 ```
-E = P × efficiency × n × H × PR
+E = (P / 1000) × n × H × PR_adjusted × (η / ηref)
 ```
 
 Όπου:
 
 - **E**: Ετήσια παραγωγή ενέργειας (kWh/έτος)
-- **P**: Ονομαστική ισχύς ανά φωτοβολταϊκό πλαίσιο (kW) - μετατρέπεται από W
-- **efficiency**: Απόδοση συλλέκτη (%) - π.χ. 80% = 0.80
+- **P**: Ονομαστική ισχύς ανά φωτοβολταϊκό πλαίσιο (W) - μετατρέπεται σε kW με διαίρεση `/1000`
 - **n**: Αριθμός φωτοβολταϊκών πλαισίων
 - **H**: Ηλιακή ακτινοβολία (kWh/m²/έτος) - Ανακτάται από NumericValue με default 1600 για Ελλάδα (admin-editable)
-- **PR**: Performance Ratio (Συντελεστής απόδοσης συστήματος) - Ανακτάται από NumericValue με default 0.80 (admin-editable)
+- **PR_adjusted**: Προσαρμοσμένο Performance Ratio (PR × συντελεστής απώλειας κλίσης)
+- **η**: Απόδοση συλλέκτη που δίνει ο χρήστης (%)
+- **ηref**: Απόδοση αναφοράς συλλέκτη (%) - Ανακτάται από NumericValue με default 21.0 (admin-editable)
 
 **Performance Ratio (PR):**
 
@@ -122,16 +123,16 @@ PR_adjusted = PR_base × Angle_loss_factor
 
 **Απόδοση Συλλέκτη (collector_efficiency):**
 
-Η απόδοση των φωτοβολταϊκών πλαισίων (π.χ. 80%) εφαρμόζεται πάνω στην ονομαστική ισχύ. Για παράδειγμα:
+Η απόδοση συλλέκτη δεν εφαρμόζεται πλέον ως άμεσος πολλαπλασιαστής της ισχύος (για να μην υπάρξει διπλομέτρηση). Αντί για αυτό χρησιμοποιείται ο λόγος `η / ηref`.
 
-- Ονομαστική ισχύς πλαισίου: 400W
-- Απόδοση συλλέκτη: 80%
-- **Πραγματική ισχύς: 400W × 0.80 = 320W**
+- Αν `η = ηref`, ο λόγος είναι `1` και ο υπολογισμός μένει στη baseline συμπεριφορά.
+- Αν `η > ηref`, η παραγωγή αυξάνεται αναλογικά.
+- Αν `η < ηref`, η παραγωγή μειώνεται αναλογικά.
 
 **Τελικός Υπολογισμός:**
 
 ```
-Annual_energy_production = (power_per_panel / 1000) × (efficiency / 100) × pv_panels_quantity × H × PR_adjusted
+Annual_energy_production = (power_per_panel / 1000) × pv_panels_quantity × H × PR_adjusted × (collector_efficiency / collector_reference_efficiency)
 ```
 
 #### Οικονομικοί Υπολογισμοί
@@ -195,20 +196,19 @@ CO2_savings = Annual_energy_production × CO2_factor
 
 ```
 Δεδομένα:
-- Αριθμός πλαισίων (n): 20
-- Ονομαστική ισχύς ανά πλαίσιο (P): 400W = 0.4 kW
-- Απόδοση συλλέκτη: 80%
-- Ηλιακή ακτινοβολία (H): 1600 kWh/m²/έτος
-- Κλίση: 32° (βέλτιστη)
-- Performance Ratio (PR): 0.80
+- Αριθμός πλαισίων (n): 6
+- Ονομαστική ισχύς ανά πλαίσιο (P): 500W
+- Ηλιακή ακτινοβολία (H): 2003.87 kWh/m²/έτος
+- PR_adjusted: 0.77878
+- Απόδοση συλλέκτη (η): 21%
+- Απόδοση αναφοράς (ηref): 21%
 
 Υπολογισμός:
-- Πραγματική ισχύς = 0.4 kW × 0.80 = 0.32 kW
-- Angle_loss_factor = 1.0 (βέλτιστη γωνία)
-- PR_adjusted = 0.80 × 1.0 = 0.80
+- (P / 1000) = 0.5 kW
+- (η / ηref) = 21 / 21 = 1
 
-E = 0.4 kW × 0.80 × 20 × 1600 kWh/m²/έτος × 0.80
-E = 8,192 kWh/έτος
+E = (500 / 1000) × 6 × 2003.87 × 0.77878 × (21 / 21)
+E = 4,681.72 kWh/έτος
 ```
 
 ### Υλοποίηση
@@ -216,7 +216,7 @@ E = 8,192 kWh/έτος
 - **Backend**: `photovoltaicSystem/models.py`
 - **Frontend**: `PhotovoltaicSystemTabContent.jsx`
 - **API Endpoints**: `/photovoltaic_systems/`
-- **NumericValue**: `Ηλιακή ακτινοβολία (kWh/m²/έτος)` - Επεξεργάσιμο από admin
+- **NumericValue**: `Ηλιακή ακτινοβολία (kWh/m²/έτος)`, `Performance Ratio (PR)`, `Απόδοση αναφοράς συλλέκτη (%)` - Επεξεργάσιμα από admin
 
 ---
 
@@ -809,7 +809,7 @@ Energy_savings = (U_before - U_after) × Area × Degree_days × 24 ÷ 1000
 **Ετήσια Παραγωγή:**
 
 ```
-Annual_production = Panel_capacity × Peak_sun_hours × 365 × System_efficiency
+Annual_production = (power_per_panel / 1000) × pv_panels_quantity × H × PR_adjusted × (collector_efficiency / collector_reference_efficiency)
 ```
 
 **Κόστος Συστήματος:**

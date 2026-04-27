@@ -48,6 +48,11 @@ class Command(BaseCommand):
                 'created_by': admin_user
             },
             {
+                'name': 'Απόδοση αναφοράς συλλέκτη (%)',
+                'value': 21.0,
+                'created_by': admin_user
+            },
+            {
                 'name': 'Απρόβλεπτα έξοδα (%)',
                 'value': 9.0,
                 'created_by': admin_user
